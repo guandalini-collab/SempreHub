@@ -54,7 +54,7 @@ Os arquivos oficiais da marca ficam junto aos recursos visuais da aplicação, e
 
 ### Como a interface consome o logo
 
-O `Dashboard` importa o arquivo pelo próprio pipeline do Vite, de modo que o hash e o caminho final de
+Os componentes da interface (`frontend/src/componentes/ui.tsx` e a tela de entrada) importam o arquivo pelo próprio pipeline do Vite, de modo que o hash e o caminho final de
 build sejam resolvidos automaticamente:
 
 ```tsx
@@ -63,8 +63,11 @@ import logoSempreHub from "./assets/SempreHub.jpg";
 <img src={logoSempreHub} alt="Logotipo SempreHub" className="h-14 w-14 rounded-lg object-contain" />
 ```
 
-O logo é exibido no topo do cabeçalho do jogo, imediatamente à esquerda do título **SempreHub** e da
-assinatura *Ecossistema de Aceleração de Negócios*.
+O logo é exibido na tela de entrada e no cabeçalho de todas as páginas, imediatamente à esquerda do título
+**SempreHub** e da assinatura *Ecossistema de Aceleração de Negócios*. Uma cópia em `frontend/public/favicon.jpg`
+é usada como ícone da aba do navegador.
+
+No Tailwind, as cores institucionais estão disponíveis como `marinho` (`#0B2545`) e `ouro` (`#C5A059`).
 
 ### Diretrizes de aplicação
 

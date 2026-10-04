@@ -4,8 +4,9 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: {
+    // Em desenvolvimento, as chamadas a /api vão para o backend FastAPI
     proxy: {
-      "/partidas": {
+      "/api": {
         target: "http://127.0.0.1:8000",
         changeOrigin: true,
       },

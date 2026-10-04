@@ -18,6 +18,10 @@ build/
 # Variáveis de ambiente
 .env
 .env.*
+!.env.example
 
 # Sistema
 .DS_Store
+
+# Testes
+.pytest_cache/

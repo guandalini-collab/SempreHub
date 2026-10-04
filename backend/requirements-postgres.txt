@@ -1,0 +1,4 @@
+# Use no servidor quando DATABASE_URL apontar para PostgreSQL:
+#   pip install -r requirements-postgres.txt
+-r requirements.txt
+psycopg2-binary>=2.9

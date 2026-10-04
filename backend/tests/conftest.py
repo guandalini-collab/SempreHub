@@ -1,0 +1,40 @@
+import os
+import sys
+from pathlib import Path
+
+import pytest
+
+# Banco isolado para os testes
+_BANCO = Path(__file__).parent / "teste.db"
+os.environ["DATABASE_URL"] = f"sqlite:///{_BANCO}"
+os.environ["SEMPREHUB_CODIGO_DOCENTE"] = "codigo-teste"
+os.environ["SEMPREHUB_FRONTEND_DIST"] = str(Path(__file__).parent / "sem-frontend")
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from fastapi.testclient import TestClient  # noqa: E402
+
+from app.database import Base, engine  # noqa: E402
+from app.main import app  # noqa: E402
+
+
+@pytest.fixture()
+def cliente():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    with TestClient(app) as c:
+        yield c
+    Base.metadata.drop_all(bind=engine)
+
+
+def cadastrar(cliente, nome, email, papel="ALUNO", codigo=None):
+    resposta = cliente.post(
+        "/api/auth/cadastro",
+        json={"nome": nome, "email": email, "senha": "senha-segura", "papel": papel, "codigo_docente": codigo},
+    )
+    assert resposta.status_code == 201, resposta.text
+    return {"Authorization": f"Bearer {resposta.json()['token']}"}
+
+
+@pytest.fixture()
+def professor(cliente):
+    return cadastrar(cliente, "Prof. Teste", "prof@iffarroupilha.edu.br", "PROFESSOR", "codigo-teste")
