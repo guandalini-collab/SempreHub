@@ -1,0 +1,23 @@
+# Dependências
+node_modules/
+backend/venv/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Build
+dist/
+build/
+
+# Banco de dados local (recriado ao rodar o backend)
+*.db
+
+# Variáveis de ambiente
+.env
+.env.*
+
+# Sistema
+.DS_Store
