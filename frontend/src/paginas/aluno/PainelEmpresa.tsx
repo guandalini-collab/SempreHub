@@ -330,40 +330,40 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
       <form onSubmit={enviar} className="space-y-6">
         <Secao titulo="Mercado e posicionamento">
           <Campo
-            rotulo="Preço de venda (R$ por unidade)"
+            rotulo="Preço de venda (por unidade)"
             ajuda={`Preço de referência do mercado: ${reais(p.preco_referencia)}. Custo da mercadoria: ${reais(p.custo_unitario)}.`}
           >
-            <EntradaNumero valor={d.preco} aoMudar={(v) => atualizar("preco", v)} minimo={1} passo={0.5} />
+            <EntradaNumero moeda valor={d.preco} aoMudar={(v) => atualizar("preco", v)} minimo={0.01} />
           </Campo>
-          <Campo rotulo="Marketing (R$ no mês)" ajuda={`Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
-            <EntradaNumero valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} passo={100} />
+          <Campo rotulo="Marketing (no mês)" ajuda={`Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
+            <EntradaNumero moeda valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} />
           </Campo>
-          <Campo rotulo="Pesquisa e desenvolvimento (R$ no mês)" ajuda={`Melhora a qualidade percebida. Índice atual: ${umDecimal(empresa.qualidade)}.`}>
-            <EntradaNumero valor={d.pd} aoMudar={(v) => atualizar("pd", v)} passo={100} />
+          <Campo rotulo="Pesquisa e desenvolvimento (no mês)" ajuda={`Melhora a qualidade percebida. Índice atual: ${umDecimal(empresa.qualidade)}.`}>
+            <EntradaNumero moeda valor={d.pd} aoMudar={(v) => atualizar("pd", v)} />
           </Campo>
-          <Campo rotulo="Networking e capacitação (R$ no mês)" ajuda="Rede de contadores e parceiros. Networking ≥ 30 evita multas em fiscalizações.">
-            <EntradaNumero valor={d.networking} aoMudar={(v) => atualizar("networking", v)} passo={50} />
+          <Campo rotulo="Networking e capacitação (no mês)" ajuda="Rede de contadores e parceiros. Networking ≥ 30 evita multas em fiscalizações.">
+            <EntradaNumero moeda valor={d.networking} aoMudar={(v) => atualizar("networking", v)} />
           </Campo>
         </Secao>
 
         <Secao titulo="Equipe">
           <Campo rotulo="Contratar" ajuda={`Salário-base ${reais(p.salario_base)}; com encargos (×${previsao.regime === "LUCRO_PRESUMIDO" ? "1,82" : "1,45"}).`}>
-            <EntradaNumero valor={d.contratar} aoMudar={(v) => atualizar("contratar", Math.round(v))} />
+            <EntradaNumero inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} />
           </Campo>
           <Campo rotulo="Demitir" ajuda={`Hoje: ${empresa.funcionarios} funcionário(s). Rescisão custa um salário.`}>
-            <EntradaNumero valor={d.demitir} aoMudar={(v) => atualizar("demitir", Math.round(v))} />
+            <EntradaNumero inteiro valor={d.demitir} aoMudar={(v) => atualizar("demitir", v)} />
           </Campo>
         </Secao>
 
         <Secao titulo="Finanças e tributos">
           <Campo
-            rotulo="Novo empréstimo (R$)"
+            rotulo="Novo empréstimo"
             ajuda={`Juros de ${percentual(p.taxa_juros_mensal, 2)} ao mês. Limite disponível: ${reais(Math.max(0, p.limite_credito - empresa.divida))}.`}
           >
-            <EntradaNumero valor={d.emprestimo} aoMudar={(v) => atualizar("emprestimo", v)} passo={1000} />
+            <EntradaNumero moeda valor={d.emprestimo} aoMudar={(v) => atualizar("emprestimo", v)} />
           </Campo>
-          <Campo rotulo="Amortizar dívida (R$)" ajuda={`Dívida atual: ${reais(empresa.divida)}.`}>
-            <EntradaNumero valor={d.amortizacao} aoMudar={(v) => atualizar("amortizacao", v)} passo={1000} />
+          <Campo rotulo="Amortizar dívida" ajuda={`Dívida atual: ${reais(empresa.divida)}.`}>
+            <EntradaNumero moeda valor={d.amortizacao} aoMudar={(v) => atualizar("amortizacao", v)} />
           </Campo>
           <Campo
             rotulo="Regime tributário"

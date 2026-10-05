@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { encerrarSessao, quandoSessaoExpirar, sessaoSalva } from "./api";
 import { Cabecalho } from "./componentes/ui";
-import Entrar from "./paginas/Entrar";
+import Entrar, { RedefinirSenha } from "./paginas/Entrar";
 import InicioAluno from "./paginas/aluno/InicioAluno";
 import PainelEmpresa from "./paginas/aluno/PainelEmpresa";
 import InicioProfessor from "./paginas/professor/InicioProfessor";
@@ -10,10 +10,17 @@ import PainelTurma from "./paginas/professor/PainelTurma";
 import type { Usuario } from "./tipos";
 
 /** Rotas simples baseadas no endereço após "#", para funcionar em qualquer hospedagem estática. */
-type Rota = { pagina: "inicio" } | { pagina: "empresa"; id: number } | { pagina: "turma"; id: number };
+type Rota =
+  | { pagina: "inicio" }
+  | { pagina: "empresa"; id: number }
+  | { pagina: "turma"; id: number }
+  | { pagina: "redefinir"; token: string };
 
 function lerRota(): Rota {
   const [, pagina, id] = window.location.hash.replace(/^#/, "").split("/");
+  if (pagina === "redefinir-senha" && id) {
+    return { pagina: "redefinir", token: id };
+  }
   if ((pagina === "empresa" || pagina === "turma") && Number(id) > 0) {
     return { pagina, id: Number(id) };
   }
@@ -38,6 +45,18 @@ export default function App() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [rota]);
+
+  if (rota.pagina === "redefinir") {
+    return (
+      <RedefinirSenha
+        token={rota.token}
+        aoConcluir={(novo) => {
+          setUsuario(novo);
+          irPara("/");
+        }}
+      />
+    );
+  }
 
   if (!usuario) {
     return <Entrar aoEntrar={setUsuario} />;

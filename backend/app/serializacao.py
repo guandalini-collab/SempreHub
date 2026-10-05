@@ -26,7 +26,13 @@ CAMPOS_PARAMETROS = [
 
 
 def usuario(u: Usuario) -> Dict[str, Any]:
-    return {"id": u.id, "nome": u.nome, "email": u.email, "papel": u.papel.value}
+    return {
+        "id": u.id,
+        "nome": u.nome,
+        "email": u.email,
+        "papel": u.papel.value,
+        "teste": u.criado_por_id is not None,
+    }
 
 
 def turma(t: Turma, completa: bool = False) -> Dict[str, Any]:
@@ -112,6 +118,7 @@ def empresa(e: Empresa) -> Dict[str, Any]:
         "id": e.id,
         "nome": e.nome,
         "aluno": e.aluno.nome if e.aluno else None,
+        "aluno_id": e.aluno_id,
         "aluno_email": e.aluno.email if e.aluno else None,
         "tipo_entrada_gem": e.tipo_entrada_gem.value,
         "classe_dornelas": e.classe_dornelas.value,

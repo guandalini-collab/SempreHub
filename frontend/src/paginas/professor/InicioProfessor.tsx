@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { api } from "../../api";
 import { Aviso, Botao, Campo, Carregando, Cartao, estiloEntrada } from "../../componentes/ui";
 import type { Turma } from "../../tipos";
+import AlunosTeste from "./AlunosTeste";
 import { EditorParametros, useParametros } from "./Parametros";
 
 export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: number) => void }) {
@@ -61,6 +62,8 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
           </button>
         ))}
       </div>
+
+      <AlunosTeste />
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
 } from "../../componentes/ui";
 import { NOME_DORNELAS, NOME_GEM, NOME_REGIME, inteiro, percentual, reais } from "../../formatos";
 import type { Decisao, DetalheTurma, Empresa, OpcaoEvento, Parametros, Resultado } from "../../tipos";
+import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
 
 const INTERVALO_ATUALIZACAO_MS = 15000;
@@ -376,6 +377,7 @@ function DetalheEmpresa({ turmaId, empresaId, aoFechar }: { turmaId: number; emp
             <span>{dados.empresa.aluno} · {dados.empresa.aluno_email}</span>
             <SeloFase fase={dados.empresa.fase_atual} />
           </div>
+          <BotaoRedefinirSenha alunoId={dados.empresa.aluno_id} nome={dados.empresa.aluno ?? "o aluno"} />
           <div className="grid grid-cols-2 gap-3 rounded-lg bg-slate-50 p-3 text-sm sm:grid-cols-4">
             <Dado rotulo="Perfil" valor={`${NOME_GEM[dados.empresa.tipo_entrada_gem]}`} />
             <Dado rotulo="Tipo" valor={NOME_DORNELAS[dados.empresa.classe_dornelas]} />

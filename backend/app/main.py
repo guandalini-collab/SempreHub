@@ -6,10 +6,10 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .config import CORS_ORIGINS, FRONTEND_DIST
-from .database import Base, engine
+from .migracoes import preparar_banco
 from .routers import aluno, auth, professor
 
-Base.metadata.create_all(bind=engine)
+preparar_banco()
 
 app = FastAPI(
     title="SempreHub — Simulador de Empreendedorismo",

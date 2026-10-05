@@ -20,6 +20,21 @@ class LoginEntrada(BaseModel):
     senha: str
 
 
+class EsqueciSenhaEntrada(BaseModel):
+    email: str = Field(min_length=3, max_length=200)
+
+
+class RedefinirSenhaEntrada(BaseModel):
+    token: str = Field(min_length=10, max_length=200)
+    nova_senha: str = Field(min_length=8, max_length=128)
+
+
+class AlunoTesteEntrada(BaseModel):
+    nome: str = Field(min_length=3, max_length=120)
+    email: str = Field(min_length=5, max_length=200)
+    senha: str = Field(min_length=8, max_length=128)
+
+
 class ParametrosTurma(BaseModel):
     total_rodadas: int = Field(12, ge=1, le=60)
     caixa_inicial: float = Field(20000.0, ge=0)

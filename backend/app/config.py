@@ -45,10 +45,23 @@ DOMINIOS_ALUNO = _lista(
     os.getenv("SEMPREHUB_DOMINIOS_ALUNO", "aluno.iffarroupilha.edu.br,aluno.iffar.edu.br")
 )
 DOMINIOS_PROFESSOR = _lista(
-    os.getenv("SEMPREHUB_DOMINIOS_PROFESSOR", "iffarroupilha.edu.br,iffar.edu.br")
+    os.getenv("SEMPREHUB_DOMINIOS_PROFESSOR", "iffarroupilha.edu.br,iffar.edu.br,gmail.com")
 )
 # Código exigido para criar conta de professor (impede que alunos se cadastrem como docentes)
 CODIGO_DOCENTE = os.getenv("SEMPREHUB_CODIGO_DOCENTE", "docente-iffar")
+
+# Endereço público do sistema, usado no link de recuperação de senha
+URL_PUBLICA = os.getenv("SEMPREHUB_URL_PUBLICA", "http://127.0.0.1:8000").rstrip("/")
+RECUPERACAO_VALIDADE_MINUTOS = int(os.getenv("SEMPREHUB_RECUPERACAO_MINUTOS", "60"))
+
+# Envio de e-mail (opcional). Sem SMTP_HOST, o link de recuperação é apenas registrado no log
+# do servidor e, em desenvolvimento, mostrado na própria tela.
+SMTP_HOST = os.getenv("SMTP_HOST", "")
+SMTP_PORTA = int(os.getenv("SMTP_PORTA", "587"))
+SMTP_USUARIO = os.getenv("SMTP_USUARIO", "")
+SMTP_SENHA = os.getenv("SMTP_SENHA", "")
+SMTP_REMETENTE = os.getenv("SMTP_REMETENTE", SMTP_USUARIO)
+SMTP_TLS = os.getenv("SMTP_TLS", "starttls").lower()  # starttls | ssl | nenhum
 
 CORS_ORIGINS = [
     origem.strip()

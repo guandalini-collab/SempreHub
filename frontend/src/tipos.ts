@@ -14,6 +14,7 @@ export interface Usuario {
   nome: string;
   email: string;
   papel: Papel;
+  teste?: boolean;
 }
 
 export interface Parametros {
@@ -52,6 +53,7 @@ export interface Empresa {
   id: number;
   nome: string;
   aluno: string | null;
+  aluno_id: number;
   aluno_email: string | null;
   tipo_entrada_gem: TipoEntradaGem;
   classe_dornelas: ClasseDornelas;

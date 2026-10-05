@@ -10,17 +10,23 @@ o mesmo mercado com as empresas dos colegas. O professor conduz a turma: abre as
 ## Como funciona
 
 **Professor**
-1. Cria a conta com e-mail `@iffarroupilha.edu.br` ou `@iffar.edu.br` e o **código de cadastro docente**.
+1. Cria a conta com e-mail `@iffarroupilha.edu.br`, `@iffar.edu.br` ou Gmail pessoal e o **código de cadastro docente**.
 2. Cria uma turma e, se quiser, ajusta os parâmetros do mercado (caixa inicial, preço de referência, salários, juros etc.).
 3. Divulga o código de 6 caracteres da turma.
 4. A cada mês, acompanha quem já enviou decisões e **fecha a rodada**, escolhendo o evento do mês ou deixando-o ser sorteado.
 5. Acompanha o ranking, abre o histórico de cada empresa e exporta tudo em CSV.
+6. Pode criar **alunos de teste** com qualquer e-mail (inclusive fictício) e **redefinir a senha** de alunos das suas turmas.
 
 **Aluno**
 1. Cria a conta com e-mail `@aluno.iffarroupilha.edu.br` ou `@aluno.iffar.edu.br`.
 2. Entra na turma pelo código e define o perfil da empresa: motivação (GEM), tipo de empreendedor (Dornelas) e regime tributário inicial.
 3. Em cada mês decide preço, marketing, P&D, networking, contratações e demissões, empréstimos e amortizações, além de mudanças de regime.
 4. Após o fechamento do mês, vê o demonstrativo de resultado, os alertas, o evento ocorrido, o mercado e a sua posição no ranking.
+
+**Senhas.** Os campos de senha têm o botão de olho para mostrar o que foi digitado. Em "Esqueci minha senha", o sistema
+envia um link de redefinição válido por 60 minutos e de uso único. Para isso, configure as variáveis `SMTP_*`
+(veja `.env.example`). Sem servidor de e-mail, o link aparece no log do servidor e, em desenvolvimento, na própria tela;
+alunos também podem pedir ao professor uma nova senha.
 
 Quem não envia decisão tem as decisões do mês anterior repetidas automaticamente, mas sem contratações, demissões ou empréstimos.
 Alunos só podem entrar antes do fechamento da 1ª rodada.
@@ -119,6 +125,8 @@ Veja `.env.example`. As principais:
 | `SEMPREHUB_CODIGO_DOCENTE` | Código exigido no cadastro de professores. |
 | `DATABASE_URL` | SQLite (padrão) ou `postgresql://...`. |
 | `SEMPREHUB_DOMINIOS_ALUNO` / `SEMPREHUB_DOMINIOS_PROFESSOR` | Domínios de e-mail aceitos. |
+| `SEMPREHUB_URL_PUBLICA` | Endereço do sistema usado no link de recuperação de senha. |
+| `SMTP_HOST`, `SMTP_PORTA`, `SMTP_USUARIO`, `SMTP_SENHA`, `SMTP_REMETENTE`, `SMTP_TLS` | Envio de e-mail da recuperação de senha. |
 | `SEMPREHUB_CORS_ORIGINS` | Necessário só se o frontend for hospedado em outro domínio (junto de `VITE_API_URL` no build). |
 
 ## Estrutura

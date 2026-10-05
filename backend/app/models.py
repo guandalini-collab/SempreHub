@@ -82,6 +82,8 @@ class Usuario(Base):
     senha_hash = Column(String(300), nullable=False)
     papel = Column(Enum(Papel), nullable=False)
     criado_em = Column(DateTime, default=agora)
+    # Preenchido quando a conta de aluno foi criada por um professor (aluno de teste)
+    criado_por_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
 
     turmas = relationship("Turma", back_populates="professor")
     empresas = relationship("Empresa", back_populates="aluno")
@@ -245,3 +247,16 @@ class EventoRodada(Base):
     criado_em = Column(DateTime, default=agora)
 
     turma = relationship("Turma", back_populates="eventos")
+
+
+class TokenRecuperacao(Base):
+    """Link de uso único para redefinir a senha. Guarda apenas o hash do token."""
+
+    __tablename__ = "tokens_recuperacao"
+
+    id = Column(Integer, primary_key=True)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False, index=True)
+    token_hash = Column(String(64), nullable=False, unique=True, index=True)
+    expira_em = Column(DateTime, nullable=False)
+    usado_em = Column(DateTime, nullable=True)
+    criado_em = Column(DateTime, default=agora)

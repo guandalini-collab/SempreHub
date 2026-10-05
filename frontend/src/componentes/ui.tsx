@@ -129,29 +129,146 @@ export function Campo({
 export const estiloEntrada =
   "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-marinho shadow-sm focus:border-ouro focus:outline-none focus:ring-2 focus:ring-ouro/40";
 
+/**
+ * Converte texto digitado no padrão brasileiro em número.
+ * Aceita "1.234,56", "1234,56", "1234.56", "2.500" (milhar) e "R$ 10,5".
+ */
+export function lerNumeroBr(texto: string): number | null {
+  let limpo = texto.replace(/R\$|%|\s/g, "");
+  if (limpo === "" || limpo === "-") return null;
+  if (limpo.includes(",")) {
+    limpo = limpo.replace(/\./g, "").replace(",", ".");
+  } else if (/^-?\d{1,3}(\.\d{3})+$/.test(limpo)) {
+    limpo = limpo.replace(/\./g, ""); // "2.500" = dois mil e quinhentos
+  }
+  const numero = Number(limpo);
+  return Number.isFinite(numero) ? numero : null;
+}
+
+function formatarNumeroBr(valor: number, casas: number, fixas: boolean): string {
+  return valor.toLocaleString("pt-BR", {
+    minimumFractionDigits: fixas ? casas : 0,
+    maximumFractionDigits: casas,
+  });
+}
+
+/**
+ * Campo numérico no padrão brasileiro: aceita vírgula decimal e mostra prefixo (R$) ou sufixo (%).
+ * Use `moeda` para valores em reais e `inteiro` para quantidades.
+ */
 export function EntradaNumero({
   valor,
   aoMudar,
   minimo = 0,
-  passo = 1,
+  moeda = false,
+  inteiro = false,
+  sufixo,
+  casas,
+  disabled,
   ...props
 }: {
   valor: number;
   aoMudar: (valor: number) => void;
   minimo?: number;
-  passo?: number;
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">) {
+  moeda?: boolean;
+  inteiro?: boolean;
+  sufixo?: string;
+  casas?: number;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type">) {
+  const casasDecimais = inteiro ? 0 : casas ?? (moeda ? 2 : 4);
+  const formatar = (v: number) => (Number.isFinite(v) ? formatarNumeroBr(v, casasDecimais, moeda) : "");
+  const [texto, setTexto] = React.useState(() => formatar(valor));
+  const [editando, setEditando] = React.useState(false);
+
+  // Atualiza o texto quando o valor muda por fora (ex.: nova rodada), mas não durante a digitação
+  React.useEffect(() => {
+    if (!editando) setTexto(formatar(valor));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valor, editando]);
+
+  function aoDigitar(evento: React.ChangeEvent<HTMLInputElement>) {
+    const bruto = evento.target.value.replace(/[^\d.,\-]/g, "");
+    setTexto(bruto);
+    const numero = lerNumeroBr(bruto);
+    if (numero === null) {
+      aoMudar(0);
+      return;
+    }
+    aoMudar(inteiro ? Math.round(numero) : numero);
+  }
+
+  function aoSair() {
+    setEditando(false);
+    const numero = lerNumeroBr(texto);
+    const final = Math.max(minimo, numero === null ? 0 : inteiro ? Math.round(numero) : numero);
+    aoMudar(final);
+    setTexto(formatar(final));
+  }
+
   return (
-    <input
-      {...props}
-      type="number"
-      inputMode="decimal"
-      min={minimo}
-      step={passo}
-      value={Number.isFinite(valor) ? valor : ""}
-      onChange={(e) => aoMudar(e.target.value === "" ? 0 : Number(e.target.value))}
-      className={estiloEntrada}
-    />
+    <div
+      className={`flex items-center rounded-lg border border-slate-300 bg-white shadow-sm focus-within:border-ouro focus-within:ring-2 focus-within:ring-ouro/40 ${
+        disabled ? "bg-slate-100 opacity-70" : ""
+      }`}
+    >
+      {moeda && <span className="select-none pl-3 text-sm font-medium text-slate-500">R$</span>}
+      <input
+        {...props}
+        disabled={disabled}
+        type="text"
+        inputMode={inteiro ? "numeric" : "decimal"}
+        autoComplete="off"
+        value={texto}
+        onFocus={() => setEditando(true)}
+        onChange={aoDigitar}
+        onBlur={aoSair}
+        className="w-full min-w-0 rounded-lg bg-transparent px-3 py-2 text-sm text-marinho focus:outline-none disabled:cursor-not-allowed"
+      />
+      {sufixo && <span className="select-none pr-3 text-sm font-medium text-slate-500">{sufixo}</span>}
+    </div>
+  );
+}
+
+function IconeOlho({ aberto }: { aberto: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+      <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="3" />
+      {!aberto && <path d="M4 4l16 16" strokeLinecap="round" />}
+    </svg>
+  );
+}
+
+/** Campo de senha com botão para mostrar ou ocultar o que foi digitado. */
+export function EntradaSenha({
+  valor,
+  aoMudar,
+  ...props
+}: {
+  valor: string;
+  aoMudar: (valor: string) => void;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type">) {
+  const [visivel, setVisivel] = React.useState(false);
+  return (
+    <div className="relative">
+      <input
+        {...props}
+        type={visivel ? "text" : "password"}
+        value={valor}
+        onChange={(e) => aoMudar(e.target.value)}
+        className={`${estiloEntrada} pr-11`}
+      />
+      <button
+        type="button"
+        onClick={() => setVisivel(!visivel)}
+        aria-label={visivel ? "Ocultar senha" : "Mostrar senha"}
+        aria-pressed={visivel}
+        title={visivel ? "Ocultar senha" : "Mostrar senha"}
+        className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-slate-500 hover:text-marinho"
+      >
+        <IconeOlho aberto={visivel} />
+      </button>
+    </div>
   );
 }
 

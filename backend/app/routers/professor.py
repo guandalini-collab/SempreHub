@@ -1,18 +1,21 @@
 import csv
 import io
 import secrets
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from .. import serializacao as ser
 from ..database import get_db
-from ..models import Decisao, Empresa, Resultado, StatusTurma, Turma, Usuario
+from ..models import Decisao, Empresa, Papel, Resultado, StatusTurma, Turma, Usuario
 from ..motor.eventos import opcoes_evento
 from ..motor.simulacao import processar_rodada
-from ..schemas import FecharRodadaEntrada, ParametrosTurma, TurmaEntrada
-from ..seguranca import exigir_professor
+from ..schemas import AlunoTesteEntrada, FecharRodadaEntrada, ParametrosTurma, TurmaEntrada
+from ..seguranca import exigir_professor, gerar_hash_senha
+from .auth import normalizar_email
 
 router = APIRouter(prefix="/api/professor", tags=["professor"])
 
@@ -205,3 +208,71 @@ def exportar_csv(
 
 def _br(valor: float) -> str:
     return f"{valor:.2f}".replace(".", ",")
+
+
+# ---------------------------------------------------------------------------
+# Contas de aluno criadas pelo professor e redefinição de senha
+# ---------------------------------------------------------------------------
+_ALFABETO_SENHA = "abcdefghjkmnpqrstuvwxyz23456789"
+
+
+class RedefinirSenhaAlunoEntrada(BaseModel):
+    nova_senha: Optional[str] = Field(None, min_length=8, max_length=128)
+
+
+@router.get("/alunos-teste")
+def listar_alunos_teste(db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    alunos = (
+        db.query(Usuario)
+        .filter(Usuario.criado_por_id == professor.id)
+        .order_by(Usuario.id.desc())
+        .all()
+    )
+    return [ser.usuario(a) for a in alunos]
+
+
+@router.post("/alunos-teste", status_code=201)
+def criar_aluno_teste(
+    dados: AlunoTesteEntrada, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)
+):
+    """Cria uma conta de aluno com qualquer e-mail (inclusive inexistente), para testes e demonstrações."""
+    email = normalizar_email(dados.email)
+    if db.query(Usuario).filter(Usuario.email == email).first():
+        raise HTTPException(409, "Já existe uma conta com este e-mail.")
+    aluno = Usuario(
+        nome=dados.nome.strip(),
+        email=email,
+        senha_hash=gerar_hash_senha(dados.senha),
+        papel=Papel.ALUNO,
+        criado_por_id=professor.id,
+    )
+    db.add(aluno)
+    db.commit()
+    db.refresh(aluno)
+    return ser.usuario(aluno)
+
+
+@router.post("/alunos/{aluno_id}/redefinir-senha")
+def redefinir_senha_aluno(
+    aluno_id: int,
+    dados: RedefinirSenhaAlunoEntrada,
+    db: Session = Depends(get_db),
+    professor: Usuario = Depends(exigir_professor),
+):
+    """O professor redefine a senha de um aluno da sua turma ou de um aluno de teste que ele criou."""
+    aluno = db.get(Usuario, aluno_id)
+    if aluno is None or aluno.papel != Papel.ALUNO:
+        raise HTTPException(404, "Aluno não encontrado.")
+    eh_da_turma = (
+        db.query(Empresa)
+        .join(Turma, Empresa.turma_id == Turma.id)
+        .filter(Empresa.aluno_id == aluno.id, Turma.professor_id == professor.id)
+        .first()
+        is not None
+    )
+    if not eh_da_turma and aluno.criado_por_id != professor.id:
+        raise HTTPException(404, "Aluno não encontrado.")
+    nova = dados.nova_senha or "".join(secrets.choice(_ALFABETO_SENHA) for _ in range(10))
+    aluno.senha_hash = gerar_hash_senha(nova)
+    db.commit()
+    return {"aluno": ser.usuario(aluno), "nova_senha": nova}
