@@ -43,9 +43,10 @@ def cadastrar(dados: CadastroEntrada, db: Session = Depends(get_db)):
 
     if dados.papel == Papel.ALUNO:
         if _dominio(email) not in config.DOMINIOS_ALUNO:
-            raise HTTPException(
-                422, f"Use seu e-mail institucional de aluno: {_lista_dominios(config.DOMINIOS_ALUNO)}."
-            )
+            mensagem = f"Use seu e-mail institucional de aluno: {_lista_dominios(config.DOMINIOS_ALUNO)}."
+            if _dominio(email) in config.DOMINIOS_PROFESSOR:
+                mensagem += ' Se você é professor(a), selecione "Sou professor(a)" acima.'
+            raise HTTPException(422, mensagem)
     else:
         if _dominio(email) not in config.DOMINIOS_PROFESSOR:
             raise HTTPException(
