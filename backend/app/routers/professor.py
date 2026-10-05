@@ -70,6 +70,15 @@ def atualizar_parametros(
 ):
     turma = _turma_do_professor(db, turma_id, professor)
     turma = bloquear_turma(db, turma.id)
+    for campo in ("modo_jogo", "cenario", "configuracao_simulacao"):
+        if campo in dados.model_fields_set:
+            atual = getattr(turma, campo)
+            novo = dados.model_dump()[campo]
+            if campo == "configuracao_simulacao":
+                from ..motor.avancado import config
+                atual = config(turma)
+            if novo != atual and (turma.empresas or turma.rodada_atual > 1):
+                raise HTTPException(422, "Escolha o modo, cenário e configuração da simulação antes de criar empresas.")
     if "modo_equipe" in dados.model_fields_set and dados.modo_equipe != turma.modo_equipe:
         if turma.rodada_atual > 1 or turma.empresas:
             raise HTTPException(422, "Escolha o modo de equipes antes de criar empresas ou fechar a primeira rodada.")
@@ -83,13 +92,15 @@ def atualizar_parametros(
     else:
         caixa_anterior = turma.caixa_inicial
         valores = dados.model_dump()
-        if "modo_equipe" not in dados.model_fields_set:
-            valores.pop("modo_equipe")
+        for campo in ("modo_equipe", "modo_jogo", "cenario", "configuracao_simulacao"):
+            if campo not in dados.model_fields_set:
+                valores.pop(campo)
         for campo, valor in valores.items():
             setattr(turma, campo, valor)
         for empresa in turma.empresas:
-            if empresa.caixa == caixa_anterior:
-                empresa.caixa = turma.caixa_inicial
+            fator = .25 if turma.modo_jogo != "LEGADO" and turma.cenario == "CRISE" else 1
+            if empresa.caixa == caixa_anterior * fator:
+                empresa.caixa = turma.caixa_inicial * fator
     db.commit()
     db.refresh(turma)
     return ser.turma(turma, completa=True)
@@ -175,7 +186,7 @@ def fechar_rodada(
 ):
     turma = _turma_do_professor(db, turma_id, professor)
     turma = bloquear_turma(db, turma.id)
-    verificar_rodada(dados.rodada, turma)
+    verificar_rodada(dados.rodada, turma, obrigatoria=turma.modo_jogo != "LEGADO")
     pendencias = pendencias_fechamento(db, turma)
     if pendencias:
         raise HTTPException(422, "Equipes pendentes: " + "; ".join(pendencias))

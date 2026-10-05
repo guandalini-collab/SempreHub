@@ -2,8 +2,13 @@ import React from "react";
 
 import { Campo, EntradaNumero, estiloEntrada } from "../../componentes/ui";
 import type { Parametros } from "../../tipos";
+import { CONFIGURACAO_MOTOR_PADRAO } from "../../tiposSimulacao";
+import ConfiguracaoSimulacao from "../../componentes/ConfiguracaoSimulacao";
 
 export const PARAMETROS_PADRAO: Parametros = {
+  modo_jogo: "TRADICIONAL",
+  cenario: "ZERO",
+  configuracao_simulacao: CONFIGURACAO_MOTOR_PADRAO,
   modo_equipe: true,
   total_rodadas: 12,
   caixa_inicial: 20000,
@@ -24,7 +29,7 @@ export const PARAMETROS_PADRAO: Parametros = {
 };
 
 type Definicao = {
-  campo: Exclude<keyof Parametros, "modo_equipe">;
+  campo: Exclude<keyof Parametros, "modo_equipe" | "modo_jogo" | "cenario" | "configuracao_simulacao">;
   rotulo: string;
   ajuda: string;
   tipo: "moeda" | "percentual" | "inteiro" | "decimal";
@@ -84,6 +89,7 @@ export function EditorParametros({
 }) {
   return (
     <div className="space-y-5">
+      {exibirModo && <ConfiguracaoSimulacao valores={valores} aoMudar={(jogo) => aoMudar({ ...valores, ...jogo })} bloqueado={modoBloqueado || somenteRodadas} />}
       {exibirModo && <Campo rotulo="Participação dos alunos" ajuda={modoBloqueado ? "O modo de participação fica definido quando a primeira empresa entra na turma." : "Em equipes, 3 a 5 alunos dividem os cargos e todos confirmam cada decisão."}>
         <select className={estiloEntrada} disabled={modoBloqueado || somenteRodadas} value={valores.modo_equipe ? "EQUIPE" : "INDIVIDUAL"} onChange={(e) => aoMudar({ ...valores, modo_equipe: e.target.value === "EQUIPE" })}>
           <option value="EQUIPE">Equipes de 3 a 5 alunos</option>

@@ -20,13 +20,13 @@ from sqlalchemy.orm import Session
 import app.migracoes as migracoes
 from app.database import Base, engine, get_db
 from app.main import app
-from app.models import Decisao, Empresa, EventoRodada, Papel, Resultado, Turma, Usuario
+from app.models import AprovacaoDecisao, Decisao, Empresa, EventoRodada, MembroEmpresa, Papel, RegistroEquipe, Resultado, Turma, Usuario
 
 from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
 
 
-_HEAD = "0004_equipes"
+_HEAD = "0005_simulacao_avancada"
 
 
 @pytest.fixture()
@@ -279,7 +279,12 @@ def test_migracao_de_equipes_preserva_turma_individual_e_historico_legado(banco_
     migracoes.preparar_banco(banco_migracoes)
     _confirmar_head(banco_migracoes)
     depois = _snapshot(banco_migracoes)
-    novas_colunas = {"turmas": {"modo_equipe": False}, "empresas": {"codigo_convite": None}, "decisoes": {"versao": 0}}
+    novas_colunas = {
+        "turmas": {"modo_equipe": False, "modo_jogo": "LEGADO", "cenario": "ZERO", "configuracao_simulacao": None, "versao_motor": 1},
+        "empresas": {"codigo_convite": None, "estado_simulacao": None},
+        "decisoes": {"versao": 0, "simulacao": None},
+        "resultados": {"detalhes_simulacao": None},
+    }
     for nome, colunas in novas_colunas.items():
         for linha in depois[nome]:
             for coluna, valor in colunas.items():
@@ -307,6 +312,123 @@ def test_migracao_de_equipes_preserva_turma_individual_e_historico_legado(banco_
         assert [resultado["rodada"] for resultado in final["resultados"]] == [1, 2]
         assert final["resultados"][0] == resultado_antigo
         assert final["empresa"]["divida"] == 8000
+
+
+def test_motor_avancado_preserva_equipes_assinaturas_e_rodadas_existentes(banco_migracoes):
+    from app.seguranca import gerar_hash_senha
+
+    configuracao = migracoes.configuracao_alembic()
+    with banco_migracoes.begin() as conexao:
+        configuracao.attributes["connection"] = conexao
+        command.upgrade(configuracao, "0004_equipes")
+    antigo = MetaData()
+    antigo.reflect(bind=banco_migracoes)
+    senha_hash = gerar_hash_senha("senha-segura")
+    with banco_migracoes.begin() as conexao:
+        professor_id = _inserir_estado_legado(
+            conexao, antigo.tables["usuarios"], Usuario,
+            nome="Prof. Legado", email="legado@iffarroupilha.edu.br", senha_hash=senha_hash, papel="PROFESSOR", versao_sessao=3,
+        )
+        alunos = [
+            _inserir_estado_legado(
+                conexao, antigo.tables["usuarios"], Usuario,
+                nome=f"Membro {indice}", email=f"membro{indice}@aluno.iffar.edu.br", senha_hash=senha_hash, papel="ALUNO", versao_sessao=5,
+            )
+            for indice in range(3)
+        ]
+        turma_id = _inserir_estado_legado(
+            conexao, antigo.tables["turmas"], Turma,
+            nome="Turma equipe antiga", codigo="ANTIGA", professor_id=professor_id,
+            rodada_atual=2, total_rodadas=2, modo_equipe=True,
+        )
+        empresa_id = _inserir_estado_legado(
+            conexao, antigo.tables["empresas"], Empresa,
+            turma_id=turma_id, aluno_id=alunos[0], nome="Equipe preservada", tipo_entrada_gem="OPORTUNIDADE",
+            classe_dornelas="SERIAL", regime_tributario="SIMPLES_NACIONAL", fase_atual="OPERACAO_ESTAVEL",
+            caixa=35774, divida=10000, funcionarios=1, marca=5, qualidade=3, faturamento_ano=20900,
+            codigo_convite="CONVITE-EQUIPE-LEGADO-PRESERVADO",
+        )
+        cargos = [["CEO", "CFO"], ["CMO", "CHRO"], ["COO"]]
+        for aluno_id, atribuicoes in zip(alunos, cargos):
+            _inserir_estado_legado(
+                conexao, antigo.tables["membros_empresa"], MembroEmpresa,
+                empresa_id=empresa_id, turma_id=turma_id, aluno_id=aluno_id, cargos=atribuicoes,
+            )
+        decisao_id = _inserir_estado_legado(
+            conexao, antigo.tables["decisoes"], Decisao,
+            empresa_id=empresa_id, rodada=1, versao=2, preco=95, emprestimo=10000, contratar=1, marketing=500, pd=300,
+        )
+        _inserir_estado_legado(
+            conexao, antigo.tables["resultados"], Resultado,
+            empresa_id=empresa_id, rodada=1, preco=95, demanda=220, capacidade=240, unidades_vendidas=220,
+            participacao_mercado=1, receita=20900, impostos=836, cmv=8800, folha=2940, custos_fixos=1500,
+            marketing=500, pd=300, juros=250, lucro_liquido=5774, caixa_final=35774, divida_final=10000,
+            regime="SIMPLES_NACIONAL", aliquota_efetiva=0.04, funcionarios=1, marca=5, qualidade=3,
+            fase="OPERACAO_ESTAVEL", autoeficacia=50, networking=35, necessidade_realizacao=50,
+        )
+        _inserir_estado_legado(
+            conexao, antigo.tables["eventos_rodada"], EventoRodada,
+            turma_id=turma_id, rodada=1, codigo="NENHUM", titulo="Mês sem imprevistos", narrativa="Rodada anterior preservada.",
+        )
+        for versao, aluno_id in [(1, alunos[0]), *[(2, aluno_id) for aluno_id in alunos]]:
+            _inserir_estado_legado(
+                conexao, antigo.tables["aprovacoes_decisao"], AprovacaoDecisao,
+                decisao_id=decisao_id, empresa_id=empresa_id, aluno_id=aluno_id, rodada=1, versao=versao,
+                conteudo={"preco": 95, "rodada": 1, "versao": versao},
+            )
+            _inserir_estado_legado(
+                conexao, antigo.tables["registros_equipe"], RegistroEquipe,
+                empresa_id=empresa_id, aluno_id=aluno_id, rodada=1, versao=versao, acao="APROVAR_DECISAO", detalhes={},
+            )
+    antes = _snapshot(banco_migracoes)
+    for _ in range(2):
+        migracoes.preparar_banco(banco_migracoes)
+        _confirmar_head(banco_migracoes)
+        depois = _snapshot(banco_migracoes)
+        novas_colunas = {
+            "turmas": {"modo_jogo": "LEGADO", "cenario": "ZERO", "configuracao_simulacao": None, "versao_motor": 1},
+            "empresas": {"estado_simulacao": None},
+            "decisoes": {"simulacao": None},
+            "resultados": {"detalhes_simulacao": None},
+        }
+        for nome, colunas in novas_colunas.items():
+            for linha in depois[nome]:
+                for coluna, valor in colunas.items():
+                    assert linha.pop(coluna) == valor
+        assert depois == antes
+
+    with _cliente_no_banco(banco_migracoes) as cliente:
+        cabecalhos = []
+        for email in ["legado@iffarroupilha.edu.br", *[f"membro{indice}@aluno.iffar.edu.br" for indice in range(3)]]:
+            login = cliente.post("/api/auth/login", json={"email": email, "senha": "senha-segura"})
+            assert login.status_code == 200
+            cabecalhos.append({"Authorization": f"Bearer {login.json()['token']}"})
+        professor, *membros = cabecalhos
+        empresa_url = f"/api/aluno/empresas/{empresa_id}"
+        painel = cliente.get(empresa_url, headers=membros[0])
+        assert painel.status_code == 200
+        assert painel.json()["turma"]["modo_jogo"] == "LEGADO"
+        assert painel.json()["empresa"]["estado_simulacao"] is None
+        assert len(painel.json()["equipe"]["membros"]) == 3
+        resultado_primeiro = painel.json()["resultados"][0]
+        decisao = cliente.put(
+            f"{empresa_url}/decisao", headers=membros[2],
+            json={"preco": 105, "amortizacao": 2000, "versao": 0, "rodada": 2},
+        )
+        assert decisao.status_code == 200
+        for headers in membros:
+            assert cliente.post(f"{empresa_url}/aprovar", headers=headers, json={"versao": decisao.json()["versao"], "rodada": 2}).status_code == 200
+        assert cliente.post(f"/api/professor/turmas/{turma_id}/fechar-rodada", headers=professor, json={"evento": "NENHUM", "rodada": 2}).status_code == 200
+        final = cliente.get(empresa_url, headers=membros[0]).json()
+        assert final["empresa"]["id"] == empresa_id
+        assert final["turma"]["status"] == "ENCERRADA"
+        assert final["resultados"][0] == resultado_primeiro
+        assert [resultado["rodada"] for resultado in final["resultados"]] == [1, 2]
+        assert final["empresa"]["divida"] == 8000
+    depois_jogo = _snapshot(banco_migracoes)
+    assert depois_jogo["membros_empresa"] == antes["membros_empresa"]
+    assert [linha for linha in depois_jogo["aprovacoes_decisao"] if linha["rodada"] == 1] == antes["aprovacoes_decisao"]
+    assert [linha for linha in depois_jogo["registros_equipe"] if linha["rodada"] == 1] == antes["registros_equipe"]
 
 
 def test_schema_legado_com_so_usuarios_recebe_tabelas_e_colunas_faltantes(banco_migracoes):

@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, baixarArquivo } from "../../api";
 import EquipeEmpresa from "../../componentes/EquipeEmpresa";
+import { PainelOperacional, RelatorioFinanceiro } from "../../componentes/SimulacaoAvancada";
+import RelatorioPedagogico from "../../componentes/RelatorioPedagogico";
 import {
   Aviso,
   Botao,
@@ -18,6 +20,7 @@ import {
 } from "../../componentes/ui";
 import { NOME_DORNELAS, NOME_GEM, NOME_REGIME, inteiro, percentual, reais } from "../../formatos";
 import type { Decisao, DetalheTurma, Empresa, Equipe, OpcaoEvento, Parametros, Resultado } from "../../tipos";
+import type { ModoJogo } from "../../tiposSimulacao";
 import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
 
@@ -86,7 +89,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-ouro">Turma</p>
             <h1 className="text-2xl font-bold">{turma.nome}</h1>
-            <p className="mt-1 text-xs text-white/70">{turma.modo_equipe ? "Equipes de 3 a 5 alunos · confirmação de todos os integrantes" : "Participação individual"}</p>
+            <p className="mt-1 text-xs text-white/70">{turma.modo_equipe ? "Equipes de 3 a 5 alunos · confirmação de todos os integrantes" : "Participação individual"} · {turma.modo_jogo === "STARTUP" ? "Startup" : turma.modo_jogo === "TRADICIONAL" ? "Empresa tradicional" : "Modelo básico"}{turma.cenario === "CRISE" ? " · recuperação de empresa" : ""}</p>
           </div>
           <div className="text-right">
             <p className="text-xs uppercase tracking-wide text-white/60">Código para os alunos</p>
@@ -148,7 +151,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
           </Cartao>
         </div>
 
-        <Cartao titulo="Ranking (patrimônio = caixa − dívida)" className="lg:col-span-3">
+        <Cartao titulo={turma.modo_jogo === "LEGADO" ? "Ranking (patrimônio = caixa − dívida)" : "Ranking por patrimônio"} className="lg:col-span-3">
           {empresas.length === 0 ? (
             <p className="text-sm text-slate-500">
               Nenhum aluno entrou ainda. Divulgue o código <strong className="font-mono">{turma.codigo}</strong>.
@@ -209,6 +212,8 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         </Cartao>
       </div>
 
+      {turma.modo_jogo !== "LEGADO" && <RelatorioPedagogico turmaId={turma.id} rodada={turma.rodada_atual} temResultados={rodadasJogadas > 0} abrirEmpresa={setEmpresaAberta} />}
+
       {rodadasJogadas > 0 && (
         <div className="grid gap-6 lg:grid-cols-2">
           <Cartao titulo="Caixa por empresa">
@@ -252,7 +257,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       )}
 
       {empresaAberta !== null && (
-        <DetalheEmpresa turmaId={turma.id} empresaId={empresaAberta} aoFechar={() => setEmpresaAberta(null)} />
+        <DetalheEmpresa turmaId={turma.id} empresaId={empresaAberta} modo={turma.modo_jogo} aoFechar={() => setEmpresaAberta(null)} />
       )}
 
       {editandoParametros && (
@@ -371,7 +376,7 @@ function FecharRodada({
   );
 }
 
-function DetalheEmpresa({ turmaId, empresaId, aoFechar }: { turmaId: number; empresaId: number; aoFechar: () => void }) {
+function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: number; empresaId: number; modo: ModoJogo; aoFechar: () => void }) {
   const [dados, setDados] = useState<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; equipe?: Equipe | null } | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [rodadaSelecionada, setRodadaSelecionada] = useState<number | null>(null);
@@ -412,6 +417,7 @@ function DetalheEmpresa({ turmaId, empresaId, aoFechar }: { turmaId: number; emp
             <Dado rotulo="Autoeficácia" valor={dados.empresa.autoeficacia.toFixed(0)} />
             <Dado rotulo="Networking" valor={dados.empresa.networking.toFixed(0)} />
           </div>
+          {dados.empresa.estado_simulacao && <PainelOperacional estado={dados.empresa.estado_simulacao} modo={modo} />}
           {dados.resultados.length === 0 ? (
             <p className="text-sm text-slate-500">A empresa ainda não tem rodadas fechadas.</p>
           ) : (
@@ -469,6 +475,7 @@ function DetalheEmpresa({ turmaId, empresaId, aoFechar }: { turmaId: number; emp
                   )}
                 </div>
               )}
+              {resultado?.detalhes_simulacao && <RelatorioFinanceiro detalhes={resultado.detalhes_simulacao} />}
             </>
           )}
         </div>

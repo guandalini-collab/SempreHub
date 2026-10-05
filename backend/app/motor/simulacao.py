@@ -129,6 +129,12 @@ def decisao_vigente(db: Session, empresa: Empresa, rodada: int, turma: Turma) ->
         amortizacao=0.0,
         regime_solicitado=None,
         automatica=1,
+        simulacao=(
+            {**(anterior.simulacao if anterior and anterior.simulacao else {}),
+             "comprar_mp": 0, "comprar_maquinas": 0, "aporte": 0,
+             "manutencao": 0, "treinamento": 0}
+            if turma.modo_jogo != "LEGADO" else None
+        ),
     )
     db.add(decisao)
     db.flush()
@@ -174,33 +180,37 @@ def processar_rodada(
 
     multiplicador_cmv = turma.cmv_multiplicador if turma.cmv_rodadas_restantes > 0 else 1.0
 
-    # 2. Preparação de cada empresa
-    calculos: List[_Calculo] = []
-    for empresa in empresas:
-        decisao = decisao_vigente(db, empresa, rodada, turma)
-        c = _Calculo(empresa=empresa, decisao=decisao, caixa_inicio=empresa.caixa)
-        if decisao.automatica:
-            c.alertas.append("Nenhuma decisão enviada: o sistema repetiu as decisões do mês anterior.")
-        _preparar_empresa(c, turma, rodada)
+    if turma.modo_jogo != "LEGADO":
+        from .avancado import processar_empresas
+        processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demanda, multiplicador_cmv)
+    else:
+        # 2. Preparação de cada empresa
+        calculos: List[_Calculo] = []
+        for empresa in empresas:
+            decisao = decisao_vigente(db, empresa, rodada, turma)
+            c = _Calculo(empresa=empresa, decisao=decisao, caixa_inicio=empresa.caixa)
+            if decisao.automatica:
+                c.alertas.append("Nenhuma decisão enviada: o sistema repetiu as decisões do mês anterior.")
+            _preparar_empresa(c, turma, rodada)
 
-        empresa.marca = RETENCAO_MARCA * empresa.marca + math.sqrt(max(0.0, decisao.marketing) / 1000)
-        empresa.qualidade = RETENCAO_QUALIDADE * empresa.qualidade + 0.5 * math.sqrt(
-            max(0.0, decisao.pd) / 1000
-        )
-        empresa.networking = _limitar(
-            empresa.networking - 1 + 2 * math.sqrt(max(0.0, decisao.networking) / 500)
-        )
+            empresa.marca = RETENCAO_MARCA * empresa.marca + math.sqrt(max(0.0, decisao.marketing) / 1000)
+            empresa.qualidade = RETENCAO_QUALIDADE * empresa.qualidade + 0.5 * math.sqrt(
+                max(0.0, decisao.pd) / 1000
+            )
+            empresa.networking = _limitar(
+                empresa.networking - 1 + 2 * math.sqrt(max(0.0, decisao.networking) / 500)
+            )
 
-        c.atratividade = _atratividade(empresa, decisao, turma, c)
-        calculos.append(c)
+            c.atratividade = _atratividade(empresa, decisao, turma, c)
+            calculos.append(c)
 
-    # 3. Divisão do mercado
-    _dividir_mercado(calculos, turma, rodada, multiplicador_demanda)
+        # 3. Divisão do mercado
+        _dividir_mercado(calculos, turma, rodada, multiplicador_demanda)
 
-    # 4. Apuração
-    unidades_totais = sum(c.vendas for c in calculos) or 1.0
-    for c in calculos:
-        _apurar(db, c, turma, rodada, evento, multiplicador_cmv, unidades_totais)
+        # 4. Apuração
+        unidades_totais = sum(c.vendas for c in calculos) or 1.0
+        for c in calculos:
+            _apurar(db, c, turma, rodada, evento, multiplicador_cmv, unidades_totais)
 
     db.add(
         EventoRodada(
@@ -255,6 +265,9 @@ def prever_decisao(empresa: Empresa, decisao: Decisao, turma: Turma) -> dict:
     A cópia não pertence à sessão SQLAlchemy: consultar a prévia nunca altera
     a empresa, as decisões ou o histórico. Mercado e novos eventos são desconhecidos.
     """
+    if turma.modo_jogo != "LEGADO":
+        from .avancado import prever
+        return prever(empresa, decisao, turma)
     copia = Empresa(**{col.name: getattr(empresa, col.name) for col in Empresa.__table__.columns})
     c = _Calculo(empresa=copia, decisao=decisao, caixa_inicio=empresa.caixa)
     _preparar_empresa(c, turma, turma.rodada_atual)

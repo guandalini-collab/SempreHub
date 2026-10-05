@@ -347,7 +347,13 @@ export function Modal({
 const LINHAS_DRE: { chave: keyof Dre; rotulo: string }[] = [
   { chave: "impostos", rotulo: "(−) Tributos" },
   { chave: "cmv", rotulo: "(−) Custo da mercadoria vendida" },
+  { chave: "refugos", rotulo: "(−) Perdas por refugo" },
+  { chave: "frete", rotulo: "(−) Frete de entrega" },
+  { chave: "armazenagem", rotulo: "(−) Armazenagem" },
+  { chave: "depreciacao", rotulo: "(−) Depreciação das máquinas" },
   { chave: "folha", rotulo: "(−) Folha de pagamento com encargos" },
+  { chave: "beneficios", rotulo: "(−) Benefícios dos funcionários" },
+  { chave: "treinamento", rotulo: "(−) Treinamento" },
   { chave: "custos_fixos", rotulo: "(−) Custos fixos (aluguel, energia...)" },
   { chave: "marketing", rotulo: "(−) Marketing" },
   { chave: "pd", rotulo: "(−) Pesquisa e desenvolvimento" },
@@ -366,11 +372,11 @@ export function TabelaDre({ dre }: { dre: Dre }) {
           <td className="py-1.5 font-semibold text-marinho">Receita bruta</td>
           <td className="py-1.5 text-right font-semibold text-marinho">{reais(dre.receita)}</td>
         </tr>
-        {LINHAS_DRE.filter(({ chave }) => dre[chave] !== 0 || ["impostos", "cmv", "custos_fixos"].includes(chave)).map(
+        {LINHAS_DRE.filter(({ chave }) => dre[chave] != null && (dre[chave] !== 0 || ["impostos", "cmv", "custos_fixos"].includes(chave))).map(
           ({ chave, rotulo }) => (
             <tr key={chave} className="border-b border-slate-100">
               <td className="py-1.5 text-slate-600">{rotulo}</td>
-              <td className="py-1.5 text-right text-red-700">{reais(-dre[chave])}</td>
+              <td className="py-1.5 text-right text-red-700">{reais(-(dre[chave] ?? 0))}</td>
             </tr>
           )
         )}

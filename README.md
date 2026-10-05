@@ -18,6 +18,15 @@ O professor conduz a turma: define a quantidade de rodadas
 5. Acompanha o ranking, abre o histórico de cada empresa e exporta tudo em CSV.
 6. Pode criar **alunos de teste** com qualquer e-mail (inclusive fictício) e **redefinir a senha** de alunos das suas turmas.
 
+As novas turmas podem usar um dos motores didáticos. **Empresa tradicional** trabalha
+com matéria-prima, produção, máquinas, manutenção, estoque, logística, prazo de
+recebimento/pagamento e recursos humanos. **Startup** trabalha com aquisição e retenção
+de clientes, capacidade de nuvem, CAC, LTV, churn, runway e aportes com diluição. O cenário
+**Crise** inicia uma situação operacional própria, com caixa, dívida, estoque e moral
+reduzidos; ele não inventa resultados de anos anteriores. Cada rodada grava uma fotografia
+independente do estado, da DRE, da DFC e do balanço. O modo e a configuração ficam
+congelados depois que a primeira empresa entra na turma.
+
 **Aluno**
 1. Cria a conta com e-mail `@aluno.iffarroupilha.edu.br` ou `@aluno.iffar.edu.br`.
 2. Entra na turma pelo código e define o perfil da empresa: motivação (GEM), tipo de empreendedor (Dornelas) e regime tributário inicial.
@@ -197,7 +206,10 @@ backend/app/
   models.py          usuários, turmas, empresas, decisões, resultados, eventos
   seguranca.py       senhas (PBKDF2) e tokens (JWT)
   routers/           rotas de autenticação, professor e aluno
-  motor/simulacao.py fechamento da rodada: mercado, DRE, caixa, fases
+  motor/simulacao.py fechamento da rodada: mercado, DRE, caixa, fases e despacho por modo
+  motor/tradicional.py produção, estoque, máquinas, logística e RH (motor puro)
+  motor/startup.py clientes, nuvem, CAC/LTV, capital e diluição (motor puro)
+  motor/avancado.py integração transacional, snapshots e concorrentes virtuais
   motor/tributos.py  MEI, Simples Nacional (Anexo I) e Lucro Presumido
   motor/eventos.py   eventos macroeconômicos
 backend/tests/       testes automatizados (pytest)
@@ -206,5 +218,7 @@ frontend/src/
   App.tsx            rotas e sessão
   paginas/aluno/     entrada na turma e painel de decisões
   paginas/professor/ turmas, fechamento de rodadas, ranking e parâmetros
-  componentes/ui.tsx componentes visuais da marca
+  componentes/ui.tsx componentes visuais da marca, DRE e DFC
+  componentes/SimulacaoAvancada.tsx controles operacionais e demonstrativos
+  componentes/RelatorioPedagogico.tsx relatório histórico e CSV do professor
 ```

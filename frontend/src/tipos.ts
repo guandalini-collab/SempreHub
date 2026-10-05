@@ -1,3 +1,5 @@
+import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, CenarioJogo, PreviaSimulacao } from "./tiposSimulacao";
+
 export type Papel = "ALUNO" | "PROFESSOR";
 export type RegimeTributario = "MEI" | "SIMPLES_NACIONAL" | "LUCRO_PRESUMIDO";
 export type FaseAtual =
@@ -19,6 +21,9 @@ export interface Usuario {
 }
 
 export interface Parametros {
+  modo_jogo: ModoJogo;
+  cenario: CenarioJogo;
+  configuracao_simulacao: ConfiguracaoMotor;
   modo_equipe: boolean;
   total_rodadas: number;
   caixa_inicial: number;
@@ -39,6 +44,9 @@ export interface Parametros {
 }
 
 export interface Turma {
+  modo_jogo: ModoJogo;
+  cenario: CenarioJogo;
+  configuracao_simulacao: ConfiguracaoMotor;
   modo_equipe: boolean;
   id: number;
   nome: string;
@@ -53,6 +61,7 @@ export interface Turma {
 }
 
 export interface Empresa {
+  estado_simulacao: EstadoSimulacao | null;
   id: number;
   nome: string;
   aluno: string | null;
@@ -81,6 +90,7 @@ export interface Empresa {
 }
 
 export interface Decisao {
+  simulacao: DecisaoSimulacao | null;
   versao: number;
   rodada: number;
   preco: number;
@@ -118,6 +128,7 @@ export interface Equipe {
 }
 
 export interface PrevisaoDecisao {
+  simulacao?: PreviaSimulacao | null;
   rodada: number;
   regime: RegimeTributario;
   funcionarios: number;
@@ -135,6 +146,12 @@ export interface PrevisaoDecisao {
 }
 
 export interface Dre {
+  refugos?: number;
+  frete?: number;
+  armazenagem?: number;
+  depreciacao?: number;
+  beneficios?: number;
+  treinamento?: number;
   receita: number;
   impostos: number;
   cmv: number;
@@ -151,6 +168,7 @@ export interface Dre {
 }
 
 export interface Resultado {
+  detalhes_simulacao: DetalhesSimulacao | null;
   rodada: number;
   preco: number;
   demanda: number;

@@ -7,6 +7,7 @@ from .motor.tributos import FATOR_CLT
 
 CAMPOS_PARAMETROS = [
     "modo_equipe",
+    "modo_jogo", "cenario", "configuracao_simulacao",
     "total_rodadas",
     "caixa_inicial",
     "preco_referencia",
@@ -45,11 +46,16 @@ def turma(t: Turma, completa: bool = False) -> Dict[str, Any]:
         "rodada_atual": t.rodada_atual,
         "total_rodadas": t.total_rodadas,
         "modo_equipe": t.modo_equipe,
+        "modo_jogo": t.modo_jogo,
+        "cenario": t.cenario,
+        "versao_motor": t.versao_motor,
         "professor": t.professor.nome if t.professor else None,
         "quantidade_empresas": len(t.empresas),
     }
     if completa:
         dados["parametros"] = {campo: getattr(t, campo) for campo in CAMPOS_PARAMETROS}
+        from .motor.avancado import config
+        dados["parametros"]["configuracao_simulacao"] = config(t)
         dados["greve_rodadas_restantes"] = t.cmv_rodadas_restantes
     return dados
 
@@ -60,6 +66,7 @@ def decisao(d: Optional[Decisao]) -> Optional[Dict[str, Any]]:
     return {
         "rodada": d.rodada,
         "versao": d.versao,
+        "simulacao": d.simulacao,
         "preco": d.preco,
         "marketing": d.marketing,
         "pd": d.pd,
@@ -83,7 +90,8 @@ def decisao(d: Optional[Decisao]) -> Optional[Dict[str, Any]]:
 
 
 def resultado(r: Resultado) -> Dict[str, Any]:
-    return {
+    dados = {
+        "detalhes_simulacao": r.detalhes_simulacao,
         "rodada": r.rodada,
         "preco": r.preco,
         "demanda": r.demanda,
@@ -118,6 +126,11 @@ def resultado(r: Resultado) -> Dict[str, Any]:
         "fase": r.fase.value,
         "alertas": r.alertas or [],
     }
+    if r.detalhes_simulacao:
+        extras = r.detalhes_simulacao.get("dre", {})
+        for campo in ("refugos", "frete", "armazenagem", "depreciacao", "beneficios", "treinamento", "manutencao"):
+            dados["dre"][campo] = extras.get(campo, 0)
+    return dados
 
 
 def evento(e: EventoRodada) -> Dict[str, Any]:
@@ -125,6 +138,7 @@ def evento(e: EventoRodada) -> Dict[str, Any]:
 
 
 def empresa(e: Empresa) -> Dict[str, Any]:
+    from .motor.avancado import patrimonio
     dados = {
         "id": e.id,
         "nome": e.nome,
@@ -138,7 +152,8 @@ def empresa(e: Empresa) -> Dict[str, Any]:
         "fase_atual": e.fase_atual.value,
         "caixa": e.caixa,
         "divida": e.divida,
-        "patrimonio": e.caixa - e.divida,
+        "patrimonio": patrimonio(e),
+        "estado_simulacao": e.estado_simulacao,
         "funcionarios": e.funcionarios,
         "marca": e.marca,
         "qualidade": e.qualidade,
@@ -157,6 +172,7 @@ def empresa(e: Empresa) -> Dict[str, Any]:
 
 
 def ranking(t: Turma) -> List[Dict[str, Any]]:
+    from .motor.avancado import patrimonio
     linhas = []
     for e in t.empresas:
         lucro_acumulado = sum(r.lucro_liquido for r in e.resultados)
@@ -166,7 +182,8 @@ def ranking(t: Turma) -> List[Dict[str, Any]]:
                 "empresa_id": e.id,
                 "empresa": e.nome,
                 "aluno": e.aluno.nome if e.aluno else None,
-                "patrimonio": e.caixa - e.divida,
+                "patrimonio": patrimonio(e),
+                "patrimonio_sem_aportes": patrimonio(e) - (e.estado_simulacao or {}).get("capital_aportado", 0),
                 "caixa": e.caixa,
                 "divida": e.divida,
                 "lucro_acumulado": lucro_acumulado,
@@ -175,7 +192,7 @@ def ranking(t: Turma) -> List[Dict[str, Any]]:
                 "fase": e.fase_atual.value,
             }
         )
-    linhas.sort(key=lambda linha: linha["patrimonio"], reverse=True)
+    linhas.sort(key=lambda linha: linha["patrimonio_sem_aportes"], reverse=True)
     for posicao, linha in enumerate(linhas, start=1):
         linha["posicao"] = posicao
     return linhas

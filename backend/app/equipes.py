@@ -75,6 +75,8 @@ def snapshot_decisao(decisao: Decisao) -> dict:
     if conteudo["regime_solicitado"] is not None:
         conteudo["regime_solicitado"] = conteudo["regime_solicitado"].value
     conteudo.update(rodada=decisao.rodada, versao=decisao.versao)
+    from copy import deepcopy
+    conteudo["simulacao"] = deepcopy(decisao.simulacao)
     return conteudo
 
 

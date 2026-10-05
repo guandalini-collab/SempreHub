@@ -112,6 +112,11 @@ class Turma(Base):
     rodada_atual = Column(Integer, nullable=False, default=1)
     total_rodadas = Column(Integer, nullable=False, default=12)
     modo_equipe = Column(Boolean, nullable=False, default=False, server_default=false())
+    # O motor histórico é mantido para todas as turmas já existentes.
+    modo_jogo = Column(String(20), nullable=False, default="LEGADO", server_default="LEGADO")
+    cenario = Column(String(10), nullable=False, default="ZERO", server_default="ZERO")
+    configuracao_simulacao = Column(JSON, nullable=True)
+    versao_motor = Column(Integer, nullable=False, default=1, server_default="1")
     criado_em = Column(DateTime, default=agora)
 
     # Parâmetros de mercado e de custos (ajustáveis pelo professor antes da 1ª rodada)
@@ -169,6 +174,8 @@ class Empresa(Base):
     qualidade = Column(Float, nullable=False, default=0.0)
     faturamento_ano = Column(Float, nullable=False, default=0.0)
     das_mei_pago_ano = Column(Float, nullable=False, default=0.0)
+    # Memória operacional entre rodadas; nula no motor histórico.
+    estado_simulacao = Column(JSON, nullable=True)
 
     turma = relationship("Turma", back_populates="empresas")
     aluno = relationship("Usuario", back_populates="empresas")
@@ -196,6 +203,7 @@ class Decisao(Base):
     emprestimo = Column(Float, nullable=False, default=0.0)
     amortizacao = Column(Float, nullable=False, default=0.0)
     regime_solicitado = Column(Enum(RegimeTributario), nullable=True)
+    simulacao = Column(JSON, nullable=True)
     automatica = Column(Integer, nullable=False, default=0)  # 1 = repetida pelo sistema
     # None é intencional em rascunhos de equipe; não aplicar o default nesse caso.
     enviada_em = Column(DateTime().evaluates_none(), default=agora, onupdate=agora)
@@ -304,6 +312,8 @@ class Resultado(Base):
     fase = Column(Enum(FaseAtual), nullable=False)
 
     alertas = Column(JSON, nullable=False, default=list)
+    # Fotografias independentes do estado e dos demonstrativos desta rodada.
+    detalhes_simulacao = Column(JSON, nullable=True)
     criado_em = Column(DateTime, default=agora)
 
     empresa = relationship("Empresa", back_populates="resultados")

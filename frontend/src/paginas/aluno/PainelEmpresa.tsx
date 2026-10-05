@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, ErroApi } from "../../api";
 import EquipeEmpresa from "../../componentes/EquipeEmpresa";
+import { ControlesSimulacao, PainelOperacional, PreviaOperacional, RelatorioFinanceiro } from "../../componentes/SimulacaoAvancada";
 import {
   Aviso,
   BarraProgresso,
@@ -19,6 +20,8 @@ import {
 } from "../../componentes/ui";
 import { NOME_DORNELAS, NOME_GEM, NOME_REGIME, inteiro, percentual, reais, umDecimal } from "../../formatos";
 import type { Decisao, DecisaoEntrada, EventoRodada, PainelAluno, PrevisaoDecisao, RegimeTributario } from "../../tipos";
+import { CONFIGURACAO_MOTOR_PADRAO, DECISAO_SIMULACAO_PADRAO } from "../../tiposSimulacao";
+import type { DecisaoSimulacao } from "../../tiposSimulacao";
 
 const INTERVALO_ATUALIZACAO_MS = 15000;
 
@@ -96,6 +99,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
             <p className="mt-1 text-xs text-white/60">
               {NOME_GEM[empresa.tipo_entrada_gem]} · {NOME_DORNELAS[empresa.classe_dornelas]}
             </p>
+            {turma.modo_jogo !== "LEGADO" && <p className="mt-1 text-xs text-white/60">{turma.modo_jogo === "STARTUP" ? "Startup digital" : "Empresa tradicional"} · {turma.cenario === "CRISE" ? "Recuperação de empresa em crise" : "Começar do zero"}</p>}
           </div>
           <div className="flex flex-col items-end gap-2">
             <SeloFase fase={empresa.fase_atual} />
@@ -131,6 +135,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
 
       {erro && <Aviso>{erro}</Aviso>}
       {turma.modo_equipe && painel.equipe && <EquipeEmpresa empresaId={empresa.id} equipe={painel.equipe} podeEditar={!encerrada && turma.rodada_atual === 1 && painel.equipe.pode_gerenciar} aoSalvar={carregar} />}
+      {empresa.estado_simulacao && <PainelOperacional estado={empresa.estado_simulacao} modo={turma.modo_jogo} />}
 
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">
@@ -258,9 +263,24 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   );
 }
 
+function simulacaoInicial(painel: PainelAluno): DecisaoSimulacao | null {
+  if (!painel.turma.modo_jogo || painel.turma.modo_jogo === "LEGADO") return null;
+  if (painel.decisao_atual?.simulacao) return { ...painel.decisao_atual.simulacao };
+  const ultima = painel.ultima_decisao?.simulacao;
+  if (ultima) return { ...DECISAO_SIMULACAO_PADRAO, ...ultima, comprar_mp: 0, comprar_maquinas: 0, aporte: 0 };
+  if (painel.turma.modo_jogo === "STARTUP") return { ...DECISAO_SIMULACAO_PADRAO };
+  // Sugestão de quantidade inicial; a prévia do servidor calcula o efeito real.
+  const estado = painel.empresa.estado_simulacao;
+  const capacidadePessoas = (painel.empresa.funcionarios + 1) * (painel.turma.parametros?.produtividade_por_pessoa ?? 120);
+  const capacidadeMaquinas = estado?.maquinas.filter((m) => m.ativacao <= painel.turma.rodada_atual).reduce((soma, m) => soma + m.capacidade * m.condicao, 0) ?? 0;
+  const producao = Math.max(0, Math.floor(Math.min(capacidadePessoas, capacidadeMaquinas)));
+  return { ...DECISAO_SIMULACAO_PADRAO, producao, comprar_mp: Math.max(0, producao - (estado?.estoque_mp.quantidade ?? 0)) };
+}
+
 function decisaoInicial(painel: PainelAluno): DecisaoEntrada {
   const base = painel.decisao_atual ?? painel.ultima_decisao;
   return {
+    simulacao: simulacaoInicial(painel),
     preco: base?.preco ?? painel.turma.parametros?.preco_referencia ?? 100,
     marketing: base?.marketing ?? 0,
     pd: base?.pd ?? 0,
@@ -466,6 +486,8 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
           </Campo>
         </Secao>
 
+        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} />}
+
         <div className="rounded-lg bg-slate-50 p-4 text-sm">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Prévia do mês</p>
           {!previsao && !erroPrevisao && <p role="status">Calculando prévia…</p>}
@@ -503,6 +525,7 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
                 </p>
               )}
               {previsao.alertas.map((alerta) => <p key={alerta} className="mt-2 text-xs font-semibold text-amber-800">{alerta}</p>)}
+              {previsao.simulacao && <PreviaOperacional simulacao={previsao.simulacao} modo={turma.modo_jogo} />}
             </>
           )}
         </div>
@@ -541,6 +564,9 @@ function Previa({ rotulo, valor }: { rotulo: string; valor: string }) {
 
 function Historico({ painel }: { painel: PainelAluno }) {
   const eventos = new Map(painel.eventos.map((e) => [e.rodada, e.titulo]));
+  const [rodadaSelecionada, setRodadaSelecionada] = useState(painel.resultados[painel.resultados.length - 1]?.rodada);
+  const temDetalhes = painel.resultados.some((r) => r.detalhes_simulacao);
+  const selecionado = painel.resultados.find((r) => r.rodada === rodadaSelecionada);
   return (
     <Cartao titulo="Histórico">
       <div className="overflow-x-auto">
@@ -555,6 +581,7 @@ function Historico({ painel }: { painel: PainelAluno }) {
               <th className="pb-2 text-right">Caixa</th>
               <th className="pb-2">Regime</th>
               <th className="pb-2">Evento</th>
+              {temDetalhes && <th className="pb-2">Demonstrativos</th>}
             </tr>
           </thead>
           <tbody>
@@ -570,11 +597,13 @@ function Historico({ painel }: { painel: PainelAluno }) {
                 <td className="py-1.5 text-right">{reais(r.caixa_final)}</td>
                 <td className="py-1.5">{NOME_REGIME[r.regime]}</td>
                 <td className="py-1.5 text-slate-500">{eventos.get(r.rodada) ?? "—"}</td>
+                {temDetalhes && <td className="py-1.5">{r.detalhes_simulacao && <button className={`rounded-md px-2 py-1 text-xs font-semibold ${rodadaSelecionada === r.rodada ? "bg-marinho text-white" : "bg-slate-100 text-marinho"}`} aria-pressed={rodadaSelecionada === r.rodada} onClick={() => setRodadaSelecionada(r.rodada)}>Ver mês {r.rodada}</button>}</td>}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {selecionado?.detalhes_simulacao && <div className="mt-5 space-y-4"><h3 className="text-sm font-semibold text-marinho">Demonstrativos e operação do mês {selecionado.rodada}</h3><RelatorioFinanceiro detalhes={selecionado.detalhes_simulacao} /></div>}
     </Cartao>
   );
 }

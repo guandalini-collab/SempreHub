@@ -1,8 +1,9 @@
 """Esquemas de entrada da API (validação dos dados enviados pelo navegador)."""
 
-from typing import List, Optional
+from math import isclose
+from typing import List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .models import CargoEquipe, ClasseDornelas, Papel, RegimeTributario, TipoEntradaGem
 
@@ -35,23 +36,90 @@ class AlunoTesteEntrada(BaseModel):
     senha: str = Field(min_length=8, max_length=128)
 
 
+class ConfiguracaoSimulacao(BaseModel):
+    """Parâmetros didáticos dos motores avançados, congelados ao iniciar o jogo."""
+
+    model_config = ConfigDict(allow_inf_nan=False, extra="forbid")
+
+    capacidade_maquina: int = Field(240, ge=1, le=100_000)
+    preco_maquina: float = Field(12000.0, gt=0, le=10_000_000)
+    vida_util_maquina: int = Field(24, ge=1, le=600)
+    custo_armazenagem: float = Field(0.01, ge=0, le=1)
+    frete_rapido: float = Field(15.0, ge=0, le=100_000)
+    frete_padrao: float = Field(10.0, ge=0, le=100_000)
+    frete_economico: float = Field(5.0, ge=0, le=100_000)
+    custo_nuvem_cliente: float = Field(10.0, ge=0, le=100_000)
+    churn_base: float = Field(0.05, ge=0, le=1)
+    aliquota_servico: float = Field(
+        0.06, ge=0, le=1,
+        description="Alíquota didática para serviços; não representa enquadramento fiscal real.",
+    )
+    concorrentes_virtuais: int = Field(0, ge=0, le=20)
+    peso_lucro: float = Field(0.4, ge=0, le=1)
+    peso_patrimonio: float = Field(0.3, ge=0, le=1)
+    peso_satisfacao: float = Field(0.2, ge=0, le=1)
+    peso_participacao: float = Field(0.1, ge=0, le=1)
+
+    @model_validator(mode="after")
+    def validar_pesos(self):
+        total = self.peso_lucro + self.peso_patrimonio + self.peso_satisfacao + self.peso_participacao
+        if not isclose(total, 1.0, rel_tol=0, abs_tol=1e-6):
+            raise ValueError("Os pesos dos indicadores pedagógicos devem somar 1.")
+        return self
+
+
+class DecisaoSimulacao(BaseModel):
+    """Produção/logística no modo tradicional e clientes/capital no modo startup.
+
+    Salário, benefícios, treinamento, prazos e posicionamento valem para ambos.
+    Compras de máquinas ativam capacidade somente na rodada seguinte. Aporte e
+    valuation são exclusivos de startup e não integram a receita da empresa.
+    """
+
+    model_config = ConfigDict(allow_inf_nan=False, extra="forbid")
+
+    producao: int = Field(0, ge=0, le=1_000_000)
+    comprar_mp: int = Field(0, ge=0, le=1_000_000)
+    comprar_maquinas: int = Field(0, ge=0, le=100)
+    manutencao: float = Field(0.0, ge=0, le=10_000_000)
+    modal: Literal["RAPIDO", "PADRAO", "ECONOMICO"] = "PADRAO"
+    salario: Optional[float] = Field(None, ge=0, le=1_000_000)
+    beneficio: float = Field(0.0, ge=0, le=1_000_000)
+    treinamento: float = Field(0.0, ge=0, le=10_000_000)
+    vendas_prazo: float = Field(0.0, ge=0, le=1)
+    prazo_recebimento: int = Field(1, ge=1, le=3)
+    compras_prazo: float = Field(0.0, ge=0, le=1)
+    prazo_pagamento: int = Field(1, ge=1, le=3)
+    posicionamento: Literal["CUSTO", "DIFERENCIACAO"] = "CUSTO"
+    canal: Literal["DIRETO", "DISTRIBUIDOR", "DIGITAL"] = "DIRETO"
+    marketing_digital: float = Field(0.0, ge=0, le=10_000_000)
+    capacidade_nuvem: int = Field(300, ge=0, le=1_000_000)
+    aporte: float = Field(0.0, ge=0, le=10_000_000)
+    valuation: float = Field(100000.0, gt=0, le=1_000_000_000)
+
+
 class ParametrosTurma(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False)
+
     modo_equipe: bool = False
+    modo_jogo: Literal["LEGADO", "TRADICIONAL", "STARTUP"] = "LEGADO"
+    cenario: Literal["ZERO", "CRISE"] = "ZERO"
+    configuracao_simulacao: ConfiguracaoSimulacao = Field(default_factory=ConfiguracaoSimulacao)
     total_rodadas: int = Field(12, ge=1, le=60)
-    caixa_inicial: float = Field(20000.0, ge=0)
-    preco_referencia: float = Field(100.0, gt=0)
-    custo_unitario: float = Field(40.0, ge=0)
-    demanda_base_por_empresa: float = Field(220.0, gt=0)
+    caixa_inicial: float = Field(20000.0, ge=0, le=10_000_000)
+    preco_referencia: float = Field(100.0, gt=0, le=100_000)
+    custo_unitario: float = Field(40.0, ge=0, le=100_000)
+    demanda_base_por_empresa: float = Field(220.0, gt=0, le=1_000_000)
     crescimento_mercado_mensal: float = Field(0.01, ge=-0.2, le=0.2)
-    produtividade_por_pessoa: float = Field(120.0, gt=0)
-    custos_fixos_mensais: float = Field(1500.0, ge=0)
-    salario_base: float = Field(2000.0, ge=0)
+    produtividade_por_pessoa: float = Field(120.0, gt=0, le=100_000)
+    custos_fixos_mensais: float = Field(1500.0, ge=0, le=10_000_000)
+    salario_base: float = Field(2000.0, ge=0, le=1_000_000)
     taxa_juros_mensal: float = Field(0.025, ge=0, le=0.5)
     taxa_cheque_especial: float = Field(0.08, ge=0, le=0.5)
-    limite_credito: float = Field(50000.0, ge=0)
+    limite_credito: float = Field(50000.0, ge=0, le=10_000_000)
     probabilidade_evento: float = Field(0.35, ge=0, le=1)
-    teto_mei_anual: float = Field(81000.0, gt=0)
-    das_mei_mensal: float = Field(82.05, ge=0)
+    teto_mei_anual: float = Field(81000.0, gt=0, le=10_000_000)
+    das_mei_mensal: float = Field(82.05, ge=0, le=100_000)
     aliquota_icms: float = Field(0.17, ge=0, le=0.4)
 
 
@@ -73,6 +141,8 @@ class EntrarTurmaEntrada(BaseModel):
 
 
 class DecisaoEntrada(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False)
+
     versao: Optional[int] = Field(None, ge=0)
     rodada: Optional[int] = Field(None, ge=1, le=60)
     preco: float = Field(gt=0, le=100000)
@@ -84,6 +154,13 @@ class DecisaoEntrada(BaseModel):
     emprestimo: float = Field(0.0, ge=0, le=10_000_000)
     amortizacao: float = Field(0.0, ge=0, le=10_000_000)
     regime_solicitado: Optional[RegimeTributario] = None
+    simulacao: Optional[DecisaoSimulacao] = None
+
+    @model_validator(mode="after")
+    def validar_marketing_digital(self):
+        if self.simulacao is not None and self.simulacao.marketing_digital > self.marketing:
+            raise ValueError("O marketing digital deve ser parte do investimento total em marketing.")
+        return self
 
 
 class EntrarEquipeEntrada(BaseModel):

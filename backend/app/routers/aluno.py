@@ -77,6 +77,8 @@ def entrar_na_turma(
         **perfil,
     )
     db.add(empresa)
+    from ..motor.avancado import iniciar_empresa
+    iniciar_empresa(empresa, turma)
     db.flush()
     if turma.modo_equipe:
         db.add(MembroEmpresa(empresa_id=empresa.id, turma_id=turma.id, aluno_id=aluno.id, cargos=["CEO"]))
@@ -222,7 +224,12 @@ def painel(empresa_id: int, db: Session = Depends(get_db), aluno: Usuario = Depe
 
 
 def _validar_decisao(empresa: Empresa, dados: DecisaoEntrada) -> None:
-    verificar_rodada(dados.rodada, empresa.turma, obrigatoria=empresa.turma.modo_equipe)
+    verificar_rodada(dados.rodada, empresa.turma,
+                    obrigatoria=empresa.turma.modo_equipe or empresa.turma.modo_jogo != "LEGADO")
+    if empresa.turma.modo_jogo != "LEGADO" and dados.simulacao is None:
+        raise HTTPException(422, "Informe as decisões de operação deste modo de jogo.")
+    if empresa.turma.modo_jogo != "STARTUP" and dados.simulacao and dados.simulacao.aporte:
+        raise HTTPException(422, "Aportes de investidores estão disponíveis no modo Startup.")
     if empresa.turma.status != StatusTurma.ABERTA:
         raise HTTPException(422, "A turma foi encerrada; não há mais rodadas para decidir.")
     if dados.demitir > empresa.funcionarios:

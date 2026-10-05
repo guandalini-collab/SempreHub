@@ -4,6 +4,7 @@ import { api } from "../../api";
 import { Aviso, Botao, Campo, Carregando, Cartao, estiloEntrada } from "../../componentes/ui";
 import type { Turma } from "../../tipos";
 import AlunosTeste from "./AlunosTeste";
+import ConfiguracaoSimulacao from "../../componentes/ConfiguracaoSimulacao";
 import { EditorParametros, useParametros } from "./Parametros";
 
 export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: number) => void }) {
@@ -59,7 +60,7 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
             <p className="mt-2 text-sm text-slate-500">
               {t.quantidade_empresas} empresa(s) · {t.status === "ABERTA" ? `rodada ${t.rodada_atual} de ${t.total_rodadas}` : `${t.total_rodadas} rodadas`}
             </p>
-            <p className="mt-1 text-xs text-slate-500">{t.modo_equipe ? "Equipes de 3 a 5 alunos" : "Participação individual"}</p>
+            <p className="mt-1 text-xs text-slate-500">{t.modo_equipe ? "Equipes de 3 a 5 alunos" : "Participação individual"} · {t.modo_jogo === "STARTUP" ? "Startup" : t.modo_jogo === "TRADICIONAL" ? "Empresa tradicional" : "Modelo básico"}{t.cenario === "CRISE" ? " · recuperação" : ""}</p>
           </button>
         ))}
       </div>
@@ -100,6 +101,7 @@ function NovaTurma({ aoCriar, aoCancelar }: { aoCriar: (t: Turma) => void; aoCan
         <Campo rotulo="Nome da turma" ajuda="Ex.: Empreendedorismo — 3º ano Técnico em Administração — 2026/2">
           <input className={estiloEntrada} value={nome} onChange={(e) => setNome(e.target.value)} required minLength={3} />
         </Campo>
+        <ConfiguracaoSimulacao valores={parametros} aoMudar={(jogo) => setParametros({ ...parametros, ...jogo })} />
         <Campo rotulo="Participação dos alunos" ajuda="Equipes dividem os cargos de gestão e confirmam as decisões em conjunto.">
           <select className={estiloEntrada} value={parametros.modo_equipe ? "EQUIPE" : "INDIVIDUAL"} onChange={(e) => setParametros({ ...parametros, modo_equipe: e.target.value === "EQUIPE" })}>
             <option value="EQUIPE">Equipes de 3 a 5 alunos</option>
