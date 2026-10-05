@@ -14,7 +14,7 @@ from ..correio import email_configurado, enviar_email
 from ..database import get_db
 from ..models import Papel, TokenRecuperacao, Usuario, agora
 from ..schemas import CadastroEntrada, EsqueciSenhaEntrada, LoginEntrada, RedefinirSenhaEntrada
-from ..seguranca import criar_token, gerar_hash_senha, usuario_atual, verificar_senha
+from ..seguranca import criar_token, gerar_hash_senha, trocar_senha, usuario_atual, verificar_senha
 
 router = APIRouter(prefix="/api/auth", tags=["autenticação"])
 log = logging.getLogger("semprehub")
@@ -150,11 +150,6 @@ def redefinir_senha(dados: RedefinirSenhaEntrada, db: Session = Depends(get_db))
     if registro is None or registro.usado_em is not None or registro.expira_em < agora():
         raise HTTPException(400, "Link inválido ou expirado. Peça um novo link de recuperação.")
     usuario = db.get(Usuario, registro.usuario_id)
-    usuario.senha_hash = gerar_hash_senha(dados.nova_senha)
-    registro.usado_em = agora()
-    # Invalida outros links pendentes do mesmo usuário
-    db.query(TokenRecuperacao).filter(
-        TokenRecuperacao.usuario_id == usuario.id, TokenRecuperacao.usado_em.is_(None)
-    ).update({"usado_em": agora()})
+    trocar_senha(db, usuario, dados.nova_senha)
     db.commit()
     return {"token": criar_token(usuario), "usuario": ser.usuario(usuario)}

@@ -14,7 +14,7 @@ from ..models import Decisao, Empresa, Papel, Resultado, StatusTurma, Turma, Usu
 from ..motor.eventos import opcoes_evento
 from ..motor.simulacao import processar_rodada
 from ..schemas import AlunoTesteEntrada, FecharRodadaEntrada, ParametrosTurma, TurmaEntrada
-from ..seguranca import exigir_professor, gerar_hash_senha
+from ..seguranca import exigir_professor, gerar_hash_senha, trocar_senha
 from .auth import normalizar_email
 
 router = APIRouter(prefix="/api/professor", tags=["professor"])
@@ -273,6 +273,6 @@ def redefinir_senha_aluno(
     if not eh_da_turma and aluno.criado_por_id != professor.id:
         raise HTTPException(404, "Aluno não encontrado.")
     nova = dados.nova_senha or "".join(secrets.choice(_ALFABETO_SENHA) for _ in range(10))
-    aluno.senha_hash = gerar_hash_senha(nova)
+    trocar_senha(db, aluno, nova)
     db.commit()
     return {"aluno": ser.usuario(aluno), "nova_senha": nova}

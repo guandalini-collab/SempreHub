@@ -80,6 +80,8 @@ class Usuario(Base):
     nome = Column(String(120), nullable=False)
     email = Column(String(200), nullable=False, unique=True, index=True)
     senha_hash = Column(String(300), nullable=False)
+    # Incrementada ao redefinir a senha para invalidar tokens de sessões anteriores.
+    versao_sessao = Column(Integer, nullable=False, default=0, server_default="0")
     papel = Column(Enum(Papel), nullable=False)
     criado_em = Column(DateTime, default=agora)
     # Preenchido quando a conta de aluno foi criada por um professor (aluno de teste)

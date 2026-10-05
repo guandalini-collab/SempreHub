@@ -75,14 +75,24 @@ def test_migracao_adiciona_coluna_em_banco_antigo(tmp_path):
     banco = create_engine(f"sqlite:///{tmp_path/'antigo.db'}")
     with banco.begin() as c:
         c.execute(text("CREATE TABLE usuarios (id INTEGER PRIMARY KEY, nome VARCHAR, email VARCHAR, senha_hash VARCHAR, papel VARCHAR, criado_em DATETIME)"))
+        c.execute(text("INSERT INTO usuarios (id, nome, email, senha_hash, papel) VALUES (1, 'Ana', 'ana@aluno.iffar.edu.br', 'hash-anterior', 'ALUNO')"))
     original = mig.engine
     mig.engine = banco
     try:
         mig.preparar_banco()
+        mig.preparar_banco()  # Executada novamente em cada inicialização do backend.
     finally:
         mig.engine = original
-    colunas = {c["name"] for c in inspect(banco).get_columns("usuarios")}
+    colunas = {c["name"]: c for c in inspect(banco).get_columns("usuarios")}
     assert "criado_por_id" in colunas
+    assert "versao_sessao" in colunas
+    assert colunas["versao_sessao"]["nullable"] is False
+    with banco.begin() as c:
+        antigo = c.execute(text("SELECT nome, email, senha_hash, papel, versao_sessao FROM usuarios WHERE id = 1")).one()
+        assert tuple(antigo) == ("Ana", "ana@aluno.iffar.edu.br", "hash-anterior", "ALUNO", 0)
+        c.execute(text("INSERT INTO usuarios (id, nome, email, senha_hash, papel) VALUES (2, 'Bia', 'bia@aluno.iffar.edu.br', 'outro-hash', 'ALUNO')"))
+        assert c.execute(text("SELECT versao_sessao FROM usuarios WHERE id = 2")).scalar_one() == 0
+    banco.dispose()
 
 
 def test_envio_pelo_resend(cliente, monkeypatch):

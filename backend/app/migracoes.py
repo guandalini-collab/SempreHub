@@ -12,6 +12,7 @@ from .database import Base, engine
 # (tabela, coluna, definição SQL compatível com SQLite e PostgreSQL)
 COLUNAS_ADICIONADAS = [
     ("usuarios", "criado_por_id", "INTEGER REFERENCES usuarios(id)"),
+    ("usuarios", "versao_sessao", "INTEGER NOT NULL DEFAULT 0"),
 ]
 
 
