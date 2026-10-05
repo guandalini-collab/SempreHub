@@ -112,7 +112,42 @@ Observações:
 - Use **HTTPS** (por exemplo, com Nginx ou Caddy como proxy reverso). As senhas trafegam no login.
 - Para várias turmas simultâneas, prefira **PostgreSQL** a SQLite.
 - Hospedagens compartilhadas tradicionais em geral não mantêm um processo Python rodando continuamente. Neste caso, é preciso um VPS ou um serviço que execute contêineres. Confirme com o provedor antes de contratar.
-- O banco é criado automaticamente na primeira execução. Para mudar o esquema com dados reais, será preciso adotar migrações (Alembic).
+- O banco é criado ou atualizado automaticamente pelo Alembic antes de a API iniciar. As revisões ficam registradas em `alembic_version`.
+
+## Migrações do banco
+
+As revisões em `backend/alembic/versions/` definem a estrutura de cada versão, tanto
+para SQLite quanto para PostgreSQL. Bancos anteriores ao Alembic são adotados sem
+recriar tabelas: as tabelas ausentes e as duas colunas históricas de usuários são
+acrescentadas, preservando contas, empresas, decisões, resultados e eventos.
+Uma tabela sem colunas obrigatórias interrompe a adoção e precisa ser revisada.
+
+O início do FastAPI executa `upgrade head` automaticamente. Migrações simultâneas
+são serializadas por banco e a revisão é confirmada na mesma transação das alterações.
+Não use `create_all` dos modelos para evoluir um banco existente: crie uma nova
+revisão, revise o SQL e teste a atualização com dados da versão anterior.
+
+Com as dependências instaladas e `DATABASE_URL` configurada, em `backend/`:
+
+```bash
+python -m alembic current
+python -m alembic history
+python -m alembic upgrade head
+python -m alembic check
+```
+
+Para desenvolver uma mudança de estrutura:
+
+```bash
+python -m alembic revision --autogenerate -m "Descrição da mudança"
+```
+
+Revise a revisão gerada antes de executá-la. O Alembic lê a mesma configuração
+da aplicação; o `alembic.ini` não contém credenciais. A adoção inicial requer
+conexão ao banco e não suporta `--sql`. As três revisões iniciais recusam
+`downgrade` para proteger dados e a revogação de sessões; para retornar a uma
+versão anterior, use uma restauração planejada de backup. Mantenha backup
+antes de publicar mudanças de estrutura em produção.
 
 ## Variáveis de ambiente
 
@@ -142,6 +177,7 @@ backend/app/
   motor/tributos.py  MEI, Simples Nacional (Anexo I) e Lucro Presumido
   motor/eventos.py   eventos macroeconômicos
 backend/tests/       testes automatizados (pytest)
+backend/alembic/     revisões versionadas e adoção de bancos existentes
 frontend/src/
   App.tsx            rotas e sessão
   paginas/aluno/     entrada na turma e painel de decisões

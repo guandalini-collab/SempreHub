@@ -1,26 +1,25 @@
-"""Criação do banco e ajustes simples de esquema em bancos já existentes.
+"""Atualiza o banco pelas revisões versionadas antes de iniciar a API."""
 
-`create_all` cria tabelas novas, mas não acrescenta colunas a tabelas antigas. Aqui ficam
-as colunas adicionadas depois da primeira versão, para que um banco já em uso continue
-funcionando sem perder dados. Quando o projeto crescer, convém migrar para o Alembic.
-"""
+from pathlib import Path
 
-from sqlalchemy import inspect, text
+from alembic import command
+from alembic.config import Config
+from sqlalchemy.engine import Engine
 
-from .database import Base, engine
-
-# (tabela, coluna, definição SQL compatível com SQLite e PostgreSQL)
-COLUNAS_ADICIONADAS = [
-    ("usuarios", "criado_por_id", "INTEGER REFERENCES usuarios(id)"),
-    ("usuarios", "versao_sessao", "INTEGER NOT NULL DEFAULT 0"),
-]
+from .database import engine
 
 
-def preparar_banco() -> None:
-    Base.metadata.create_all(bind=engine)
-    inspetor = inspect(engine)
-    with engine.begin() as conexao:
-        for tabela, coluna, definicao in COLUNAS_ADICIONADAS:
-            existentes = {c["name"] for c in inspetor.get_columns(tabela)}
-            if coluna not in existentes:
-                conexao.execute(text(f"ALTER TABLE {tabela} ADD COLUMN {coluna} {definicao}"))
+def configuracao_alembic() -> Config:
+    backend = Path(__file__).resolve().parents[1]
+    configuracao = Config(str(backend / "alembic.ini"))
+    configuracao.set_main_option("script_location", str(backend / "alembic"))
+    return configuracao
+
+
+def preparar_banco(banco: Engine = None) -> None:
+    # A conexão passa fora do ConfigParser: URLs e credenciais não são gravadas
+    # no alembic.ini nem precisam de interpolação/escape.
+    with (banco if banco is not None else engine).connect() as conexao:
+        configuracao = configuracao_alembic()
+        configuracao.attributes["connection"] = conexao
+        command.upgrade(configuracao, "head")
