@@ -18,7 +18,7 @@ export const PARAMETROS_PADRAO: Parametros = {
   limite_credito: 50000,
   probabilidade_evento: 0.35,
   teto_mei_anual: 81000,
-  das_mei_mensal: 81,
+  das_mei_mensal: 82.05,
   aliquota_icms: 0.17,
 };
 

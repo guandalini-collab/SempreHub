@@ -113,7 +113,7 @@ class Turma(Base):
     limite_credito = Column(Float, nullable=False, default=50000.0)
     probabilidade_evento = Column(Float, nullable=False, default=0.35)
     teto_mei_anual = Column(Float, nullable=False, default=81000.0)
-    das_mei_mensal = Column(Float, nullable=False, default=81.0)
+    das_mei_mensal = Column(Float, nullable=False, default=82.05)
     aliquota_icms = Column(Float, nullable=False, default=0.17)
 
     # Estado macroeconômico persistente (efeitos de eventos que duram mais de uma rodada)

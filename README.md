@@ -42,9 +42,12 @@ Alunos só podem entrar antes do fechamento da 1ª rodada.
 | **Perfil inicial** | Oportunidade/necessidade (GEM) definem a autoeficácia inicial. O serial começa com mais networking; o franqueado tem marca, mas paga 5% de royalties; o corporativo começa com qualidade maior; o social, com rede comunitária. |
 | **Eventos (Knight)** | Greve na logística (CMV +40% por 2 meses), notificação fiscal, alta ou queda da Selic (±0,5 p.p.), demanda aquecida (+25%) e retração (−25%). Atingem toda a turma no mesmo mês. |
 
-**Simplificações e valores a conferir.** Os valores padrão do teto do MEI (R$ 81.000/ano), do DAS
-(R$ 81/mês) e do ICMS (17%) são parâmetros didáticos e **devem ser conferidos com a legislação vigente**
-antes de cada uso. Todos podem ser alterados por turma. Também não estão modelados:
+**Valores tributários padrão (conferidos em outubro de 2026).** Teto do MEI: R$ 81.000/ano, sem
+alteração para 2026. DAS do MEI de comércio: R$ 82,05/mês (5% do salário mínimo de R$ 1.621 + R$ 1 de ICMS).
+ICMS: 17%, alíquota interna geral do Rio Grande do Sul (art. 27, X, do RICMS/RS). Todos podem ser
+alterados por turma; confira-os novamente a cada ano, porque mudam com o salário mínimo e a legislação.
+
+**Simplificações.** Não estão modelados:
 - a transição da reforma tributária (CBS/IBS);
 - o adicional de IRPJ;
 - a regra de que a opção pelo Simples só vale a partir de janeiro. No jogo, a mudança de regime vale no próprio mês.

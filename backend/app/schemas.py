@@ -35,7 +35,7 @@ class ParametrosTurma(BaseModel):
     limite_credito: float = Field(50000.0, ge=0)
     probabilidade_evento: float = Field(0.35, ge=0, le=1)
     teto_mei_anual: float = Field(81000.0, gt=0)
-    das_mei_mensal: float = Field(81.0, ge=0)
+    das_mei_mensal: float = Field(82.05, ge=0)
     aliquota_icms: float = Field(0.17, ge=0, le=0.4)
 
 
