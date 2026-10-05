@@ -36,6 +36,9 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./semprehub.db")
 # Alguns provedores ainda entregam o prefixo antigo "postgres://".
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+# Fixa o driver psycopg2 (o SQLAlchemy 2.1 passou a usar o psycopg 3 por padrão)
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 SECRET_KEY = os.getenv("SEMPREHUB_SECRET_KEY", "dev-somente-local-troque-em-producao")
 TOKEN_VALIDADE_HORAS = int(os.getenv("SEMPREHUB_TOKEN_HORAS", "12"))
