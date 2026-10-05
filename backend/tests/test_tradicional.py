@@ -195,6 +195,16 @@ class TestTradicional(unittest.TestCase):
         self.assertLess(baixa["atratividade"], alta["atratividade"])
         self.assert_reconciliacao(empresa, resultado)
 
+    def test_canal_comissao_e_marketing_digital_nao_duplicam_orcamento(self):
+        empresa, decisao, parametros = base()
+        decisao["marketing"] = 100
+        decisao["simulacao"].update({"canal": "DISTRIBUIDOR", "marketing_digital": 100})
+        resultado = apurar(preparar(empresa, decisao, parametros, 1), 40, sem_tributos)
+        self.assertEqual(resultado["dre"]["comissao_canal"], 200)
+        self.assertEqual(resultado["detalhes"]["operacao"]["canal"], "DISTRIBUIDOR")
+        self.assertEqual(resultado["detalhes"]["operacao"]["marketing_digital"], 100)
+        self.assertEqual(resultado["dre"]["marketing"], 100)
+
     def test_credito_principal_amortizacao_e_vencimento_nao_sao_despesas(self):
         empresa, decisao, parametros = base()
         empresa["divida"] = 1000

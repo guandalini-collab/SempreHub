@@ -354,6 +354,7 @@ const LINHAS_DRE: { chave: keyof Dre; rotulo: string }[] = [
   { chave: "folha", rotulo: "(−) Folha de pagamento com encargos" },
   { chave: "beneficios", rotulo: "(−) Benefícios dos funcionários" },
   { chave: "treinamento", rotulo: "(−) Treinamento" },
+  { chave: "comissao_canal", rotulo: "(−) Comissão do canal" },
   { chave: "custos_fixos", rotulo: "(−) Custos fixos (aluguel, energia...)" },
   { chave: "marketing", rotulo: "(−) Marketing" },
   { chave: "pd", rotulo: "(−) Pesquisa e desenvolvimento" },

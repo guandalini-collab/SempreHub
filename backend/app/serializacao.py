@@ -128,7 +128,7 @@ def resultado(r: Resultado) -> Dict[str, Any]:
     }
     if r.detalhes_simulacao:
         extras = r.detalhes_simulacao.get("dre", {})
-        for campo in ("refugos", "frete", "armazenagem", "depreciacao", "beneficios", "treinamento", "manutencao"):
+        for campo in ("refugos", "frete", "armazenagem", "depreciacao", "beneficios", "treinamento", "manutencao", "comissao_canal"):
             dados["dre"][campo] = extras.get(campo, 0)
     return dados
 

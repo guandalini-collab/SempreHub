@@ -202,10 +202,21 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
 
     marca = 0.8 * e.get("marca", 0) + math.sqrt(marketing / 1000)
     qualidade = 0.9 * e.get("qualidade", 0) + 0.5 * math.sqrt(pd / 1000)
+    canal = getattr(op.get("canal", "DIRETO"), "value", op.get("canal", "DIRETO"))
+    digital = min(marketing, _dinheiro(max(0, op.get("marketing_digital", 0))))
+    fator_canal = {
+        "DIRETO": 1.0,
+        "DISTRIBUIDOR": 1.10,
+        "DIGITAL": 1.05 + (0.10 * digital / marketing if marketing else 0),
+    }.get(canal, 1.0)
+    taxa_comissao_canal = {"DIRETO": 0.0, "DISTRIBUIDOR": 0.05, "DIGITAL": 0.03}.get(canal, 0.0)
+    # Marketing digital é parte do orçamento já lançado e melhora a marca;
+    # não é uma despesa adicional.
+    marca += 0.20 * math.sqrt(digital / 1000)
     preco = max(0.01, d.get("preco", 100))
     atratividade = ((p.get("preco_referencia", 100) / preco) ** 2
                     * (1 + marca) ** 0.30 * (1 + qualidade) ** 0.25
-                    * (0.5 + 0.5 * s["satisfacao"] / 100))
+                    * (0.5 + 0.5 * s["satisfacao"] / 100) * fator_canal)
     diferenciar = op.get("posicionamento", "CUSTO") == "DIFERENCIACAO"
     desalinhada = ((diferenciar and marca < 3 and qualidade < 3)
                    or (not diferenciar and preco > p.get("preco_referencia", 100)))
@@ -228,6 +239,8 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         "despesas_pagas": despesas_pagas, "compras_a_vista": compra_a_vista,
         "pagamentos_vencidos": pagamentos_vencidos, "recebimentos_vencidos": recebimentos,
         "investimento": investimento, "taxa_royalties": taxa_royalties,
+        "canal": canal, "marketing_digital": digital,
+        "taxa_comissao_canal": taxa_comissao_canal,
         "producao_planejada": producao_pedida, "producao_real": producao_real,
         "producao_boa": boas, "refugo": refugo, "turnover": turnover,
         "estoque_mp_inicial": mp_inicial, "estoque_pa_inicial": pa_inicial,
@@ -261,12 +274,14 @@ def apurar(preparo: dict, demanda: float,
     frete = _produto(vendas, custo_frete)
     armazenagem = _produto(pa["valor"], cfg.get("custo_armazenagem", 0.01))
     royalties = _produto(receita, c["taxa_royalties"])
+    comissao_canal = _produto(receita, c["taxa_comissao_canal"])
     dre = {
         "receita": receita, "impostos": impostos, "cmv": cmv, "folha": c["folha"],
         "custos_fixos": _dinheiro(p.get("custos_fixos_mensais", 1500)),
         "marketing": _dinheiro(d.get("marketing", 0)), "pd": _dinheiro(d.get("pd", 0)),
         "networking": _dinheiro(d.get("networking", 0)), "rescisoes": c["rescisoes"],
         "royalties": royalties, "juros": c["juros"], "multas": _dinheiro(p.get("multas", 0)),
+        "comissao_canal": comissao_canal,
         "refugos": c["custo_refugo"], "frete": frete, "armazenagem": armazenagem,
         "depreciacao": c["depreciacao"], "beneficios": c["beneficios"],
         "treinamento": c["treinamento"], "manutencao": c["manutencao"],
@@ -274,7 +289,7 @@ def apurar(preparo: dict, demanda: float,
     dre["lucro_liquido"] = _soma([receita, -_soma(v for k, v in dre.items() if k != "receita")])
     recebimentos = _soma([c["recebimentos_vencidos"], venda_vista])
     pagamentos = _soma([c["pagamentos_vencidos"], c["compras_a_vista"], c["despesas_pagas"],
-                        impostos, frete, armazenagem, royalties])
+                        impostos, frete, armazenagem, royalties, comissao_canal])
     operacional = _soma([recebimentos, -pagamentos])
     investimento, financiamento = -c["investimento"], _soma([c["emprestimo"], -c["amortizacao"]])
     variacao = _soma([operacional, investimento, financiamento])
@@ -303,7 +318,8 @@ def apurar(preparo: dict, demanda: float,
     operacao.update(demanda=demanda, vendas=vendas, ruptura=ruptura,
                     estoque_mp_final=deepcopy(s["estoque_mp"]), estoque_pa_final=deepcopy(pa),
                     satisfacao=s["satisfacao"], moral=s["rh"]["moral"], qualificacao=s["rh"]["qualificacao"],
-                    amortizacao_obrigatoria=c["amortizacao_obrigatoria"])
+                    amortizacao_obrigatoria=c["amortizacao_obrigatoria"], canal=c["canal"],
+                    marketing_digital=c["marketing_digital"], comissao_canal=comissao_canal)
     detalhes = {"versao_motor": 1, "modo": "TRADICIONAL", "configuracao": deepcopy(p),
                 "estado_inicial": deepcopy(c["estado_inicial"]), "estado_final": deepcopy(s),
                 "operacao": operacao, "dfc": dfc, "balanco": balanco}
