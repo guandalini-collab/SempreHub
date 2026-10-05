@@ -49,29 +49,24 @@ Os arquivos oficiais da marca ficam junto aos recursos visuais da aplicação, e
 
 | Arquivo | Caminho | Uso |
 | --- | --- | --- |
-| `SempreHub.jpg` | `frontend/src/assets/SempreHub.jpg` | Logo de tela (1024×1024). É o arquivo consumido pela interface. |
-| `SempreHub.pdf` | `frontend/src/assets/SempreHub.pdf` | Versão vetorial/impressa. Material institucional, apresentações e aplicações em alta resolução. |
+| `SempreHub.jpg` | `frontend/src/assets/SempreHub.jpg` | Arte original (1024×1024, fundo branco). Fonte para gerar as demais versões. |
+| `SempreHub.pdf` | `frontend/src/assets/SempreHub.pdf` | Mesma arte em PDF (imagem, não vetorial), para material institucional. |
+| `logo-semprehub.png` | `frontend/src/assets/logo-semprehub.png` | Logo horizontal recortado, fundo transparente. É o arquivo usado na interface. |
+| `icone-semprehub.png` | `frontend/src/assets/icone-semprehub.png` | Só o símbolo (rede), fundo transparente, para usos quadrados. |
+| `favicon.png` | `frontend/public/favicon.png` | Símbolo em fundo branco (256×256), ícone da aba do navegador. |
 
-### Como a interface consome o logo
+### Como a interface usa o logo
 
-Os componentes da interface (`frontend/src/componentes/ui.tsx` e a tela de entrada) importam o arquivo pelo próprio pipeline do Vite, de modo que o hash e o caminho final de
-build sejam resolvidos automaticamente:
+- **Tela de entrada:** logo horizontal grande (cerca de 260–290 px de largura), dentro do cartão branco.
+- **Cabeçalho:** logo horizontal sobre uma placa branca com contorno em Ouro Fosco, ao lado da assinatura
+  *Ecossistema de Aceleração de Negócios* (oculta em telas pequenas).
 
-```tsx
-import logoSempreHub from "./assets/SempreHub.jpg";
-
-<img src={logoSempreHub} alt="Logotipo SempreHub" className="h-14 w-14 rounded-lg object-contain" />
-```
-
-O logo é exibido na tela de entrada e no cabeçalho de todas as páginas, imediatamente à esquerda do título
-**SempreHub** e da assinatura *Ecossistema de Aceleração de Negócios*. Uma cópia em `frontend/public/favicon.jpg`
-é usada como ícone da aba do navegador.
-
-No Tailwind, as cores institucionais estão disponíveis como `marinho` (`#0B2545`) e `ouro` (`#C5A059`).
+O logo original tem muito espaço em branco ao redor; por isso a interface usa a versão recortada. Sobre o Azul
+Profundo, o logo fica sempre numa placa branca, porque o "Sempre" em azul-escuro perderia contraste direto sobre o fundo.
 
 ### Diretrizes de aplicação
 
-- Preserve a proporção quadrada original (1:1). Não distorça, não recorte.
+- Preserve a proporção do logo. Não distorça. Use a versão recortada (`logo-semprehub.png`) em vez de reduzir o quadrado original.
 - Mantenha uma área de respiro equivalente a pelo menos 25% da altura do logo ao seu redor.
-- Sobre fundo escuro, use o logo como está — ele foi desenhado para conviver com o Azul Profundo.
+- Sobre fundo escuro, aplique o logo numa placa branca, sem alterar suas cores.
 - Não recolorize, não aplique sombras, gradientes ou contornos fora da paleta institucional.

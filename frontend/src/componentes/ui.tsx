@@ -1,6 +1,6 @@
 import React from "react";
 
-import logoSempreHub from "../assets/SempreHub.jpg";
+import logoSempreHub from "../assets/logo-semprehub.png";
 import { NOME_FASE, corFase, reais } from "../formatos";
 import type { Dre, FaseAtual, Usuario } from "../tipos";
 
@@ -18,16 +18,16 @@ export function Cabecalho({
   return (
     <header className="bg-marinho text-white shadow-lg">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <button onClick={aoInicio} className="flex items-center gap-3 text-left" aria-label="Ir para o início">
-          <img
-            src={logoSempreHub}
-            alt="Logotipo SempreHub"
-            className="h-11 w-11 shrink-0 rounded-lg object-contain ring-1 ring-ouro/40"
-          />
-          <div>
-            <p className="text-lg font-bold leading-tight tracking-tight">SempreHub</p>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-ouro">Ecossistema de Aceleração de Negócios</p>
-          </div>
+        <button onClick={aoInicio} className="flex items-center gap-4 text-left" aria-label="SempreHub — ir para o início">
+          {/* O logo vai sobre um fundo branco, como foi desenhado, para manter cores e legibilidade */}
+          <span className="flex shrink-0 items-center rounded-xl bg-white px-3 py-1.5 shadow-sm ring-1 ring-ouro/40">
+            <img src={logoSempreHub} alt="SempreHub" className="h-10 w-auto sm:h-16" />
+          </span>
+          <span className="hidden text-[11px] uppercase leading-snug tracking-[0.2em] text-ouro md:block">
+            Ecossistema de
+            <br />
+            Aceleração de Negócios
+          </span>
         </button>
         <div className="flex items-center gap-4 text-sm">
           <div className="text-right">

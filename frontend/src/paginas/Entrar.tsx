@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import logoSempreHub from "../assets/SempreHub.jpg";
+import logoSempreHub from "../assets/logo-semprehub.png";
 import { api, iniciarSessao } from "../api";
 import { Aviso, Botao, Campo, EntradaSenha, estiloEntrada } from "../componentes/ui";
 import type { Papel, Usuario } from "../tipos";
@@ -11,12 +11,16 @@ function Moldura({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-marinho px-4 py-10">
       <div className="w-full max-w-md">
-        <div className="mb-8 flex flex-col items-center text-center">
-          <img src={logoSempreHub} alt="Logotipo SempreHub" className="mb-4 h-24 w-24 rounded-xl object-contain ring-1 ring-ouro/40" />
-          <h1 className="text-3xl font-bold tracking-tight text-white">SempreHub</h1>
-          <p className="mt-1 text-xs uppercase tracking-[0.25em] text-ouro">Simulador de Empreendedorismo</p>
+        <p className="mb-4 text-center text-xs uppercase tracking-[0.25em] text-ouro">Ecossistema de Aceleração de Negócios</p>
+        <div className="rounded-xl bg-white p-6 shadow-2xl">
+          <div className="mb-6 flex flex-col items-center border-b border-slate-100 pb-5 text-center">
+            <h1>
+              <img src={logoSempreHub} alt="SempreHub" className="mx-auto h-auto w-64 sm:w-72" />
+            </h1>
+            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Simulador de Empreendedorismo</p>
+          </div>
+          {children}
         </div>
-        <div className="rounded-xl bg-white p-6 shadow-2xl">{children}</div>
         <p className="mt-6 text-center text-xs text-white/50">Instituto Federal Farroupilha</p>
       </div>
     </div>
