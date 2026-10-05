@@ -83,3 +83,36 @@ def test_migracao_adiciona_coluna_em_banco_antigo(tmp_path):
         mig.engine = original
     colunas = {c["name"] for c in inspect(banco).get_columns("usuarios")}
     assert "criado_por_id" in colunas
+
+
+def test_envio_pelo_resend(cliente, monkeypatch):
+    import json as _json
+
+    import app.correio as correio
+    from app import config
+
+    monkeypatch.setattr(config, "RESEND_API_KEY", "re_teste")
+    monkeypatch.setattr(config, "EMAIL_REMETENTE", "SempreHub <nao-responda@semprehub.com.br>")
+    enviados = []
+
+    class RespostaFalsa:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def urlopen_falso(pedido, timeout=0):
+        enviados.append((pedido.full_url, pedido.headers, _json.loads(pedido.data)))
+        return RespostaFalsa()
+
+    monkeypatch.setattr(correio.urllib.request, "urlopen", urlopen_falso)
+    cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
+    r = cliente.post("/api/auth/esqueci-senha", json={"email": "ana@aluno.iffar.edu.br"})
+    assert r.status_code == 200 and "link_desenvolvimento" not in r.json()
+    url, cabecalhos, corpo = enviados[0]
+    assert url == "https://api.resend.com/emails"
+    assert cabecalhos["Authorization"] == "Bearer re_teste"
+    assert corpo["to"] == ["ana@aluno.iffar.edu.br"] and "redefinir-senha/" in corpo["text"]

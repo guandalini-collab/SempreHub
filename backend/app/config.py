@@ -63,6 +63,10 @@ SMTP_SENHA = os.getenv("SMTP_SENHA", "")
 SMTP_REMETENTE = os.getenv("SMTP_REMETENTE", SMTP_USUARIO)
 SMTP_TLS = os.getenv("SMTP_TLS", "starttls").lower()  # starttls | ssl | nenhum
 
+# Alternativa por API HTTPS (Resend), para servidores que bloqueiam SMTP (ex.: Railway Hobby)
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+EMAIL_REMETENTE = os.getenv("EMAIL_REMETENTE", "")
+
 CORS_ORIGINS = [
     origem.strip()
     for origem in os.getenv(

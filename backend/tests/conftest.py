@@ -6,7 +6,8 @@ import pytest
 
 # Banco isolado para os testes
 _BANCO = Path(__file__).parent / "teste.db"
-os.environ["DATABASE_URL"] = f"sqlite:///{_BANCO}"
+# Para testar com PostgreSQL: SEMPREHUB_TESTE_DB=postgresql://... python -m pytest
+os.environ["DATABASE_URL"] = os.getenv("SEMPREHUB_TESTE_DB", f"sqlite:///{_BANCO}")
 os.environ["SEMPREHUB_CODIGO_DOCENTE"] = "codigo-teste"
 os.environ["SEMPREHUB_FRONTEND_DIST"] = str(Path(__file__).parent / "sem-frontend")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))

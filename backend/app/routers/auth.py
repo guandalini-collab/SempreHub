@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from .. import config
 from .. import serializacao as ser
-from ..correio import enviar_email, smtp_configurado
+from ..correio import email_configurado, enviar_email
 from ..database import get_db
 from ..models import Papel, TokenRecuperacao, Usuario, agora
 from ..schemas import CadastroEntrada, EsqueciSenhaEntrada, LoginEntrada, RedefinirSenhaEntrada
@@ -126,7 +126,7 @@ def esqueci_senha(dados: EsqueciSenhaEntrada, db: Session = Depends(get_db)):
     )
     enviado = enviar_email(usuario.email, "SempreHub — redefinição de senha", corpo)
 
-    if not enviado and not smtp_configurado():
+    if not enviado and not email_configurado():
         if config.AMBIENTE != "producao":
             # Sem servidor de e-mail em desenvolvimento: o link aparece na tela para testes locais
             resposta["link_desenvolvimento"] = link
