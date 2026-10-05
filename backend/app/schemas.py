@@ -1,10 +1,10 @@
 """Esquemas de entrada da API (validação dos dados enviados pelo navegador)."""
 
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from .models import ClasseDornelas, Papel, RegimeTributario, TipoEntradaGem
+from .models import CargoEquipe, ClasseDornelas, Papel, RegimeTributario, TipoEntradaGem
 
 
 class CadastroEntrada(BaseModel):
@@ -36,6 +36,7 @@ class AlunoTesteEntrada(BaseModel):
 
 
 class ParametrosTurma(BaseModel):
+    modo_equipe: bool = False
     total_rodadas: int = Field(12, ge=1, le=60)
     caixa_inicial: float = Field(20000.0, ge=0)
     preco_referencia: float = Field(100.0, gt=0)
@@ -60,6 +61,7 @@ class TurmaEntrada(ParametrosTurma):
 
 class FecharRodadaEntrada(BaseModel):
     evento: str = "SORTEAR"
+    rodada: Optional[int] = Field(None, ge=1, le=60)
 
 
 class EntrarTurmaEntrada(BaseModel):
@@ -71,6 +73,8 @@ class EntrarTurmaEntrada(BaseModel):
 
 
 class DecisaoEntrada(BaseModel):
+    versao: Optional[int] = Field(None, ge=0)
+    rodada: Optional[int] = Field(None, ge=1, le=60)
     preco: float = Field(gt=0, le=100000)
     marketing: float = Field(0.0, ge=0, le=10_000_000)
     pd: float = Field(0.0, ge=0, le=10_000_000)
@@ -80,3 +84,21 @@ class DecisaoEntrada(BaseModel):
     emprestimo: float = Field(0.0, ge=0, le=10_000_000)
     amortizacao: float = Field(0.0, ge=0, le=10_000_000)
     regime_solicitado: Optional[RegimeTributario] = None
+
+
+class EntrarEquipeEntrada(BaseModel):
+    codigo: str = Field(min_length=16, max_length=64)
+
+
+class MembroEquipeEntrada(BaseModel):
+    aluno_id: int = Field(gt=0)
+    cargos: List[CargoEquipe] = Field(min_length=1, max_length=5)
+
+
+class EquipeEntrada(BaseModel):
+    membros: List[MembroEquipeEntrada] = Field(min_length=1, max_length=5)
+
+
+class AprovarDecisaoEntrada(BaseModel):
+    versao: int = Field(ge=1)
+    rodada: Optional[int] = Field(None, ge=1, le=60)

@@ -12,6 +12,7 @@ from .. import config
 from .. import serializacao as ser
 from ..correio import email_configurado, enviar_email
 from ..database import get_db
+from ..equipes import registrar_login
 from ..models import Papel, TokenRecuperacao, Usuario, agora
 from ..schemas import CadastroEntrada, EsqueciSenhaEntrada, LoginEntrada, RedefinirSenhaEntrada
 from ..seguranca import criar_token, gerar_hash_senha, trocar_senha, usuario_atual, verificar_senha
@@ -78,7 +79,12 @@ def entrar(dados: LoginEntrada, db: Session = Depends(get_db)):
     usuario = db.query(Usuario).filter(Usuario.email == email).first()
     if usuario is None or not verificar_senha(dados.senha, usuario.senha_hash):
         raise HTTPException(401, "E-mail ou senha incorretos.")
-    return {"token": criar_token(usuario), "usuario": ser.usuario(usuario)}
+    # A sessão emitida usa a versão cuja senha foi verificada. Uma troca
+    # concorrente de senha deve revogá-la, mesmo se o commit expirar o usuário.
+    token = criar_token(usuario)
+    registrar_login(db, usuario)
+    db.commit()
+    return {"token": token, "usuario": ser.usuario(usuario)}
 
 
 @router.get("/eu")

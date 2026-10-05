@@ -13,6 +13,7 @@ os.environ["SEMPREHUB_FRONTEND_DIST"] = str(Path(__file__).parent / "sem-fronten
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
+from sqlalchemy import text  # noqa: E402
 
 from app.database import Base, engine  # noqa: E402
 from app.main import app  # noqa: E402
@@ -21,10 +22,14 @@ from app.main import app  # noqa: E402
 @pytest.fixture()
 def cliente():
     Base.metadata.drop_all(bind=engine)
+    with engine.begin() as conexao:
+        conexao.execute(text("DROP TABLE IF EXISTS alembic_version"))
     Base.metadata.create_all(bind=engine)
     with TestClient(app) as c:
         yield c
     Base.metadata.drop_all(bind=engine)
+    with engine.begin() as conexao:
+        conexao.execute(text("DROP TABLE IF EXISTS alembic_version"))
 
 
 def cadastrar(cliente, nome, email, papel="ALUNO", codigo=None):

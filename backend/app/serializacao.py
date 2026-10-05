@@ -6,6 +6,7 @@ from .models import Decisao, Empresa, EventoRodada, Resultado, Turma, Usuario
 from .motor.tributos import FATOR_CLT
 
 CAMPOS_PARAMETROS = [
+    "modo_equipe",
     "total_rodadas",
     "caixa_inicial",
     "preco_referencia",
@@ -43,6 +44,7 @@ def turma(t: Turma, completa: bool = False) -> Dict[str, Any]:
         "status": t.status.value,
         "rodada_atual": t.rodada_atual,
         "total_rodadas": t.total_rodadas,
+        "modo_equipe": t.modo_equipe,
         "professor": t.professor.nome if t.professor else None,
         "quantidade_empresas": len(t.empresas),
     }
@@ -57,6 +59,7 @@ def decisao(d: Optional[Decisao]) -> Optional[Dict[str, Any]]:
         return None
     return {
         "rodada": d.rodada,
+        "versao": d.versao,
         "preco": d.preco,
         "marketing": d.marketing,
         "pd": d.pd,
@@ -68,6 +71,14 @@ def decisao(d: Optional[Decisao]) -> Optional[Dict[str, Any]]:
         "regime_solicitado": d.regime_solicitado.value if d.regime_solicitado else None,
         "automatica": bool(d.automatica),
         "enviada_em": d.enviada_em.isoformat() + "Z" if d.enviada_em else None,
+        "aprovacoes": [
+            {
+                "aluno_id": a.aluno_id, "nome": a.aluno.nome,
+                "versao": a.versao, "aprovado_em": a.aprovado_em.isoformat() + "Z",
+                "conteudo": a.conteudo,
+            }
+            for a in d.aprovacoes
+        ],
     }
 
 
@@ -114,7 +125,7 @@ def evento(e: EventoRodada) -> Dict[str, Any]:
 
 
 def empresa(e: Empresa) -> Dict[str, Any]:
-    return {
+    dados = {
         "id": e.id,
         "nome": e.nome,
         "aluno": e.aluno.nome if e.aluno else None,
@@ -137,6 +148,12 @@ def empresa(e: Empresa) -> Dict[str, Any]:
         "faturamento_ano": e.faturamento_ano,
         "fator_clt": FATOR_CLT[e.regime_tributario],
     }
+    if e.turma.modo_equipe:
+        dados["equipe_membros"] = [
+            {"aluno_id": m.aluno_id, "nome": m.aluno.nome, "cargos": m.cargos or []}
+            for m in e.membros
+        ]
+    return dados
 
 
 def ranking(t: Turma) -> List[Dict[str, Any]]:

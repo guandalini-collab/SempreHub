@@ -54,6 +54,7 @@ Os arquivos oficiais da marca ficam junto aos recursos visuais da aplicação, e
 | `logo-semprehub.png` | `frontend/src/assets/logo-semprehub.png` | Logo horizontal recortado, fundo transparente. É o arquivo usado na interface. |
 | `icone-semprehub.png` | `frontend/src/assets/icone-semprehub.png` | Só o símbolo (rede), fundo transparente, para usos quadrados. |
 | `favicon.png` | `frontend/public/favicon.png` | Símbolo em fundo branco (256×256), ícone da aba do navegador. |
+| `semprehub-original.svg` | `frontend/public/marca/semprehub-original.svg` | Arquivo original enviado para comunicação; contém a arte em imagem incorporada, preservada sem alterações. Disponível em `/marca/semprehub-original.svg`. |
 
 ### Como a interface usa o logo
 

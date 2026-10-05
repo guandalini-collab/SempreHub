@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import { api } from "../../api";
+import { api, ErroApi } from "../../api";
+import EquipeEmpresa from "../../componentes/EquipeEmpresa";
 import {
   Aviso,
   BarraProgresso,
@@ -17,7 +18,7 @@ import {
   estiloEntrada,
 } from "../../componentes/ui";
 import { NOME_DORNELAS, NOME_GEM, NOME_REGIME, inteiro, percentual, reais, umDecimal } from "../../formatos";
-import type { DecisaoEntrada, EventoRodada, PainelAluno, PrevisaoDecisao, RegimeTributario } from "../../tipos";
+import type { Decisao, DecisaoEntrada, EventoRodada, PainelAluno, PrevisaoDecisao, RegimeTributario } from "../../tipos";
 
 const INTERVALO_ATUALIZACAO_MS = 15000;
 
@@ -45,25 +46,32 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   const [painel, setPainel] = useState<PainelAluno | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [eventoAberto, setEventoAberto] = useState<EventoRodada | null>(null);
+  const sequenciaCarga = useRef(0);
 
   const carregar = useCallback(async () => {
+    const sequencia = ++sequenciaCarga.current;
     try {
       const dados = await api.get<PainelAluno>(`/api/aluno/empresas/${empresaId}`);
+      if (sequencia !== sequenciaCarga.current) return;
       setPainel(dados);
       const ultimoEvento = dados.eventos[dados.eventos.length - 1];
       if (ultimoEvento && ultimoEvento.rodada > lerEventoVisto(empresaId)) {
         setEventoAberto(ultimoEvento);
       }
       setErro(null);
+      return dados;
     } catch (e) {
+      if (sequencia !== sequenciaCarga.current) return;
       setErro(e instanceof Error ? e.message : "Erro ao carregar.");
     }
   }, [empresaId]);
 
   useEffect(() => {
+    setPainel(null);
+    setEventoAberto(null);
     carregar();
     const intervalo = window.setInterval(carregar, INTERVALO_ATUALIZACAO_MS);
-    return () => window.clearInterval(intervalo);
+    return () => { window.clearInterval(intervalo); sequenciaCarga.current += 1; };
   }, [carregar]);
 
   if (erro && !painel) return <Aviso>{erro}</Aviso>;
@@ -122,6 +130,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       </div>
 
       {erro && <Aviso>{erro}</Aviso>}
+      {turma.modo_equipe && painel.equipe && <EquipeEmpresa empresaId={empresa.id} equipe={painel.equipe} podeEditar={!encerrada && turma.rodada_atual === 1 && painel.equipe.pode_gerenciar} aoSalvar={carregar} />}
 
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">
@@ -265,10 +274,13 @@ function decisaoInicial(painel: PainelAluno): DecisaoEntrada {
   };
 }
 
-function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar: () => Promise<void> }) {
+function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar: () => Promise<PainelAluno | undefined> }) {
   const { empresa, turma } = painel;
   const p = turma.parametros!;
+  const versaoServidor = painel.equipe?.versao_decisao ?? painel.decisao_atual?.versao ?? 0;
   const [d, setD] = useState<DecisaoEntrada>(() => decisaoInicial(painel));
+  const [base, setBase] = useState(() => ({ entrada: decisaoInicial(painel), versao: versaoServidor, rodada: turma.rodada_atual }));
+  const [conflitoServidor, setConflitoServidor] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState<{ tipo: "erro" | "sucesso"; texto: string } | null>(null);
   const [previa, setPrevia] = useState<{ chave: string; dados?: PrevisaoDecisao; erro?: string } | null>(null);
@@ -276,13 +288,37 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
   const chavePrevisao = JSON.stringify({ d, empresa, turma, tentativaPrevia });
   const previsao = previa?.chave === chavePrevisao ? previa.dados : undefined;
   const erroPrevisao = previa?.chave === chavePrevisao ? previa.erro : undefined;
+  const alterada = JSON.stringify(d) !== JSON.stringify(base.entrada);
+  const conflito = conflitoServidor || base.versao !== versaoServidor;
 
-  // Ao mudar de rodada, recomeça a partir da última decisão
+  // Novas versões são carregadas apenas quando o aluno não está editando.
   useEffect(() => {
-    setD(decisaoInicial(painel));
-    setMensagem(null);
+    if (base.rodada !== turma.rodada_atual || !alterada) {
+      const entrada = decisaoInicial(painel);
+      setD(entrada);
+      setBase({ entrada, versao: versaoServidor, rodada: turma.rodada_atual });
+      setConflitoServidor(false);
+      setMensagem(null);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [turma.rodada_atual]);
+  }, [turma.rodada_atual, versaoServidor]);
+
+  async function carregarDecisaoSalva() {
+    setCarregando(true);
+    setMensagem(null);
+    try {
+      const atual = await aoEnviar();
+      if (!atual) throw new Error("Não foi possível carregar a decisão salva. Seus campos foram mantidos; tente novamente.");
+      const entrada = decisaoInicial(atual);
+      setD(entrada);
+      setBase({ entrada, versao: atual.equipe?.versao_decisao ?? atual.decisao_atual?.versao ?? 0, rodada: atual.turma.rodada_atual });
+      setConflitoServidor(false);
+    } catch (e) {
+      setMensagem({ tipo: "erro", texto: e instanceof Error ? e.message : "Erro ao carregar a decisão salva." });
+    } finally {
+      setCarregando(false);
+    }
+  }
 
   const atualizar = <K extends keyof DecisaoEntrada>(campo: K, valor: DecisaoEntrada[K]) =>
     setD((atual) => ({ ...atual, [campo]: valor }));
@@ -292,7 +328,7 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
     const { d: entrada, empresa: empresaAtual, turma: turmaAtual } = JSON.parse(chavePrevisao);
     const temporizador = window.setTimeout(async () => {
       try {
-        const dados = await api.post<PrevisaoDecisao>(`/api/aluno/empresas/${empresaAtual.id}/previsao`, entrada);
+        const dados = await api.post<PrevisaoDecisao>(`/api/aluno/empresas/${empresaAtual.id}/previsao`, { ...entrada, rodada: turmaAtual.rodada_atual });
         if (!cancelada) {
           if (dados.rodada !== turmaAtual.rodada_atual) {
             setPrevia({ chave: chavePrevisao, erro: "O professor avançou a rodada. Aguarde a atualização do painel." });
@@ -312,15 +348,40 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
 
   async function enviar(evento: React.FormEvent) {
     evento.preventDefault();
-    if (!previsao || carregando) return;
+    if (!previsao || carregando || conflito) return;
     setCarregando(true);
     setMensagem(null);
     try {
-      await api.put(`/api/aluno/empresas/${empresa.id}/decisao`, d);
-      setMensagem({ tipo: "sucesso", texto: "Decisões enviadas. Você pode alterá-las até o professor fechar o mês." });
+      const salva = await api.put<Decisao>(`/api/aluno/empresas/${empresa.id}/decisao`, { ...d, versao: base.versao, rodada: base.rodada });
+      setBase({ entrada: { ...d }, versao: salva.versao, rodada: turma.rodada_atual });
+      setConflitoServidor(false);
+      setMensagem({ tipo: "sucesso", texto: turma.modo_equipe ? `Rascunho da versão ${salva.versao} salvo. Agora cada integrante deve confirmar essa versão na própria conta.` : "Decisões enviadas. Você pode alterá-las até o professor fechar o mês." });
       await aoEnviar();
     } catch (e) {
+      if (e instanceof ErroApi && e.status === 409) {
+        setConflitoServidor(true);
+        await aoEnviar();
+      }
       setMensagem({ tipo: "erro", texto: e instanceof Error ? e.message : "Erro ao enviar." });
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  async function confirmarDecisao() {
+    if (carregando || alterada || conflito || !painel.decisao_atual) return;
+    setCarregando(true);
+    setMensagem(null);
+    try {
+      await api.post(`/api/aluno/empresas/${empresa.id}/aprovar`, { versao: base.versao, rodada: base.rodada });
+      setMensagem({ tipo: "sucesso", texto: `Você confirmou a versão ${base.versao}. Acompanhe as confirmações dos colegas no quadro da equipe.` });
+      await aoEnviar();
+    } catch (e) {
+      if (e instanceof ErroApi && e.status === 409) {
+        setConflitoServidor(true);
+        await aoEnviar();
+      }
+      setMensagem({ tipo: "erro", texto: e instanceof Error ? e.message : "Erro ao confirmar a decisão." });
     } finally {
       setCarregando(false);
     }
@@ -331,13 +392,16 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
       titulo={`Decisões para o mês ${turma.rodada_atual}`}
       acao={
         painel.decisao_atual ? (
-          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Enviada</span>
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${!turma.modo_equipe || painel.equipe?.pronta ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{turma.modo_equipe ? (painel.equipe?.pronta ? "Confirmada pela equipe" : `Rascunho · versão ${versaoServidor}`) : "Enviada"}</span>
         ) : (
           <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">Pendente</span>
         )
       }
     >
       <form onSubmit={enviar} className="space-y-6">
+        {turma.modo_equipe && <p className="text-sm text-slate-600">Todos os integrantes podem preparar a decisão. Salvar uma nova versão pede uma nova confirmação de toda a equipe. Revise os valores e a prévia antes de confirmar.</p>}
+        {conflito && <div className="space-y-2"><Aviso tipo="info">Outra atualização chegou enquanto você editava. Seus campos foram mantidos. Carregue a decisão salva da empresa antes de continuar; essa ação substitui os valores do formulário.</Aviso><Botao type="button" variante="secundario" disabled={carregando} onClick={carregarDecisaoSalva}>Carregar decisão salva</Botao></div>}
+        <fieldset disabled={carregando} className="space-y-6">
         <Secao titulo="Mercado e posicionamento">
           <Campo
             rotulo="Preço de venda (por unidade)"
@@ -356,7 +420,7 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
           </Campo>
         </Secao>
 
-        <Secao titulo="Equipe">
+        <Secao titulo="Funcionários da empresa">
           <Campo rotulo="Contratar" ajuda={`Salário-base ${reais(p.salario_base)}. A prévia aplica os encargos do regime efetivo.`}>
             <EntradaNumero inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} />
           </Campo>
@@ -442,12 +506,15 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
             </>
           )}
         </div>
+        </fieldset>
 
         {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}
-        <div className="flex justify-end">
-          <Botao type="submit" carregando={carregando} disabled={!previsao}>
-            {painel.decisao_atual ? "Atualizar decisões" : "Enviar decisões"}
+        {turma.modo_equipe && alterada && <p className="text-xs text-amber-800">Há alterações no formulário. Salve o rascunho antes de confirmar a decisão.</p>}
+        <div className="flex flex-wrap justify-end gap-2">
+          <Botao type="submit" carregando={carregando} disabled={!previsao || conflito || (turma.modo_equipe && !!painel.decisao_atual && !alterada)}>
+            {turma.modo_equipe ? "Salvar rascunho" : painel.decisao_atual ? "Atualizar decisões" : "Enviar decisões"}
           </Botao>
+          {turma.modo_equipe && <Botao type="button" variante="secundario" carregando={carregando} disabled={alterada || conflito || !painel.decisao_atual || !!painel.equipe?.aprovada_por_mim} onClick={confirmarDecisao}>{painel.equipe?.aprovada_por_mim && !alterada ? "Você já confirmou esta versão" : `Confirmar decisão${base.versao ? ` · versão ${base.versao}` : ""}`}</Botao>}
         </div>
       </form>
     </Cartao>

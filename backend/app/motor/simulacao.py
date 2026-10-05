@@ -147,6 +147,13 @@ def processar_rodada(
     if not empresas:
         raise ValueError("Não há empresas na turma para processar a rodada.")
 
+    if turma.modo_equipe:
+        from ..equipes import pendencias_fechamento
+
+        pendencias = pendencias_fechamento(db, turma)
+        if pendencias:
+            raise ValueError("Equipes pendentes: " + "; ".join(pendencias))
+
     rng = rng or random.Random()
     rodada = turma.rodada_atual
     evento = ev.escolher_evento(escolha_evento, turma.probabilidade_evento, rng)

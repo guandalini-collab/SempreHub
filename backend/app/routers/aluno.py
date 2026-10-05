@@ -1,11 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import and_, or_, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .. import serializacao as ser
 from ..database import get_db
-from ..models import Decisao, Empresa, Resultado, StatusTurma, Turma, Usuario, agora
+from ..equipes import (
+    bloquear_turma, dados_equipe, decisao_atual, invalidar_aprovacoes,
+    novo_convite, pendencias_equipe, registrar, snapshot_decisao, verificar_rodada, verificar_versao,
+)
+from ..models import AprovacaoDecisao, Decisao, Empresa, MembroEmpresa, Resultado, StatusTurma, Turma, Usuario, agora
 from ..motor.simulacao import perfil_inicial, prever_decisao
-from ..schemas import DecisaoEntrada, EntrarTurmaEntrada
+from ..schemas import AprovarDecisaoEntrada, DecisaoEntrada, EntrarEquipeEntrada, EntrarTurmaEntrada, EquipeEntrada
 from ..seguranca import exigir_aluno
 
 router = APIRouter(prefix="/api/aluno", tags=["aluno"])
@@ -13,14 +19,30 @@ router = APIRouter(prefix="/api/aluno", tags=["aluno"])
 
 def _empresa_do_aluno(db: Session, empresa_id: int, aluno: Usuario) -> Empresa:
     empresa = db.get(Empresa, empresa_id)
-    if empresa is None or empresa.aluno_id != aluno.id:
+    if empresa is None:
         raise HTTPException(404, "Empresa não encontrada.")
+    if empresa.aluno_id != aluno.id:
+        membro = db.query(MembroEmpresa).filter(
+            MembroEmpresa.empresa_id == empresa.id, MembroEmpresa.aluno_id == aluno.id,
+        ).first() if empresa.turma.modo_equipe else None
+        if membro is None:
+            raise HTTPException(404, "Empresa não encontrada.")
     return empresa
+
+
+def _empresa_para_alterar(db: Session, empresa_id: int, aluno: Usuario) -> Empresa:
+    empresa = _empresa_do_aluno(db, empresa_id, aluno)
+    bloquear_turma(db, empresa.turma_id)
+    db.refresh(empresa)
+    return _empresa_do_aluno(db, empresa_id, aluno)
 
 
 @router.get("/empresas")
 def minhas_empresas(db: Session = Depends(get_db), aluno: Usuario = Depends(exigir_aluno)):
-    empresas = db.query(Empresa).filter(Empresa.aluno_id == aluno.id).order_by(Empresa.id.desc()).all()
+    empresas = db.query(Empresa).filter(or_(
+        Empresa.aluno_id == aluno.id,
+        and_(Empresa.turma.has(Turma.modo_equipe.is_(True)), Empresa.membros.any(MembroEmpresa.aluno_id == aluno.id)),
+    )).order_by(Empresa.id.desc()).all()
     return [{"empresa": ser.empresa(e), "turma": ser.turma(e.turma)} for e in empresas]
 
 
@@ -31,11 +53,15 @@ def entrar_na_turma(
     turma = db.query(Turma).filter(Turma.codigo == dados.codigo.strip().upper()).first()
     if turma is None:
         raise HTTPException(404, "Código de turma não encontrado. Confira com seu professor.")
+    turma = bloquear_turma(db, turma.id)
     if turma.status != StatusTurma.ABERTA:
         raise HTTPException(422, "Esta turma já foi encerrada.")
     if turma.rodada_atual > 1:
         raise HTTPException(422, "A turma já começou. Peça ao professor para incluí-lo antes da 1ª rodada.")
-    if db.query(Empresa).filter(Empresa.turma_id == turma.id, Empresa.aluno_id == aluno.id).first():
+    if (
+        db.query(Empresa).filter(Empresa.turma_id == turma.id, Empresa.aluno_id == aluno.id).first()
+        or db.query(MembroEmpresa).filter(MembroEmpresa.turma_id == turma.id, MembroEmpresa.aluno_id == aluno.id).first()
+    ):
         raise HTTPException(409, "Você já tem uma empresa nesta turma.")
 
     perfil = perfil_inicial(dados.tipo_entrada_gem, dados.classe_dornelas)
@@ -43,6 +69,7 @@ def entrar_na_turma(
         turma_id=turma.id,
         aluno_id=aluno.id,
         nome=dados.nome_empresa.strip(),
+        codigo_convite=novo_convite() if turma.modo_equipe else None,
         tipo_entrada_gem=dados.tipo_entrada_gem,
         classe_dornelas=dados.classe_dornelas,
         regime_tributario=dados.regime_tributario,
@@ -50,9 +77,89 @@ def entrar_na_turma(
         **perfil,
     )
     db.add(empresa)
+    db.flush()
+    if turma.modo_equipe:
+        db.add(MembroEmpresa(empresa_id=empresa.id, turma_id=turma.id, aluno_id=aluno.id, cargos=["CEO"]))
+        registrar(db, empresa, aluno, "CRIAR_EQUIPE")
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(409, "Você já participa de uma empresa nesta turma.")
+    db.refresh(empresa)
+    return {"empresa": ser.empresa(empresa), "turma": ser.turma(turma), "equipe": dados_equipe(empresa, None, aluno)}
+
+
+@router.post("/equipes/entrar", status_code=201)
+def entrar_na_equipe(
+    dados: EntrarEquipeEntrada, db: Session = Depends(get_db), aluno: Usuario = Depends(exigir_aluno),
+):
+    empresa = db.query(Empresa).filter(Empresa.codigo_convite == dados.codigo.strip()).first()
+    if empresa is None:
+        raise HTTPException(404, "Convite de equipe não encontrado. Confira o código com o CEO.")
+    turma = bloquear_turma(db, empresa.turma_id)
+    db.refresh(empresa)
+    if not turma.modo_equipe:
+        raise HTTPException(422, "Esta turma usa empresas individuais.")
+    if turma.status != StatusTurma.ABERTA or turma.rodada_atual != 1:
+        raise HTTPException(422, "Só é possível ingressar na equipe antes do fechamento da primeira rodada.")
+    if (
+        db.query(MembroEmpresa).filter(MembroEmpresa.turma_id == turma.id, MembroEmpresa.aluno_id == aluno.id).first()
+        or db.query(Empresa).filter(Empresa.turma_id == turma.id, Empresa.aluno_id == aluno.id).first()
+    ):
+        raise HTTPException(409, "Você já participa de uma empresa nesta turma.")
+    if len(empresa.membros) >= 5:
+        raise HTTPException(422, "Esta equipe já tem 5 alunos. Entre em outra equipe.")
+    db.add(MembroEmpresa(empresa_id=empresa.id, turma_id=turma.id, aluno_id=aluno.id, cargos=[]))
+    versao = invalidar_aprovacoes(db, empresa)
+    registrar(db, empresa, aluno, "ENTRAR_EQUIPE", versao)
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(409, "Você já participa de uma empresa nesta turma.")
+    db.refresh(empresa)
+    return {
+        "empresa": ser.empresa(empresa), "turma": ser.turma(turma),
+        "equipe": dados_equipe(empresa, decisao_atual(db, empresa), aluno),
+    }
+
+
+@router.put("/empresas/{empresa_id}/equipe")
+def distribuir_cargos(
+    empresa_id: int, dados: EquipeEntrada, db: Session = Depends(get_db), aluno: Usuario = Depends(exigir_aluno),
+):
+    empresa = _empresa_para_alterar(db, empresa_id, aluno)
+    if not empresa.turma.modo_equipe:
+        raise HTTPException(422, "Esta turma usa empresas individuais.")
+    if aluno.id != empresa.aluno_id:
+        raise HTTPException(403, "Somente o fundador (CEO) pode distribuir os cargos.")
+    if empresa.turma.status != StatusTurma.ABERTA:
+        raise HTTPException(422, "A turma foi encerrada.")
+    if empresa.turma.rodada_atual != 1:
+        raise HTTPException(422, "Distribua os cargos antes do fechamento da primeira rodada.")
+    atribuicoes = {m.aluno_id: [cargo.value for cargo in m.cargos] for m in dados.membros}
+    if len(atribuicoes) != len(dados.membros) or set(atribuicoes) != {m.aluno_id for m in empresa.membros}:
+        raise HTTPException(422, "Informe todos os integrantes atuais, uma única vez cada.")
+    for aluno_id, cargos in atribuicoes.items():
+        if len(cargos) != len(set(cargos)):
+            raise HTTPException(422, "Não repita o mesmo cargo para um integrante.")
+        if ("CEO" in cargos) != (aluno_id == empresa.aluno_id):
+            raise HTTPException(422, "O fundador da empresa deve permanecer como o único CEO.")
+    todos_cargos = [cargo for cargos in atribuicoes.values() for cargo in cargos]
+    if len(todos_cargos) != len(set(todos_cargos)):
+        raise HTTPException(422, "Cada cargo deve ser atribuído a um único integrante; um aluno pode acumular cargos diferentes.")
+    mudou = any(m.cargos != atribuicoes[m.aluno_id] for m in empresa.membros)
+    if mudou:
+        for membro in empresa.membros:
+            membro.cargos = atribuicoes[membro.aluno_id]
+        versao = invalidar_aprovacoes(db, empresa)
+        registrar(db, empresa, aluno, "ALTERAR_CARGOS", versao, {"membros": [
+            {"aluno_id": aluno_id, "cargos": cargos} for aluno_id, cargos in atribuicoes.items()
+        ]})
     db.commit()
     db.refresh(empresa)
-    return {"empresa": ser.empresa(empresa), "turma": ser.turma(turma)}
+    return dados_equipe(empresa, decisao_atual(db, empresa), aluno)
 
 
 @router.get("/empresas/{empresa_id}")
@@ -110,10 +217,12 @@ def painel(empresa_id: int, db: Session = Depends(get_db), aluno: Usuario = Depe
         "mercado": concorrentes,
         "posicao_ranking": posicao,
         "total_empresas": len(turma.empresas),
+        "equipe": dados_equipe(empresa, decisao_atual, aluno),
     }
 
 
 def _validar_decisao(empresa: Empresa, dados: DecisaoEntrada) -> None:
+    verificar_rodada(dados.rodada, empresa.turma, obrigatoria=empresa.turma.modo_equipe)
     if empresa.turma.status != StatusTurma.ABERTA:
         raise HTTPException(422, "A turma foi encerrada; não há mais rodadas para decidir.")
     if dados.demitir > empresa.funcionarios:
@@ -131,7 +240,7 @@ def previa_decisao(
 ):
     empresa = _empresa_do_aluno(db, empresa_id, aluno)
     _validar_decisao(empresa, dados)
-    return prever_decisao(empresa, Decisao(**dados.model_dump()), empresa.turma)
+    return prever_decisao(empresa, Decisao(**dados.model_dump(exclude={"versao", "rodada"})), empresa.turma)
 
 
 @router.put("/empresas/{empresa_id}/decisao")
@@ -141,7 +250,7 @@ def enviar_decisao(
     db: Session = Depends(get_db),
     aluno: Usuario = Depends(exigir_aluno),
 ):
-    empresa = _empresa_do_aluno(db, empresa_id, aluno)
+    empresa = _empresa_para_alterar(db, empresa_id, aluno)
     turma = empresa.turma
     _validar_decisao(empresa, dados)
     decisao = (
@@ -149,13 +258,62 @@ def enviar_decisao(
         .filter(Decisao.empresa_id == empresa.id, Decisao.rodada == turma.rodada_atual)
         .first()
     )
+    versao_atual = decisao.versao if decisao else 0
+    verificar_versao(dados.versao, versao_atual, obrigatoria=turma.modo_equipe)
+    valores = dados.model_dump(exclude={"versao", "rodada"})
+    valores.update(
+        automatica=0, versao=versao_atual + 1,
+        enviada_em=None if turma.modo_equipe else agora(),
+    )
     if decisao is None:
-        decisao = Decisao(empresa_id=empresa.id, rodada=turma.rodada_atual)
+        decisao = Decisao(empresa_id=empresa.id, rodada=turma.rodada_atual, **valores)
         db.add(decisao)
-    for campo, valor in dados.model_dump().items():
-        setattr(decisao, campo, valor)
-    decisao.automatica = 0
-    decisao.enviada_em = agora()
+        db.flush()
+    else:
+        atualizado = db.execute(
+            update(Decisao).where(Decisao.id == decisao.id, Decisao.versao == versao_atual).values(**valores),
+            execution_options={"synchronize_session": False},
+        )
+        if atualizado.rowcount != 1:
+            raise HTTPException(409, "A decisão foi alterada. Atualize o painel antes de salvar.")
+        db.refresh(decisao)
+    if turma.modo_equipe:
+        registrar(db, empresa, aluno, "SALVAR_DECISAO", decisao.versao, snapshot_decisao(decisao))
     db.commit()
     db.refresh(decisao)
     return ser.decisao(decisao)
+
+
+@router.post("/empresas/{empresa_id}/aprovar")
+def aprovar_decisao(
+    empresa_id: int, dados: AprovarDecisaoEntrada,
+    db: Session = Depends(get_db), aluno: Usuario = Depends(exigir_aluno),
+):
+    empresa = _empresa_para_alterar(db, empresa_id, aluno)
+    if not empresa.turma.modo_equipe:
+        raise HTTPException(422, "Esta turma usa empresas individuais.")
+    verificar_rodada(dados.rodada, empresa.turma, obrigatoria=True)
+    if empresa.turma.status != StatusTurma.ABERTA:
+        raise HTTPException(422, "A turma foi encerrada.")
+    decisao = decisao_atual(db, empresa)
+    verificar_versao(dados.versao, decisao.versao if decisao else 0)
+    pendencias = pendencias_equipe(empresa, decisao, incluir_aprovacoes=False)
+    if pendencias:
+        raise HTTPException(422, " ".join(pendencias))
+    existente = next((a for a in decisao.aprovacoes if a.versao == decisao.versao and a.aluno_id == aluno.id), None)
+    if existente is None:
+        conteudo = snapshot_decisao(decisao)
+        conteudo["membros"] = [
+            {"aluno_id": m.aluno_id, "cargos": m.cargos} for m in empresa.membros
+        ]
+        decisao.aprovacoes.append(AprovacaoDecisao(
+            empresa_id=empresa.id, aluno_id=aluno.id,
+            rodada=decisao.rodada, versao=decisao.versao, conteudo=conteudo,
+        ))
+        registrar(db, empresa, aluno, "APROVAR_DECISAO", decisao.versao)
+        db.flush()
+        if not pendencias_equipe(empresa, decisao):
+            decisao.enviada_em = agora()
+    db.commit()
+    db.refresh(empresa)
+    return dados_equipe(empresa, decisao_atual(db, empresa), aluno)

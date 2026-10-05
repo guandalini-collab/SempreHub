@@ -59,11 +59,16 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
             <p className="mt-2 text-sm text-slate-500">
               {t.quantidade_empresas} empresa(s) · {t.status === "ABERTA" ? `rodada ${t.rodada_atual} de ${t.total_rodadas}` : `${t.total_rodadas} rodadas`}
             </p>
+            <p className="mt-1 text-xs text-slate-500">{t.modo_equipe ? "Equipes de 3 a 5 alunos" : "Participação individual"}</p>
           </button>
         ))}
       </div>
 
       <AlunosTeste />
+      <Cartao titulo="Comunicação do programa">
+        <p className="mb-2 text-sm text-slate-600">Use a identidade do SempreHub nos materiais de apresentação da turma.</p>
+        <a href="/marca/semprehub-original.svg" download className="text-sm font-semibold text-marinho underline">Baixar logo do SempreHub</a>
+      </Cartao>
     </div>
   );
 }
@@ -95,10 +100,16 @@ function NovaTurma({ aoCriar, aoCancelar }: { aoCriar: (t: Turma) => void; aoCan
         <Campo rotulo="Nome da turma" ajuda="Ex.: Empreendedorismo — 3º ano Técnico em Administração — 2026/2">
           <input className={estiloEntrada} value={nome} onChange={(e) => setNome(e.target.value)} required minLength={3} />
         </Campo>
+        <Campo rotulo="Participação dos alunos" ajuda="Equipes dividem os cargos de gestão e confirmam as decisões em conjunto.">
+          <select className={estiloEntrada} value={parametros.modo_equipe ? "EQUIPE" : "INDIVIDUAL"} onChange={(e) => setParametros({ ...parametros, modo_equipe: e.target.value === "EQUIPE" })}>
+            <option value="EQUIPE">Equipes de 3 a 5 alunos</option>
+            <option value="INDIVIDUAL">Individual</option>
+          </select>
+        </Campo>
         <button type="button" className="text-sm font-semibold text-marinho underline" onClick={() => setAvancado(!avancado)}>
           {avancado ? "Ocultar parâmetros do mercado" : "Ajustar parâmetros do mercado (opcional)"}
         </button>
-        {avancado && <EditorParametros valores={parametros} aoMudar={setParametros} />}
+        {avancado && <EditorParametros valores={parametros} aoMudar={setParametros} exibirModo={false} />}
         {erro && <Aviso>{erro}</Aviso>}
         <div className="flex justify-end gap-2">
           {aoCancelar && (

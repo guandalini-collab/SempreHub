@@ -1,7 +1,8 @@
 # SempreHub — Simulador de Empreendedorismo
 
-Jogo de empresas para o ensino de empreendedorismo. Cada aluno dirige uma empresa que disputa
-o mesmo mercado com as empresas dos colegas. O professor conduz a turma: abre as rodadas
+Jogo de empresas para o ensino de empreendedorismo. Alunos participam individualmente ou
+em equipes de 3 a 5 integrantes, dirigindo empresas que disputam o mesmo mercado.
+O professor conduz a turma: define a quantidade de rodadas
 (cada rodada é um mês), escolhe ou sorteia os eventos macroeconômicos e acompanha os resultados.
 
 - **Backend:** FastAPI (Python), SQLAlchemy, SQLite ou PostgreSQL.
@@ -11,7 +12,7 @@ o mesmo mercado com as empresas dos colegas. O professor conduz a turma: abre as
 
 **Professor**
 1. Cria a conta com e-mail `@iffarroupilha.edu.br`, `@iffar.edu.br` ou Gmail pessoal e o **código de cadastro docente**.
-2. Cria uma turma e, se quiser, ajusta os parâmetros do mercado (caixa inicial, preço de referência, salários, juros etc.).
+2. Cria uma turma, escolhe participação individual ou por equipes e ajusta os parâmetros do mercado (caixa inicial, preço de referência, salários, juros etc.).
 3. Divulga o código de 6 caracteres da turma.
 4. A cada mês, acompanha quem já enviou decisões e **fecha a rodada**, escolhendo o evento do mês ou deixando-o ser sorteado.
 5. Acompanha o ranking, abre o histórico de cada empresa e exporta tudo em CSV.
@@ -30,6 +31,29 @@ alunos também podem pedir ao professor uma nova senha.
 
 Quem não envia decisão tem as decisões do mês anterior repetidas automaticamente, mas sem contratações, demissões ou empréstimos.
 Alunos só podem entrar antes do fechamento da 1ª rodada.
+
+### Participação por equipes
+
+1. O professor cria uma turma com **Equipes de 3 a 5 alunos**.
+2. Um integrante abre a empresa pelo código da turma e assume a direção geral (CEO).
+3. Os colegas, cada um na própria conta, escolhem **Entrar em uma equipe** e usam
+   o convite fornecido pelo CEO. Todos compartilham a mesma empresa e histórico.
+4. Antes de fechar a primeira rodada, o CEO distribui os cargos CEO, CFO (finanças),
+   CMO (marketing), COO (operações) e CHRO (pessoas). Uma pessoa pode acumular cargos.
+5. A equipe salva um rascunho por rodada. Cada integrante confere os dados e seleciona
+   **Confirmar decisão** na própria conta. Alterar a decisão ou a composição/cargos
+   invalida as confirmações da versão anterior, preservando-as no registro histórico.
+6. O professor só fecha a rodada quando todas as equipes estão completas e todos os
+   integrantes confirmaram a versão atual. O painel mostra as pendências por empresa.
+
+Logins, alterações, cargos e confirmações ficam registrados com participante, rodada,
+versão e horário. Versão e rodada esperadas impedem que um formulário antigo sobrescreva
+uma decisão mais recente. As turmas individuais anteriores mantêm suas regras e dados.
+O modo de participação é escolhido antes de a primeira empresa entrar na turma.
+
+A logo original para materiais de comunicação está em
+`frontend/public/marca/semprehub-original.svg`, disponível pelo botão **Baixar logo do
+SempreHub** no painel do professor. A interface mantém a versão recortada da mesma arte.
 
 ## Regras do modelo
 

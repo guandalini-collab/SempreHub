@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, baixarArquivo } from "../../api";
+import EquipeEmpresa from "../../componentes/EquipeEmpresa";
 import {
   Aviso,
   Botao,
@@ -16,7 +17,7 @@ import {
   estiloEntrada,
 } from "../../componentes/ui";
 import { NOME_DORNELAS, NOME_GEM, NOME_REGIME, inteiro, percentual, reais } from "../../formatos";
-import type { Decisao, DetalheTurma, Empresa, OpcaoEvento, Parametros, Resultado } from "../../tipos";
+import type { Decisao, DetalheTurma, Empresa, Equipe, OpcaoEvento, Parametros, Resultado } from "../../tipos";
 import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
 
@@ -28,23 +29,30 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const [erro, setErro] = useState<string | null>(null);
   const [empresaAberta, setEmpresaAberta] = useState<number | null>(null);
   const [editandoParametros, setEditandoParametros] = useState(false);
+  const sequenciaCarga = useRef(0);
   const [historicos, setHistoricos] = useState<Record<number, Resultado[]>>({});
 
   const carregar = useCallback(async () => {
+    const sequencia = ++sequenciaCarga.current;
     try {
       const detalhe = await api.get<DetalheTurma>(`/api/professor/turmas/${turmaId}`);
+      if (sequencia !== sequenciaCarga.current) return;
       setDados(detalhe);
       setErro(null);
     } catch (e) {
+      if (sequencia !== sequenciaCarga.current) return;
       setErro(e instanceof Error ? e.message : "Erro ao carregar.");
     }
   }, [turmaId]);
 
   useEffect(() => {
+    setDados(null);
+    setEmpresaAberta(null);
+    setHistoricos({});
     carregar();
     api.get<OpcaoEvento[]>("/api/professor/eventos").then(setEventos).catch(() => undefined);
     const intervalo = window.setInterval(carregar, INTERVALO_ATUALIZACAO_MS);
-    return () => window.clearInterval(intervalo);
+    return () => { window.clearInterval(intervalo); sequenciaCarga.current += 1; };
   }, [carregar]);
 
   // Históricos de caixa de todas as empresas para o gráfico comparativo
@@ -78,6 +86,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-ouro">Turma</p>
             <h1 className="text-2xl font-bold">{turma.nome}</h1>
+            <p className="mt-1 text-xs text-white/70">{turma.modo_equipe ? "Equipes de 3 a 5 alunos · confirmação de todos os integrantes" : "Participação individual"}</p>
           </div>
           <div className="text-right">
             <p className="text-xs uppercase tracking-wide text-white/60">Código para os alunos</p>
@@ -87,7 +96,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <Indicador rotulo="Rodada" valor={aberta ? `${turma.rodada_atual} de ${turma.total_rodadas}` : "Encerrada"} destaque />
           <Indicador rotulo="Empresas" valor={empresas.length} />
-          <Indicador rotulo="Decisões enviadas" valor={aberta ? `${enviadas} de ${empresas.length}` : "—"} />
+          <Indicador rotulo={turma.modo_equipe ? "Equipes prontas" : "Decisões enviadas"} valor={aberta ? `${enviadas} de ${empresas.length}` : "—"} />
           <Indicador rotulo="Juros atuais" valor={`${percentual(turma.parametros!.taxa_juros_mensal, 2)} a.m.`} />
         </div>
         {(turma.greve_rodadas_restantes ?? 0) > 0 && (
@@ -102,7 +111,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="space-y-6 lg:col-span-2">
           {aberta ? (
-            <FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} eventos={eventos} empresas={empresas} aoFechar={carregar} />
+            <FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} eventos={eventos} empresas={empresas} aoFechar={carregar} />
           ) : (
             <Cartao titulo="Simulação encerrada">
               <p className="text-sm text-slate-600">
@@ -170,7 +179,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
                         <td className="py-2 font-semibold text-ouro">{linha.posicao}º</td>
                         <td className="py-2">
                           <p className="font-medium text-marinho">{linha.empresa}</p>
-                          <p className="text-xs text-slate-500">{linha.aluno}</p>
+                          <p className="text-xs text-slate-500">{turma.modo_equipe ? empresa.equipe_membros?.map((m) => m.nome).join(", ") || linha.aluno : linha.aluno}</p>
                         </td>
                         <td className={`py-2 text-right font-semibold ${linha.patrimonio < 0 ? "text-red-700" : "text-marinho"}`}>
                           {reais(linha.patrimonio)}
@@ -183,9 +192,9 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
                         {aberta && (
                           <td className="py-2 text-center">
                             {empresa.decisao_enviada ? (
-                              <span className="text-emerald-600" title="Decisão enviada">✔</span>
+                              <span className="text-emerald-600" title={turma.modo_equipe ? "Decisão confirmada pela equipe" : "Decisão enviada"}>✔</span>
                             ) : (
-                              <span className="text-amber-600" title="Ainda não enviou">…</span>
+                              <span className="text-amber-600" title={empresa.equipe_pendencias?.join("; ") || "Ainda não enviou"}>…</span>
                             )}
                           </td>
                         )}
@@ -251,6 +260,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
           turmaId={turma.id}
           inicial={turma.parametros!}
           somenteRodadas={turma.rodada_atual > 1}
+          modoBloqueado={turma.quantidade_empresas > 0}
           aoFechar={() => setEditandoParametros(false)}
           aoSalvar={async () => {
             setEditandoParametros(false);
@@ -274,12 +284,14 @@ function Dado({ rotulo, valor }: { rotulo: string; valor: string }) {
 function FecharRodada({
   turmaId,
   rodada,
+  modoEquipe,
   eventos,
   empresas,
   aoFechar,
 }: {
   turmaId: number;
   rodada: number;
+  modoEquipe: boolean;
   eventos: OpcaoEvento[];
   empresas: Empresa[];
   aoFechar: () => Promise<void>;
@@ -290,11 +302,17 @@ function FecharRodada({
   const [mensagem, setMensagem] = useState<{ tipo: "erro" | "sucesso"; texto: string } | null>(null);
   const pendentes = empresas.filter((e) => !e.decisao_enviada);
 
+  useEffect(() => {
+    setConfirmando(false);
+    setMensagem(null);
+  }, [turmaId, rodada]);
+
   async function fechar() {
+    if (modoEquipe && pendentes.length) return;
     setCarregando(true);
     setMensagem(null);
     try {
-      const resposta = await api.post<{ evento: OpcaoEvento }>(`/api/professor/turmas/${turmaId}/fechar-rodada`, { evento });
+      const resposta = await api.post<{ evento: OpcaoEvento }>(`/api/professor/turmas/${turmaId}/fechar-rodada`, { evento, rodada });
       setMensagem({ tipo: "sucesso", texto: `Mês ${rodada} fechado. Evento: ${resposta.evento.titulo}.` });
       setConfirmando(false);
       await aoFechar();
@@ -324,8 +342,10 @@ function FecharRodada({
         {descricao && <p className="text-xs leading-relaxed text-slate-500">{descricao}</p>}
         {pendentes.length > 0 && (
           <Aviso tipo="info">
-            {pendentes.length} empresa(s) ainda não enviaram decisões ({pendentes.map((e) => e.nome).join(", ")}). Se você fechar
-            agora, o sistema repetirá as decisões anteriores delas.
+            {modoEquipe ? <>
+              <p className="font-semibold">{pendentes.length} equipe(s) ainda precisam concluir a decisão. A rodada estará disponível quando todas estiverem prontas.</p>
+              <ul className="mt-2 space-y-2">{pendentes.map((e) => <li key={e.id}><strong>{e.nome}:</strong> {(e.equipe_pendencias?.length ? e.equipe_pendencias : ["Decisão ainda não confirmada por todos"]).join("; ")}.</li>)}</ul>
+            </> : <>{pendentes.length} empresa(s) ainda não enviaram decisões ({pendentes.map((e) => e.nome).join(", ")}). Se você fechar agora, o sistema repetirá as decisões anteriores delas.</>}
           </Aviso>
         )}
         {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}
@@ -335,13 +355,13 @@ function FecharRodada({
             <Botao variante="secundario" onClick={() => setConfirmando(false)}>
               Voltar
             </Botao>
-            <Botao carregando={carregando} onClick={fechar}>
+            <Botao carregando={carregando} disabled={modoEquipe && pendentes.length > 0} onClick={fechar}>
               Confirmar
             </Botao>
           </div>
         ) : (
           <div className="flex justify-end">
-            <Botao disabled={empresas.length === 0} onClick={() => setConfirmando(true)}>
+            <Botao disabled={empresas.length === 0 || (modoEquipe && pendentes.length > 0)} onClick={() => setConfirmando(true)}>
               Fechar rodada
             </Botao>
           </div>
@@ -352,16 +372,17 @@ function FecharRodada({
 }
 
 function DetalheEmpresa({ turmaId, empresaId, aoFechar }: { turmaId: number; empresaId: number; aoFechar: () => void }) {
-  const [dados, setDados] = useState<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[] } | null>(null);
+  const [dados, setDados] = useState<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; equipe?: Equipe | null } | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
   const [rodadaSelecionada, setRodadaSelecionada] = useState<number | null>(null);
 
   useEffect(() => {
     api
-      .get<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[] }>(`/api/professor/turmas/${turmaId}/empresas/${empresaId}`)
+      .get<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; equipe?: Equipe | null }>(`/api/professor/turmas/${turmaId}/empresas/${empresaId}`)
       .then((d) => {
         setDados(d);
         if (d.resultados.length) setRodadaSelecionada(d.resultados[d.resultados.length - 1].rodada);
-      });
+      }).catch((e) => setErro(e instanceof Error ? e.message : "Não foi possível carregar esta empresa."));
   }, [turmaId, empresaId]);
 
   const resultado = dados?.resultados.find((r) => r.rodada === rodadaSelecionada);
@@ -369,7 +390,7 @@ function DetalheEmpresa({ turmaId, empresaId, aoFechar }: { turmaId: number; emp
 
   return (
     <Modal titulo={dados ? dados.empresa.nome : "Empresa"} aoFechar={aoFechar}>
-      {!dados ? (
+      {erro ? <Aviso>{erro}</Aviso> : !dados ? (
         <Carregando />
       ) : (
         <div className="space-y-4">
@@ -377,7 +398,10 @@ function DetalheEmpresa({ turmaId, empresaId, aoFechar }: { turmaId: number; emp
             <span>{dados.empresa.aluno} · {dados.empresa.aluno_email}</span>
             <SeloFase fase={dados.empresa.fase_atual} />
           </div>
-          <BotaoRedefinirSenha alunoId={dados.empresa.aluno_id} nome={dados.empresa.aluno ?? "o aluno"} />
+          {dados.equipe ? <>
+            <EquipeEmpresa empresaId={dados.empresa.id} equipe={dados.equipe} />
+            <div className="space-y-2">{dados.equipe.membros.map((m) => <div key={m.aluno_id} className="flex flex-wrap items-center justify-between gap-2"><span className="text-sm text-slate-600">{m.nome}</span><BotaoRedefinirSenha alunoId={m.aluno_id} nome={m.nome} /></div>)}</div>
+          </> : <BotaoRedefinirSenha alunoId={dados.empresa.aluno_id} nome={dados.empresa.aluno ?? "o aluno"} />}
           <div className="grid grid-cols-2 gap-3 rounded-lg bg-slate-50 p-3 text-sm sm:grid-cols-4">
             <Dado rotulo="Perfil" valor={`${NOME_GEM[dados.empresa.tipo_entrada_gem]}`} />
             <Dado rotulo="Tipo" valor={NOME_DORNELAS[dados.empresa.classe_dornelas]} />
@@ -457,12 +481,14 @@ function EditarParametros({
   turmaId,
   inicial,
   somenteRodadas,
+  modoBloqueado,
   aoFechar,
   aoSalvar,
 }: {
   turmaId: number;
   inicial: Parametros;
   somenteRodadas: boolean;
+  modoBloqueado: boolean;
   aoFechar: () => void;
   aoSalvar: () => Promise<void>;
 }) {
@@ -498,7 +524,7 @@ function EditarParametros({
         </>
       }
     >
-      <EditorParametros valores={valores} aoMudar={setValores} somenteRodadas={somenteRodadas} />
+      <EditorParametros valores={valores} aoMudar={setValores} somenteRodadas={somenteRodadas} modoBloqueado={modoBloqueado} />
       {erro && (
         <div className="mt-4">
           <Aviso>{erro}</Aviso>

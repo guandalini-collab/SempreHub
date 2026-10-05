@@ -1,16 +1,19 @@
 import csv
 import io
+import json
 import secrets
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from .. import serializacao as ser
 from ..database import get_db
-from ..models import Decisao, Empresa, Papel, Resultado, StatusTurma, Turma, Usuario
+from ..equipes import bloquear_turma, dados_equipe, decisao_atual, pendencias_equipe, pendencias_fechamento, verificar_rodada
+from ..models import Decisao, Empresa, MembroEmpresa, Papel, Resultado, StatusTurma, Turma, Usuario
 from ..motor.eventos import opcoes_evento
 from ..motor.simulacao import processar_rodada
 from ..schemas import AlunoTesteEntrada, FecharRodadaEntrada, ParametrosTurma, TurmaEntrada
@@ -66,6 +69,10 @@ def atualizar_parametros(
     professor: Usuario = Depends(exigir_professor),
 ):
     turma = _turma_do_professor(db, turma_id, professor)
+    turma = bloquear_turma(db, turma.id)
+    if "modo_equipe" in dados.model_fields_set and dados.modo_equipe != turma.modo_equipe:
+        if turma.rodada_atual > 1 or turma.empresas:
+            raise HTTPException(422, "Escolha o modo de equipes antes de criar empresas ou fechar a primeira rodada.")
     if turma.rodada_atual > 1:
         # Depois da 1ª rodada só o número total de rodadas pode mudar, para não distorcer a competição
         if dados.total_rodadas < turma.rodada_atual - 1:
@@ -75,7 +82,10 @@ def atualizar_parametros(
             turma.status = StatusTurma.ABERTA
     else:
         caixa_anterior = turma.caixa_inicial
-        for campo, valor in dados.model_dump().items():
+        valores = dados.model_dump()
+        if "modo_equipe" not in dados.model_fields_set:
+            valores.pop("modo_equipe")
+        for campo, valor in valores.items():
             setattr(turma, campo, valor)
         for empresa in turma.empresas:
             if empresa.caixa == caixa_anterior:
@@ -101,7 +111,10 @@ def detalhar_turma(
     empresas = []
     for e in turma.empresas:
         dados = ser.empresa(e)
-        dados["decisao_enviada"] = e.id in enviadas
+        pendencias = pendencias_equipe(e, decisao_atual(db, e)) if turma.modo_equipe else []
+        dados["decisao_enviada"] = not pendencias if turma.modo_equipe else e.id in enviadas
+        dados["decisao_pronta"] = dados["decisao_enviada"]
+        dados["equipe_pendencias"] = pendencias
         empresas.append(dados)
     return {
         "turma": ser.turma(turma, completa=True),
@@ -149,6 +162,7 @@ def detalhar_empresa(
         "empresa": ser.empresa(empresa),
         "resultados": [ser.resultado(r) for r in empresa.resultados],
         "decisoes": [decisoes[r] for r in sorted(decisoes)],
+        "equipe": dados_equipe(empresa, decisao_atual(db, empresa)),
     }
 
 
@@ -160,6 +174,11 @@ def fechar_rodada(
     professor: Usuario = Depends(exigir_professor),
 ):
     turma = _turma_do_professor(db, turma_id, professor)
+    turma = bloquear_turma(db, turma.id)
+    verificar_rodada(dados.rodada, turma)
+    pendencias = pendencias_fechamento(db, turma)
+    if pendencias:
+        raise HTTPException(422, "Equipes pendentes: " + "; ".join(pendencias))
     try:
         evento = processar_rodada(db, turma, dados.evento)
     except ValueError as erro:
@@ -182,10 +201,28 @@ def exportar_csv(
         "marketing", "pd", "networking", "rescisoes", "royalties", "juros", "multas",
         "lucro_liquido", "caixa_final", "divida_final", "funcionarios", "fase",
         "autoeficacia", "networking_indice", "necessidade_realizacao",
+        "equipe", "cargos", "versao_decisao", "aprovacoes", "participacao_individual",
     ]
     escritor.writerow(cabecalho)
     for e in turma.empresas:
         for r in e.resultados:
+            decisao = next((d for d in e.decisoes if d.rodada == r.rodada), None)
+            membros = e.membros if turma.modo_equipe else []
+            aprovacoes = [
+                {
+                    "aluno": a.aluno.nome, "aluno_id": a.aluno_id, "versao": a.versao,
+                    "aprovado_em": a.aprovado_em.isoformat() + "Z",
+                }
+                for a in (decisao.aprovacoes if decisao else [])
+            ]
+            participacao = [
+                {
+                    "aluno": registro.aluno.nome, "aluno_id": registro.aluno_id,
+                    "acao": registro.acao, "versao": registro.versao,
+                    "data": registro.data.isoformat() + "Z",
+                }
+                for registro in e.registros_equipe if registro.rodada == r.rodada
+            ]
             escritor.writerow(
                 [
                     r.rodada, e.nome, e.aluno.nome, e.aluno.email, r.regime.value,
@@ -195,6 +232,11 @@ def exportar_csv(
                     _br(r.royalties), _br(r.juros), _br(r.multas), _br(r.lucro_liquido),
                     _br(r.caixa_final), _br(r.divida_final), r.funcionarios, r.fase.value,
                     _br(r.autoeficacia), _br(r.networking), _br(r.necessidade_realizacao),
+                    ", ".join(m.aluno.nome for m in membros),
+                    json.dumps([{"aluno": m.aluno.nome, "cargos": m.cargos} for m in membros], ensure_ascii=False),
+                    decisao.versao if decisao else 0,
+                    json.dumps(aprovacoes, ensure_ascii=False),
+                    json.dumps(participacao, ensure_ascii=False),
                 ]
             )
     conteudo = "﻿" + saida.getvalue()  # BOM para o Excel reconhecer acentos
@@ -266,7 +308,10 @@ def redefinir_senha_aluno(
     eh_da_turma = (
         db.query(Empresa)
         .join(Turma, Empresa.turma_id == Turma.id)
-        .filter(Empresa.aluno_id == aluno.id, Turma.professor_id == professor.id)
+        .filter(
+            or_(Empresa.aluno_id == aluno.id, Empresa.membros.any(MembroEmpresa.aluno_id == aluno.id)),
+            Turma.professor_id == professor.id,
+        )
         .first()
         is not None
     )

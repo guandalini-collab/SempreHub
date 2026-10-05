@@ -8,6 +8,7 @@ export type FaseAtual =
   | "SOBREVIVENCIA";
 export type TipoEntradaGem = "NECESSIDADE" | "OPORTUNIDADE";
 export type ClasseDornelas = "SERIAL" | "FRANQUIA" | "CORPORATIVO" | "SOCIAL";
+export type CargoEquipe = "CEO" | "CFO" | "CMO" | "COO" | "CHRO";
 
 export interface Usuario {
   id: number;
@@ -18,6 +19,7 @@ export interface Usuario {
 }
 
 export interface Parametros {
+  modo_equipe: boolean;
   total_rodadas: number;
   caixa_inicial: number;
   preco_referencia: number;
@@ -37,6 +39,7 @@ export interface Parametros {
 }
 
 export interface Turma {
+  modo_equipe: boolean;
   id: number;
   nome: string;
   codigo: string;
@@ -72,9 +75,13 @@ export interface Empresa {
   faturamento_ano: number;
   fator_clt: number;
   decisao_enviada?: boolean;
+  decisao_pronta?: boolean;
+  equipe_pendencias?: string[];
+  equipe_membros?: MembroEquipe[];
 }
 
 export interface Decisao {
+  versao: number;
   rodada: number;
   preco: number;
   marketing: number;
@@ -89,7 +96,26 @@ export interface Decisao {
   enviada_em: string | null;
 }
 
-export type DecisaoEntrada = Omit<Decisao, "rodada" | "automatica" | "enviada_em">;
+export type DecisaoEntrada = Omit<Decisao, "rodada" | "automatica" | "enviada_em" | "versao">;
+
+export interface MembroEquipe {
+  aluno_id: number;
+  nome: string;
+  cargos: CargoEquipe[];
+}
+
+export interface Equipe {
+  codigo_convite: string | null;
+  membros: MembroEquipe[];
+  meus_cargos: CargoEquipe[];
+  pode_gerenciar: boolean;
+  versao_decisao: number;
+  aprovacoes: { aluno_id: number; nome: string; versao: number; aprovado_em: string }[];
+  aprovada_por_mim: boolean;
+  pronta: boolean;
+  pendencias: string[];
+  historico: { acao: string; aluno_id: number | null; aluno: string | null; rodada: number; versao: number | null; data: string }[];
+}
 
 export interface PrevisaoDecisao {
   rodada: number;
@@ -168,6 +194,7 @@ export interface LinhaRanking {
 }
 
 export interface PainelAluno {
+  equipe?: Equipe | null;
   empresa: Empresa;
   turma: Turma;
   decisao_atual: Decisao | null;

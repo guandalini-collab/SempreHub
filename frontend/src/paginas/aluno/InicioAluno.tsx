@@ -45,7 +45,7 @@ export default function InicioAluno({ abrirEmpresa }: { abrirEmpresa: (id: numbe
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-marinho">Minhas empresas</h1>
-          <p className="text-sm text-slate-500">Cada turma em que você joga tem a sua própria empresa.</p>
+          <p className="text-sm text-slate-500">Acesse suas empresas e as equipes de que você participa.</p>
         </div>
         {!mostrarFormulario && (
           <Botao onClick={() => setMostrarFormulario(true)}>Entrar em uma turma</Botao>
@@ -75,6 +75,7 @@ export default function InicioAluno({ abrirEmpresa }: { abrirEmpresa: (id: numbe
               </div>
               <SeloFase fase={empresa.fase_atual} />
             </div>
+            {turma.modo_equipe && <p className="mb-3 text-xs text-slate-500">Equipe · {empresa.equipe_membros?.map((m) => m.nome).join(", ") || "Empresa compartilhada"}</p>}
             <div className="grid grid-cols-3 gap-2 text-sm">
               <div>
                 <p className="text-xs text-slate-500">Caixa</p>
@@ -99,6 +100,7 @@ export default function InicioAluno({ abrirEmpresa }: { abrirEmpresa: (id: numbe
 }
 
 function FormularioEntrada({ aoEntrar, aoCancelar }: { aoEntrar: (id: number) => void; aoCancelar?: () => void }) {
+  const [modo, setModo] = useState<"CRIAR" | "EQUIPE">("CRIAR");
   const [codigo, setCodigo] = useState("");
   const [nomeEmpresa, setNomeEmpresa] = useState("");
   const [gem, setGem] = useState<TipoEntradaGem>("OPORTUNIDADE");
@@ -112,6 +114,11 @@ function FormularioEntrada({ aoEntrar, aoCancelar }: { aoEntrar: (id: number) =>
     setErro(null);
     setCarregando(true);
     try {
+      if (modo === "EQUIPE") {
+        const resposta = await api.post<{ empresa: Empresa }>("/api/aluno/equipes/entrar", { codigo });
+        aoEntrar(resposta.empresa.id);
+        return;
+      }
       const resposta = await api.post<{ empresa: Empresa }>("/api/aluno/turmas/entrar", {
         codigo,
         nome_empresa: nomeEmpresa,
@@ -128,23 +135,30 @@ function FormularioEntrada({ aoEntrar, aoCancelar }: { aoEntrar: (id: number) =>
   }
 
   return (
-    <Cartao titulo="Abrir sua empresa em uma turma">
+    <Cartao titulo="Participar da simulação">
+      <div className="mb-5 grid gap-2 sm:grid-cols-2" role="group" aria-label="Como participar">
+        <Botao type="button" variante={modo === "CRIAR" ? "primario" : "secundario"} aria-pressed={modo === "CRIAR"} onClick={() => { setModo("CRIAR"); setCodigo(""); setErro(null); }}>Abrir uma empresa</Botao>
+        <Botao type="button" variante={modo === "EQUIPE" ? "primario" : "secundario"} aria-pressed={modo === "EQUIPE"} onClick={() => { setModo("EQUIPE"); setCodigo(""); setErro(null); }}>Entrar em uma equipe</Botao>
+      </div>
       <form onSubmit={enviar} className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Campo rotulo="Código da turma" ajuda="Informado pelo professor (6 caracteres).">
+          <Campo rotulo={modo === "EQUIPE" ? "Código de convite da empresa" : "Código da turma"} ajuda={modo === "EQUIPE" ? "Peça o convite ao colega que abriu a empresa. O código da turma serve para abrir uma empresa." : "Informado pelo professor. Em turmas por equipes, quem abre a empresa assume o cargo de CEO e convida os colegas."}>
             <input
-              className={`${estiloEntrada} uppercase tracking-widest`}
+              className={`${estiloEntrada} ${modo === "CRIAR" ? "uppercase tracking-widest" : "font-mono"}`}
               value={codigo}
-              onChange={(e) => setCodigo(e.target.value.toUpperCase())}
-              maxLength={12}
+              onChange={(e) => setCodigo(modo === "CRIAR" ? e.target.value.toUpperCase() : e.target.value)}
+              maxLength={modo === "CRIAR" ? 12 : 80}
+              autoCapitalize={modo === "CRIAR" ? "characters" : "none"}
+              autoComplete="off"
+              spellCheck={false}
               required
             />
           </Campo>
-          <Campo rotulo="Nome da empresa">
+          {modo === "CRIAR" && <Campo rotulo="Nome da empresa">
             <input className={estiloEntrada} value={nomeEmpresa} onChange={(e) => setNomeEmpresa(e.target.value)} required />
-          </Campo>
+          </Campo>}
         </div>
-
+        {modo === "CRIAR" && <>
         <Grupo titulo="Por que você está empreendendo? (GEM)">
           {(Object.keys(NOME_GEM) as TipoEntradaGem[]).map((g) => (
             <Opcao key={g} ativo={gem === g} aoEscolher={() => setGem(g)} titulo={NOME_GEM[g]} descricao={DESCRICAO_GEM[g]} />
@@ -168,6 +182,8 @@ function FormularioEntrada({ aoEntrar, aoCancelar }: { aoEntrar: (id: number) =>
             <Opcao key={r} ativo={regime === r} aoEscolher={() => setRegime(r)} titulo={NOME_REGIME[r]} descricao={DESCRICAO_REGIME[r]} />
           ))}
         </Grupo>
+        </>}
+        {modo === "EQUIPE" && <p className="text-sm text-slate-600">Você compartilhará a mesma empresa e o histórico das rodadas com os colegas. Cada integrante usa sua própria conta para confirmar as decisões.</p>}
 
         {erro && <Aviso>{erro}</Aviso>}
         <div className="flex justify-end gap-2">
@@ -177,7 +193,7 @@ function FormularioEntrada({ aoEntrar, aoCancelar }: { aoEntrar: (id: number) =>
             </Botao>
           )}
           <Botao type="submit" carregando={carregando}>
-            Abrir empresa
+            {modo === "EQUIPE" ? "Entrar na equipe" : "Abrir empresa"}
           </Botao>
         </div>
       </form>

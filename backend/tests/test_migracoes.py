@@ -14,19 +14,19 @@ from alembic.autogenerate import compare_metadata
 from alembic.migration import MigrationContext
 from alembic.script import ScriptDirectory
 from fastapi.testclient import TestClient
-from sqlalchemy import Column, DateTime, Enum, Integer, MetaData, String, Table, create_engine, inspect, select, text
+from sqlalchemy import Column, DateTime, Enum, Float, Integer, MetaData, String, Table, create_engine, inspect, select, text
 from sqlalchemy.orm import Session
 
 import app.migracoes as migracoes
 from app.database import Base, engine, get_db
 from app.main import app
-from app.models import Papel, Usuario
+from app.models import Decisao, Empresa, EventoRodada, Papel, Resultado, Turma, Usuario
 
 from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
 
 
-_HEAD = "0003_versao_sessao"
+_HEAD = "0004_equipes"
 
 
 @pytest.fixture()
@@ -82,7 +82,7 @@ def _snapshot(banco):
     metadata.reflect(bind=banco)
     with banco.connect() as conexao:
         return {
-            nome: [dict(linha) for linha in conexao.execute(select(tabela).order_by(tabela.c.id)).mappings()]
+            nome: [dict(linha) for linha in conexao.execute(select(tabela).order_by(*tabela.primary_key.columns)).mappings()]
             for nome, tabela in metadata.tables.items()
             if nome != "alembic_version"
         }
@@ -210,9 +210,103 @@ def test_revisao_anterior_e_atualizada_sem_perder_contas(banco_migracoes):
     depois = _snapshot(banco_migracoes)
     for usuario in depois["usuarios"]:
         assert usuario.pop("versao_sessao") == 0
-    assert depois == antes
+    assert {nome: depois[nome] for nome in antes} == antes
+    assert all(depois[nome] == [] for nome in depois.keys() - antes.keys())
     with Session(banco_migracoes) as sessao:
         assert sessao.get(Usuario, 2).criado_por_id == 1
+
+
+def _inserir_estado_legado(conexao, tabela, modelo, **dados):
+    """Insere apenas colunas existentes na revisão antiga, com defaults do domínio."""
+    valores = {}
+    for coluna in modelo.__table__.columns:
+        if coluna.name not in tabela.c or coluna.primary_key or coluna.name in dados:
+            continue
+        if coluna.default is not None:
+            valores[coluna.name] = coluna.default.arg(None) if coluna.default.is_callable else coluna.default.arg
+        elif not coluna.nullable and isinstance(coluna.type, Float):
+            valores[coluna.name] = 0.0
+    valores.update(dados)
+    return conexao.execute(tabela.insert().values(**valores)).inserted_primary_key[0]
+
+
+def test_migracao_de_equipes_preserva_turma_individual_e_historico_legado(banco_migracoes):
+    configuracao = migracoes.configuracao_alembic()
+    with banco_migracoes.begin() as conexao:
+        configuracao.attributes["connection"] = conexao
+        command.upgrade(configuracao, "0003_versao_sessao")
+    antigo = MetaData()
+    antigo.reflect(bind=banco_migracoes)
+    from app.seguranca import gerar_hash_senha
+
+    senha_hash = gerar_hash_senha("senha-segura")
+    with banco_migracoes.begin() as conexao:
+        professor_id = _inserir_estado_legado(
+            conexao, antigo.tables["usuarios"], Usuario,
+            nome="Prof. Legado", email="legado@iffarroupilha.edu.br", senha_hash=senha_hash, papel="PROFESSOR", versao_sessao=3,
+        )
+        aluno_id = _inserir_estado_legado(
+            conexao, antigo.tables["usuarios"], Usuario,
+            nome="Ana", email="ana@aluno.iffar.edu.br", senha_hash=senha_hash, papel="ALUNO", versao_sessao=5,
+        )
+        turma_id = _inserir_estado_legado(
+            conexao, antigo.tables["turmas"], Turma,
+            nome="Turma individual antiga", codigo="ANTIGA", professor_id=professor_id, rodada_atual=2, total_rodadas=3,
+        )
+        empresa_id = _inserir_estado_legado(
+            conexao, antigo.tables["empresas"], Empresa,
+            turma_id=turma_id, aluno_id=aluno_id, nome="Empresa preservada", tipo_entrada_gem="OPORTUNIDADE",
+            classe_dornelas="SERIAL", regime_tributario="SIMPLES_NACIONAL", fase_atual="OPERACAO_ESTAVEL",
+            caixa=35774, divida=10000, funcionarios=1, marca=5, qualidade=3, faturamento_ano=20900,
+        )
+        _inserir_estado_legado(
+            conexao, antigo.tables["decisoes"], Decisao,
+            empresa_id=empresa_id, rodada=1, preco=95, emprestimo=10000, contratar=1, marketing=500, pd=300,
+        )
+        _inserir_estado_legado(
+            conexao, antigo.tables["resultados"], Resultado,
+            empresa_id=empresa_id, rodada=1, preco=95, demanda=220, capacidade=240, unidades_vendidas=220,
+            participacao_mercado=1, receita=20900, impostos=836, cmv=8800, folha=2940, custos_fixos=1500,
+            marketing=500, pd=300, juros=250, lucro_liquido=5774, caixa_final=35774, divida_final=10000,
+            regime="SIMPLES_NACIONAL", aliquota_efetiva=0.04, funcionarios=1, marca=5, qualidade=3,
+            fase="OPERACAO_ESTAVEL", autoeficacia=50, networking=35, necessidade_realizacao=50,
+        )
+        _inserir_estado_legado(
+            conexao, antigo.tables["eventos_rodada"], EventoRodada,
+            turma_id=turma_id, rodada=1, codigo="NENHUM", titulo="Mês sem imprevistos", narrativa="Histórico anterior preservado.",
+        )
+    antes = _snapshot(banco_migracoes)
+    migracoes.preparar_banco(banco_migracoes)
+    _confirmar_head(banco_migracoes)
+    depois = _snapshot(banco_migracoes)
+    novas_colunas = {"turmas": {"modo_equipe": False}, "empresas": {"codigo_convite": None}, "decisoes": {"versao": 0}}
+    for nome, colunas in novas_colunas.items():
+        for linha in depois[nome]:
+            for coluna, valor in colunas.items():
+                assert linha.pop(coluna) == valor
+    assert {nome: depois[nome] for nome in antes} == antes
+    assert all(depois[nome] == [] for nome in depois.keys() - antes.keys())
+
+    # A migração não exige integrantes ou assinaturas de jogos individuais já iniciados.
+    with _cliente_no_banco(banco_migracoes) as cliente:
+        logins = {}
+        for papel, email in (("aluno", "ana@aluno.iffar.edu.br"), ("professor", "legado@iffarroupilha.edu.br")):
+            resposta = cliente.post("/api/auth/login", json={"email": email, "senha": "senha-segura"})
+            assert resposta.status_code == 200
+            logins[papel] = {"Authorization": f"Bearer {resposta.json()['token']}"}
+        empresa_url = f"/api/aluno/empresas/{empresa_id}"
+        painel = cliente.get(empresa_url, headers=logins["aluno"])
+        assert painel.status_code == 200
+        assert painel.json()["turma"]["modo_equipe"] is False
+        assert painel.json()["equipe"] is None
+        resultado_antigo = painel.json()["resultados"][0]
+        assert cliente.put(f"{empresa_url}/decisao", headers=logins["aluno"], json={"preco": 105, "amortizacao": 2000}).status_code == 200
+        assert cliente.post(f"/api/professor/turmas/{turma_id}/fechar-rodada", headers=logins["professor"], json={"evento": "NENHUM"}).status_code == 200
+        final = cliente.get(empresa_url, headers=logins["aluno"]).json()
+        assert final["empresa"]["id"] == empresa_id
+        assert [resultado["rodada"] for resultado in final["resultados"]] == [1, 2]
+        assert final["resultados"][0] == resultado_antigo
+        assert final["empresa"]["divida"] == 8000
 
 
 def test_schema_legado_com_so_usuarios_recebe_tabelas_e_colunas_faltantes(banco_migracoes):

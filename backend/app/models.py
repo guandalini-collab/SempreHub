@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import (
     JSON,
+    Boolean,
     Column,
     DateTime,
     Enum,
@@ -22,6 +23,7 @@ from sqlalchemy import (
     Integer,
     String,
     UniqueConstraint,
+    false,
 )
 from sqlalchemy.orm import relationship
 
@@ -73,6 +75,14 @@ class StatusTurma(str, enum.Enum):
     ENCERRADA = "ENCERRADA"
 
 
+class CargoEquipe(str, enum.Enum):
+    CEO = "CEO"
+    CFO = "CFO"
+    CMO = "CMO"
+    COO = "COO"
+    CHRO = "CHRO"
+
+
 class Usuario(Base):
     __tablename__ = "usuarios"
 
@@ -101,6 +111,7 @@ class Turma(Base):
     status = Column(Enum(StatusTurma), nullable=False, default=StatusTurma.ABERTA)
     rodada_atual = Column(Integer, nullable=False, default=1)
     total_rodadas = Column(Integer, nullable=False, default=12)
+    modo_equipe = Column(Boolean, nullable=False, default=False, server_default=false())
     criado_em = Column(DateTime, default=agora)
 
     # Parâmetros de mercado e de custos (ajustáveis pelo professor antes da 1ª rodada)
@@ -137,6 +148,7 @@ class Empresa(Base):
     turma_id = Column(Integer, ForeignKey("turmas.id"), nullable=False, index=True)
     aluno_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False, index=True)
     nome = Column(String(120), nullable=False)
+    codigo_convite = Column(String(64), nullable=True, unique=True, index=True)
     criado_em = Column(DateTime, default=agora)
 
     # Perfil empreendedor
@@ -162,6 +174,8 @@ class Empresa(Base):
     aluno = relationship("Usuario", back_populates="empresas")
     decisoes = relationship("Decisao", back_populates="empresa", order_by="Decisao.rodada")
     resultados = relationship("Resultado", back_populates="empresa", order_by="Resultado.rodada")
+    membros = relationship("MembroEmpresa", back_populates="empresa", order_by="MembroEmpresa.id")
+    registros_equipe = relationship("RegistroEquipe", back_populates="empresa", order_by="RegistroEquipe.id")
 
 
 class Decisao(Base):
@@ -171,6 +185,7 @@ class Decisao(Base):
     id = Column(Integer, primary_key=True)
     empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False, index=True)
     rodada = Column(Integer, nullable=False)
+    versao = Column(Integer, nullable=False, default=0, server_default="0")
 
     preco = Column(Float, nullable=False)
     marketing = Column(Float, nullable=False, default=0.0)
@@ -182,9 +197,67 @@ class Decisao(Base):
     amortizacao = Column(Float, nullable=False, default=0.0)
     regime_solicitado = Column(Enum(RegimeTributario), nullable=True)
     automatica = Column(Integer, nullable=False, default=0)  # 1 = repetida pelo sistema
-    enviada_em = Column(DateTime, default=agora, onupdate=agora)
+    # None é intencional em rascunhos de equipe; não aplicar o default nesse caso.
+    enviada_em = Column(DateTime().evaluates_none(), default=agora, onupdate=agora)
 
     empresa = relationship("Empresa", back_populates="decisoes")
+    aprovacoes = relationship("AprovacaoDecisao", back_populates="decisao", order_by="AprovacaoDecisao.id")
+
+
+class MembroEmpresa(Base):
+    """Um aluno integra no máximo uma empresa em cada turma."""
+
+    __tablename__ = "membros_empresa"
+    __table_args__ = (UniqueConstraint("turma_id", "aluno_id", name="uq_membro_turma_aluno"),)
+
+    id = Column(Integer, primary_key=True)
+    empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False, index=True)
+    turma_id = Column(Integer, ForeignKey("turmas.id"), nullable=False, index=True)
+    aluno_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False, index=True)
+    cargos = Column(JSON, nullable=False, default=list)
+    criado_em = Column(DateTime, default=agora)
+
+    empresa = relationship("Empresa", back_populates="membros")
+    aluno = relationship("Usuario")
+
+
+class AprovacaoDecisao(Base):
+    """Assinatura da revisão exata; versões anteriores nunca são apagadas."""
+
+    __tablename__ = "aprovacoes_decisao"
+    __table_args__ = (
+        UniqueConstraint("decisao_id", "versao", "aluno_id", name="uq_aprovacao_decisao_versao_aluno"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    decisao_id = Column(Integer, ForeignKey("decisoes.id"), nullable=False, index=True)
+    empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False, index=True)
+    aluno_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False, index=True)
+    rodada = Column(Integer, nullable=False)
+    versao = Column(Integer, nullable=False)
+    conteudo = Column(JSON, nullable=False)
+    aprovado_em = Column(DateTime, nullable=False, default=agora)
+
+    decisao = relationship("Decisao", back_populates="aprovacoes")
+    aluno = relationship("Usuario")
+
+
+class RegistroEquipe(Base):
+    """Participação autenticada de cada aluno, preservada entre rodadas."""
+
+    __tablename__ = "registros_equipe"
+
+    id = Column(Integer, primary_key=True)
+    empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False, index=True)
+    aluno_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False, index=True)
+    rodada = Column(Integer, nullable=False)
+    versao = Column(Integer, nullable=False)
+    acao = Column(String(40), nullable=False)
+    detalhes = Column(JSON, nullable=False, default=dict)
+    data = Column(DateTime, nullable=False, default=agora)
+
+    empresa = relationship("Empresa", back_populates="registros_equipe")
+    aluno = relationship("Usuario")
 
 
 class Resultado(Base):

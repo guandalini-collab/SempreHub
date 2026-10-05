@@ -1,9 +1,10 @@
 import React from "react";
 
-import { Campo, EntradaNumero } from "../../componentes/ui";
+import { Campo, EntradaNumero, estiloEntrada } from "../../componentes/ui";
 import type { Parametros } from "../../tipos";
 
 export const PARAMETROS_PADRAO: Parametros = {
+  modo_equipe: true,
   total_rodadas: 12,
   caixa_inicial: 20000,
   preco_referencia: 100,
@@ -23,7 +24,7 @@ export const PARAMETROS_PADRAO: Parametros = {
 };
 
 type Definicao = {
-  campo: keyof Parametros;
+  campo: Exclude<keyof Parametros, "modo_equipe">;
   rotulo: string;
   ajuda: string;
   tipo: "moeda" | "percentual" | "inteiro" | "decimal";
@@ -72,13 +73,23 @@ export function EditorParametros({
   valores,
   aoMudar,
   somenteRodadas = false,
+  modoBloqueado = false,
+  exibirModo = true,
 }: {
   valores: Parametros;
   aoMudar: (valores: Parametros) => void;
   somenteRodadas?: boolean;
+  modoBloqueado?: boolean;
+  exibirModo?: boolean;
 }) {
   return (
     <div className="space-y-5">
+      {exibirModo && <Campo rotulo="Participação dos alunos" ajuda={modoBloqueado ? "O modo de participação fica definido quando a primeira empresa entra na turma." : "Em equipes, 3 a 5 alunos dividem os cargos e todos confirmam cada decisão."}>
+        <select className={estiloEntrada} disabled={modoBloqueado || somenteRodadas} value={valores.modo_equipe ? "EQUIPE" : "INDIVIDUAL"} onChange={(e) => aoMudar({ ...valores, modo_equipe: e.target.value === "EQUIPE" })}>
+          <option value="EQUIPE">Equipes de 3 a 5 alunos</option>
+          <option value="INDIVIDUAL">Individual</option>
+        </select>
+      </Campo>}
       {GRUPOS.map((grupo) => (
         <fieldset key={grupo.titulo}>
           <legend className="mb-3 border-b border-slate-200 pb-1 text-sm font-semibold text-marinho">{grupo.titulo}</legend>
