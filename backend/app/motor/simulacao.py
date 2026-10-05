@@ -166,7 +166,6 @@ def processar_rodada(
         multiplicador_demanda = 1 - ev.VARIACAO_DEMANDA
 
     multiplicador_cmv = turma.cmv_multiplicador if turma.cmv_rodadas_restantes > 0 else 1.0
-    novo_ano = rodada > 1 and (rodada - 1) % 12 == 0
 
     # 2. Preparação de cada empresa
     calculos: List[_Calculo] = []
@@ -175,13 +174,7 @@ def processar_rodada(
         c = _Calculo(empresa=empresa, decisao=decisao, caixa_inicio=empresa.caixa)
         if decisao.automatica:
             c.alertas.append("Nenhuma decisão enviada: o sistema repetiu as decisões do mês anterior.")
-        if novo_ano:
-            empresa.faturamento_ano = 0.0
-            empresa.das_mei_pago_ano = 0.0
-
-        _aplicar_mudanca_regime(empresa, decisao, turma, c)
-        _aplicar_pessoal(empresa, decisao, turma, c)
-        _aplicar_financiamento(empresa, decisao, turma, c)
+        _preparar_empresa(c, turma, rodada)
 
         empresa.marca = RETENCAO_MARCA * empresa.marca + math.sqrt(max(0.0, decisao.marketing) / 1000)
         empresa.qualidade = RETENCAO_QUALIDADE * empresa.qualidade + 0.5 * math.sqrt(
@@ -191,13 +184,6 @@ def processar_rodada(
             empresa.networking - 1 + 2 * math.sqrt(max(0.0, decisao.networking) / 500)
         )
 
-        produtividade = turma.produtividade_por_pessoa
-        if empresa.autoeficacia < AUTOEFICACIA_BAIXA:
-            produtividade *= 1 - QUEDA_PRODUTIVIDADE_AUTOEFICACIA_BAIXA
-            c.alertas.append(
-                "Autoeficácia baixa: a insegurança do empreendedor reduziu a produtividade em 10%."
-            )
-        c.capacidade = (1 + empresa.funcionarios) * produtividade
         c.atratividade = _atratividade(empresa, decisao, turma, c)
         calculos.append(c)
 
@@ -230,6 +216,66 @@ def processar_rodada(
 
     db.commit()
     return db.query(EventoRodada).filter_by(turma_id=turma.id, rodada=rodada).one()
+
+
+def _preparar_empresa(c: _Calculo, turma: Turma, rodada: int) -> None:
+    empresa, decisao = c.empresa, c.decisao
+    if rodada > 1 and (rodada - 1) % 12 == 0:
+        empresa.faturamento_ano = 0.0
+        empresa.das_mei_pago_ano = 0.0
+    _aplicar_mudanca_regime(empresa, decisao, turma, c)
+    _aplicar_pessoal(empresa, decisao, turma, c)
+    _aplicar_financiamento(empresa, decisao, turma, c)
+    produtividade = turma.produtividade_por_pessoa
+    if empresa.autoeficacia < AUTOEFICACIA_BAIXA:
+        produtividade *= 1 - QUEDA_PRODUTIVIDADE_AUTOEFICACIA_BAIXA
+        c.alertas.append(
+            "Autoeficácia baixa: a insegurança do empreendedor reduziu a produtividade em 10%."
+        )
+    c.capacidade = (1 + empresa.funcionarios) * produtividade
+
+
+def _juros(c: _Calculo, turma: Turma) -> float:
+    return (
+        c.empresa.divida * turma.taxa_juros_mensal
+        + max(0.0, -c.caixa_inicio) * turma.taxa_cheque_especial
+    )
+
+
+def prever_decisao(empresa: Empresa, decisao: Decisao, turma: Turma) -> dict:
+    """Prévia sem gravação, reutilizando as regras de preparação do fechamento.
+
+    A cópia não pertence à sessão SQLAlchemy: consultar a prévia nunca altera
+    a empresa, as decisões ou o histórico. Mercado e novos eventos são desconhecidos.
+    """
+    copia = Empresa(**{col.name: getattr(empresa, col.name) for col in Empresa.__table__.columns})
+    c = _Calculo(empresa=copia, decisao=decisao, caixa_inicio=empresa.caixa)
+    _preparar_empresa(c, turma, turma.rodada_atual)
+    folha = copia.funcionarios * turma.salario_base * FATOR_CLT[copia.regime_tributario]
+    juros = _juros(c, turma)
+    gastos = (
+        folha + turma.custos_fixos_mensais + decisao.marketing + decisao.pd
+        + decisao.networking + c.rescisoes + juros
+    )
+    multiplicador_cmv = turma.cmv_multiplicador if turma.cmv_rodadas_restantes > 0 else 1.0
+    royalties = ROYALTIES_FRANQUIA if copia.classe_dornelas == ClasseDornelas.FRANQUIA else 0.0
+    margem = decisao.preco * (1 - royalties) - turma.custo_unitario * multiplicador_cmv
+    return {
+        "rodada": turma.rodada_atual,
+        "regime": copia.regime_tributario.value,
+        "funcionarios": copia.funcionarios,
+        "capacidade": c.capacidade,
+        "folha": folha,
+        "juros": juros,
+        "gastos_previstos": gastos,
+        "margem_unitaria": margem,
+        "ponto_equilibrio": gastos / margem if margem > 0 else None,
+        "emprestimo_aprovado": c.emprestimo,
+        "amortizacao_aplicada": c.amortizacao,
+        "divida_prevista": copia.divida,
+        "caixa_disponivel": empresa.caixa + c.emprestimo - c.amortizacao,
+        "alertas": c.alertas,
+    }
 
 
 def _aplicar_mudanca_regime(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo) -> None:
@@ -413,10 +459,9 @@ def _apurar(
                 f"Atenção: o faturamento do ano já atingiu {empresa.faturamento_ano / teto:.0%} do teto do MEI."
             )
 
-    juros = empresa.divida * turma.taxa_juros_mensal
+    juros = _juros(c, turma)
     if c.caixa_inicio < 0:
         juros_cheque = -c.caixa_inicio * turma.taxa_cheque_especial
-        juros += juros_cheque
         c.alertas.append(f"Cheque especial: {_reais(juros_cheque)} de juros sobre o caixa negativo.")
 
     multas = 0.0

@@ -91,6 +91,23 @@ export interface Decisao {
 
 export type DecisaoEntrada = Omit<Decisao, "rodada" | "automatica" | "enviada_em">;
 
+export interface PrevisaoDecisao {
+  rodada: number;
+  regime: RegimeTributario;
+  funcionarios: number;
+  capacidade: number;
+  folha: number;
+  juros: number;
+  gastos_previstos: number;
+  margem_unitaria: number;
+  ponto_equilibrio: number | null;
+  emprestimo_aprovado: number;
+  amortizacao_aplicada: number;
+  divida_prevista: number;
+  caixa_disponivel: number;
+  alertas: string[];
+}
+
 export interface Dre {
   receita: number;
   impostos: number;

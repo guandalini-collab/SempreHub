@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from .. import serializacao as ser
 from ..database import get_db
 from ..models import Decisao, Empresa, Resultado, StatusTurma, Turma, Usuario, agora
-from ..motor.simulacao import perfil_inicial
+from ..motor.simulacao import perfil_inicial, prever_decisao
 from ..schemas import DecisaoEntrada, EntrarTurmaEntrada
 from ..seguranca import exigir_aluno
 
@@ -113,6 +113,27 @@ def painel(empresa_id: int, db: Session = Depends(get_db), aluno: Usuario = Depe
     }
 
 
+def _validar_decisao(empresa: Empresa, dados: DecisaoEntrada) -> None:
+    if empresa.turma.status != StatusTurma.ABERTA:
+        raise HTTPException(422, "A turma foi encerrada; não há mais rodadas para decidir.")
+    if dados.demitir > empresa.funcionarios:
+        raise HTTPException(422, f"Você só pode demitir até {empresa.funcionarios} funcionário(s).")
+    if dados.amortizacao > empresa.divida + dados.emprestimo + 0.01:
+        raise HTTPException(422, "A amortização não pode ser maior que a dívida.")
+
+
+@router.post("/empresas/{empresa_id}/previsao")
+def previa_decisao(
+    empresa_id: int,
+    dados: DecisaoEntrada,
+    db: Session = Depends(get_db),
+    aluno: Usuario = Depends(exigir_aluno),
+):
+    empresa = _empresa_do_aluno(db, empresa_id, aluno)
+    _validar_decisao(empresa, dados)
+    return prever_decisao(empresa, Decisao(**dados.model_dump()), empresa.turma)
+
+
 @router.put("/empresas/{empresa_id}/decisao")
 def enviar_decisao(
     empresa_id: int,
@@ -122,12 +143,7 @@ def enviar_decisao(
 ):
     empresa = _empresa_do_aluno(db, empresa_id, aluno)
     turma = empresa.turma
-    if turma.status != StatusTurma.ABERTA:
-        raise HTTPException(422, "A turma foi encerrada; não há mais rodadas para decidir.")
-    if dados.demitir > empresa.funcionarios:
-        raise HTTPException(422, f"Você só pode demitir até {empresa.funcionarios} funcionário(s).")
-    if dados.amortizacao > empresa.divida + dados.emprestimo + 0.01:
-        raise HTTPException(422, "A amortização não pode ser maior que a dívida.")
+    _validar_decisao(empresa, dados)
     decisao = (
         db.query(Decisao)
         .filter(Decisao.empresa_id == empresa.id, Decisao.rodada == turma.rodada_atual)

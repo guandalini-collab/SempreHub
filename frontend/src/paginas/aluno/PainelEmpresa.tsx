@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { api } from "../../api";
 import {
@@ -17,7 +17,7 @@ import {
   estiloEntrada,
 } from "../../componentes/ui";
 import { NOME_DORNELAS, NOME_GEM, NOME_REGIME, inteiro, percentual, reais, umDecimal } from "../../formatos";
-import type { DecisaoEntrada, EventoRodada, PainelAluno, RegimeTributario } from "../../tipos";
+import type { DecisaoEntrada, EventoRodada, PainelAluno, PrevisaoDecisao, RegimeTributario } from "../../tipos";
 
 const INTERVALO_ATUALIZACAO_MS = 15000;
 
@@ -136,7 +136,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
               </p>
             </Cartao>
           ) : (
-            <FormularioDecisao painel={painel} aoEnviar={carregar} />
+            <FormularioDecisao key={empresa.id} painel={painel} aoEnviar={carregar} />
           )}
         </div>
         <div className="space-y-6 lg:col-span-2">
@@ -271,6 +271,11 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
   const [d, setD] = useState<DecisaoEntrada>(() => decisaoInicial(painel));
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState<{ tipo: "erro" | "sucesso"; texto: string } | null>(null);
+  const [previa, setPrevia] = useState<{ chave: string; dados?: PrevisaoDecisao; erro?: string } | null>(null);
+  const [tentativaPrevia, setTentativaPrevia] = useState(0);
+  const chavePrevisao = JSON.stringify({ d, empresa, turma, tentativaPrevia });
+  const previsao = previa?.chave === chavePrevisao ? previa.dados : undefined;
+  const erroPrevisao = previa?.chave === chavePrevisao ? previa.erro : undefined;
 
   // Ao mudar de rodada, recomeça a partir da última decisão
   useEffect(() => {
@@ -282,22 +287,32 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
   const atualizar = <K extends keyof DecisaoEntrada>(campo: K, valor: DecisaoEntrada[K]) =>
     setD((atual) => ({ ...atual, [campo]: valor }));
 
-  const previsao = useMemo(() => {
-    const regime = d.regime_solicitado ?? empresa.regime_tributario;
-    const fator = regime === "LUCRO_PRESUMIDO" ? 1.82 : 1.45;
-    const funcionarios = Math.max(0, empresa.funcionarios + d.contratar - d.demitir);
-    const folha = funcionarios * p.salario_base * fator;
-    const capacidade = (1 + funcionarios) * p.produtividade_por_pessoa;
-    const juros = (empresa.divida + d.emprestimo - d.amortizacao) * p.taxa_juros_mensal;
-    const gastosFixos =
-      folha + p.custos_fixos_mensais + d.marketing + d.pd + d.networking + d.demitir * p.salario_base + Math.max(0, juros);
-    const margemUnitaria = d.preco - p.custo_unitario;
-    const pontoEquilibrio = margemUnitaria > 0 ? gastosFixos / margemUnitaria : Infinity;
-    return { funcionarios, folha, capacidade, gastosFixos, margemUnitaria, pontoEquilibrio, regime };
-  }, [d, empresa, p]);
+  useEffect(() => {
+    let cancelada = false;
+    const { d: entrada, empresa: empresaAtual, turma: turmaAtual } = JSON.parse(chavePrevisao);
+    const temporizador = window.setTimeout(async () => {
+      try {
+        const dados = await api.post<PrevisaoDecisao>(`/api/aluno/empresas/${empresaAtual.id}/previsao`, entrada);
+        if (!cancelada) {
+          if (dados.rodada !== turmaAtual.rodada_atual) {
+            setPrevia({ chave: chavePrevisao, erro: "O professor avançou a rodada. Aguarde a atualização do painel." });
+          } else {
+            setPrevia({ chave: chavePrevisao, dados });
+          }
+        }
+      } catch (e) {
+        if (!cancelada) setPrevia({ chave: chavePrevisao, erro: e instanceof Error ? e.message : "Erro ao calcular a prévia." });
+      }
+    }, 250);
+    return () => {
+      cancelada = true;
+      window.clearTimeout(temporizador);
+    };
+  }, [chavePrevisao]);
 
   async function enviar(evento: React.FormEvent) {
     evento.preventDefault();
+    if (!previsao || carregando) return;
     setCarregando(true);
     setMensagem(null);
     try {
@@ -310,11 +325,6 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
       setCarregando(false);
     }
   }
-
-  const avisoMei =
-    previsao.regime === "MEI" && previsao.funcionarios > 1
-      ? "Com mais de 1 empregado a empresa deixa de ser MEI e passa ao Simples Nacional."
-      : null;
 
   return (
     <Cartao
@@ -347,7 +357,7 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
         </Secao>
 
         <Secao titulo="Equipe">
-          <Campo rotulo="Contratar" ajuda={`Salário-base ${reais(p.salario_base)}; com encargos (×${previsao.regime === "LUCRO_PRESUMIDO" ? "1,82" : "1,45"}).`}>
+          <Campo rotulo="Contratar" ajuda={`Salário-base ${reais(p.salario_base)}. A prévia aplica os encargos do regime efetivo.`}>
             <EntradaNumero inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} />
           </Campo>
           <Campo rotulo="Demitir" ajuda={`Hoje: ${empresa.funcionarios} funcionário(s). Rescisão custa um salário.`}>
@@ -394,29 +404,48 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
 
         <div className="rounded-lg bg-slate-50 p-4 text-sm">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Prévia do mês</p>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 sm:grid-cols-3">
-            <Previa rotulo="Capacidade de produção" valor={`${inteiro(previsao.capacidade)} un.`} />
-            <Previa rotulo="Folha com encargos" valor={reais(previsao.folha)} />
-            <Previa rotulo="Gastos fixos do mês" valor={reais(previsao.gastosFixos)} />
-            <Previa rotulo="Margem por unidade" valor={reais(previsao.margemUnitaria)} />
-            <Previa
-              rotulo="Ponto de equilíbrio"
-              valor={Number.isFinite(previsao.pontoEquilibrio) ? `${inteiro(Math.ceil(previsao.pontoEquilibrio))} un.` : "sem margem"}
-            />
-            <Previa rotulo="Caixa disponível" valor={reais(empresa.caixa + d.emprestimo - d.amortizacao)} />
-          </div>
-          <p className="mt-2 text-xs text-slate-500">Antes de tributos. O ponto de equilíbrio considera a margem sobre o custo da mercadoria.</p>
-          {previsao.pontoEquilibrio > previsao.capacidade && Number.isFinite(previsao.pontoEquilibrio) && (
-            <p className="mt-2 text-xs font-semibold text-red-700">
-              Atenção: mesmo vendendo toda a capacidade, a empresa não cobre os gastos fixos deste mês.
-            </p>
+          {!previsao && !erroPrevisao && <p role="status">Calculando prévia…</p>}
+          {erroPrevisao && (
+            <div className="space-y-2">
+              <Aviso>{erroPrevisao}</Aviso>
+              <Botao type="button" variante="secundario" onClick={() => setTentativaPrevia((atual) => atual + 1)}>
+                Tentar calcular novamente
+              </Botao>
+            </div>
           )}
-          {avisoMei && <p className="mt-2 text-xs font-semibold text-amber-800">{avisoMei}</p>}
+          {previsao && (
+            <>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 sm:grid-cols-3">
+                <Previa rotulo="Capacidade de produção" valor={`${inteiro(previsao.capacidade)} un.`} />
+                <Previa rotulo="Folha com encargos" valor={reais(previsao.folha)} />
+                <Previa rotulo="Gastos previstos do mês" valor={reais(previsao.gastos_previstos)} />
+                <Previa rotulo="Margem por unidade" valor={reais(previsao.margem_unitaria)} />
+                <Previa
+                  rotulo="Ponto de equilíbrio"
+                  valor={previsao.ponto_equilibrio !== null ? `${inteiro(Math.ceil(previsao.ponto_equilibrio))} un.` : "sem margem"}
+                />
+                <Previa rotulo="Caixa após financiamento" valor={reais(previsao.caixa_disponivel)} />
+                <Previa rotulo="Empréstimo aprovado na prévia" valor={reais(previsao.emprestimo_aprovado)} />
+                <Previa rotulo="Amortização aplicada" valor={reais(previsao.amortizacao_aplicada)} />
+                <Previa rotulo="Regime considerado" valor={NOME_REGIME[previsao.regime]} />
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                Antes de tributos, vendas e novos eventos. Inclui juros, royalties de franquia e efeitos ainda ativos de rodadas anteriores.
+                O caixa acima é anterior aos gastos do mês; o resultado final depende do mercado e do evento no fechamento.
+              </p>
+              {previsao.ponto_equilibrio !== null && previsao.ponto_equilibrio > previsao.capacidade && (
+                <p className="mt-2 text-xs font-semibold text-red-700">
+                  Atenção: mesmo vendendo toda a capacidade, a empresa não cobre os gastos previstos deste mês.
+                </p>
+              )}
+              {previsao.alertas.map((alerta) => <p key={alerta} className="mt-2 text-xs font-semibold text-amber-800">{alerta}</p>)}
+            </>
+          )}
         </div>
 
         {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}
         <div className="flex justify-end">
-          <Botao type="submit" carregando={carregando}>
+          <Botao type="submit" carregando={carregando} disabled={!previsao}>
             {painel.decisao_atual ? "Atualizar decisões" : "Enviar decisões"}
           </Botao>
         </div>
