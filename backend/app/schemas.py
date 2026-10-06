@@ -44,6 +44,7 @@ class ConfiguracaoSimulacao(BaseModel):
     capacidade_maquina: int = Field(240, ge=1, le=100_000)
     preco_maquina: float = Field(12000.0, gt=0, le=10_000_000)
     vida_util_maquina: int = Field(24, ge=1, le=600)
+    custo_frete_km: float = Field(0.1, ge=0, le=1000)
     custo_armazenagem: float = Field(0.01, ge=0, le=1)
     frete_rapido: float = Field(15.0, ge=0, le=100_000)
     frete_padrao: float = Field(10.0, ge=0, le=100_000)
@@ -183,6 +184,7 @@ class DecisaoEntrada(BaseModel):
 
     versao: Optional[int] = Field(None, ge=0)
     rodada: Optional[int] = Field(None, ge=1, le=60)
+    revisao_areas: dict[Literal["decisoes", "financas", "producao", "logistica"], bool] = Field(default_factory=dict)
     preco: float = Field(gt=0, le=100000)
     marketing: float = Field(0.0, ge=0, le=10_000_000)
     pd: float = Field(0.0, ge=0, le=10_000_000)

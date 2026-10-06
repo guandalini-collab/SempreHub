@@ -66,6 +66,7 @@ def decisao(d: Optional[Decisao]) -> Optional[Dict[str, Any]]:
     return {
         "rodada": d.rodada,
         "versao": d.versao,
+        "revisao_areas": d.revisao_areas or {},
         "simulacao": d.simulacao,
         "plano_comercial": d.plano_comercial,
         "preco": d.preco,

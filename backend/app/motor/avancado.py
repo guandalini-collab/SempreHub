@@ -82,9 +82,10 @@ def prever(empresa, decisao, turma):
     op = (decisao.simulacao or {})
     if turma.modo_jogo == "TRADICIONAL":
         cfg = config(turma)
-        fretes = {"RAPIDO": cfg["frete_rapido"], "PADRAO": cfg["frete_padrao"], "ECONOMICO": cfg["frete_economico"]}
+        from .localizacao import estimar_frete
+        localizacao = estimar_frete(op, cfg)
         custo = ((decisao.plano_comercial or {}).get("custo_unitario", turma.custo_unitario)) * (turma.cmv_multiplicador if turma.cmv_rodadas_restantes > 0 else 1)
-        margem = decisao.preco * (1 - (0.05 if empresa.classe_dornelas.value == "FRANQUIA" else 0)) - custo - fretes.get(op.get("modal", "PADRAO"), 10)
+        margem = decisao.preco * (1 - (0.05 if empresa.classe_dornelas.value == "FRANQUIA" else 0)) - custo - localizacao["frete_unitario"]
         producao = calculo.get("producao_planejada", 0)
     else:
         margem = decisao.preco - (decisao.plano_comercial or {}).get("custo_unitario", config(turma)["custo_nuvem_cliente"])
@@ -102,6 +103,7 @@ def prever(empresa, decisao, turma):
         "caixa_disponivel": empresa.caixa + calculo.get("emprestimo", 0) - calculo.get("amortizacao", 0),
         "alertas": calculo.get("alertas", []),
         "simulacao": {"estado": deepcopy(calculo.get("estado", {})), "producao": producao,
+                       **(localizacao if turma.modo_jogo == "TRADICIONAL" else {}),
                        "aviso": "Estimativa sem vendas: demanda e eventos da próxima rodada ainda são desconhecidos."},
     }
 

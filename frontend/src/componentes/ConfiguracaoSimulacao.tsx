@@ -12,6 +12,7 @@ type CampoConfiguracao = {
 };
 
 const CAMPOS_TRADICIONAL: CampoConfiguracao[] = [
+  { campo: "custo_frete_km", rotulo: "Frete por unidade e quilômetro (R$)", ajuda: "Taxa didática adicional à modalidade, aplicada à distância média ponderada da localização escolhida.", tipo: "moeda", minimo: 0 },
   { campo: "capacidade_maquina", rotulo: "Capacidade de uma máquina", ajuda: "Unidades que uma máquina em boas condições pode produzir por mês.", tipo: "inteiro", minimo: 1 },
   { campo: "preco_maquina", rotulo: "Preço de uma máquina", ajuda: "Investimento disponível às empresas durante o jogo.", tipo: "moeda" },
   { campo: "vida_util_maquina", rotulo: "Vida útil da máquina", ajuda: "Meses usados para calcular a depreciação.", tipo: "inteiro", minimo: 1 },

@@ -26,6 +26,6 @@ export default function CentroGravidade({ estudo, aoMudar }: { estudo?: EstudoCe
     <p className="text-sm font-semibold">A escolha é sua: registre a localização e justifique.</p>
     <div className="grid gap-3 sm:grid-cols-2"><Campo rotulo="X da localização escolhida (km)"><input type="number" className={estiloEntrada} step="any" min={-1000000} max={1000000} value={dados.local_x ?? ""} onChange={e => aoMudar({ ...dados, local_x: e.target.value === "" ? null : Number(e.target.value) })} /></Campo><Campo rotulo="Y da localização escolhida (km)"><input type="number" className={estiloEntrada} step="any" min={-1000000} max={1000000} value={dados.local_y ?? ""} onChange={e => aoMudar({ ...dados, local_y: e.target.value === "" ? null : Number(e.target.value) })} /></Campo></div>
     <Campo rotulo="Justificativa da localização"><textarea className={estiloEntrada} maxLength={2000} value={dados.justificativa} onChange={e => aoMudar({ ...dados, justificativa: e.target.value })} /></Campo>
-    <p className="text-xs text-slate-600">O estudo fica registrado junto com a decisão. Nesta etapa, a localização não altera automaticamente o frete nem a capacidade de produção.</p>
+    <p className="text-xs text-slate-600">O estudo fica registrado junto com a decisão. Com localização escolhida e volumes positivos, a distância média ponderada afeta o frete. Consulte a tarifa em Logística; a localização não muda a capacidade das máquinas.</p>
   </div>;
 }

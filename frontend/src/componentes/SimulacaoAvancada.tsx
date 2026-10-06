@@ -17,13 +17,20 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
   area?: string;
   rodada: number;
 }) {
+  const estudo = valores.centro_gravidade;
+  const volume = estudo?.pontos.reduce((s, p) => s + p.volume, 0) ?? 0;
+  const temLocalizacao = !!estudo && estudo.local_x != null && estudo.local_y != null && volume > 0;
+  const distancia = temLocalizacao ? estudo!.pontos.reduce((s, p) => s + Math.hypot(p.x - estudo!.local_x!, p.y - estudo!.local_y!) * p.volume, 0) / volume : 0;
+  const taxaKm = config.custo_frete_km ?? 0.1;
+  const adicionalFrete = Math.round(distancia * taxaKm * 100) / 100;
+  const baseFrete = valores.modal === "RAPIDO" ? config.frete_rapido : valores.modal === "ECONOMICO" ? config.frete_economico : config.frete_padrao;
   const mudar = <K extends keyof DecisaoSimulacao>(campo: K, valor: DecisaoSimulacao[K]) => aoMudar({ ...valores, [campo]: valor });
   return <div className="space-y-6">
     {modo === "TRADICIONAL" && <>
       <Secao titulo="Produção e investimento" oculto={area !== "producao"}>
         <Campo rotulo="Produção planejada" ajuda="Unidades a produzir neste mês. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><ControleVisual rotulo="producao" moeda={false} inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} limite={10000} /></Campo>
         <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar neste mês. O que não for consumido continua no estoque para as próximas rodadas."><ControleVisual rotulo="comprar mp" moeda={false} inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} limite={10000} /></Campo>
-        {rodada >= 3 ? <Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={100} /></Campo> : <p className="rounded-lg bg-blue-50 p-4 text-sm text-blue-900"><strong>Expansão do maquinário a partir do mês 3.</strong> Nos dois primeiros meses, planeje a produção com as máquinas iniciais e cuide da manutenção.</p>}
+        {rodada >= 3 ? <><Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={100} /></Campo><dl className="mt-3 grid gap-2 rounded-lg bg-blue-50 p-4 text-sm sm:grid-cols-2"><div><dt>Investimento total</dt><dd className="font-bold">{reais(valores.comprar_maquinas * config.preco_maquina)}</dd></div><div><dt>Capacidade adicional nominal</dt><dd className="font-bold">{inteiro(valores.comprar_maquinas * config.capacidade_maquina)} un./mês</dd></div><div><dt>Disponível no mês</dt><dd className="font-bold">{rodada + 1}</dd></div><div><dt>Depreciação mensal estimada</dt><dd className="font-bold">{reais(valores.comprar_maquinas * config.preco_maquina / config.vida_util_maquina)}</dd></div></dl><p className="mt-2 text-xs text-slate-600">A capacidade efetiva também depende de pessoas, matéria-prima e condição das máquinas. A compra reduz o caixa; a depreciação afeta o lucro nos meses de operação.</p></> : <p className="rounded-lg bg-blue-50 p-4 text-sm text-blue-900"><strong>Expansão do maquinário a partir do mês 3.</strong> Nos dois primeiros meses, planeje a produção com as máquinas iniciais e cuide da manutenção.</p>}
         <Campo rotulo="Manutenção do mês" ajuda="Cuida das condições das máquinas e da capacidade das próximas rodadas."><ControleVisual rotulo="manutencao"  valor={valores.manutencao} aoMudar={(v) => mudar("manutencao", v)} limite={100000} /></Campo>
 
       </Secao>
@@ -37,6 +44,7 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
           </select>
         </Campo>
       </Secao>
+      {area === "logistica" && <div className="rounded-lg bg-blue-50 p-4 text-sm"><h3 className="font-bold">Frete e localização</h3><p className="mt-2">Modalidade: {reais(baseFrete)}/unidade · taxa didática: {reais(taxaKm)}/unidade/km.</p><p className="mt-2">Distância média ponderada: {distancia.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} km · adicional: {reais(adicionalFrete)}/unidade.</p><p className="mt-2 font-bold">Frete estimado: {reais(baseFrete + adicionalFrete)} por unidade vendida.</p><p className="mt-2">{temLocalizacao ? "A localização escolhida em Produção afeta o frete registrado na DRE e no caixa." : "Sem localização definida e volumes positivos, aplica-se apenas o custo da modalidade. Complete o estudo em Produção para incluir as distâncias."}</p></div>}
       <Secao titulo="Compras a prazo" oculto={area !== "financas"}>
         <Campo rotulo="Parcela das compras a prazo" ajuda="A compra entra no estoque agora; o pagamento ocorre no vencimento. O restante é pago à vista."><EntradaNumero valor={valores.compras_prazo * 100} sufixo="%" aoMudar={(v) => mudar("compras_prazo", v / 100)} /></Campo>
         <Campo rotulo="Prazo de pagamento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_pagamento} onChange={(e) => mudar("prazo_pagamento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} mês(es)</option>)}</select></Campo>

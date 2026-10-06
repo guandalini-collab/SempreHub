@@ -91,6 +91,7 @@ export interface Empresa {
 }
 
 export interface Decisao {
+  revisao_areas?: Partial<Record<"decisoes" | "financas" | "producao" | "logistica", boolean>>;
   simulacao: DecisaoSimulacao | null;
   plano_comercial?: PlanoComercial | null;
   versao: number;

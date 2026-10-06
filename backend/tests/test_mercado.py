@@ -5,7 +5,7 @@ from .test_fluxo import _criar_turma, _entrar
 def edicao():
     fonte={"titulo":"Fonte de aquisição","url":"https://example.com/produto"}
     artigo={"titulo":"Mercado brasileiro","texto":"Dados de mercado consultados para esta edição.","data":"2026-10-06","fontes":[fonte]}
-    return {"setor":"Eletrônicos e Tecnologia","comercio":"B2C","noticias":[artigo],"analises":[artigo],"produtos":[{"id":"produto-1","nome":"Produto de teste","descricao":"Descrição de produto de teste","custo_unitario":30,"unidade":"unidade","base_custo":"Preço público de aquisição, não custo industrial.","data":"2026-10-06","fontes":[fonte]}]}
+    return {"setor":"Eletrônicos e Tecnologia","comercio":"B2C","noticias":[artigo],"analises":[artigo],"produtos":[{"natureza":"FISICO","id":"produto-1","nome":"Produto de teste","descricao":"Descrição de produto de teste","custo_unitario":30,"unidade":"unidade","base_custo":"Preço público de aquisição, não custo industrial.","data":"2026-10-06","fontes":[fonte]}]}
 
 
 def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch):
@@ -70,12 +70,14 @@ def test_concorrentes_externos_disputam_demanda_no_basico(cliente,professor):
 
 def test_custo_catalogo_aplicado_servico_digital(cliente,professor,monkeypatch):
     from app.routers import mercado
-    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(edicao(),{"https://example.com/produto"}))
+    digital = edicao()
+    digital["produtos"][0].update(natureza="SERVICO_DIGITAL", unidade="cliente/mês")
+    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(digital,{"https://example.com/produto"}))
     turma=_criar_turma(cliente,professor,modo_jogo="STARTUP",cenario="CRISE")
     aluno=cadastrar(cliente,"Bia","catalogo-startup@aluno.iffar.edu.br")
     empresa=_entrar(cliente,aluno,turma["codigo"],"Serviço digital")
     docente=f"/api/professor/turmas/{turma['id']}/mercado"
-    eid=cliente.post(docente+"/pesquisar",headers=professor,json={"setor":"Tecnologia","noticias":1,"analises":1,"produtos":1}).json()["id"]
+    eid=cliente.post(docente+"/pesquisar",headers=professor,json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":1}).json()["id"]
     cliente.post(docente+f"/{eid}/publicar",headers=professor,json={})
     plano={"edicao_id":eid,"produto_id":"produto-1","estrategia_preco":"VALOR","posicionamento":"INOVACAO","canais":["ECOMMERCE"],"cobertura":"NACIONAL","intensidade":"BAIXA","midias":[]}
     resposta=cliente.put(f"/api/aluno/empresas/{empresa}/decisao",headers=aluno,json={"rodada":1,"preco":100,"plano_comercial":plano,"simulacao":{"capacidade_nuvem":300}})
@@ -129,7 +131,18 @@ def test_pesquisa_insuficiente_explica_o_que_faltou(cliente,professor,monkeypatc
     monkeypatch.setattr(mercado,"gerar_json",lambda *a:(bruto,{"https://example.com/produto"}))
     turma=_criar_turma(cliente,professor)
     base=f"/api/professor/turmas/{turma['id']}/mercado"
-    r=cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Tecnologia","noticias":1,"analises":1,"produtos":3})
+    r=cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":3})
     assert r.status_code==502
     assert "produtos com custo documentado: 0 de 3" in r.json()["detail"]
     assert cliente.get(base,headers=professor).json()["edicoes"]==[]
+
+
+def test_recusa_produto_fisico_em_startup_e_outro_setor(cliente, professor, monkeypatch):
+    from app.routers import mercado
+    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (edicao(), {"https://example.com/produto"}))
+    turma = _criar_turma(cliente, professor, modo_jogo="STARTUP")
+    base = f"/api/professor/turmas/{turma['id']}/mercado"
+    pesquisa = {"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1}
+    assert cliente.post(base + "/pesquisar", headers=professor, json=pesquisa).status_code == 422
+    assert cliente.post(base + "/pesquisar", headers=professor, json={**pesquisa, "setor": "Alimentos e Bebidas"}).status_code == 502
+    assert cliente.get(base, headers=professor).json()["edicoes"] == []

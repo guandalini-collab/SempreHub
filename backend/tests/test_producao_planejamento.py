@@ -69,3 +69,40 @@ def test_conversao_apenas_turma_de_teste_e_preserva_historico(cliente, professor
         backup = json.loads(db.execute(text('SELECT dados FROM semprehub_manutencao_backup')).scalar_one())
         assert backup['turma']['modo_jogo'] == 'LEGADO'
         db.execute(text('DROP TABLE semprehub_manutencao_backup'))
+
+
+def test_localizacao_altera_previa_dre_e_preserva_balanco(cliente, professor):
+    turma = _criar_turma(cliente, professor, modo_jogo="TRADICIONAL", total_rodadas=2, demanda_base_por_empresa=40, configuracao_simulacao={"custo_frete_km": .5})
+    aluno = cadastrar(cliente, "Ana", "frete@aluno.iffar.edu.br")
+    empresa = _entrar(cliente, aluno, turma["codigo"], "Fábrica")
+    base = f"/api/aluno/empresas/{empresa}"
+    estudo = {"pontos": [{"nome": "A", "x": 0, "y": 0, "volume": 1}, {"nome": "B", "x": 40, "y": 0, "volume": 3}], "local_x": 0, "local_y": 0}
+    revisao = {k: True for k in ("decisoes", "financas", "producao", "logistica")}
+    decisao = {"rodada": 1, "preco": 100, "revisao_areas": revisao, "simulacao": {"comprar_mp": 100, "producao": 100, "centro_gravidade": estudo}}
+    previa = cliente.post(base + "/previsao", headers=aluno, json=decisao)
+    assert previa.status_code == 200, previa.text
+    assert previa.json()["simulacao"]["frete_unitario"] == 25
+    assert cliente.put(base + "/decisao", headers=aluno, json=decisao).status_code == 200
+    assert cliente.get(base, headers=aluno).json()["decisao_atual"]["revisao_areas"] == revisao
+    _fechar(cliente, professor, turma, 1)
+    resultado = cliente.get(base, headers=aluno).json()["resultados"][0]
+    operacao = resultado["detalhes_simulacao"]["operacao"]
+    assert operacao["distancia_media_km"] == 30
+    assert operacao["frete_unitario"] == 25
+    assert resultado["unidades_vendidas"] > 0
+    assert resultado["dre"]["frete"] == resultado["unidades_vendidas"] * 25
+    balanco = resultado["detalhes_simulacao"]["balanco"]
+    ativo = sum(balanco[k] for k in ("caixa", "receber", "estoques", "imobilizado"))
+    assert abs(ativo - balanco["pagar"] - balanco["divida"] - balanco["patrimonio"]) < .01
+    _fechar(cliente, professor, turma, 2)
+    assert cliente.get(base, headers=aluno).json()["resultados"][0] == resultado
+
+
+def test_frete_sem_localizacao_mantem_tarifa_e_nao_muta_estudo():
+    from app.motor.localizacao import estimar_frete
+    estudo = {"modal": "ECONOMICO", "centro_gravidade": {"pontos": [{"x": 0, "y": 0, "volume": 0}], "local_x": 100, "local_y": 100}}
+    antes = deepcopy(estudo)
+    resultado = estimar_frete(estudo, {})
+    assert resultado["frete_unitario"] == 5
+    assert resultado["localizacao_aplicada"] is False
+    assert estudo == antes

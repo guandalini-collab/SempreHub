@@ -203,6 +203,7 @@ class Decisao(Base):
     emprestimo = Column(Float, nullable=False, default=0.0)
     amortizacao = Column(Float, nullable=False, default=0.0)
     regime_solicitado = Column(Enum(RegimeTributario), nullable=True)
+    revisao_areas = Column(JSON, nullable=True)
     simulacao = Column(JSON, nullable=True)
     plano_comercial = Column(JSON, nullable=True)
     automatica = Column(Integer, nullable=False, default=0)  # 1 = repetida pelo sistema

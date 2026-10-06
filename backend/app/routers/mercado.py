@@ -35,6 +35,8 @@ class Artigo(BaseModel):
     fontes: list[Fonte] = Field(min_length=1, max_length=10)
 
 class Produto(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False)
+    natureza: Literal["FISICO", "SERVICO_DIGITAL"] | None = None
     id: str = Field(min_length=1, max_length=80)
     nome: str = Field(min_length=3, max_length=200)
     descricao: str = Field(min_length=10, max_length=3000)
@@ -46,6 +48,7 @@ class Produto(BaseModel):
 
 class Edicao(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
+    modo_operacao: Literal["LEGADO", "TRADICIONAL", "STARTUP"] | None = None
     setor: str
     comercio: Literal["B2C", "B2B", "HIBRIDO"]
     noticias: list[Artigo] = Field(max_length=10)
@@ -75,6 +78,18 @@ def validar_fontes(dados, pesquisadas=None):
     if len({p.id for p in dados.produtos}) != len(dados.produtos):
         raise HTTPException(422, "Os códigos dos produtos devem ser únicos.")
 
+def validar_coerencia(edicao, turma, pesquisa=None, exigir_natureza=False):
+    if edicao.modo_operacao is not None and edicao.modo_operacao != turma.modo_jogo:
+        raise HTTPException(422, "A edição de mercado não corresponde ao modelo de operação da turma.")
+    if pesquisa and (edicao.setor.strip().casefold() != pesquisa.setor.strip().casefold() or edicao.comercio != pesquisa.comercio):
+        raise HTTPException(502, "A pesquisa retornou outro setor ou tipo de comércio; nenhuma edição foi salva.")
+    esperado = "SERVICO_DIGITAL" if turma.modo_jogo == "STARTUP" else "FISICO"
+    for produto in edicao.produtos:
+        if (exigir_natureza and produto.natureza is None) or (produto.natureza is not None and produto.natureza != esperado):
+            raise HTTPException(422, "Classifique produtos físicos para Empresa tradicional/modelo básico, e serviços digitais recorrentes para Startup.")
+        if produto.natureza == "SERVICO_DIGITAL" and not ("cliente" in produto.unidade.lower() and any(p in produto.unidade.lower() for p in ("mês", "mes", "mensal"))):
+            raise HTTPException(422, "Serviços digitais devem ter custo por cliente/mês.")
+
 @router.get("/api/professor/turmas/{turma_id}/mercado")
 def listar(turma_id:int, db:Session=Depends(get_db), usuario:Usuario=Depends(exigir_professor)):
     _turma_do_professor(db,turma_id,usuario)
@@ -85,8 +100,11 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     turma=_turma_do_professor(db,turma_id,usuario)
     rodada=turma.rodada_atual
     if turma.status != StatusTurma.ABERTA: raise HTTPException(409,"Turma encerrada.")
-    instrucoes='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. id deve ser texto, custo_unitario deve ser número em BRL, sem símbolos ou separadores locais. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; nunca rotule preço de varejo como custo industrial. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores.'''
-    bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True,Edicao.model_json_schema())
+    instrucoes='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,natureza,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. Cada produto deve incluir natureza FISICO ou SERVICO_DIGITAL conforme o modo de operação. O setor informado não determina o modelo da empresa. No modo tradicional descreva o custo por unidade de matéria-prima/kit de montagem documentado, identificando a base e sem atribuir custos industriais não documentados. Notícias e análises devem contextualizar o setor e o modo informado separadamente. id deve ser texto, custo_unitario deve ser número em BRL, sem símbolos ou separadores locais. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; nunca rotule preço de varejo como custo industrial. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores.'''
+    schema = Edicao.model_json_schema()
+    schema["$defs"]["Produto"]["properties"]["natureza"] = {"type": "string", "enum": ["FISICO", "SERVICO_DIGITAL"]}
+    schema["$defs"]["Produto"]["required"].append("natureza")
+    bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True,schema)
     if isinstance(bruto, dict):
         nomes = {"noticias": "notícias", "analises": "análises", "produtos": "produtos com custo documentado"}
         faltas = [f"{nomes[k]}: {len(bruto[k])} de {getattr(dados,k)}" for k in nomes if isinstance(bruto.get(k),list) and len(bruto[k]) < getattr(dados,k)]
@@ -99,6 +117,8 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     if len(edicao.noticias)!=dados.noticias or len(edicao.analises)!=dados.analises or len(edicao.produtos)!=dados.produtos:
         raise HTTPException(502,"A pesquisa não entregou as quantidades solicitadas.")
     validar_fontes(edicao,fontes)
+    validar_coerencia(edicao,turma,dados,exigir_natureza=True)
+    edicao.modo_operacao=turma.modo_jogo
     db.refresh(turma)
     if turma.rodada_atual != rodada: raise HTTPException(409,"A rodada avançou durante a pesquisa. Repita para a rodada atual.")
     e=ConteudoMercado(turma_id=turma_id,rodada=rodada,dados=edicao.model_dump())
@@ -107,8 +127,10 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
 
 @router.put("/api/professor/turmas/{turma_id}/mercado/{edicao_id}")
 def revisar(turma_id:int, edicao_id:int,dados:Edicao, db:Session=Depends(get_db), usuario:Usuario=Depends(exigir_professor)):
-    _turma_do_professor(db,turma_id,usuario)
+    turma=_turma_do_professor(db,turma_id,usuario)
     validar_fontes(dados)
+    validar_coerencia(dados,turma,exigir_natureza=True)
+    dados.modo_operacao=turma.modo_jogo
     n=db.execute(update(ConteudoMercado).where(ConteudoMercado.id==edicao_id,ConteudoMercado.turma_id==turma_id,ConteudoMercado.publicado.is_(False)).values(dados=dados.model_dump())).rowcount
     if not n: raise HTTPException(409,"Edição inexistente ou já publicada; o histórico é preservado.")
     db.commit();return {"salvo":True}
@@ -123,6 +145,7 @@ def publicar(turma_id:int,edicao_id:int, db:Session=Depends(get_db), usuario:Usu
     if e.publicado: return serializar(e)
     if e.rodada!=turma.rodada_atual or turma.status!=StatusTurma.ABERTA: raise HTTPException(409,"Só é possível publicar na rodada aberta.")
     if db.query(ConteudoMercado).filter_by(turma_id=turma_id,rodada=e.rodada,publicado=True).first(): raise HTTPException(409,"Esta rodada já tem edição publicada.")
+    validar_coerencia(Edicao.model_validate(e.dados),turma,exigir_natureza=True)
     e.publicado=True;db.commit();return serializar(e)
 
 @router.get("/api/aluno/empresas/{empresa_id}/mercado-real")
@@ -187,6 +210,7 @@ def validar_plano(db,empresa,dados):
         raise HTTPException(422,"Escolha um produto de uma edição publicada pelo sistema.")
     produto=next((p for p in e.dados["produtos"] if p["id"]==plano.produto_id),None)
     if not produto: raise HTTPException(422,"Produto indisponível.")
+    validar_coerencia(Edicao.model_validate(e.dados),empresa.turma)
     anterior=max((d for d in empresa.decisoes if d.plano_comercial and d.rodada<empresa.turma.rodada_atual),key=lambda d:d.rodada,default=None)
     if empresa.turma.modo_jogo=="TRADICIONAL" and anterior and (anterior.plano_comercial["produto_id"],anterior.plano_comercial["edicao_id"])!=(plano.produto_id,plano.edicao_id):
         raise HTTPException(422,"Mantenha o produto no modo industrial: estoques e máquinas estão vinculados à operação original.")

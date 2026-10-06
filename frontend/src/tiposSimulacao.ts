@@ -8,6 +8,7 @@ export interface ConfiguracaoMotor {
   capacidade_maquina: number;
   preco_maquina: number;
   vida_util_maquina: number;
+  custo_frete_km: number;
   custo_armazenagem: number;
   frete_rapido: number;
   frete_padrao: number;
@@ -140,6 +141,7 @@ export const CONFIGURACAO_MOTOR_PADRAO: ConfiguracaoMotor = {
   capacidade_maquina: 240,
   preco_maquina: 12000,
   vida_util_maquina: 24,
+  custo_frete_km: 0.1,
   custo_armazenagem: 0.01,
   frete_rapido: 15,
   frete_padrao: 10,

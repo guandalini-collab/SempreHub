@@ -5,6 +5,7 @@ não são CPV, máquinas não são despesas e títulos não são dinheiro recebi
 As regras de RH e de capacidade são hipóteses didáticas deste perfil.
 """
 
+from .localizacao import estimar_frete
 from copy import deepcopy
 from decimal import Decimal, ROUND_HALF_UP
 import math
@@ -269,8 +270,8 @@ def apurar(preparo: dict, demanda: float,
     impostos, aliquota = tributar(receita, cmv)
     impostos = _dinheiro(impostos)
     modal = op.get("modal", "PADRAO")
-    custo_frete = cfg.get({"RAPIDO": "frete_rapido", "PADRAO": "frete_padrao", "ECONOMICO": "frete_economico"}[modal],
-                          {"RAPIDO": 15, "PADRAO": 10, "ECONOMICO": 5}[modal])
+    localizacao = estimar_frete(op, cfg)
+    custo_frete = localizacao["frete_unitario"]
     frete = _produto(vendas, custo_frete)
     armazenagem = _produto(pa["valor"], cfg.get("custo_armazenagem", 0.01))
     royalties = _produto(receita, c["taxa_royalties"])
@@ -315,6 +316,7 @@ def apurar(preparo: dict, demanda: float,
     operacao = {k: c[k] for k in ("producao_planejada", "producao_real", "producao_boa", "refugo",
                                 "capacidade_produtiva", "capacidade_maquinas", "utilizacao_maquinas",
                                 "estoque_mp_inicial", "estoque_pa_inicial", "turnover")}
+    operacao.update(localizacao)
     operacao.update(demanda=demanda, vendas=vendas, ruptura=ruptura,
                     estoque_mp_final=deepcopy(s["estoque_mp"]), estoque_pa_final=deepcopy(pa),
                     satisfacao=s["satisfacao"], moral=s["rh"]["moral"], qualificacao=s["rh"]["qualificacao"],
