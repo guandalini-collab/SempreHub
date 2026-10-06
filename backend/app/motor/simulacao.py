@@ -379,6 +379,9 @@ def _atratividade(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo)
             "Porter — diferenciação sem base: preço premium sem marca nem qualidade reconhecidas "
             "reduziu sua atratividade em 20%."
         )
+    from .estrategia import avaliar, mensagens
+    avaliacao = avaliar(decisao, turma)
+    c.alertas.extend(mensagens(avaliacao))
     return valor
 
 
@@ -419,7 +422,11 @@ def _dividir_mercado(
             c.vendas += extra
             c.demanda += extra
 
+    from .estrategia import avaliar
     for c in calculos:
+        fator = avaliar(c.decisao, turma)["fator"]
+        c.demanda *= fator
+        c.vendas *= fator
         perdida = c.demanda - c.vendas
         if perdida >= 1:
             c.alertas.append(

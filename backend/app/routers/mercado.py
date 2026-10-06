@@ -173,7 +173,7 @@ def gerar_relatorio(turma_id:int,empresa_id:int,rodada:int,db:Session=Depends(ge
     if dados.get("decisao"):
         dados["decisao"].pop("aprovacoes", None)
     dados["historico"]=[{"rodada":r.rodada,"receita":r.receita,"lucro":r.lucro_liquido,"caixa":r.caixa_final} for r in empresa.resultados if r.rodada<rodada]
-    bruto,_=gerar_json('''Redija um relatório empresarial em português com tom frio, objetivo e profissional. JSON {texto:string}. Use apenas os dados fornecidos, não invente indicadores nem atribua causalidade não comprovada. Inclua resultado comercial, DRE, fluxo de caixa, balanço quando disponível, riscos e comparação histórica. Discuta decisões sem escolher a próxima decisão pela equipe. Não mencione IA, ferramentas, professor ou avaliações pedagógicas. Não trate plano comercial como executado se os dados não comprovam sua execução. Não exponha dados pessoais. Até 8000 caracteres.''',dados)
+    bruto,_=gerar_json('''Redija um relatório empresarial em português com tom frio, objetivo e profissional. JSON {texto:string}. Use apenas os dados fornecidos, não invente indicadores nem atribua causalidade não comprovada. Inclua resultado comercial, DRE, fluxo de caixa, balanço quando disponível, riscos e comparação histórica. Explique os efeitos de alinhamento estratégico registrados nos alertas e na avaliação da rodada, separando o fator comercial de custos, capacidade e eventos. Não atribua julgamento de qualidade aos textos livres. Discuta decisões sem escolher a próxima decisão pela equipe. Não mencione IA, ferramentas, professor ou avaliações pedagógicas. Não trate plano comercial como executado se os dados não comprovam sua execução. Não exponha dados pessoais. Até 8000 caracteres.''',dados)
     texto=bruto.get("texto") if isinstance(bruto,dict) else None
     if not isinstance(texto,str) or not 30<=len(texto)<=24000: raise HTTPException(502,"Relatório inválido.")
     from sqlalchemy.exc import IntegrityError
@@ -225,6 +225,18 @@ def validar_plano(db,empresa,dados):
         dados.simulacao.marketing_digital=round(sum(midias[m.id]["preco_unitario"]*m.quantidade for m in plano.midias if midias[m.id]["categoria"] in ("Digital","Display")),2)
         dados.simulacao.canal="DISTRIBUIDOR" if "ATACADO" in plano.canais else "DIGITAL" if any(c in plano.canais for c in ("ECOMMERCE","MARKETPLACE")) else "DIRETO"
         dados.simulacao.posicionamento="CUSTO" if plano.posicionamento=="PRECO" else "DIFERENCIACAO"
+    if plano.analises:
+        # Limita os textos e IDs usando o catálogo validado pelo servidor.
+        import json
+        if len(json.dumps(plano.analises.model_dump(), ensure_ascii=False)) > 60000:
+            raise HTTPException(422, "As análises ultrapassam o tamanho permitido.")
+        ids = {p["id"] for p in e.dados["produtos"]}
+        if any(p.produto_id not in ids for p in plano.analises.bcg):
+            raise HTTPException(422, "Mapeie na BCG somente produtos do catálogo selecionado.")
+        if len({p.produto_id for p in plano.analises.bcg}) != len(plano.analises.bcg):
+            raise HTTPException(422, "Não repita produtos na BCG.")
+        if any(m not in midias for m in plano.analises.segmentacao.midias):
+            raise HTTPException(422, "Selecione mídias válidas na segmentação.")
     for chave,valor in plano.estrategias.items():
         if chave not in ("SWOT","PORTER","BCG","PESTEL","DEMOGRAFICA","GEOGRAFICA","PSICOGRAFICA","COMPORTAMENTAL") or len(valor)>12000:
             raise HTTPException(422,"Análise estratégica inválida.")

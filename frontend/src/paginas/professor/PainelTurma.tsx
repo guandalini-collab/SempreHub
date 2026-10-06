@@ -1,3 +1,4 @@
+import { ResumoAnalises } from "../../componentes/FerramentasEstrategicas";
 import { Conquistas, type Jornada } from "../../componentes/Experiencia";
 import LayoutPainel, { SecaoPainel } from "../../componentes/LayoutPainel";
 import { GestaoMercado } from "../../componentes/MercadoReal";
@@ -500,6 +501,7 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
             <Dado rotulo="Networking" valor={dados.empresa.networking.toFixed(0)} />
           </div>
           {dados.empresa.estado_simulacao && <PainelOperacional estado={dados.empresa.estado_simulacao} modo={modo} />}
+          {dados.decisoes.filter(d => d.plano_comercial?.analises).map(d => <ResumoAnalises key={d.rodada} rodada={d.rodada} valor={d.plano_comercial!.analises!} />)}
           {dados.resultados.length === 0 ? (
             <p className="text-sm text-slate-500">A empresa ainda não tem rodadas fechadas.</p>
           ) : (

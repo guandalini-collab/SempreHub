@@ -1,7 +1,7 @@
 """Esquemas de entrada da API (validação dos dados enviados pelo navegador)."""
 
 from math import isclose
-from typing import List, Literal, Optional
+from typing import Annotated, List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -165,6 +165,72 @@ class AlocacaoMidia(BaseModel):
     id: str = Field(max_length=80)
     quantidade: int = Field(ge=1, le=1000000)
 
+class ItensAnalise(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+
+
+class SWOTAnalise(ItensAnalise):
+    forcas: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    fraquezas: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    oportunidades: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    ameacas: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    diretriz: Optional[Literal["PRECO", "QUALIDADE", "INOVACAO"]] = None
+
+
+class ForcaAnalise(ItensAnalise):
+    intensidade: Optional[int] = Field(None, ge=1, le=10)
+    justificativa: str = Field("", max_length=2000)
+
+
+class PorterAnalise(ItensAnalise):
+    rivalidade: ForcaAnalise = Field(default_factory=ForcaAnalise)
+    fornecedores: ForcaAnalise = Field(default_factory=ForcaAnalise)
+    compradores: ForcaAnalise = Field(default_factory=ForcaAnalise)
+    entrantes: ForcaAnalise = Field(default_factory=ForcaAnalise)
+    substitutos: ForcaAnalise = Field(default_factory=ForcaAnalise)
+
+
+class ProdutoBCG(ItensAnalise):
+    produto_id: str = Field(min_length=1, max_length=80)
+    nome: str = Field(min_length=1, max_length=200)
+    crescimento: float = Field(ge=-100, le=1000)
+    participacao: float = Field(ge=0, le=100)
+    classificacao: Literal["ESTRELA", "VACA", "INTERROGACAO", "ABACAXI"]
+
+
+class PESTELAnalise(ItensAnalise):
+    politico: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    economico: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    social: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    tecnologico: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    ambiental: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    legal: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    juros_previstos: Optional[float] = Field(None, ge=0, le=100)
+
+
+class SegmentacaoAnalise(ItensAnalise):
+    demografica: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    geografica: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    psicografica: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    comportamental: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    porte: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    setor: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    compras: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=20)
+    preco_maximo: Optional[float] = Field(None, gt=0, le=1000000)
+    cobertura: Optional[Literal["LOCAL", "REGIONAL", "NACIONAL", "INTERNACIONAL"]] = None
+    canais: list[Literal["VAREJO", "ECOMMERCE", "MARKETPLACE", "ATACADO", "FRANQUIA", "DIRETO"]] = Field(default_factory=list, max_length=6)
+    midias: list[Annotated[str, Field(min_length=1, max_length=2000)]] = Field(default_factory=list, max_length=80)
+
+
+class AnalisesEstrategicas(ItensAnalise):
+    versao: Literal[1] = 1
+    swot: SWOTAnalise = Field(default_factory=SWOTAnalise)
+    porter: PorterAnalise = Field(default_factory=PorterAnalise)
+    bcg: list[ProdutoBCG] = Field(default_factory=list, max_length=20)
+    pestel: PESTELAnalise = Field(default_factory=PESTELAnalise)
+    segmentacao: SegmentacaoAnalise = Field(default_factory=SegmentacaoAnalise)
+
+
 class PlanoComercial(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
     edicao_id: int = Field(gt=0)
@@ -176,6 +242,7 @@ class PlanoComercial(BaseModel):
     intensidade: Literal["BAIXA", "MEDIA", "ALTA", "INTENSIVA"]
     midias: list[AlocacaoMidia] = Field(default_factory=list, max_length=80)
     estrategias: dict[str, str] = Field(default_factory=dict)
+    analises: Optional[AnalisesEstrategicas] = None
     custo_unitario: Optional[float] = Field(None, gt=0, le=1000000)
     produto_nome: Optional[str] = Field(None, max_length=200)
 

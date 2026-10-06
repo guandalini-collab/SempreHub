@@ -71,6 +71,7 @@ const ITENS_PAINEL = [
     "simbolo": "✎",
     "grupo": "Decisões da rodada"
   },
+  { "id": "estrategia", "titulo": "Ferramentas e segmentação", "descricao": "SWOT, Porter, BCG, PESTEL e público-alvo.", "simbolo": "◇", "grupo": "Decisões da rodada" },
   {
     "id": "financas",
     "titulo": "Finanças",
@@ -273,7 +274,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <RelatorioPrimeiraRodada empresaId={empresa.id} disponivel={resultados.some(r => r.rodada === 1)} />
 
       </SecaoPainel>
-      <SecaoPainel id={AREAS_DECISAO.includes(secao) ? secao : "decisoes"} ativa={secao}>
+      <SecaoPainel id={(AREAS_DECISAO.includes(secao) || secao === "estrategia") ? secao : "decisoes"} ativa={secao}>
         <div>
           {encerrada ? (
             <Cartao titulo="Simulação encerrada">
@@ -567,7 +568,7 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
 
   return (
     <Cartao
-      titulo={`${area === "financas" ? "Planejamento financeiro" : area === "producao" ? "Produção e operação" : area === "logistica" ? "Logística" : "Decisões comerciais"} · mês ${turma.rodada_atual}`}
+      titulo={`${area === "estrategia" ? "Ferramentas estratégicas e segmentação" : area === "financas" ? "Planejamento financeiro" : area === "producao" ? "Produção e operação" : area === "logistica" ? "Logística" : "Decisões comerciais"} · mês ${turma.rodada_atual}`}
       acao={
         painel.decisao_atual ? (
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${!turma.modo_equipe || painel.equipe?.pronta ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{turma.modo_equipe ? (painel.equipe?.pronta ? "Confirmada pela equipe" : `Rascunho · versão ${versaoServidor}`) : "Enviada"}</span>
@@ -582,13 +583,13 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
           const aplicavel = id !== "logistica" || turma.modo_jogo === "TRADICIONAL";
           const revisada = !!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>];
           return <button type="button" key={id} onClick={() => aoNavegar(id)} className={`rounded-lg border p-3 text-left text-sm ${aplicavel && revisada ? "border-emerald-300 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>{id === "decisoes" ? "Produtos e marketing" : id === "financas" ? "Finanças" : id === "producao" ? "Produção" : "Logística"} · {aplicavel ? revisada ? "Revisado ✓" : "Revisar →" : "Sem decisão neste modelo"}</button>;
-        })}</div><label className="mt-4 flex items-center gap-3 text-sm font-semibold"><input type="checkbox" disabled={area === "logistica" && turma.modo_jogo !== "TRADICIONAL"} checked={!!d.revisao_areas?.[area as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e => setD(atual => ({ ...atual, revisao_areas: { ...atual.revisao_areas, [area]: e.target.checked } }))} />Conferi os valores desta área</label><p className="mt-2 text-xs text-slate-500">As revisões ficam registradas ao salvar ou enviar esta versão da decisão.</p></div>
+        })}</div><label className="mt-4 flex items-center gap-3 text-sm font-semibold"><input type="checkbox" disabled={area === "logistica" && turma.modo_jogo !== "TRADICIONAL"} checked={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : area) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e => setD(atual => ({ ...atual, revisao_areas: { ...atual.revisao_areas, [area === "estrategia" ? "decisoes" : area]: e.target.checked } }))} />Conferi os valores desta área</label><p className="mt-2 text-xs text-slate-500">As revisões ficam registradas ao salvar ou enviar esta versão da decisão.</p></div>
         {turma.modo_equipe && <p className="text-sm text-slate-600">Todos os integrantes podem preparar a decisão. Salvar uma nova versão pede uma nova confirmação de toda a equipe. Revise os valores e a prévia antes de confirmar.</p>}
         {conflito && <div className="space-y-2"><Aviso tipo="info">Outra atualização chegou enquanto você editava. Seus campos foram mantidos. Carregue a decisão salva da empresa antes de continuar; essa ação substitui os valores do formulário.</Aviso><Botao type="button" variante="secundario" disabled={carregando} onClick={carregarDecisaoSalva}>Carregar decisão salva</Botao></div>}
         <fieldset disabled={carregando} className="space-y-6">
-        <div hidden={area !== "decisoes"}>
-        <EditorMix empresaId={empresa.id} rodada={turma.rodada_atual} plano={d.plano_comercial} aoMudar={(plano,total)=>setD(atual=>manterRevisoes(atual,{...atual,plano_comercial:plano,marketing:total,simulacao:atual.simulacao?{...atual.simulacao,marketing_digital:0}:null}))} />
-          <Secao titulo="Mercado e posicionamento">
+        <div hidden={area !== "decisoes" && area !== "estrategia"}>
+        <EditorMix visao={area === "estrategia" ? "estrategia" : "mix"} aoNavegar={aoNavegar} empresaId={empresa.id} rodada={turma.rodada_atual} plano={d.plano_comercial} aoMudar={(plano,total)=>setD(atual=>manterRevisoes(atual,{...atual,plano_comercial:plano,marketing:total,simulacao:atual.simulacao?{...atual.simulacao,marketing_digital:0}:null}))} />
+          <div hidden={area !== "decisoes"}><Secao titulo="Mercado e posicionamento">
           <Campo
             rotulo="Preço de venda (por unidade)"
             ajuda={`Preço de referência do mercado: ${reais(p.preco_referencia)}. Custo da mercadoria: ${reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)}.`}
@@ -604,7 +605,7 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
           <Campo rotulo="Networking e capacitação (no mês)" ajuda="Rede de contadores e parceiros. Networking ≥ 30 evita multas em fiscalizações.">
             <ControleVisual rotulo="Networking e capacitação" valor={d.networking} aoMudar={(v) => atualizar("networking", v)} limite={Math.max(1000, empresa.caixa)} />
           </Campo>
-        </Secao>
+        </Secao></div>
 
         </div>
         <div hidden={area !== "producao"}>

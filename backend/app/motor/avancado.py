@@ -74,7 +74,12 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0):
             p["configuracao_simulacao"]["custo_nuvem_cliente"] = decisao.plano_comercial["custo_unitario"]
     p["multa_evento"] = multa
     p["multas"] = multa
-    return motor(turma).preparar(dados, entrada, p, turma.rodada_atual, multiplicador_custo)
+    preparo = motor(turma).preparar(dados, entrada, p, turma.rodada_atual, multiplicador_custo)
+    from .estrategia import avaliar, mensagens
+    avaliacao = avaliar(decisao, turma)
+    preparo["avaliacao_estrategica"] = avaliacao
+    preparo["alertas"].extend(mensagens(avaliacao))
+    return preparo
 
 
 def prever(empresa, decisao, turma):
@@ -104,6 +109,7 @@ def prever(empresa, decisao, turma):
         "alertas": calculo.get("alertas", []),
         "simulacao": {"estado": deepcopy(calculo.get("estado", {})), "producao": producao,
                        **(localizacao if turma.modo_jogo == "TRADICIONAL" else {}),
+                       "avaliacao_estrategica": calculo["avaliacao_estrategica"],
                        "aviso": "Estimativa sem vendas: demanda e eventos da próxima rodada ainda são desconhecidos."},
     }
 
@@ -154,7 +160,9 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     demandas = [total * atr / soma for atr in atrativos]
     for bot, demanda in zip(bots, demandas[len(preparos):]):
         bot["unidades_vendidas"] = min(bot["capacidade"], demanda)
-    return demandas[:len(preparos)], bots
+    # O fator de conversão é aplicado uma única vez depois da disputa.
+    # Assim não desaparece quando há somente uma empresa no mercado.
+    return [demanda * p["avaliacao_estrategica"]["fator"] for demanda, p in zip(demandas, preparos)], bots
 
 
 def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demanda, multiplicador_custo):
@@ -190,7 +198,7 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         bot["participacao_mercado"] = bot["unidades_vendidas"] / total_vendas if total_vendas else 0
         bot.pop("atratividade")
         bot.pop("capacidade")
-    for empresa, d, a, demanda in zip(empresas, decisoes, apuracoes, demandas):
+    for empresa, d, a, demanda, preparo in zip(empresas, decisoes, apuracoes, demandas, preparos):
         empresa.estado_simulacao = deepcopy(a["estado"])
         empresa.caixa, empresa.divida, empresa.funcionarios = a["caixa"], a["divida"], a["funcionarios"]
         empresa.marca = a.get("marca", empresa.marca)
@@ -205,6 +213,7 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
                               FaseAtual.CAPTACAO if empresa.divida > 0 else
                               FaseAtual.OPERACAO_ESTAVEL if dre["lucro_liquido"] > 0 else FaseAtual.PLANEJAMENTO)
         detalhes = deepcopy(a["detalhes"])
+        detalhes["avaliacao_estrategica"] = deepcopy(preparo["avaliacao_estrategica"])
         detalhes.update(parametros=parametros(turma), decisao=colunas(d), dre=deepcopy(dre),
                         concorrentes_virtuais=deepcopy(bots), evento=evento.codigo)
         # Datas ORM não são valores JSON das fotografias.
