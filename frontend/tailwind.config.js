@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        marinho: "#0B2545", // Azul Profundo — cor primária da marca
-        ouro: "#C5A059", // Ouro Fosco — cor de acento
+        marinho: "#102A68", // Azul Profundo — cor primária da marca
+        ouro: "#FFC233", // Amarelo vivo — cor de acento
       },
     },
   },

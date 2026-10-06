@@ -31,6 +31,9 @@ import type { DecisaoSimulacao } from "../../tiposSimulacao";
 const ITENS_PAINEL = [
   {"id": "visao", "titulo": "Visão geral", "descricao": "Seu negócio, a competição e os próximos passos.", "simbolo": "◈"},
   {"id": "decisoes", "titulo": "Decisões e mix de marketing", "descricao": "Escolha produtos, preços, mídias e investimentos da rodada.", "simbolo": "✎"},
+  { id: "financas", titulo: "Finanças e cálculos", descricao: "Planeje crédito, pagamentos e tributos; confira margem e ponto de equilíbrio na prévia.", simbolo: "$" },
+  { id: "producao", titulo: "Produção e operação", descricao: "Planeje a capacidade de atendimento, produção e investimentos operacionais.", simbolo: "⚒" },
+  { id: "logistica", titulo: "Logística e entregas", descricao: "Escolha a entrega e consulte os custos de transporte disponíveis no seu modelo.", simbolo: "➜" },
   {"id": "mercado", "titulo": "News e análises", "descricao": "Consulte as notícias e análises antes de decidir.", "simbolo": "▤"},
   {"id": "aprendizagem", "titulo": "Estratégia e manuais", "descricao": "Ferramentas estratégicas, materiais e guia de mídias.", "simbolo": "◇"},
   {"id": "resultados", "titulo": "Resultados e finanças", "descricao": "DRE, balanço patrimonial, indicadores e histórico.", "simbolo": "▥"},
@@ -38,6 +41,8 @@ const ITENS_PAINEL = [
   {"id": "equipe", "titulo": "Empresa e equipe", "descricao": "Acompanhe sua operação e os integrantes da empresa.", "simbolo": "♙"},
   { id: "conquistas", titulo: "Conquistas", descricao: "Marcos e evolução da sua jornada empresarial.", simbolo: "★" },
 ];
+
+const AREAS_DECISAO = ["decisoes", "financas", "producao", "logistica"];
 
 const INTERVALO_ATUALIZACAO_MS = 15000;
 
@@ -180,7 +185,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <RelatorioPrimeiraRodada empresaId={empresa.id} disponivel={resultados.some(r => r.rodada === 1)} />
 
       </SecaoPainel>
-      <SecaoPainel id="decisoes" ativa={secao}>
+      <SecaoPainel id={AREAS_DECISAO.includes(secao) ? secao : "decisoes"} ativa={secao}>
         <div>
           {encerrada ? (
             <Cartao titulo="Simulação encerrada">
@@ -193,7 +198,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
               </p>
             </Cartao>
           ) : (
-            <FormularioDecisao key={empresa.id} painel={painel} aoEnviar={carregar} />
+            <FormularioDecisao key={empresa.id} painel={painel} area={secao} aoEnviar={carregar} />
           )}
         </div>
       </SecaoPainel>
@@ -269,15 +274,15 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
             <GraficoLinhas
               rotulosX={resultados.map((r) => `M${r.rodada}`)}
               series={[
-                { nome: "Caixa", cor: "#0B2545", valores: resultados.map((r) => r.caixa_final) },
-                { nome: "Lucro do mês", cor: "#C5A059", valores: resultados.map((r) => r.dre.lucro_liquido) },
+                { nome: "Caixa", cor: "#102A68", valores: resultados.map((r) => r.caixa_final) },
+                { nome: "Lucro do mês", cor: "#FFC233", valores: resultados.map((r) => r.dre.lucro_liquido) },
               ]}
             />
           </Cartao>
           <Cartao titulo="Participação de mercado">
             <GraficoLinhas
               rotulosX={resultados.map((r) => `M${r.rodada}`)}
-              series={[{ nome: "Participação", cor: "#C5A059", valores: resultados.map((r) => r.participacao_mercado) }]}
+              series={[{ nome: "Participação", cor: "#FFC233", valores: resultados.map((r) => r.participacao_mercado) }]}
               formatar={(v) => percentual(v, 0)}
             />
           </Cartao>
@@ -342,7 +347,7 @@ function decisaoInicial(painel: PainelAluno): DecisaoEntrada {
   };
 }
 
-function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar: () => Promise<PainelAluno | undefined> }) {
+function FormularioDecisao({ painel, aoEnviar, area }: { painel: PainelAluno; area: string; aoEnviar: () => Promise<PainelAluno | undefined> }) {
   const { empresa, turma } = painel;
   const p = turma.parametros!;
   const versaoServidor = painel.equipe?.versao_decisao ?? painel.decisao_atual?.versao ?? 0;
@@ -457,7 +462,7 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
 
   return (
     <Cartao
-      titulo={`Decisões para o mês ${turma.rodada_atual}`}
+      titulo={`${area === "financas" ? "Planejamento financeiro" : area === "producao" ? "Produção e operação" : area === "logistica" ? "Logística" : "Decisões comerciais"} · mês ${turma.rodada_atual}`}
       acao={
         painel.decisao_atual ? (
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${!turma.modo_equipe || painel.equipe?.pronta ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{turma.modo_equipe ? (painel.equipe?.pronta ? "Confirmada pela equipe" : `Rascunho · versão ${versaoServidor}`) : "Enviada"}</span>
@@ -467,9 +472,11 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
       }
     >
       <form onSubmit={enviar} className="space-y-6">
+        <p className="rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-900">As escolhas de Marketing, Finanças, Produção e Logística compõem uma única decisão. Ao enviar, todas as áreas preenchidas são registradas juntas.</p>
         {turma.modo_equipe && <p className="text-sm text-slate-600">Todos os integrantes podem preparar a decisão. Salvar uma nova versão pede uma nova confirmação de toda a equipe. Revise os valores e a prévia antes de confirmar.</p>}
         {conflito && <div className="space-y-2"><Aviso tipo="info">Outra atualização chegou enquanto você editava. Seus campos foram mantidos. Carregue a decisão salva da empresa antes de continuar; essa ação substitui os valores do formulário.</Aviso><Botao type="button" variante="secundario" disabled={carregando} onClick={carregarDecisaoSalva}>Carregar decisão salva</Botao></div>}
         <fieldset disabled={carregando} className="space-y-6">
+        <div hidden={area !== "decisoes"}>
         <EditorMix empresaId={empresa.id} rodada={turma.rodada_atual} plano={d.plano_comercial} aoMudar={(plano,total)=>setD(atual=>({...atual,plano_comercial:plano,marketing:total,simulacao:atual.simulacao?{...atual.simulacao,marketing_digital:0}:null}))} />
           <Secao titulo="Mercado e posicionamento">
           <Campo
@@ -489,7 +496,9 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
           </Campo>
         </Secao>
 
-        <Secao titulo="Funcionários da empresa">
+        </div>
+        <div hidden={area !== "producao"}>
+        <Secao titulo="Funcionários e capacidade de atendimento">
           <Campo rotulo="Contratar" ajuda={`Salário-base ${reais(p.salario_base)}. A prévia aplica os encargos do regime efetivo.`}>
             <ControleVisual rotulo="Contratar funcionários" moeda={false} inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} limite={20} />
           </Campo>
@@ -498,6 +507,9 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
           </Campo>
         </Secao>
 
+        </div>
+        <div hidden={area !== "financas"}>
+        <div className="mb-4 rounded-xl border-l-4 border-blue-600 bg-blue-50 p-4 text-sm"><h3 className="font-bold text-blue-900">Planeje antes de enviar</h3><p className="mt-2">Use preço de venda, custo unitário e despesas para analisar a margem e o ponto de equilíbrio. A prévia abaixo reúne os valores calculados para você conferir seu planejamento.</p><p className="mt-2 font-semibold">Preço escolhido: {reais(d.preco)} · Custo unitário: {reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)} · Caixa atual: {reais(empresa.caixa)}</p></div>
         <Secao titulo="Finanças e tributos">
           <Campo
             rotulo="Novo empréstimo"
@@ -535,7 +547,9 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
           </Campo>
         </Secao>
 
-        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
+        </div>
+        {turma.modo_jogo === "LEGADO" && ["producao", "logistica"].includes(area) && <div className="rounded-xl border-l-4 border-blue-600 bg-blue-50 p-5"><h3 className="font-bold">{area === "producao" ? "Capacidade no modelo básico" : "Logística no modelo básico"}</h3><p className="mt-2 text-sm">{area === "producao" ? "Neste modelo, a capacidade depende da equipe de funcionários. Estoques, máquinas e planejamento de produção são controles do modelo Empresa tradicional." : "Este modelo não possui escolha de frete ou entregas. Esses controles estão disponíveis no modelo Empresa tradicional; no modelo Startup, a operação é digital."}</p><p className="mt-2 text-sm">Confira a capacidade e os gastos previstos na prévia abaixo.</p></div>}
+        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
 
         <div className="rounded-lg bg-slate-50 p-4 text-sm">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Prévia do mês</p>

@@ -87,7 +87,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 text-marinho">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-50 to-indigo-100 text-marinho">
       <Cabecalho usuario={usuario} aoSair={sair} aoInicio={() => irPara("/")} />
       <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
         {rota.pagina !== "inicio" && (

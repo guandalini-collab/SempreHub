@@ -220,7 +220,7 @@ export function TourGuiado({ perfil }: { perfil: PerfilAprendizagem }) {
       </div>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3">
         {passoAtual === passos.length - 1 && <label className="flex items-center gap-2 text-xs text-slate-600">
-          <input type="checkbox" checked={naoMostrar} onChange={(e) => setNaoMostrar(e.target.checked)} className="h-4 w-4 accent-[#C5A059]" />
+          <input type="checkbox" checked={naoMostrar} onChange={(e) => setNaoMostrar(e.target.checked)} className="h-4 w-4 accent-[#FFC233]" />
           Não mostrar novamente
         </label>}
         {passoAtual > 0 && <Botao variante="secundario" onClick={() => setPassoAtual(passoAtual - 1)}>Anterior</Botao>}

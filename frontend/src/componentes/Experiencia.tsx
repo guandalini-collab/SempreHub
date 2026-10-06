@@ -39,7 +39,7 @@ export function ControleVisual({
 }) {
   const teto = Math.max(limite, valor, minimo + 1);
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
       <div className="mb-3 text-2xl font-bold tabular-nums">
         {moeda ? reais(valor) : valor}
       </div>
@@ -51,12 +51,10 @@ export function ControleVisual({
         step={inteiro ? 1 : 0.01}
         value={valor}
         onChange={(e) => aoMudar(Number(e.target.value))}
-        className="w-full accent-[#C5A059]"
+        className="w-full accent-[#2563EB]"
       />
-      <details className="mt-2">
-        <summary className="cursor-pointer text-xs font-medium text-slate-600">
-          Ajustar valor exato
-        </summary>
+      <div className="mt-2">
+        <p className="text-xs font-medium text-slate-600">Valor exato · você pode digitar</p>
         <div className="mt-2">
           <EntradaNumero
             aria-label={`${rotulo} — valor exato`}
@@ -67,7 +65,7 @@ export function ControleVisual({
             inteiro={inteiro}
           />
         </div>
-      </details>
+      </div>
     </div>
   );
 }

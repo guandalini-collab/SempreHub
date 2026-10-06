@@ -61,9 +61,9 @@ export function Cartao({
   return (
     <section className={`rounded-2xl bg-white p-5 shadow-[0_8px_30px_-18px_rgba(11,37,69,0.25)] ring-1 ring-slate-200 ${className}`}>
       {(titulo || acao) && (
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          {titulo && <h2 className="text-base font-semibold text-marinho">{titulo}</h2>}
-          {acao}
+        <div className="-mx-5 -mt-5 mb-5 flex flex-wrap items-center justify-between gap-2 rounded-t-2xl bg-gradient-to-r from-marinho to-blue-700 px-5 py-4 text-white">
+          {titulo && <h2 className="text-base font-semibold text-white">{titulo}</h2>}
+          <div className="[&_.text-slate-500]:text-blue-100">{acao}</div>
         </div>
       )}
       {children}
@@ -435,7 +435,7 @@ export function GraficoLinhas({
       <svg viewBox={`0 0 ${largura} ${altura}`} className="w-full" role="img" aria-label={series.map((s) => s.nome).join(", ")}>
         {marcas.map((m) => (
           <g key={m}>
-            <line x1={margem.esquerda} x2={largura - margem.direita} y1={y(m)} y2={y(m)} stroke="#0B2545" strokeOpacity={0.08} />
+            <line x1={margem.esquerda} x2={largura - margem.direita} y1={y(m)} y2={y(m)} stroke="#102A68" strokeOpacity={0.08} />
             <text x={margem.esquerda - 6} y={y(m) + 3} textAnchor="end" fontSize="10" fill="#64748b">
               {formatar(m)}
             </text>
@@ -480,4 +480,4 @@ export function GraficoLinhas({
   );
 }
 
-export const CORES_SERIES = ["#0B2545", "#C5A059", "#2A6F97", "#B5523B", "#5C8A4E", "#7D5BA6", "#8C8C8C", "#1F8A8A"];
+export const CORES_SERIES = ["#102A68", "#FFC233", "#2A6F97", "#B5523B", "#5C8A4E", "#7D5BA6", "#8C8C8C", "#1F8A8A"];

@@ -260,8 +260,8 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
             <GraficoLinhas
               rotulosX={mercado.map((m) => `M${m.rodada}`)}
               series={[
-                { nome: "Receita total", cor: "#0B2545", valores: mercado.map((m) => m.receita) },
-                { nome: "Lucro total", cor: "#C5A059", valores: mercado.map((m) => m.lucro) },
+                { nome: "Receita total", cor: "#102A68", valores: mercado.map((m) => m.receita) },
+                { nome: "Lucro total", cor: "#FFC233", valores: mercado.map((m) => m.lucro) },
               ]}
             />
             <p className="mt-2 text-xs text-slate-500">

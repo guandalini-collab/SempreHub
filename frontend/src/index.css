@@ -22,10 +22,20 @@
 @layer base {
   body { background: #f3f5fa; }
   button, summary, input, select, textarea { touch-action: manipulation; }
-  button:focus-visible, summary:focus-visible { outline: 3px solid #C5A059; outline-offset: 3px; }
+  button:focus-visible, summary:focus-visible { outline: 3px solid #FFC233; outline-offset: 3px; }
   input[type="range"] { min-height: 36px; cursor: pointer; }
   [hidden] { display: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+@layer base {
+  body { background: #eef3ff; }
+  input[type="range"] { accent-color: #2563eb; }
+}
+@layer components {
+  #menu-painel button[aria-current="page"] { background: #2563eb; color: white; box-shadow: 0 4px 18px rgb(37 99 235 / 35%); }
+  #menu-painel button:hover { background: #234484; color: white; }
+  #menu-painel button[aria-current="page"]:hover { background: #1d4ed8; }
 }
