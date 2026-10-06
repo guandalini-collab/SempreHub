@@ -34,84 +34,84 @@ const ITENS_PAINEL = [
     "titulo": "Início",
     "descricao": "Resumo do seu negócio.",
     "simbolo": "◈",
-    "grupo": "Sua turma"
+    "grupo": "Minha empresa"
   },
   {
     "id": "rodada",
-    "titulo": "Rodada atual",
+    "titulo": "O que fazer nesta rodada",
     "descricao": "Veja o que fazer e o que falta enviar.",
     "simbolo": "▷",
-    "grupo": "Sua turma"
+    "grupo": "Rodada atual"
   },
   {
     "id": "equipe",
     "titulo": "Minha empresa e equipe",
     "descricao": "Integrantes e informações da empresa.",
     "simbolo": "♙",
-    "grupo": "Sua turma"
+    "grupo": "Minha empresa"
   },
   {
     "id": "mercado",
     "titulo": "Notícias e mercado",
     "descricao": "Leia antes de tomar suas decisões.",
     "simbolo": "▤",
-    "grupo": "1. Preparar"
+    "grupo": "Rodada atual"
   },
   {
     "id": "aprendizagem",
     "titulo": "Estratégia e ajuda",
     "descricao": "Análises estratégicas, manuais e mídias.",
     "simbolo": "◇",
-    "grupo": "1. Preparar"
+    "grupo": "Estratégia e ajuda"
   },
   {
     "id": "decisoes",
     "titulo": "Produtos e marketing",
     "descricao": "Escolha produtos, preços e campanhas.",
     "simbolo": "✎",
-    "grupo": "2. Decidir"
+    "grupo": "Decisões da rodada"
   },
   {
     "id": "financas",
     "titulo": "Finanças",
     "descricao": "Cálculos, crédito, pagamentos e tributos.",
     "simbolo": "$",
-    "grupo": "2. Decidir"
+    "grupo": "Decisões da rodada"
   },
   {
     "id": "producao",
     "titulo": "Produção",
     "descricao": "Capacidade, equipe e operação.",
     "simbolo": "⚒",
-    "grupo": "2. Decidir"
+    "grupo": "Decisões da rodada"
   },
   {
     "id": "logistica",
     "titulo": "Logística",
     "descricao": "Frete e entrega dos produtos.",
     "simbolo": "➜",
-    "grupo": "2. Decidir"
+    "grupo": "Decisões da rodada"
   },
   {
     "id": "resultados",
     "titulo": "Resultados, DRE e balanço",
     "descricao": "Indicadores e demonstrativos financeiros.",
     "simbolo": "▥",
-    "grupo": "3. Acompanhar"
+    "grupo": "Resultados e evolução"
   },
   {
     "id": "relatorios",
     "titulo": "Relatórios da empresa",
     "descricao": "Leia a análise das rodadas concluídas.",
     "simbolo": "▧",
-    "grupo": "3. Acompanhar"
+    "grupo": "Resultados e evolução"
   },
   {
     "id": "conquistas",
     "titulo": "Conquistas",
     "descricao": "Sua evolução no jogo.",
     "simbolo": "★",
-    "grupo": "3. Acompanhar"
+    "grupo": "Resultados e evolução"
   }
 ];
 

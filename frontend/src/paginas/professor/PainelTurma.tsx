@@ -30,53 +30,60 @@ import { EditorParametros } from "./Parametros";
 
 const ITENS_PAINEL = [
   {
-    "id": "visao",
-    "titulo": "Início da turma",
-    "descricao": "Resumo e código de entrada.",
-    "simbolo": "◈",
-    "grupo": "Sua turma"
-  },
-  {
     "id": "rodada",
-    "titulo": "Rodada atual",
-    "descricao": "Pendências e encerramento da rodada.",
-    "simbolo": "▷",
-    "grupo": "Sua turma"
+    "titulo": "Acompanhar rodada",
+    "descricao": "Confira o andamento das decisões.",
+    "simbolo": "→",
+    "grupo": "Rodada atual"
   },
   {
     "id": "equipes",
-    "titulo": "Alunos e empresas",
-    "descricao": "Equipes, decisões e ranking.",
-    "simbolo": "♙",
-    "grupo": "Sua turma"
+    "titulo": "Ver alunos, empresas e pendências",
+    "descricao": "Confira equipes, decisões e ranking.",
+    "simbolo": "→",
+    "grupo": "Rodada atual"
   },
   {
     "id": "mercado",
-    "titulo": "Preparar mercado",
-    "descricao": "Notícias, análises e catálogo de produtos.",
-    "simbolo": "▤",
-    "grupo": "Preparar"
-  },
-  {
-    "id": "configuracao",
-    "titulo": "Configurar turma",
-    "descricao": "Regras do mercado e exportação de dados.",
-    "simbolo": "⚙",
-    "grupo": "Preparar"
+    "titulo": "Preparar notícias e produtos",
+    "descricao": "Pesquise, revise e publique o mercado.",
+    "simbolo": "→",
+    "grupo": "Rodada atual"
   },
   {
     "id": "resultados",
-    "titulo": "Resultados da turma",
-    "descricao": "Compare empresas e analise as rodadas.",
-    "simbolo": "▥",
-    "grupo": "Acompanhar"
+    "titulo": "Ver resultados do mês",
+    "descricao": "Compare resultados e análises da turma.",
+    "simbolo": "→",
+    "grupo": "Rodada atual"
+  },
+  {
+    "id": "fechamento",
+    "titulo": "Fechar mês (rodada)",
+    "descricao": "Confira pendências e confirme o encerramento.",
+    "simbolo": "→",
+    "grupo": "Rodada atual"
+  },
+  {
+    "id": "visao",
+    "titulo": "Resumo e código da turma",
+    "descricao": "Dados gerais e código de entrada.",
+    "simbolo": "→",
+    "grupo": "Minha turma"
+  },
+  {
+    "id": "configuracao",
+    "titulo": "Configurações e exportação",
+    "descricao": "Ajuste parâmetros e exporte dados.",
+    "simbolo": "→",
+    "grupo": "Minha turma"
   },
   {
     "id": "aprendizagem",
-    "titulo": "Manuais e ajuda",
-    "descricao": "Materiais de apoio à simulação.",
-    "simbolo": "◇",
-    "grupo": "Acompanhar"
+    "titulo": "Manuais e materiais",
+    "descricao": "Ferramentas e apoio à simulação.",
+    "simbolo": "→",
+    "grupo": "Ajuda"
   }
 ];
 
@@ -180,7 +187,9 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
 
       </SecaoPainel>
       <SecaoPainel id="rodada" ativa={secao}>
-      <Cartao titulo={`Acompanhar rodada ${Math.min(turma.rodada_atual, turma.total_rodadas)}`}><p className="mb-4">{enviadas} de {empresas.length} empresas com decisões enviadas. Confira as empresas e prepare o mercado por estes atalhos.</p><div className="flex flex-wrap gap-3"><Botao variante="secundario" onClick={() => setSecao("equipes")}>Ver alunos, empresas e pendências</Botao><Botao variante="secundario" onClick={() => setSecao("mercado")}>Preparar notícias e produtos</Botao><Botao variante="secundario" onClick={() => setSecao("resultados")}>Ver resultados da turma</Botao></div></Cartao>
+      <Cartao titulo={`Acompanhar rodada ${Math.min(turma.rodada_atual, turma.total_rodadas)}`}><p className="mb-4">{enviadas} de {empresas.length} empresas com decisões enviadas. Confira as empresas e prepare o mercado por estes atalhos.</p><div className="flex flex-wrap gap-3"><Botao variante="secundario" onClick={() => setSecao("equipes")}>Ver alunos, empresas e pendências</Botao><Botao variante="secundario" onClick={() => setSecao("mercado")}>Preparar notícias e produtos</Botao><Botao variante="secundario" onClick={() => setSecao("resultados")}>Ver resultados da turma</Botao><Botao onClick={() => setSecao("fechamento")}>Ir para fechar mês</Botao></div></Cartao>
+      </SecaoPainel>
+      <SecaoPainel id="fechamento" ativa={secao}>
           {aberta ? (
             <FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} eventos={eventos} empresas={empresas} aoFechar={carregar} />
           ) : (
