@@ -45,8 +45,8 @@ export default function InicioAluno({ abrirEmpresa }: { abrirEmpresa: (id: numbe
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-marinho">Minhas empresas</h1>
-          <p className="text-sm text-slate-500">Acesse suas empresas e as equipes de que você participa.</p>
+          <h1 className="text-2xl font-bold text-marinho">Minhas turmas e empresas</h1>
+          <p className="text-sm text-slate-500">Escolha sua turma para acessar a empresa, a rodada e suas decisões.</p>
         </div>
         {!mostrarFormulario && (
           <Botao onClick={() => setMostrarFormulario(true)}>Entrar em uma turma</Botao>
@@ -95,6 +95,7 @@ export default function InicioAluno({ abrirEmpresa }: { abrirEmpresa: (id: numbe
                 </p>
               </div>
             </div>
+            <span className="mt-4 block rounded-lg bg-blue-700 px-4 py-3 text-center text-sm font-bold text-white">Abrir empresa e rodada atual →</span>
           </button>
         ))}
       </div>

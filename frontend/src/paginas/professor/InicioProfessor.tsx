@@ -64,6 +64,7 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
               {t.quantidade_empresas} empresa(s) · {t.status === "ABERTA" ? `rodada ${t.rodada_atual} de ${t.total_rodadas}` : `${t.total_rodadas} rodadas`}
             </p>
             <p className="mt-1 text-xs text-slate-500">{t.modo_equipe ? "Equipes de 3 a 5 alunos" : "Participação individual"} · {t.modo_jogo === "STARTUP" ? "Startup" : t.modo_jogo === "TRADICIONAL" ? "Empresa tradicional" : "Modelo básico"}{t.cenario === "CRISE" ? " · recuperação" : ""}</p>
+            <span className="mt-4 block rounded-lg bg-blue-700 px-4 py-3 text-center text-sm font-bold text-white">Abrir turma e rodada atual →</span>
           </button>
         ))}
       </div>

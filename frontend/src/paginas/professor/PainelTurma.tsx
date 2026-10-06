@@ -29,13 +29,55 @@ import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
 
 const ITENS_PAINEL = [
-  {"id": "visao", "titulo": "Visão geral", "descricao": "Acompanhe a turma e o progresso das decisões.", "simbolo": "◈"},
-  {"id": "rodada", "titulo": "Gestão da rodada", "descricao": "Confira as pendências e encerre a rodada.", "simbolo": "▷"},
-  {"id": "mercado", "titulo": "Notícias, análises e produtos", "descricao": "Pesquise, revise e publique a edição de mercado.", "simbolo": "▤"},
-  {"id": "equipes", "titulo": "Empresas e ranking", "descricao": "Acesse equipes, decisões e resultados individuais.", "simbolo": "♙"},
-  {"id": "resultados", "titulo": "Resultados da turma", "descricao": "Compare o desempenho e consulte a análise pedagógica.", "simbolo": "▥"},
-  {"id": "aprendizagem", "titulo": "Biblioteca e manuais", "descricao": "Consulte materiais e ferramentas de aprendizagem.", "simbolo": "◇"},
-  {"id": "configuracao", "titulo": "Configurações e dados", "descricao": "Ajuste os parâmetros e exporte os dados.", "simbolo": "⚙"},
+  {
+    "id": "visao",
+    "titulo": "Início da turma",
+    "descricao": "Resumo e código de entrada.",
+    "simbolo": "◈",
+    "grupo": "Sua turma"
+  },
+  {
+    "id": "rodada",
+    "titulo": "Rodada atual",
+    "descricao": "Pendências e encerramento da rodada.",
+    "simbolo": "▷",
+    "grupo": "Sua turma"
+  },
+  {
+    "id": "equipes",
+    "titulo": "Alunos e empresas",
+    "descricao": "Equipes, decisões e ranking.",
+    "simbolo": "♙",
+    "grupo": "Sua turma"
+  },
+  {
+    "id": "mercado",
+    "titulo": "Preparar mercado",
+    "descricao": "Notícias, análises e catálogo de produtos.",
+    "simbolo": "▤",
+    "grupo": "Preparar"
+  },
+  {
+    "id": "configuracao",
+    "titulo": "Configurar turma",
+    "descricao": "Regras do mercado e exportação de dados.",
+    "simbolo": "⚙",
+    "grupo": "Preparar"
+  },
+  {
+    "id": "resultados",
+    "titulo": "Resultados da turma",
+    "descricao": "Compare empresas e analise as rodadas.",
+    "simbolo": "▥",
+    "grupo": "Acompanhar"
+  },
+  {
+    "id": "aprendizagem",
+    "titulo": "Manuais e ajuda",
+    "descricao": "Materiais de apoio à simulação.",
+    "simbolo": "◇",
+    "grupo": "Acompanhar"
+  }
 ];
 
 const INTERVALO_ATUALIZACAO_MS = 15000;
@@ -46,7 +88,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const [erro, setErro] = useState<string | null>(null);
   const [empresaAberta, setEmpresaAberta] = useState<number | null>(null);
   const [editandoParametros, setEditandoParametros] = useState(false);
-  const [secao, setSecao] = useState("visao");
+  const [secao, setSecao] = useState("rodada");
   const sequenciaCarga = useRef(0);
   const [historicos, setHistoricos] = useState<Record<number, Resultado[]>>({});
 
@@ -98,7 +140,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const rotulos = Array.from({ length: rodadasJogadas }, (_, i) => `M${i + 1}`);
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor">
+    <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ turma: turma.nome, codigo: turma.codigo, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
       <SecaoPainel id="visao" ativa={secao}>
       <div className="rounded-xl bg-marinho p-5 text-white shadow-lg">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -138,6 +180,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
 
       </SecaoPainel>
       <SecaoPainel id="rodada" ativa={secao}>
+      <Cartao titulo={`Acompanhar rodada ${Math.min(turma.rodada_atual, turma.total_rodadas)}`}><p className="mb-4">{enviadas} de {empresas.length} empresas com decisões enviadas. Confira as empresas e prepare o mercado por estes atalhos.</p><div className="flex flex-wrap gap-3"><Botao variante="secundario" onClick={() => setSecao("equipes")}>Ver alunos, empresas e pendências</Botao><Botao variante="secundario" onClick={() => setSecao("mercado")}>Preparar notícias e produtos</Botao><Botao variante="secundario" onClick={() => setSecao("resultados")}>Ver resultados da turma</Botao></div></Cartao>
           {aberta ? (
             <FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} eventos={eventos} empresas={empresas} aoFechar={carregar} />
           ) : (
@@ -239,7 +282,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         </Cartao>
       </SecaoPainel>
       <SecaoPainel id="resultados" ativa={secao}>
-      {rodadasJogadas === 0 && <Cartao titulo="Resultados ainda indisponíveis"><p>Os gráficos e indicadores serão disponibilizados após o encerramento da primeira rodada. As empresas podem ser acompanhadas em Empresas e ranking.</p></Cartao>}
+      {rodadasJogadas === 0 && <Cartao titulo="Resultados ainda indisponíveis"><p>Os gráficos e indicadores serão disponibilizados após o encerramento da primeira rodada. As empresas podem ser acompanhadas em Alunos e empresas.</p></Cartao>}
       {turma.modo_jogo !== "LEGADO" && <RelatorioPedagogico turmaId={turma.id} rodada={turma.rodada_atual} temResultados={rodadasJogadas > 0} abrirEmpresa={setEmpresaAberta} />}
 
       {rodadasJogadas > 0 && (

@@ -5,6 +5,7 @@ export interface ItemPainel {
   titulo: string;
   descricao: string;
   simbolo: string;
+  grupo?: string;
 }
 export function SecaoPainel({
   id,
@@ -29,6 +30,7 @@ export default function LayoutPainel({
   total,
   concluidas,
   perfil,
+  contexto,
   children,
 }: {
   itens: ItemPainel[];
@@ -38,6 +40,7 @@ export default function LayoutPainel({
   total: number;
   concluidas: number;
   perfil: string;
+  contexto?: { turma: string; empresa?: string; status: string; codigo?: string };
   children: React.ReactNode;
 }) {
   const [aberto, setAberto] = useState(false);
@@ -84,7 +87,9 @@ export default function LayoutPainel({
           aria-label={`Navegação do ${perfil}`}
           className={`${aberto ? "block" : "hidden"} mt-4 space-y-1 lg:block`}
         >
-          {itens.map((i) => (
+          {itens.map((i, indice) => (
+            <React.Fragment key={i.id}>
+            {i.grupo && itens[indice - 1]?.grupo !== i.grupo && <p className="px-3 pb-1 pt-4 text-[11px] font-bold uppercase tracking-wider text-blue-200">{i.grupo}</p>}
             <button
               type="button"
               key={i.id}
@@ -99,11 +104,12 @@ export default function LayoutPainel({
               <span aria-hidden="true" className="w-5 text-center">
                 {i.simbolo}
               </span>
-              {i.titulo}
+              <span><span className="block">{i.titulo}</span><span className={`mt-1 block text-xs font-normal ${ativa === i.id ? "text-marinho/80" : "text-blue-100/80"}`}>{i.descricao}</span></span>
             </button>
+            </React.Fragment>
           ))}
         </nav>
-        <div className="mt-5 border-t border-white/15 pt-4">
+        <div className="mt-5 hidden border-t border-white/15 pt-4 lg:block">
           <p className="text-sm font-semibold">Jornada empresarial</p>
           <p className="mt-1 text-xs text-white/70">
             Rodada {Math.min(rodada, total)} de {total} · {concluidas}{" "}
@@ -128,6 +134,12 @@ export default function LayoutPainel({
         </div>
       </aside>
       <div className="min-w-0 space-y-6">
+        {contexto && <div className="rounded-xl border border-blue-200 bg-white p-4 shadow-sm" aria-label="Turma e rodada atual">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Turma</p><p className="text-lg font-bold">{contexto.turma}</p>{contexto.empresa && <p className="text-sm text-slate-600">Sua empresa: {contexto.empresa}</p>}{contexto.codigo && <p className="text-sm text-slate-600">Código de entrada: <strong className="font-mono">{contexto.codigo}</strong></p>}</div>
+            <div className="flex flex-wrap items-center gap-3"><div><p className="font-bold text-blue-700">Rodada {Math.min(rodada, total)} de {total}</p><p className="text-sm text-slate-600">{contexto.status}</p></div><button type="button" onClick={() => aoSelecionar("rodada")} className="rounded-lg bg-blue-700 px-4 py-3 text-sm font-bold text-white hover:bg-blue-800">Abrir rodada atual →</button><a href="#/" className="rounded-lg border border-slate-300 px-3 py-3 text-sm font-semibold">Trocar turma</a></div>
+          </div>
+        </div>}
         <header>
           <h2
             ref={titulo}
