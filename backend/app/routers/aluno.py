@@ -232,6 +232,8 @@ def _validar_decisao(empresa: Empresa, dados: DecisaoEntrada) -> None:
         raise HTTPException(422, "Informe as decisões de operação deste modo de jogo.")
     if empresa.turma.modo_jogo != "STARTUP" and dados.simulacao and dados.simulacao.aporte:
         raise HTTPException(422, "Aportes de investidores estão disponíveis no modo Startup.")
+    if empresa.turma.modo_jogo == "TRADICIONAL" and dados.simulacao and dados.simulacao.comprar_maquinas and empresa.turma.rodada_atual < 3:
+        raise HTTPException(422, "Novos investimentos em máquinas estão disponíveis a partir do terceiro mês, após as duas primeiras rodadas.")
     if empresa.turma.status != StatusTurma.ABERTA:
         raise HTTPException(422, "A turma foi encerrada; não há mais rodadas para decidir.")
     if dados.demitir > empresa.funcionarios:

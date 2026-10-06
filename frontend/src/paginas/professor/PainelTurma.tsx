@@ -533,6 +533,7 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
                     ) : (
                       <p className="text-sm text-slate-500">—</p>
                     )}
+                    {decisao?.simulacao?.centro_gravidade && <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3"><h4 className="font-bold">Estudo de centro de gravidade</h4><p className="mt-2 text-sm">Local escolhido: X {decisao.simulacao.centro_gravidade.local_x ?? "não informado"} km · Y {decisao.simulacao.centro_gravidade.local_y ?? "não informado"} km</p><p className="mt-1 whitespace-pre-wrap text-sm">{decisao.simulacao.centro_gravidade.justificativa || "Sem justificativa registrada."}</p><ul className="mt-2 text-xs">{decisao.simulacao.centro_gravidade.pontos.map((p, i) => <li key={i}>{p.nome || `Local ${i + 1}`}: X {p.x}, Y {p.y}, volume {p.volume}</li>)}</ul></div>}
                     {decisao?.automatica && (
                       <p className="mt-2 text-xs text-amber-700">Decisão repetida automaticamente (o aluno não enviou).</p>
                     )}

@@ -71,6 +71,22 @@ class ConfiguracaoSimulacao(BaseModel):
         return self
 
 
+class PontoCentroGravidade(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False, extra="forbid")
+    nome: str = Field("", max_length=100)
+    x: float = Field(0, ge=-1_000_000, le=1_000_000)
+    y: float = Field(0, ge=-1_000_000, le=1_000_000)
+    volume: float = Field(0, ge=0, le=1_000_000)
+
+
+class EstudoCentroGravidade(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False, extra="forbid")
+    pontos: list[PontoCentroGravidade] = Field(default_factory=list, max_length=20)
+    local_x: Optional[float] = Field(None, ge=-1_000_000, le=1_000_000)
+    local_y: Optional[float] = Field(None, ge=-1_000_000, le=1_000_000)
+    justificativa: str = Field("", max_length=2000)
+
+
 class DecisaoSimulacao(BaseModel):
     """Produção/logística no modo tradicional e clientes/capital no modo startup.
 
@@ -81,6 +97,7 @@ class DecisaoSimulacao(BaseModel):
 
     model_config = ConfigDict(allow_inf_nan=False, extra="forbid")
 
+    centro_gravidade: Optional[EstudoCentroGravidade] = None
     producao: int = Field(0, ge=0, le=1_000_000)
     comprar_mp: int = Field(0, ge=0, le=1_000_000)
     comprar_maquinas: int = Field(0, ge=0, le=100)

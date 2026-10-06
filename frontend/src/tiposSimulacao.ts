@@ -31,7 +31,15 @@ export interface ConfiguracaoJogo {
   configuracao_simulacao: ConfiguracaoMotor;
 }
 
+export interface EstudoCentroGravidade {
+  pontos: { nome: string; x: number; y: number; volume: number }[];
+  local_x: number | null;
+  local_y: number | null;
+  justificativa: string;
+}
+
 export interface DecisaoSimulacao {
+  centro_gravidade?: EstudoCentroGravidade | null;
   producao: number;
   comprar_mp: number;
   comprar_maquinas: number;

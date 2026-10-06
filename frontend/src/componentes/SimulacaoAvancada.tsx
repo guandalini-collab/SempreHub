@@ -1,3 +1,4 @@
+import CentroGravidade from "./CentroGravidade";
 import { ControleVisual } from "./Experiencia";
 import React from "react";
 
@@ -5,7 +6,7 @@ import { inteiro, percentual, reais, umDecimal } from "../formatos";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, PreviaSimulacao } from "../tiposSimulacao";
 import { Campo, Cartao, EntradaNumero, estiloEntrada } from "./ui";
 
-export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, area = "decisoes" }: {
+export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, area = "decisoes", rodada }: {
   modo: ModoJogo;
   valores: DecisaoSimulacao;
   aoMudar: (valores: DecisaoSimulacao) => void;
@@ -14,6 +15,7 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
   marketing: number;
   mixSelecionado?: boolean;
   area?: string;
+  rodada: number;
 }) {
   const mudar = <K extends keyof DecisaoSimulacao>(campo: K, valor: DecisaoSimulacao[K]) => aoMudar({ ...valores, [campo]: valor });
   return <div className="space-y-6">
@@ -21,10 +23,11 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
       <Secao titulo="Produção e investimento" oculto={area !== "producao"}>
         <Campo rotulo="Produção planejada" ajuda="Unidades a produzir neste mês. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><ControleVisual rotulo="producao" moeda={false} inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} limite={10000} /></Campo>
         <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar neste mês. O que não for consumido continua no estoque para as próximas rodadas."><ControleVisual rotulo="comprar mp" moeda={false} inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} limite={10000} /></Campo>
-        <Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={10000} /></Campo>
+        {rodada >= 3 ? <Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={100} /></Campo> : <p className="rounded-lg bg-blue-50 p-4 text-sm text-blue-900"><strong>Expansão do maquinário a partir do mês 3.</strong> Nos dois primeiros meses, planeje a produção com as máquinas iniciais e cuide da manutenção.</p>}
         <Campo rotulo="Manutenção do mês" ajuda="Cuida das condições das máquinas e da capacidade das próximas rodadas."><ControleVisual rotulo="manutencao"  valor={valores.manutencao} aoMudar={(v) => mudar("manutencao", v)} limite={100000} /></Campo>
 
       </Secao>
+      <div hidden={area !== "producao"}><CentroGravidade estudo={valores.centro_gravidade} aoMudar={(estudo) => mudar("centro_gravidade", estudo)} /></div>
       <Secao titulo="Logística e entregas" oculto={area !== "logistica"}>
         <Campo rotulo="Entrega" ajuda="O frete é cobrado por unidade vendida. A experiência da entrega afeta a satisfação futura.">
           <select className={estiloEntrada} value={valores.modal} onChange={(e) => mudar("modal", e.target.value as DecisaoSimulacao["modal"])}>
