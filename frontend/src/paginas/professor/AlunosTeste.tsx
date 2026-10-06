@@ -10,6 +10,20 @@ export function BotaoRedefinirSenha({ alunoId, nome }: { alunoId: number; nome: 
   const [carregando, setCarregando] = useState(false);
   const [novaSenha, setNovaSenha] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [copiada, setCopiada] = useState(false);
+  const [erroCopia, setErroCopia] = useState<string | null>(null);
+
+  async function copiarSenha() {
+    if (!novaSenha) return;
+    setCopiada(false);
+    setErroCopia(null);
+    try {
+      await navigator.clipboard.writeText(novaSenha);
+      setCopiada(true);
+    } catch {
+      setErroCopia("Não foi possível copiar automaticamente. Selecione somente a senha no quadro e copie manualmente.");
+    }
+  }
 
   async function redefinir() {
     setCarregando(true);
@@ -28,8 +42,13 @@ export function BotaoRedefinirSenha({ alunoId, nome }: { alunoId: number; nome: 
   if (novaSenha) {
     return (
       <Aviso tipo="sucesso">
-        Nova senha de {nome}: <strong className="select-all font-mono text-base">{novaSenha}</strong>. Repasse ao aluno; ele
-        pode trocá-la depois em "Esqueci minha senha".
+        <p>Nova senha de {nome}</p>
+        <div className="my-2 flex flex-wrap items-center gap-3">
+          <code className="select-all rounded border border-green-200 bg-white px-3 py-2 font-mono text-base">{novaSenha}</code>
+          <Botao variante="secundario" type="button" onClick={copiarSenha}>Copiar senha</Botao>
+        </div>
+        <p role="status" aria-live="polite">{copiada ? "Senha copiada. Repasse ao aluno para entrar com seu e-mail cadastrado." : "Repasse somente a senha do quadro ao aluno, sem espaços ou pontuação adicional."}</p>
+        {erroCopia && <p role="alert" className="mt-2">{erroCopia}</p>}
       </Aviso>
     );
   }
