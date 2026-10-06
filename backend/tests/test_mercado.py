@@ -101,9 +101,35 @@ def test_integracao_organiza_citacoes_sem_inventar_fontes(monkeypatch):
         requisicoes.append(json.loads(req.data))
         return io.BytesIO(json.dumps(next(respostas)).encode())
     monkeypatch.setattr(inteligencia_mercado.urllib.request,"urlopen",abrir)
-    dados,fontes=inteligencia_mercado.gerar_json("Pesquise produtos e devolva JSON",{},True)
+    from app.routers.mercado import Edicao
+    dados,fontes=inteligencia_mercado.gerar_json("Pesquise produtos e devolva JSON",{},True,Edicao.model_json_schema())
     assert dados["produtos"][0]["custo_unitario"]==30
     assert fontes=={"https://example.com/produto"}
-    assert requisicoes[0]["tools"][0]["type"]=="web_search_preview"
-    assert requisicoes[1]["text"]["format"]["type"]=="json_object"
+    assert requisicoes[0]["tools"][0]["type"]=="web_search"
+    assert requisicoes[1]["text"]["format"]["type"]=="json_schema"
     assert "tools" not in requisicoes[1]
+
+
+def test_fontes_rastreamento_nao_altera_identidade_da_pagina():
+    import pytest
+    from fastapi import HTTPException
+    from app.routers.mercado import Edicao, validar_fontes
+    dados=Edicao.model_validate(edicao())
+    validar_fontes(dados,{"https://example.com/produto?utm_source=openai"})
+    with pytest.raises(HTTPException):
+        validar_fontes(dados,{"https://example.com/outro-produto?utm_source=openai"})
+    with pytest.raises(HTTPException):
+        validar_fontes(dados,{"https://example.com/produto?sku=diferente"})
+
+
+def test_pesquisa_insuficiente_explica_o_que_faltou(cliente,professor,monkeypatch):
+    from app.routers import mercado
+    bruto=edicao()
+    bruto["produtos"]=[]
+    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(bruto,{"https://example.com/produto"}))
+    turma=_criar_turma(cliente,professor)
+    base=f"/api/professor/turmas/{turma['id']}/mercado"
+    r=cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Tecnologia","noticias":1,"analises":1,"produtos":3})
+    assert r.status_code==502
+    assert "produtos com custo documentado: 0 de 3" in r.json()["detail"]
+    assert cliente.get(base,headers=professor).json()["edicoes"]==[]

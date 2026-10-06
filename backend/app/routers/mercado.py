@@ -1,9 +1,9 @@
 """Pesquisa, revisão e publicação separadas das decisões dos alunos."""
 from datetime import datetime, timezone
 from typing import Literal
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import update
 from sqlalchemy.orm import Session
 from ..database import get_db
@@ -57,6 +57,12 @@ def serializar(e):
     return {"id": e.id, "rodada": e.rodada, "publicado": e.publicado, "dados": e.dados}
 
 
+def _url_sem_rastreamento(url):
+    partes = urlparse(url)
+    consulta = urlencode([(k, v) for k, v in parse_qsl(partes.query, keep_blank_values=True) if not k.lower().startswith("utm_")])
+    return urlunparse(partes._replace(query=consulta, fragment=""))
+
+
 def validar_fontes(dados, pesquisadas=None):
     urls = []
     for item in dados.noticias + dados.analises + dados.produtos:
@@ -64,7 +70,7 @@ def validar_fontes(dados, pesquisadas=None):
             if urlparse(fonte.url).scheme != "https" or not urlparse(fonte.url).hostname:
                 raise HTTPException(422, "As fontes precisam ter URLs HTTPS válidas.")
             urls.append(fonte.url)
-    if pesquisadas is not None and any(url not in pesquisadas for url in urls):
+    if pesquisadas is not None and any(_url_sem_rastreamento(url) not in {_url_sem_rastreamento(u) for u in pesquisadas} for url in urls):
         raise HTTPException(502, "A pesquisa não confirmou todas as fontes; nenhuma edição foi salva.")
     if len({p.id for p in dados.produtos}) != len(dados.produtos):
         raise HTTPException(422, "Os códigos dos produtos devem ser únicos.")
@@ -79,10 +85,17 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     turma=_turma_do_professor(db,turma_id,usuario)
     rodada=turma.rodada_atual
     if turma.status != StatusTurma.ABERTA: raise HTTPException(409,"Turma encerrada.")
-    instrucoes='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; nunca rotule preço de varejo como custo industrial. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores.'''
-    bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True)
+    instrucoes='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. id deve ser texto, custo_unitario deve ser número em BRL, sem símbolos ou separadores locais. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; nunca rotule preço de varejo como custo industrial. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores.'''
+    bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True,Edicao.model_json_schema())
+    if isinstance(bruto, dict):
+        nomes = {"noticias": "notícias", "analises": "análises", "produtos": "produtos com custo documentado"}
+        faltas = [f"{nomes[k]}: {len(bruto[k])} de {getattr(dados,k)}" for k in nomes if isinstance(bruto.get(k),list) and len(bruto[k]) < getattr(dados,k)]
+        if faltas:
+            raise HTTPException(502, "A busca confirmou menos itens que o solicitado (" + "; ".join(faltas) + "). Nenhuma edição foi salva. Tente novamente ou reduza a quantidade.")
     try: edicao=Edicao.model_validate(bruto)
-    except ValueError: raise HTTPException(502,"Pesquisa incompleta ou inválida; nenhuma edição foi salva.") from None
+    except ValidationError as erro:
+        campos = sorted({str(e["loc"][0]) for e in erro.errors() if e["loc"]})
+        raise HTTPException(502,"A pesquisa retornou campos incompletos em " + ", ".join(campos) + ". Nenhuma edição foi salva. Tente novamente.") from None
     if len(edicao.noticias)!=dados.noticias or len(edicao.analises)!=dados.analises or len(edicao.produtos)!=dados.produtos:
         raise HTTPException(502,"A pesquisa não entregou as quantidades solicitadas.")
     validar_fontes(edicao,fontes)
