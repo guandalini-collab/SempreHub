@@ -135,6 +135,12 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
         </div>
       </div>
 
+      <section className="rounded-xl border-2 border-ouro bg-amber-50 p-5" aria-label="Ambiente de competição">
+        <h2 className="text-lg font-bold text-marinho">Você está em um mercado competitivo</h2>
+        <p className="mt-2 text-sm text-slate-700">Sua empresa disputa clientes com {Math.max(0, painel.total_empresas - 1)} outra(s) empresa(s) da turma e {turma.modo_jogo === "LEGADO" ? 0 : turma.configuracao_simulacao.concorrentes_virtuais} concorrente(s) externo(s) simulados, conforme a configuração do sistema. Preços, produtos, comunicação e capacidade de atendimento influenciam os resultados de cada rodada.</p>
+        <p className="mt-2 text-sm font-semibold text-marinho">As decisões das outras empresas também afetam sua participação no mercado.</p>
+      </section>
+      {ultimo && <IndicadoresFinanceiros resultado={ultimo} />}
       {erro && <Aviso>{erro}</Aviso>}
       {turma.modo_equipe && painel.equipe && <EquipeEmpresa empresaId={empresa.id} equipe={painel.equipe} podeEditar={!encerrada && turma.rodada_atual === 1 && painel.equipe.pode_gerenciar} aoSalvar={carregar} />}
       {empresa.estado_simulacao && <PainelOperacional estado={empresa.estado_simulacao} modo={turma.modo_jogo} />}
@@ -191,7 +197,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
               </>
             ) : (
               <p className="text-sm text-slate-500">
-                Nenhuma rodada fechada ainda. Envie suas decisões e aguarde o professor fechar o mês.
+                Nenhuma rodada fechada ainda. Envie suas decisões e aguarde o fechamento do mês pelo sistema.
               </p>
             )}
           </Cartao>
@@ -355,7 +361,7 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
         const dados = await api.post<PrevisaoDecisao>(`/api/aluno/empresas/${empresaAtual.id}/previsao`, { ...entrada, rodada: turmaAtual.rodada_atual });
         if (!cancelada) {
           if (dados.rodada !== turmaAtual.rodada_atual) {
-            setPrevia({ chave: chavePrevisao, erro: "O professor avançou a rodada. Aguarde a atualização do painel." });
+            setPrevia({ chave: chavePrevisao, erro: "O sistema avançou a rodada. Aguarde a atualização do painel." });
           } else {
             setPrevia({ chave: chavePrevisao, dados });
           }
@@ -379,7 +385,7 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
       const salva = await api.put<Decisao>(`/api/aluno/empresas/${empresa.id}/decisao`, { ...d, versao: base.versao, rodada: base.rodada });
       setBase({ entrada: { ...d }, versao: salva.versao, rodada: turma.rodada_atual });
       setConflitoServidor(false);
-      setMensagem({ tipo: "sucesso", texto: turma.modo_equipe ? `Rascunho da versão ${salva.versao} salvo. Agora cada integrante deve confirmar essa versão na própria conta.` : "Decisões enviadas. Você pode alterá-las até o professor fechar o mês." });
+      setMensagem({ tipo: "sucesso", texto: turma.modo_equipe ? `Rascunho da versão ${salva.versao} salvo. Agora cada integrante deve confirmar essa versão na própria conta.` : "Decisões enviadas. Você pode alterá-las até o fechamento do mês pelo sistema." });
       await aoEnviar();
     } catch (e) {
       if (e instanceof ErroApi && e.status === 409) {
@@ -610,4 +616,26 @@ function Historico({ painel }: { painel: PainelAluno }) {
       {selecionado?.detalhes_simulacao && <div className="mt-5 space-y-4"><h3 className="text-sm font-semibold text-marinho">Demonstrativos e operação do mês {selecionado.rodada}</h3><RelatorioFinanceiro detalhes={selecionado.detalhes_simulacao} /></div>}
     </Cartao>
   );
+}
+
+function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resultados"][number] }) {
+  const { dre, detalhes_simulacao: detalhes } = resultado;
+  const margem = dre.receita > 0 ? dre.lucro_liquido / dre.receita : null;
+  const b = detalhes?.balanco;
+  const ativos = b ? b.caixa + b.receber + b.estoques + b.imobilizado : null;
+  const passivos = b ? b.pagar + b.divida : null;
+  return <Cartao titulo={`KPIs e indicadores financeiros · rodada ${resultado.rodada}`}>
+    <dl className="grid gap-4 sm:grid-cols-3">
+      <div><dt className="text-sm text-slate-500">Margem líquida</dt><dd className="font-bold text-marinho">{margem === null ? "—" : percentual(margem)}</dd><p className="text-xs text-slate-500">Lucro líquido dividido pela receita.</p></div>
+      <div><dt className="text-sm text-slate-500">Participação no mercado</dt><dd className="font-bold text-marinho">{percentual(resultado.participacao_mercado)}</dd><p className="text-xs text-slate-500">Parcela do mercado conquistada nesta rodada.</p></div>
+      <div><dt className="text-sm text-slate-500">Atendimento da demanda</dt><dd className="font-bold text-marinho">{resultado.demanda > 0 ? percentual(resultado.unidades_vendidas / resultado.demanda) : "—"}</dd><p className="text-xs text-slate-500">Unidades vendidas divididas pela demanda da empresa.</p></div>
+      {b && <>
+        <div><dt className="text-sm text-slate-500">Endividamento sobre ativos</dt><dd className="font-bold text-marinho">{ativos !== null && ativos > 0 && passivos !== null ? percentual(passivos / ativos) : "—"}</dd><p className="text-xs text-slate-500">Contas a pagar e dívida divididas pelo total de ativos.</p></div>
+        <div><dt className="text-sm text-slate-500">Retorno sobre o patrimônio · rodada</dt><dd className="font-bold text-marinho">{b.patrimonio > 0 ? percentual(dre.lucro_liquido / b.patrimonio) : "—"}</dd><p className="text-xs text-slate-500">Lucro da rodada dividido pelo patrimônio final; não é uma taxa anual.</p></div>
+        <div><dt className="text-sm text-slate-500">Caixa operacional</dt><dd className="font-bold text-marinho">{reais(detalhes!.dfc.operacional)}</dd><p className="text-xs text-slate-500">Recebimentos menos pagamentos operacionais.</p></div>
+      </>}
+    </dl>
+    <p className="mt-3 text-xs text-slate-500">“—” indica ausência de uma base válida para cálculo. Compare com as rodadas anteriores e com os demonstrativos.</p>
+    {detalhes && <div className="mt-5"><RelatorioFinanceiro detalhes={detalhes} /></div>}
+  </Cartao>;
 }

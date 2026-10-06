@@ -54,7 +54,7 @@ class ConfiguracaoSimulacao(BaseModel):
         0.06, ge=0, le=1,
         description="Alíquota didática para serviços; não representa enquadramento fiscal real.",
     )
-    concorrentes_virtuais: int = Field(0, ge=0, le=20)
+    concorrentes_virtuais: int = Field(0, ge=0, le=200)
     peso_lucro: float = Field(0.4, ge=0, le=1)
     peso_patrimonio: float = Field(0.3, ge=0, le=1)
     peso_satisfacao: float = Field(0.2, ge=0, le=1)

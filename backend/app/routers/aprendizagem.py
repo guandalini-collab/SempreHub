@@ -17,7 +17,7 @@ def primeira_rodada(empresa_id: int, db: Session = Depends(get_db), aluno: Usuar
     empresa = _empresa_do_aluno(db, empresa_id, aluno)
     resultado = next((r for r in empresa.resultados if r.rodada == 1), None)
     if resultado is None:
-        raise HTTPException(409, "O relatório ficará disponível após o professor fechar a primeira rodada.")
+        raise HTTPException(409, "O relatório ficará disponível após o fechamento da primeira rodada pelo sistema.")
     decisao = next((d for d in empresa.decisoes if d.rodada == 1), None)
     evento = next((e for e in empresa.turma.eventos if e.rodada == 1), None)
     dados_resultado = _rodada(empresa, resultado, decisao)
@@ -52,4 +52,4 @@ def news(empresa_id: int, db: Session = Depends(get_db), aluno: Usuario = Depend
             } if resultados else None,
         })
     return {"jornal": "SempreHub News", "rodada_atual": turma.rodada_atual, "edicoes": edicoes,
-            "orientacao": "Relacione os eventos e os indicadores de mercado com os resultados da sua empresa. O professor escolhe ou sorteia o evento no fechamento."}
+            "orientacao": "Relacione os eventos e os indicadores de mercado com os resultados da sua empresa. As condições de mercado são aplicadas pelo sistema no fechamento."}

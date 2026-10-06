@@ -109,15 +109,18 @@ export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao 
           ["Caixa no fim", dfc.caixa_final],
         ]} />
       </Cartao>
-      <Cartao titulo="Balanço ao fim da rodada">
+      <Cartao titulo="Balanço patrimonial ao fim da rodada">
         <ListaFinanceira linhas={[
           ["Caixa", balanco.caixa],
           ["Contas a receber", balanco.receber],
           ["Estoques", balanco.estoques],
           ["Máquinas líquidas de depreciação", balanco.imobilizado],
-          ["Contas a pagar", -balanco.pagar],
-          ["Dívida", -balanco.divida],
-          ["Patrimônio", balanco.patrimonio],
+          ["Total do ativo", balanco.caixa + balanco.receber + balanco.estoques + balanco.imobilizado],
+          ["Contas a pagar", balanco.pagar],
+          ["Dívida", balanco.divida],
+          ["Total do passivo", balanco.pagar + balanco.divida],
+          ["Patrimônio líquido", balanco.patrimonio],
+          ["Passivo + patrimônio líquido", balanco.pagar + balanco.divida + balanco.patrimonio],
           ["Capital de giro", balanco.capital_giro],
         ]} />
       </Cartao>
