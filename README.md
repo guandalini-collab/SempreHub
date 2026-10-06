@@ -66,6 +66,20 @@ SempreHub** no painel do professor. A interface mantém a versão recortada da m
 
 ## Regras do modelo
 
+### Apoio pedagógico
+
+Os painéis incluem tour guiado com preferência **Não mostrar novamente**, manuais
+separados de aluno e professor em PDF, biblioteca de análises e referências com
+indicações de capítulos/seções. O catálogo explica 24 mídias, suas finalidades,
+unidades de compra, faixas ilustrativas de custo, prazos e efeitos no caixa.
+O **SempreHub News** no painel da empresa reúne eventos e indicadores agregados
+das rodadas concluídas. Após o primeiro fechamento, o relatório da equipe é
+disponibilizado automaticamente e conserva a fotografia da primeira rodada.
+Os manuais e as ilustrações editáveis ficam em `docs/`; gere os PDFs com
+`backend/venv/bin/python docs/gerar_manuais.py` (Pandoc e WeasyPrint,
+instalável com `backend/venv/bin/pip install -r docs/requirements.txt`).
+
+
 | Elemento | Regra |
 | --- | --- |
 | **Mercado** | Demanda total = demanda base × nº de empresas × crescimento mensal × efeito do preço médio × evento. A demanda é dividida pela **atratividade** de cada empresa: preço relativo (peso maior), marca (acumulada com marketing) e qualidade (acumulada com P&D). |

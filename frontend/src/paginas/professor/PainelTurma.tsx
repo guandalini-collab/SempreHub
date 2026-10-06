@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, baixarArquivo } from "../../api";
+import { BibliotecaAprendizagem } from "../../componentes/Aprendizagem";
 import EquipeEmpresa from "../../componentes/EquipeEmpresa";
 import { PainelOperacional, RelatorioFinanceiro } from "../../componentes/SimulacaoAvancada";
 import RelatorioPedagogico from "../../componentes/RelatorioPedagogico";
@@ -110,6 +111,8 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       </div>
 
       {erro && <Aviso>{erro}</Aviso>}
+
+      <BibliotecaAprendizagem rodada={turma.rodada_atual} modo={turma.modo_jogo} />
 
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="space-y-6 lg:col-span-2">

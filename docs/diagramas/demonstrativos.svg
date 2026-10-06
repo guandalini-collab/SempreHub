@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 330" role="img" aria-labelledby="t d">
+  <title id="t">Relação entre DRE, DFC e balanço</title>
+  <desc id="d">A DRE mede o resultado, a DFC mede o dinheiro e o balanço mostra os saldos acumulados.</desc>
+  <defs><style>.box{rx:18;stroke-width:3}.h{font-weight:700;font-size:25px;font-family:Arial,sans-serif;fill:#0b2545}.p{font-size:16px;font-family:Arial,sans-serif;fill:#334155}.arr{stroke:#c5a059;stroke-width:4;fill:none;marker-end:url(#a)}</style><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 Z" fill="#c5a059"/></marker></defs>
+  <rect width="1100" height="330" fill="#f8fafc"/>
+  <rect class="box" x="30" y="80" width="300" height="160" fill="#e8f1fb" stroke="#0b2545"/><text class="h" x="180" y="124" text-anchor="middle">DRE</text><text class="p" x="180" y="158" text-anchor="middle">Receita − custos − despesas</text><text class="p" x="180" y="184" text-anchor="middle">= lucro ou prejuízo</text><text class="p" x="180" y="215" text-anchor="middle">competência econômica</text>
+  <path class="arr" d="M340 160 H380"/>
+  <rect class="box" x="400" y="80" width="300" height="160" fill="#eaf7ef" stroke="#24704f"/><text class="h" x="550" y="124" text-anchor="middle">DFC</text><text class="p" x="550" y="158" text-anchor="middle">Entradas − saídas de dinheiro</text><text class="p" x="550" y="184" text-anchor="middle">= variação do caixa</text><text class="p" x="550" y="215" text-anchor="middle">recebimentos e pagamentos</text>
+  <path class="arr" d="M710 160 H750"/>
+  <rect class="box" x="770" y="80" width="300" height="160" fill="#fff7e6" stroke="#c5a059"/><text class="h" x="920" y="124" text-anchor="middle">Balanço</text><text class="p" x="920" y="158" text-anchor="middle">Ativos − obrigações</text><text class="p" x="920" y="184" text-anchor="middle">= patrimônio</text><text class="p" x="920" y="215" text-anchor="middle">posição ao fim da rodada</text>
+  <text x="550" y=" forty" text-anchor="middle" style="font-weight:700;font-size:27px;font-family:Arial,sans-serif;fill:#0b2545">Três leituras para uma mesma decisão</text>
+</svg>

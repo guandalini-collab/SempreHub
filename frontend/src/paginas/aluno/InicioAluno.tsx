@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { api } from "../../api";
+import { BibliotecaAprendizagem, ManualRapido, TourGuiado } from "../../componentes/Aprendizagem";
 import { Aviso, Botao, Campo, Carregando, Cartao, SeloFase, estiloEntrada } from "../../componentes/ui";
 import {
   DESCRICAO_DORNELAS,
@@ -52,6 +53,8 @@ export default function InicioAluno({ abrirEmpresa }: { abrirEmpresa: (id: numbe
         )}
       </div>
 
+      <TourGuiado perfil="ALUNO" />
+
       {mostrarFormulario && (
         <FormularioEntrada
           aoCancelar={itens.length ? () => setMostrarFormulario(false) : undefined}
@@ -95,6 +98,9 @@ export default function InicioAluno({ abrirEmpresa }: { abrirEmpresa: (id: numbe
           </button>
         ))}
       </div>
+
+      <ManualRapido perfil="ALUNO" />
+      <BibliotecaAprendizagem />
     </div>
   );
 }

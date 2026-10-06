@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, ErroApi } from "../../api";
+import { BibliotecaAprendizagem } from "../../componentes/Aprendizagem";
+import { RelatorioPrimeiraRodada } from "../../componentes/ConteudoRodada";
 import EquipeEmpresa from "../../componentes/EquipeEmpresa";
 import { ControlesSimulacao, PainelOperacional, PreviaOperacional, RelatorioFinanceiro } from "../../componentes/SimulacaoAvancada";
 import {
@@ -136,6 +138,8 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       {erro && <Aviso>{erro}</Aviso>}
       {turma.modo_equipe && painel.equipe && <EquipeEmpresa empresaId={empresa.id} equipe={painel.equipe} podeEditar={!encerrada && turma.rodada_atual === 1 && painel.equipe.pode_gerenciar} aoSalvar={carregar} />}
       {empresa.estado_simulacao && <PainelOperacional estado={empresa.estado_simulacao} modo={turma.modo_jogo} />}
+      <BibliotecaAprendizagem rodada={turma.rodada_atual} modo={turma.modo_jogo} empresaId={empresa.id} />
+      <RelatorioPrimeiraRodada empresaId={empresa.id} disponivel={resultados.some(r => r.rodada === 1)} />
 
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="lg:col-span-3">

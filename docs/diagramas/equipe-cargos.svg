@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" role="img" aria-labelledby="t d">
+  <title id="t">Equipe e cargos de gestão</title>
+  <desc id="d">Uma equipe compartilha uma empresa; o CEO coordena e os demais cargos cobrem finanças, marketing, operações e pessoas.</desc>
+  <defs><style>.box{rx:18;stroke-width:3}.h{font-weight:700;font-size:22px;font-family:Arial,sans-serif;fill:#0b2545}.p{font-size:16px;font-family:Arial,sans-serif;fill:#334155}.line{stroke:#c5a059;stroke-width:4}</style></defs>
+  <rect width="1000" height="480" fill="#f8fafc"/>
+  <rect class="box" x="330" y="30" width="340" height="115" fill="#0b2545" stroke="#c5a059"/>
+  <text x="500" y="74" text-anchor="middle" style="font-weight:700;font-size:27px;font-family:Arial,sans-serif;fill:#fff">Uma empresa</text><text x="500" y="108" text-anchor="middle" style="font-size:16px;font-family:Arial,sans-serif;fill:#fff">3 a 5 integrantes · 1 histórico</text>
+  <path class="line" d="M500 145 V200 M500 200 H140 M500 200 H860 M140 200 V240 M355 200 V240 M645 200 V240 M860 200 V240"/>
+  <rect class="box" x="45" y="245" width="190" height="150" fill="#fff7e6" stroke="#c5a059"/><text class="h" x="140" y="285" text-anchor="middle">CEO</text><text class="p" x="140" y="315" text-anchor="middle">coordena a</text><text class="p" x="140" y="340" text-anchor="middle">decisão e garante</text><text class="p" x="140" y="365" text-anchor="middle">que a equipe avance</text>
+  <rect class="box" x="260" y="245" width="190" height="150" fill="#e8f1fb" stroke="#0b2545"/><text class="h" x="355" y="285" text-anchor="middle">CFO</text><text class="p" x="355" y="315" text-anchor="middle">caixa, crédito,</text><text class="p" x="355" y="340" text-anchor="middle">DRE, DFC e</text><text class="p" x="355" y="365" text-anchor="middle">balanço</text>
+  <rect class="box" x="475" y="245" width="190" height="150" fill="#eaf7ef" stroke="#24704f"/><text class="h" x="570" y="285" text-anchor="middle">CMO · COO</text><text class="p" x="570" y="315" text-anchor="middle">mercado, preço,</text><text class="p" x="570" y="340" text-anchor="middle">produção, estoque</text><text class="p" x="570" y="365" text-anchor="middle">e logística</text>
+  <rect class="box" x="690" y="245" width="190" height="150" fill="#f3edf9" stroke="#6b46a1"/><text class="h" x="785" y="285" text-anchor="middle">CHRO</text><text class="p" x="785" y="315" text-anchor="middle">salários, benefícios,</text><text class="p" x="785" y="340" text-anchor="middle">treinamento, moral</text><text class="p" x="785" y="365" text-anchor="middle">e rotatividade</text>
+  <text x="500" y="442" text-anchor="middle" style="font-size:16px;font-family:Arial,sans-serif;fill:#475569">Uma pessoa pode acumular cargos; cada cargo precisa ter um titular na versão pronta.</text>
+</svg>

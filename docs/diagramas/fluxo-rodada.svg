@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" role="img" aria-labelledby="t d">
+  <title id="t">Fluxo de uma rodada do SempreHub</title>
+  <desc id="d">O aluno lê o cenário, prepara e confirma uma decisão; o professor fecha a rodada; o sistema calcula e preserva os resultados.</desc>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 Z" fill="#c5a059"/></marker>
+    <style>
+      .box{rx:18;stroke-width:3}.title{font-weight:700;font-size:22px;font-family:Arial,sans-serif;fill:#0b2545}.text{font-size:16px;font-family:Arial,sans-serif;fill:#334155}.arrow{stroke:#c5a059;stroke-width:4;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1200" height="320" fill="#f8fafc"/>
+  <rect class="box" x="22" y="86" width="190" height="150" fill="#e8f1fb" stroke="#0b2545"/>
+  <text class="title" x="117" y="126" text-anchor="middle">1. Ler</text><text class="text" x="117" y="158" text-anchor="middle">cenário, News</text><text class="text" x="117" y="184" text-anchor="middle">e resultados</text><text class="text" x="117" y="210" text-anchor="middle">anteriores</text>
+  <path class="arrow" d="M215 161 H260"/>
+  <rect class="box" x="265" y="86" width="190" height="150" fill="#fff7e6" stroke="#c5a059"/>
+  <text class="title" x="360" y="126" text-anchor="middle">2. Decidir</text><text class="text" x="360" y="158" text-anchor="middle">mercado, operação</text><text class="text" x="360" y="184" text-anchor="middle">e caixa</text><text class="text" x="360" y="210" text-anchor="middle">do mês</text>
+  <path class="arrow" d="M458 161 H503"/>
+  <rect class="box" x="508" y="86" width="190" height="150" fill="#eaf7ef" stroke="#24704f"/>
+  <text class="title" x="603" y="126" text-anchor="middle">3. Confirmar</text><text class="text" x="603" y="158" text-anchor="middle">salvar rascunho,</text><text class="text" x="603" y="184" text-anchor="middle">revisar e assinar</text><text class="text" x="603" y="210" text-anchor="middle">a versão</text>
+  <path class="arrow" d="M701 161 H746"/>
+  <rect class="box" x="751" y="86" width="190" height="150" fill="#f3edf9" stroke="#6b46a1"/>
+  <text class="title" x="846" y="126" text-anchor="middle">4. Fechar</text><text class="text" x="846" y="158" text-anchor="middle">professor escolhe</text><text class="text" x="846" y="184" text-anchor="middle">o evento e encerra</text><text class="text" x="846" y="210" text-anchor="middle">o mês</text>
+  <path class="arrow" d="M944 161 H989"/>
+  <rect class="box" x="994" y="86" width="184" height="150" fill="#e8f1fb" stroke="#0b2545"/>
+  <text class="title" x="1086" y="126" text-anchor="middle">5. Aprender</text><text class="text" x="1086" y="158" text-anchor="middle">DRE, DFC,</text><text class="text" x="1086" y="184" text-anchor="middle">balanço, News</text><text class="text" x="1086" y="210" text-anchor="middle">e histórico</text>
+  <text x="600" y="45" text-anchor="middle" style="font-weight:700;font-size:27px;font-family:Arial,sans-serif;fill:#0b2545">Uma rodada é um ciclo completo de aprendizagem</text>
+</svg>
