@@ -240,15 +240,15 @@ export function TourGuiado({ perfil }: { perfil: PerfilAprendizagem }) {
   );
 }
 
-export function BibliotecaAprendizagem({ rodada, modo, empresaId }: { rodada?: number; modo?: string; empresaId?: number }) {
-  const [aba, setAba] = useState<AbaBiblioteca>("NEWS");
+export function BibliotecaAprendizagem({ rodada, modo, empresaId, mercadoSeparado = false }: { rodada?: number; modo?: string; empresaId?: number; mercadoSeparado?: boolean }) {
+  const [aba, setAba] = useState<AbaBiblioteca>(mercadoSeparado ? "REFERENCIAS" : "NEWS");
   const noticias = useMemo(() => {
     if (!rodada) return noticiasBase;
     return noticiasBase.map((noticia) => ({ ...noticia, titulo: `Rodada ${rodada}: ${noticia.titulo}` }));
   }, [rodada]);
 
   const abas: { id: AbaBiblioteca; titulo: string }[] = [
-    { id: "NEWS", titulo: "SempreHub News" },
+    ...(!mercadoSeparado ? [{ id: "NEWS" as const, titulo: "SempreHub News" }] : []),
     { id: "REFERENCIAS", titulo: "Autores e referências" },
     { id: "ANALISES", titulo: "Análises" },
     { id: "MIDIAS", titulo: "Mídias e comunicação" },

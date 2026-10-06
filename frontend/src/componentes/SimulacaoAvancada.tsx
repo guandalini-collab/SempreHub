@@ -1,3 +1,4 @@
+import { ControleVisual } from "./Experiencia";
 import React from "react";
 
 import { inteiro, percentual, reais, umDecimal } from "../formatos";
@@ -17,10 +18,10 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
   return <div className="space-y-6">
     {modo === "TRADICIONAL" && <>
       <Secao titulo="Produção e investimento">
-        <Campo rotulo="Produção planejada" ajuda="Unidades a produzir neste mês. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><EntradaNumero inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} /></Campo>
-        <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar neste mês. O que não for consumido continua no estoque para as próximas rodadas."><EntradaNumero inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} /></Campo>
-        <Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><EntradaNumero inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} /></Campo>
-        <Campo rotulo="Manutenção do mês" ajuda="Cuida das condições das máquinas e da capacidade das próximas rodadas."><EntradaNumero moeda valor={valores.manutencao} aoMudar={(v) => mudar("manutencao", v)} /></Campo>
+        <Campo rotulo="Produção planejada" ajuda="Unidades a produzir neste mês. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><ControleVisual rotulo="producao" moeda={false} inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} limite={10000} /></Campo>
+        <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar neste mês. O que não for consumido continua no estoque para as próximas rodadas."><ControleVisual rotulo="comprar mp" moeda={false} inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} limite={10000} /></Campo>
+        <Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={10000} /></Campo>
+        <Campo rotulo="Manutenção do mês" ajuda="Cuida das condições das máquinas e da capacidade das próximas rodadas."><ControleVisual rotulo="manutencao"  valor={valores.manutencao} aoMudar={(v) => mudar("manutencao", v)} limite={100000} /></Campo>
         <Campo rotulo="Entrega" ajuda="O frete é cobrado por unidade vendida. A experiência da entrega afeta a satisfação futura.">
           <select className={estiloEntrada} value={valores.modal} onChange={(e) => mudar("modal", e.target.value as DecisaoSimulacao["modal"])}>
             <option value="RAPIDO">Rápida · {reais(config.frete_rapido)} por unidade</option>
@@ -35,17 +36,17 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
       </Secao>
     </>}
     {modo === "STARTUP" && <Secao titulo="Serviço digital e investidores">
-      <Campo rotulo="Capacidade da nuvem" ajuda="Número de clientes que a operação consegue atender neste mês. Os clientes sem atendimento continuam na base, com impacto na satisfação."><EntradaNumero inteiro valor={valores.capacidade_nuvem} aoMudar={(v) => mudar("capacidade_nuvem", v)} /></Campo>
-      <Campo rotulo="Aporte de investidores" ajuda="Entrada de capital no caixa em troca de participação. Não é receita nem lucro e pode reduzir a participação dos fundadores."><EntradaNumero moeda valor={valores.aporte} aoMudar={(v) => mudar("aporte", v)} /></Campo>
-      <Campo rotulo="Valuation antes do aporte" ajuda="Valor da empresa usado para definir a participação do investidor."><EntradaNumero moeda minimo={0.01} valor={valores.valuation} aoMudar={(v) => mudar("valuation", v)} /></Campo>
+      <Campo rotulo="Capacidade da nuvem" ajuda="Número de clientes que a operação consegue atender neste mês. Os clientes sem atendimento continuam na base, com impacto na satisfação."><ControleVisual rotulo="capacidade nuvem" moeda={false} inteiro valor={valores.capacidade_nuvem} aoMudar={(v) => mudar("capacidade_nuvem", v)} limite={10000} /></Campo>
+      <Campo rotulo="Aporte de investidores" ajuda="Entrada de capital no caixa em troca de participação. Não é receita nem lucro e pode reduzir a participação dos fundadores."><ControleVisual rotulo="aporte"  valor={valores.aporte} aoMudar={(v) => mudar("aporte", v)} limite={100000} /></Campo>
+      <Campo rotulo="Valuation antes do aporte" ajuda="Valor da empresa usado para definir a participação do investidor."><ControleVisual rotulo="valuation"  minimo={0.01} valor={valores.valuation} aoMudar={(v) => mudar("valuation", v)} limite={100000} /></Campo>
     </Secao>}
     <Secao titulo="Pessoas e desenvolvimento">
       <Campo rotulo="Salário da equipe de funcionários" ajuda={`O padrão da turma é ${reais(salarioBase)} por funcionário. Salários, benefícios e treinamento influenciam moral, qualificação e rotatividade.`}>
         <select className={estiloEntrada} value={valores.salario === null ? "PADRAO" : "PROPRIO"} onChange={(e) => mudar("salario", e.target.value === "PADRAO" ? null : salarioBase)}><option value="PADRAO">Usar salário-base da turma</option><option value="PROPRIO">Definir salário da empresa</option></select>
       </Campo>
-      {valores.salario !== null && <Campo rotulo="Salário por funcionário"><EntradaNumero moeda valor={valores.salario} aoMudar={(v) => mudar("salario", v)} /></Campo>}
-      <Campo rotulo="Benefício por funcionário" ajuda="Valor mensal por empregado; aparece como despesa de benefícios."><EntradaNumero moeda valor={valores.beneficio} aoMudar={(v) => mudar("beneficio", v)} /></Campo>
-      <Campo rotulo="Treinamento do mês" ajuda="Investimento total em capacitação dos funcionários; o desenvolvimento passa para as rodadas seguintes."><EntradaNumero moeda valor={valores.treinamento} aoMudar={(v) => mudar("treinamento", v)} /></Campo>
+      {valores.salario !== null && <Campo rotulo="Salário por funcionário"><ControleVisual rotulo="salario"  valor={valores.salario} aoMudar={(v) => mudar("salario", v)} limite={100000} /></Campo>}
+      <Campo rotulo="Benefício por funcionário" ajuda="Valor mensal por empregado; aparece como despesa de benefícios."><ControleVisual rotulo="beneficio"  valor={valores.beneficio} aoMudar={(v) => mudar("beneficio", v)} limite={100000} /></Campo>
+      <Campo rotulo="Treinamento do mês" ajuda="Investimento total em capacitação dos funcionários; o desenvolvimento passa para as rodadas seguintes."><ControleVisual rotulo="treinamento"  valor={valores.treinamento} aoMudar={(v) => mudar("treinamento", v)} limite={100000} /></Campo>
     </Secao>
     {!mixSelecionado && <Secao titulo="Posicionamento e canais">
       <Campo rotulo="Estratégia de posicionamento"><select className={estiloEntrada} value={valores.posicionamento} onChange={(e) => mudar("posicionamento", e.target.value as DecisaoSimulacao["posicionamento"])}><option value="CUSTO">Liderança em custo</option><option value="DIFERENCIACAO">Diferenciação</option></select></Campo>

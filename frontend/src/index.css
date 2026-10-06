@@ -18,3 +18,14 @@
     padding-right: 0;
   }
 }
+
+@layer base {
+  body { background: #f3f5fa; }
+  button, summary, input, select, textarea { touch-action: manipulation; }
+  button:focus-visible, summary:focus-visible { outline: 3px solid #C5A059; outline-offset: 3px; }
+  input[type="range"] { min-height: 36px; cursor: pointer; }
+  [hidden] { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

@@ -17,11 +17,11 @@ export function Cabecalho({
 }) {
   return (
     <header className="bg-marinho text-white shadow-lg">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <button onClick={aoInicio} className="flex items-center gap-4 text-left" aria-label="SempreHub — ir para o início">
           {/* O logo vai sobre um fundo branco, como foi desenhado, para manter cores e legibilidade */}
           <span className="flex shrink-0 items-center rounded-xl bg-white px-3 py-1.5 shadow-sm ring-1 ring-ouro/40">
-            <img src={logoSempreHub} alt="SempreHub" className="h-10 w-auto sm:h-16" />
+            <img src={logoSempreHub} alt="SempreHub" className="h-10 w-auto sm:h-12" />
           </span>
           <span className="hidden text-[11px] uppercase leading-snug tracking-[0.2em] text-ouro md:block">
             Ecossistema de
@@ -59,7 +59,7 @@ export function Cartao({
   className?: string;
 }) {
   return (
-    <section className={`rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 ${className}`}>
+    <section className={`rounded-2xl bg-white p-5 shadow-[0_8px_30px_-18px_rgba(11,37,69,0.25)] ring-1 ring-slate-200 ${className}`}>
       {(titulo || acao) && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           {titulo && <h2 className="text-base font-semibold text-marinho">{titulo}</h2>}

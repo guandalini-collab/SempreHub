@@ -1,3 +1,5 @@
+import { Conquistas, type Jornada } from "../../componentes/Experiencia";
+import LayoutPainel, { SecaoPainel } from "../../componentes/LayoutPainel";
 import { GestaoMercado } from "../../componentes/MercadoReal";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -26,6 +28,16 @@ import type { ModoJogo } from "../../tiposSimulacao";
 import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
 
+const ITENS_PAINEL = [
+  {"id": "visao", "titulo": "Visão geral", "descricao": "Acompanhe a turma e o progresso das decisões.", "simbolo": "◈"},
+  {"id": "rodada", "titulo": "Gestão da rodada", "descricao": "Confira as pendências e encerre a rodada.", "simbolo": "▷"},
+  {"id": "mercado", "titulo": "Notícias, análises e produtos", "descricao": "Pesquise, revise e publique a edição de mercado.", "simbolo": "▤"},
+  {"id": "equipes", "titulo": "Empresas e ranking", "descricao": "Acesse equipes, decisões e resultados individuais.", "simbolo": "♙"},
+  {"id": "resultados", "titulo": "Resultados da turma", "descricao": "Compare o desempenho e consulte a análise pedagógica.", "simbolo": "▥"},
+  {"id": "aprendizagem", "titulo": "Biblioteca e manuais", "descricao": "Consulte materiais e ferramentas de aprendizagem.", "simbolo": "◇"},
+  {"id": "configuracao", "titulo": "Configurações e dados", "descricao": "Ajuste os parâmetros e exporte os dados.", "simbolo": "⚙"},
+];
+
 const INTERVALO_ATUALIZACAO_MS = 15000;
 
 export default function PainelTurma({ turmaId }: { turmaId: number }) {
@@ -34,6 +46,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const [erro, setErro] = useState<string | null>(null);
   const [empresaAberta, setEmpresaAberta] = useState<number | null>(null);
   const [editandoParametros, setEditandoParametros] = useState(false);
+  const [secao, setSecao] = useState("visao");
   const sequenciaCarga = useRef(0);
   const [historicos, setHistoricos] = useState<Record<number, Resultado[]>>({});
 
@@ -85,7 +98,8 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const rotulos = Array.from({ length: rodadasJogadas }, (_, i) => `M${i + 1}`);
 
   return (
-    <div className="space-y-6">
+    <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor">
+      <SecaoPainel id="visao" ativa={secao}>
       <div className="rounded-xl bg-marinho p-5 text-white shadow-lg">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -111,13 +125,19 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         )}
       </div>
 
+      <Cartao titulo="Prontidão da turma"><p className="mb-3 text-sm text-slate-600">{enviadas} de {empresas.length} empresas prontas nesta rodada</p><div className="h-3 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label="Empresas com decisões enviadas" aria-valuenow={empresas.length ? Math.round(enviadas / empresas.length * 100) : 0} aria-valuemin={0} aria-valuemax={100}><div className="h-full bg-emerald-500 transition-all" style={{ width: `${empresas.length ? enviadas / empresas.length * 100 : 0}%` }} /></div><p className="mt-3 text-xs text-slate-500">As decisões e confirmações das equipes atualizam este painel automaticamente.</p></Cartao>
+      <Cartao titulo="Próximos passos"><div className="grid gap-3 sm:grid-cols-3"><Botao variante="secundario" onClick={() => setSecao("mercado")}>1. Preparar mercado</Botao><Botao variante="secundario" onClick={() => setSecao("equipes")}>2. Acompanhar empresas</Botao><Botao onClick={() => setSecao("rodada")}>3. Gerenciar rodada</Botao></div><p className="mt-4 text-sm">{aberta ? `${enviadas} de ${empresas.length} empresas com decisões enviadas. Confira as pendências antes de encerrar a rodada.` : "Simulação concluída. Consulte os resultados da turma."}</p></Cartao>
+      </SecaoPainel>
       {erro && <Aviso>{erro}</Aviso>}
 
+      <SecaoPainel id="mercado" ativa={secao}>
       <GestaoMercado turmaId={turmaId} rodada={dados.turma.rodada_atual} empresas={dados.empresas} />
-      <BibliotecaAprendizagem rodada={turma.rodada_atual} modo={turma.modo_jogo} />
+      </SecaoPainel>
+      <SecaoPainel id="aprendizagem" ativa={secao}>
+      <BibliotecaAprendizagem mercadoSeparado rodada={turma.rodada_atual} modo={turma.modo_jogo} />
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        <div className="space-y-6 lg:col-span-2">
+      </SecaoPainel>
+      <SecaoPainel id="rodada" ativa={secao}>
           {aberta ? (
             <FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} eventos={eventos} empresas={empresas} aoFechar={carregar} />
           ) : (
@@ -127,6 +147,8 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
               </p>
             </Cartao>
           )}
+      </SecaoPainel>
+      <SecaoPainel id="configuracao" ativa={secao}>
           <Cartao
             titulo="Parâmetros e dados"
             acao={
@@ -154,8 +176,8 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
             </dl>
             <p className="mt-3 text-xs text-slate-500">O CSV traz todas as rodadas de todas as empresas, pronto para Excel ou análise estatística.</p>
           </Cartao>
-        </div>
-
+      </SecaoPainel>
+      <SecaoPainel id="equipes" ativa={secao}>
         <Cartao titulo={turma.modo_jogo === "LEGADO" ? "Ranking (patrimônio = caixa − dívida)" : "Ranking por patrimônio"} className="lg:col-span-3">
           {empresas.length === 0 ? (
             <p className="text-sm text-slate-500">
@@ -186,7 +208,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
                       >
                         <td className="py-2 font-semibold text-ouro">{linha.posicao}º</td>
                         <td className="py-2">
-                          <p className="font-medium text-marinho">{linha.empresa}</p>
+                          <button type="button" className="font-medium text-marinho underline decoration-ouro underline-offset-4" onClick={(e) => { e.stopPropagation(); setEmpresaAberta(linha.empresa_id); }}>{linha.empresa}</button>
                           <p className="text-xs text-slate-500">{turma.modo_equipe ? empresa.equipe_membros?.map((m) => m.nome).join(", ") || linha.aluno : linha.aluno}</p>
                         </td>
                         <td className={`py-2 text-right font-semibold ${linha.patrimonio < 0 ? "text-red-700" : "text-marinho"}`}>
@@ -215,8 +237,9 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
             </div>
           )}
         </Cartao>
-      </div>
-
+      </SecaoPainel>
+      <SecaoPainel id="resultados" ativa={secao}>
+      {rodadasJogadas === 0 && <Cartao titulo="Resultados ainda indisponíveis"><p>Os gráficos e indicadores serão disponibilizados após o encerramento da primeira rodada. As empresas podem ser acompanhadas em Empresas e ranking.</p></Cartao>}
       {turma.modo_jogo !== "LEGADO" && <RelatorioPedagogico turmaId={turma.id} rodada={turma.rodada_atual} temResultados={rodadasJogadas > 0} abrirEmpresa={setEmpresaAberta} />}
 
       {rodadasJogadas > 0 && (
@@ -261,6 +284,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         </Cartao>
       )}
 
+      </SecaoPainel>
       {empresaAberta !== null && (
         <DetalheEmpresa turmaId={turma.id} empresaId={empresaAberta} modo={turma.modo_jogo} aoFechar={() => setEmpresaAberta(null)} />
       )}
@@ -278,7 +302,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
           }}
         />
       )}
-    </div>
+    </LayoutPainel>
   );
 }
 
@@ -382,13 +406,13 @@ function FecharRodada({
 }
 
 function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: number; empresaId: number; modo: ModoJogo; aoFechar: () => void }) {
-  const [dados, setDados] = useState<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; equipe?: Equipe | null } | null>(null);
+  const [dados, setDados] = useState<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; jornada?: Jornada; equipe?: Equipe | null } | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [rodadaSelecionada, setRodadaSelecionada] = useState<number | null>(null);
 
   useEffect(() => {
     api
-      .get<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; equipe?: Equipe | null }>(`/api/professor/turmas/${turmaId}/empresas/${empresaId}`)
+      .get<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; jornada?: Jornada; equipe?: Equipe | null }>(`/api/professor/turmas/${turmaId}/empresas/${empresaId}`)
       .then((d) => {
         setDados(d);
         if (d.resultados.length) setRodadaSelecionada(d.resultados[d.resultados.length - 1].rodada);
@@ -404,6 +428,7 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
         <Carregando />
       ) : (
         <div className="space-y-4">
+          <details className="rounded-xl border p-3"><summary className="cursor-pointer font-semibold">Conquistas e evolução desta empresa</summary><div className="mt-3"><Conquistas jornada={dados.jornada} /></div></details>
           <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
             <span>{dados.empresa.aluno} · {dados.empresa.aluno_email}</span>
             <SeloFase fase={dados.empresa.fase_atual} />

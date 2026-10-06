@@ -11,6 +11,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from .. import serializacao as ser
+from ..experiencia import jornada_empresa
 from ..database import get_db
 from ..equipes import bloquear_turma, dados_equipe, decisao_atual, pendencias_equipe, pendencias_fechamento, verificar_rodada
 from ..models import Decisao, Empresa, MembroEmpresa, Papel, Resultado, StatusTurma, Turma, Usuario
@@ -173,6 +174,7 @@ def detalhar_empresa(
         "empresa": ser.empresa(empresa),
         "resultados": [ser.resultado(r) for r in empresa.resultados],
         "decisoes": [decisoes[r] for r in sorted(decisoes)],
+        "jornada": jornada_empresa(empresa),
         "equipe": dados_equipe(empresa, decisao_atual(db, empresa)),
     }
 

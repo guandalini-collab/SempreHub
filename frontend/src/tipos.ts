@@ -219,6 +219,7 @@ export interface PainelAluno {
   equipe?: Equipe | null;
   empresa: Empresa;
   turma: Turma;
+  jornada?: import("./componentes/Experiencia").Jornada;
   decisao_atual: Decisao | null;
   ultima_decisao: Decisao | null;
   resultados: Resultado[];

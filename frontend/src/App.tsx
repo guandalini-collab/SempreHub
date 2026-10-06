@@ -89,7 +89,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-100 text-marinho">
       <Cabecalho usuario={usuario} aoSair={sair} aoInicio={() => irPara("/")} />
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
         {rota.pagina !== "inicio" && (
           <button onClick={() => irPara("/")} className="mb-4 text-sm font-medium text-slate-500 hover:text-marinho">
             ← {ehProfessor ? "Minhas turmas" : "Minhas empresas"}

@@ -1,3 +1,5 @@
+import { ControleVisual, ResumoNegocio, Conquistas, FeedResultados, ViradaRodada } from "../../componentes/Experiencia";
+import LayoutPainel, { SecaoPainel } from "../../componentes/LayoutPainel";
 import { EditorMix, MercadoPublicado } from "../../componentes/MercadoReal";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -26,6 +28,17 @@ import type { Decisao, DecisaoEntrada, EventoRodada, PainelAluno, PrevisaoDecisa
 import { CONFIGURACAO_MOTOR_PADRAO, DECISAO_SIMULACAO_PADRAO } from "../../tiposSimulacao";
 import type { DecisaoSimulacao } from "../../tiposSimulacao";
 
+const ITENS_PAINEL = [
+  {"id": "visao", "titulo": "Visão geral", "descricao": "Seu negócio, a competição e os próximos passos.", "simbolo": "◈"},
+  {"id": "decisoes", "titulo": "Decisões e mix de marketing", "descricao": "Escolha produtos, preços, mídias e investimentos da rodada.", "simbolo": "✎"},
+  {"id": "mercado", "titulo": "News e análises", "descricao": "Consulte as notícias e análises antes de decidir.", "simbolo": "▤"},
+  {"id": "aprendizagem", "titulo": "Estratégia e manuais", "descricao": "Ferramentas estratégicas, materiais e guia de mídias.", "simbolo": "◇"},
+  {"id": "resultados", "titulo": "Resultados e finanças", "descricao": "DRE, balanço patrimonial, indicadores e histórico.", "simbolo": "▥"},
+  {"id": "relatorios", "titulo": "Relatórios empresariais", "descricao": "Avalie os resultados das decisões de sua empresa.", "simbolo": "▧"},
+  {"id": "equipe", "titulo": "Empresa e equipe", "descricao": "Acompanhe sua operação e os integrantes da empresa.", "simbolo": "♙"},
+  { id: "conquistas", titulo: "Conquistas", descricao: "Marcos e evolução da sua jornada empresarial.", simbolo: "★" },
+];
+
 const INTERVALO_ATUALIZACAO_MS = 15000;
 
 function chaveEventoVisto(empresaId: number) {
@@ -52,6 +65,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   const [painel, setPainel] = useState<PainelAluno | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [eventoAberto, setEventoAberto] = useState<EventoRodada | null>(null);
+  const [secao, setSecao] = useState("visao");
   const sequenciaCarga = useRef(0);
 
   const carregar = useCallback(async () => {
@@ -93,7 +107,8 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   }
 
   return (
-    <div className="space-y-6">
+    <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno">
+      <SecaoPainel id="visao" ativa={secao}>
       <div className="rounded-xl bg-marinho p-5 text-white shadow-lg">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -118,6 +133,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
           </div>
         )}
 
+        <details className="mt-4 border-t border-white/15 pt-3"><summary className="cursor-pointer text-sm text-white/80">Perfil, estrutura e desenvolvimento da empresa</summary>
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           <Indicador rotulo="Caixa" valor={reais(empresa.caixa)} destaque />
           <Indicador rotulo="Dívida" valor={reais(empresa.divida)} />
@@ -134,23 +150,38 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
           <BarraProgresso escuro rotulo="Necessidade de realização" valor={empresa.necessidade_realizacao} />
           <BarraProgresso escuro rotulo="Networking" valor={empresa.networking} />
         </div>
+        </details>
       </div>
 
       <section className="rounded-xl border-2 border-ouro bg-amber-50 p-5" aria-label="Ambiente de competição">
         <h2 className="text-lg font-bold text-marinho">Você está em um mercado competitivo</h2>
-        <p className="mt-2 text-sm text-slate-700">Sua empresa disputa clientes com {Math.max(0, painel.total_empresas - 1)} outra(s) empresa(s) da turma e {turma.configuracao_simulacao.concorrentes_virtuais} concorrente(s) externo(s) simulados, conforme a configuração do sistema. Preços, produtos, comunicação e capacidade de atendimento influenciam os resultados de cada rodada.</p>
+        <p className="mt-2 text-sm text-slate-700">Sua empresa disputa clientes com {Math.max(0, painel.total_empresas - 1)} outra(s) empresa(s) da turma e {(turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO).concorrentes_virtuais} concorrente(s) externo(s) simulados, conforme a configuração do sistema. Preços, produtos, comunicação e capacidade de atendimento influenciam os resultados de cada rodada.</p>
         <p className="mt-2 text-sm font-semibold text-marinho">As decisões das outras empresas também afetam sua participação no mercado.</p>
       </section>
-      {ultimo && <IndicadoresFinanceiros resultado={ultimo} />}
+      <ResumoNegocio painel={painel} aoResultados={() => setSecao("resultados")} />
+      <Cartao titulo="Sua missão nesta rodada"><ol className="space-y-3 text-sm"><li>1. Consulte as notícias e análises do mercado.</li><li>2. Defina a estratégia e as decisões da sua empresa.</li><li>3. Envie a decisão e acompanhe os resultados.</li></ol><p className="my-4 font-semibold">{encerrada ? "Jornada concluída: confira seu desempenho." : painel.decisao_atual?.enviada_em ? "Decisão registrada. Acompanhe as confirmações e o fechamento da rodada." : "Próximo objetivo: preparar e enviar sua decisão."}</p><Botao onClick={() => setSecao(encerrada ? "resultados" : "decisoes")}>{encerrada ? "Analisar resultados" : "Ir para decisões"}</Botao></Cartao>
+      </SecaoPainel>
       {erro && <Aviso>{erro}</Aviso>}
+      <SecaoPainel id="equipe" ativa={secao}>
+      {!turma.modo_equipe && <Cartao titulo="Participação individual"><p>Você administra esta empresa individualmente.</p></Cartao>}
       {turma.modo_equipe && painel.equipe && <EquipeEmpresa empresaId={empresa.id} equipe={painel.equipe} podeEditar={!encerrada && turma.rodada_atual === 1 && painel.equipe.pode_gerenciar} aoSalvar={carregar} />}
       {empresa.estado_simulacao && <PainelOperacional estado={empresa.estado_simulacao} modo={turma.modo_jogo} />}
-      <MercadoPublicado empresaId={empresa.id} rodada={turma.rodada_atual} />
-      <BibliotecaAprendizagem rodada={turma.rodada_atual} modo={turma.modo_jogo} empresaId={empresa.id} />
+      </SecaoPainel>
+      <SecaoPainel id="conquistas" ativa={secao}><Conquistas jornada={painel.jornada} /></SecaoPainel>
+      <SecaoPainel id="mercado" ativa={secao}>
+      <FeedResultados jornada={painel.jornada} aoResultados={() => setSecao("resultados")} />
+      <MercadoPublicado visao="mercado" empresaId={empresa.id} rodada={turma.rodada_atual} />
+      </SecaoPainel>
+      <SecaoPainel id="aprendizagem" ativa={secao}>
+      <BibliotecaAprendizagem mercadoSeparado rodada={turma.rodada_atual} modo={turma.modo_jogo} empresaId={empresa.id} />
+      </SecaoPainel>
+      <SecaoPainel id="relatorios" ativa={secao}>
+      <MercadoPublicado visao="relatorios" empresaId={empresa.id} rodada={turma.rodada_atual} />
       <RelatorioPrimeiraRodada empresaId={empresa.id} disponivel={resultados.some(r => r.rodada === 1)} />
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        <div className="lg:col-span-3">
+      </SecaoPainel>
+      <SecaoPainel id="decisoes" ativa={secao}>
+        <div>
           {encerrada ? (
             <Cartao titulo="Simulação encerrada">
               <p className="text-sm text-slate-600">
@@ -165,7 +196,10 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
             <FormularioDecisao key={empresa.id} painel={painel} aoEnviar={carregar} />
           )}
         </div>
-        <div className="space-y-6 lg:col-span-2">
+      </SecaoPainel>
+      <SecaoPainel id="resultados" ativa={secao}>
+      {ultimo && <IndicadoresFinanceiros resultado={ultimo} />}
+        <div className="grid gap-6 xl:grid-cols-2">
           <Cartao titulo={ultimo ? `Resultado do mês ${ultimo.rodada}` : "Resultado do mês"}>
             {ultimo ? (
               <>
@@ -183,7 +217,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
                     <p className="text-base font-semibold text-marinho">{percentual(ultimo.participacao_mercado)}</p>
                   </div>
                 </div>
-                <TabelaDre dre={ultimo.dre} />
+                <details className="rounded-xl border border-slate-200 p-4"><summary className="cursor-pointer font-semibold">Ver DRE completa</summary><div className="mt-4"><TabelaDre dre={ultimo.dre} /></div></details>
                 <p className="mt-2 text-xs text-slate-500">
                   Alíquota efetiva de tributos: {percentual(ultimo.aliquota_efetiva, 2)} da receita.
                 </p>
@@ -228,7 +262,6 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
             )}
           </Cartao>
         </div>
-      </div>
 
       {resultados.length > 0 && (
         <div className="grid gap-6 lg:grid-cols-2">
@@ -253,6 +286,8 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
 
       {resultados.length > 0 && <Historico painel={painel} />}
 
+      </SecaoPainel>
+      <ViradaRodada painel={painel} podeAbrir={!eventoAberto} />
       {eventoAberto && (
         <Modal
           titulo={`Mês ${eventoAberto.rodada}: ${eventoAberto.titulo}`}
@@ -271,7 +306,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
           )}
         </Modal>
       )}
-    </div>
+    </LayoutPainel>
   );
 }
 
@@ -441,25 +476,25 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
             rotulo="Preço de venda (por unidade)"
             ajuda={`Preço de referência do mercado: ${reais(p.preco_referencia)}. Custo da mercadoria: ${reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)}.`}
           >
-            <EntradaNumero moeda valor={d.preco} aoMudar={(v) => atualizar("preco", v)} minimo={0.01} />
+            <ControleVisual rotulo="Preço de venda" valor={d.preco} aoMudar={(v) => atualizar("preco", v)} minimo={0.01} limite={p.preco_referencia * 3} />
           </Campo>
           <Campo rotulo="Marketing (no mês)" ajuda={`Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
-            {d.plano_comercial ? <p className="font-semibold">{reais(d.marketing)} · calculado pelas mídias escolhidas</p> : <EntradaNumero moeda valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} />}
+            {d.plano_comercial ? <p className="font-semibold">{reais(d.marketing)} · calculado pelas mídias escolhidas</p> : <ControleVisual rotulo="Investimento em marketing" valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} limite={Math.max(1000, empresa.caixa)} />}
           </Campo>
           <Campo rotulo="Pesquisa e desenvolvimento (no mês)" ajuda={`Melhora a qualidade percebida. Índice atual: ${umDecimal(empresa.qualidade)}.`}>
-            <EntradaNumero moeda valor={d.pd} aoMudar={(v) => atualizar("pd", v)} />
+            <ControleVisual rotulo="Pesquisa e desenvolvimento" valor={d.pd} aoMudar={(v) => atualizar("pd", v)} limite={Math.max(1000, empresa.caixa)} />
           </Campo>
           <Campo rotulo="Networking e capacitação (no mês)" ajuda="Rede de contadores e parceiros. Networking ≥ 30 evita multas em fiscalizações.">
-            <EntradaNumero moeda valor={d.networking} aoMudar={(v) => atualizar("networking", v)} />
+            <ControleVisual rotulo="Networking e capacitação" valor={d.networking} aoMudar={(v) => atualizar("networking", v)} limite={Math.max(1000, empresa.caixa)} />
           </Campo>
         </Secao>
 
         <Secao titulo="Funcionários da empresa">
           <Campo rotulo="Contratar" ajuda={`Salário-base ${reais(p.salario_base)}. A prévia aplica os encargos do regime efetivo.`}>
-            <EntradaNumero inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} />
+            <ControleVisual rotulo="Contratar funcionários" moeda={false} inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} limite={20} />
           </Campo>
           <Campo rotulo="Demitir" ajuda={`Hoje: ${empresa.funcionarios} funcionário(s). Rescisão custa um salário.`}>
-            <EntradaNumero inteiro valor={d.demitir} aoMudar={(v) => atualizar("demitir", v)} />
+            <ControleVisual rotulo="Demitir funcionários" moeda={false} inteiro valor={d.demitir} aoMudar={(v) => atualizar("demitir", v)} limite={empresa.funcionarios} />
           </Campo>
         </Secao>
 
@@ -468,10 +503,10 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
             rotulo="Novo empréstimo"
             ajuda={`Juros de ${percentual(p.taxa_juros_mensal, 2)} ao mês. Limite disponível: ${reais(Math.max(0, p.limite_credito - empresa.divida))}.`}
           >
-            <EntradaNumero moeda valor={d.emprestimo} aoMudar={(v) => atualizar("emprestimo", v)} />
+            <ControleVisual rotulo="Novo empréstimo" valor={d.emprestimo} aoMudar={(v) => atualizar("emprestimo", v)} limite={Math.max(0, p.limite_credito - empresa.divida)} />
           </Campo>
           <Campo rotulo="Amortizar dívida" ajuda={`Dívida atual: ${reais(empresa.divida)}.`}>
-            <EntradaNumero moeda valor={d.amortizacao} aoMudar={(v) => atualizar("amortizacao", v)} />
+            <ControleVisual rotulo="Amortizar dívida" valor={d.amortizacao} aoMudar={(v) => atualizar("amortizacao", v)} limite={empresa.divida} />
           </Campo>
           <Campo
             rotulo="Regime tributário"
@@ -640,6 +675,7 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
       </>}
     </dl>
     <p className="mt-3 text-xs text-slate-500">“—” indica ausência de uma base válida para cálculo. Compare com as rodadas anteriores e com os demonstrativos.</p>
+    <details className="mt-5 rounded-xl border border-slate-200 p-4"><summary className="cursor-pointer font-semibold">Ver balanço e demonstrativos completos</summary>
     {resultado.balanco_basico && <div className="mt-5 rounded border p-4"><h3 className="font-semibold">Balanço patrimonial · modelo básico · rodada {resultado.rodada}</h3><p className="my-2 text-xs text-slate-500">O modelo básico opera à vista, sem estoques, imobilizado ou contas a prazo. Saldo de caixa negativo aparece como cheque especial no passivo.</p><dl className="grid gap-3 sm:grid-cols-3">{([
       ["Caixa e bancos",resultado.balanco_basico.caixa],
       ["Empréstimos",resultado.balanco_basico.emprestimos],
@@ -649,5 +685,6 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
       ["Patrimônio líquido",resultado.balanco_basico.patrimonio_liquido]
     ] as const).map(([nome,valor])=><div key={nome}><dt className="text-sm text-slate-500">{nome}</dt><dd className="font-bold">{reais(valor)}</dd></div>)}</dl></div>}
     {detalhes && <div className="mt-5"><RelatorioFinanceiro detalhes={detalhes} /></div>}
+    </details>
   </Cartao>;
 }

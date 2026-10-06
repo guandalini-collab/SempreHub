@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .. import serializacao as ser
+from ..experiencia import jornada_empresa
 from ..database import get_db
 from ..equipes import (
     bloquear_turma, dados_equipe, decisao_atual, invalidar_aprovacoes,
@@ -220,6 +221,7 @@ def painel(empresa_id: int, db: Session = Depends(get_db), aluno: Usuario = Depe
         "posicao_ranking": posicao,
         "total_empresas": len(turma.empresas),
         "equipe": dados_equipe(empresa, decisao_atual, aluno),
+        "jornada": jornada_empresa(empresa),
     }
 
 
