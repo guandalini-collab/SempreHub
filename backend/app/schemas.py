@@ -223,6 +223,7 @@ class SegmentacaoAnalise(ItensAnalise):
 
 
 class AnalisesEstrategicas(ItensAnalise):
+    diagnostico_automatico: bool = False
     versao: Literal[1] = 1
     swot: SWOTAnalise = Field(default_factory=SWOTAnalise)
     porter: PorterAnalise = Field(default_factory=PorterAnalise)
@@ -231,9 +232,26 @@ class AnalisesEstrategicas(ItensAnalise):
     segmentacao: SegmentacaoAnalise = Field(default_factory=SegmentacaoAnalise)
 
 
+class MixProduto(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False)
+    produto_id: str = Field(min_length=1, max_length=80)
+    preco: float = Field(gt=0, le=100000)
+    peso: float = Field(gt=0, le=100)
+    revisado: bool = False
+    estrategia_preco: Literal["PENETRACAO", "COMPETITIVO", "DESNATAMENTO", "VALOR"]
+    posicionamento: Literal["QUALIDADE", "PRECO", "INOVACAO"]
+    canais: list[Literal["VAREJO", "ECOMMERCE", "MARKETPLACE", "ATACADO", "FRANQUIA", "DIRETO"]] = Field(min_length=1, max_length=6)
+    cobertura: Literal["LOCAL", "REGIONAL", "NACIONAL", "INTERNACIONAL"]
+    intensidade: Literal["BAIXA", "MEDIA", "ALTA", "INTENSIVA"]
+    midias: list[AlocacaoMidia] = Field(default_factory=list, max_length=80)
+    custo_unitario: Optional[float] = Field(None, gt=0, le=1000000)
+    produto_nome: Optional[str] = Field(None, max_length=200)
+
+
 class PlanoComercial(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
     edicao_id: int = Field(gt=0)
+    produtos: list[MixProduto] = Field(default_factory=list, max_length=10)
     produto_id: str = Field(max_length=80)
     estrategia_preco: Literal["PENETRACAO", "COMPETITIVO", "DESNATAMENTO", "VALOR"]
     posicionamento: Literal["QUALIDADE", "PRECO", "INOVACAO"]

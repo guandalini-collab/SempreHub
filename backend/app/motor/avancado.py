@@ -65,9 +65,14 @@ def motor(turma):
 def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0):
     dados = colunas(empresa)
     dados["estado_simulacao"] = dados["estado_simulacao"] or estado_inicial(turma)
+    if turma.modo_jogo=="TRADICIONAL":
+        anteriores=[d for d in empresa.decisoes if d.rodada<turma.rodada_atual and d.plano_comercial]
+        original=anteriores[-1].plano_comercial["produto_id"] if anteriores else (decisao.plano_comercial or {}).get("produto_id")
+        if original: dados["estado_simulacao"].setdefault("produto_estoque_original",original)
     entrada = colunas(decisao)
     entrada["simulacao"] = DecisaoSimulacao.model_validate(entrada["simulacao"] or {}).model_dump()
     p = parametros(turma)
+    p["custo_referencia_portfolio"]=turma.custo_unitario
     if decisao.plano_comercial:
         p["custo_unitario"] = decisao.plano_comercial["custo_unitario"]
         if turma.modo_jogo == "STARTUP":
@@ -75,6 +80,11 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0):
     p["multa_evento"] = multa
     p["multas"] = multa
     preparo = motor(turma).preparar(dados, entrada, p, turma.rodada_atual, multiplicador_custo)
+    itens=(decisao.plano_comercial or {}).get("produtos", [])
+    if itens:
+        from .portfolio import atrativos
+        base=(turma.preco_referencia/decisao.preco)**(1.4 if turma.modo_jogo=="STARTUP" else 2)
+        preparo["atratividade"]*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade))/sum(i["peso"] for i in itens)/base
     from .estrategia import avaliar, mensagens
     avaliacao = avaliar(decisao, turma)
     preparo["avaliacao_estrategica"] = avaliacao

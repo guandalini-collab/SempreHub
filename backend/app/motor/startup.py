@@ -222,6 +222,7 @@ def preparar(
         **{chave: rh[chave] for chave in ("folha", "beneficios", "treinamento", "rescisoes")},
     }
     return {
+        "plano_comercial": deepcopy(decisao.get("plano_comercial")),
         "capacidade": capacidade, "atratividade": atratividade,
         "estado_inicial": deepcopy(estado_inicial), "estado": estado,
         "funcionarios": rh["funcionarios"], "emprestimo": emprestimo,
@@ -263,11 +264,28 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
             - nao_atendidos / clientes * 30,
         )
     estado["satisfacao"] = satisfacao
-    receita = _dinheiro(_decimal(atendidos) * _decimal(preparo["preco"]))
-    custo_nuvem = _dinheiro(
-        _decimal(atendidos) * _decimal(configuracao["custo_nuvem_cliente"])
-        * _decimal(preparo["multiplicador_custo"]),
-    )
+    itens=(preparo.get("plano_comercial") or {}).get("produtos", [])
+    linhas=[]
+    if itens:
+        from .portfolio import dividir, atrativos
+        base=deepcopy(estado.get("clientes_produtos") or {})
+        if not base: base[itens[0]["produto_id"]]=preparo["clientes_iniciais"]
+        atuais=[base.get(p["produto_id"],0) for p in itens]
+        retencao=dividir(preparo["clientes_retidos"],atuais)
+        novos=dividir(adquiridos,atrativos(itens,1,1))
+        finais=[r+n for r,n in zip(retencao,novos)]
+        ativos=dividir(atendidos,finais)
+        estado["clientes_produtos"]={p["produto_id"]:q for p,q in zip(itens,finais)}
+        for item,q,f in zip(itens,ativos,finais):
+            linhas.append({"produto_id":item["produto_id"],"nome":item["produto_nome"],"preco":item["preco"],"vendas":q,"clientes_finais":f,"receita":_dinheiro(q*item["preco"]),"cmv":_dinheiro(q*item["custo_unitario"]*preparo["multiplicador_custo"])})
+        receita=_soma(*(l["receita"] for l in linhas))
+        custo_nuvem=_soma(*(l["cmv"] for l in linhas))
+    else:
+        receita = _dinheiro(_decimal(atendidos) * _decimal(preparo["preco"]))
+        custo_nuvem = _dinheiro(
+            _decimal(atendidos) * _decimal(configuracao["custo_nuvem_cliente"])
+            * _decimal(preparo["multiplicador_custo"]),
+        )
     aliquota = float(configuracao["aliquota_servico"])
     impostos = _dinheiro(_decimal(receita) * _decimal(aliquota))
     royalties = _dinheiro(_decimal(receita) * _decimal(preparo["taxa_royalties"]))
@@ -306,6 +324,7 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
     cac = _dinheiro(preparo["custos"]["marketing"] / adquiridos) if adquiridos else None
     ltv = _dinheiro(margem_cliente / preparo["churn"]) if margem_cliente is not None and preparo["churn"] > 0 else None
     operacao = {
+        "produtos": linhas,
         "clientes_iniciais": preparo["clientes_iniciais"], "clientes_perdidos": preparo["clientes_perdidos"],
         "churn": preparo["churn"], "clientes_retidos": preparo["clientes_retidos"],
         "clientes_adquiridos": adquiridos, "clientes_atendidos": atendidos, "clientes_finais": clientes,

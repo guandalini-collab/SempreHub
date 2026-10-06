@@ -12,6 +12,14 @@ def quadrante(crescimento, participacao):
 
 def avaliar(decisao, turma):
     plano = decisao.plano_comercial or {}
+    itens=plano.get("produtos", [])
+    if itens:
+        from types import SimpleNamespace
+        resultados=[avaliar(SimpleNamespace(plano_comercial={**plano,**item,"produtos":[]},preco=item["preco"],emprestimo=decisao.emprestimo),turma) for item in itens]
+        peso=sum(p["peso"] for p in itens)
+        reducao=round(sum(p["peso"]*r["reducao"] for p,r in zip(itens,resultados))/peso,6)
+        achados=[{**a,"produto_id":p["produto_id"],"texto":p.get("produto_nome",p["produto_id"])+": "+a["texto"]} for p,r in zip(itens,resultados) for a in r["achados"]]
+        return {"versao":1,"fator":1-reducao,"reducao":reducao,"achados":achados,"avaliada":any(r["avaliada"] for r in resultados),"produtos":[{"produto_id":p["produto_id"],**r} for p,r in zip(itens,resultados)]}
     analises = plano.get("analises")
     achados = []
     if not analises:
@@ -25,13 +33,13 @@ def avaliar(decisao, turma):
         registrar("SWOT", "diretriz", "O posicionamento comercial diverge da diretriz escolhida na SWOT.", .04)
     rivalidade = analises.get("porter", {}).get("rivalidade", {}).get("intensidade")
     nivel = (turma.configuracao_simulacao or {}).get("nivel_concorrencia", "MEDIA")
-    if rivalidade is not None and ((nivel == "ALTA" and rivalidade <= 3) or (nivel == "BAIXA" and rivalidade >= 8)):
+    if not analises.get("diagnostico_automatico") and rivalidade is not None and ((nivel == "ALTA" and rivalidade <= 3) or (nivel == "BAIXA" and rivalidade >= 8)):
         registrar("PORTER", "rivalidade", "A intensidade estimada da rivalidade contradiz o nível de concorrência do mercado da rodada.", .03)
     produto = next((p for p in analises.get("bcg", []) if p["produto_id"] == plano.get("produto_id")), None)
     if produto and produto["classificacao"] != quadrante(produto["crescimento"], produto["participacao"]):
         registrar("BCG", "quadrante", "A classificação do produto escolhido contradiz crescimento e participação informados na BCG (cortes: 10% e 1×).", .03)
     juros = analises.get("pestel", {}).get("juros_previstos")
-    if juros is not None and decisao.emprestimo > 0 and abs(juros - turma.taxa_juros_mensal * 100) > 2:
+    if not analises.get("diagnostico_automatico") and juros is not None and decisao.emprestimo > 0 and abs(juros - turma.taxa_juros_mensal * 100) > 2:
         registrar("PESTEL", "juros", "O plano solicita crédito com uma premissa de juros divergente da taxa do mês em mais de 2 pontos percentuais.", .02)
     segmento = analises.get("segmentacao", {})
     teto = segmento.get("preco_maximo")

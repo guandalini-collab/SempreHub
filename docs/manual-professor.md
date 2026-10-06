@@ -80,3 +80,11 @@ Discuta investimentos em tráfego pago, conteúdo, SEO, e-mail/CRM, identidade v
 Em **Alunos de teste**, crie contas para demonstração quando necessário. Use a função de redefinição de senha para alunos de suas turmas. A recuperação por e-mail depende do envio configurado no sistema. Oriente os alunos a consultar o manual separado e a reabrir a orientação inicial. O tour pode ser ocultado com **Não mostrar novamente**; a escolha fica no navegador do usuário.
 
 Antes de encerrar a atividade, faça a devolutiva final com evidências de várias rodadas, evitando avaliar apenas a posição no ranking.
+
+## Mix completo e diagnósticos automáticos
+
+Todas as equipes configuram preço, posicionamento, canais e campanhas de **todos os produtos** da edição de mercado utilizada. Revise cada produto antes de enviar. O peso de operação distribui a capacidade compartilhada; o investimento em mídia é a soma das campanhas de cada produto. Os resultados apresentam vendas, receita e custos por produto, além dos demonstrativos consolidados.
+
+Em **Ferramentas e segmentação**, o sistema prepara SWOT, Porter e PESTEL por IA, para consulta. A equipe interpreta o diagnóstico, escolhe a diretriz estratégica e preenche BCG e segmentação. As decisões da equipe continuam influenciando a coerência do mix e o resultado. Os diagnósticos ficam preservados por empresa e rodada.
+
+Consulte **Manual de mídias** na sidebar para pesquisar os formatos do catálogo, entender objetivos, unidades de compra e cuidados. A mesma área oferece o guia completo em PDF.

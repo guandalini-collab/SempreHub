@@ -1,3 +1,4 @@
+import ResultadoProdutos, {type LinhaProduto} from "./ResultadoProdutos";
 import CentroGravidade from "./CentroGravidade";
 import { ControleVisual } from "./Experiencia";
 import React from "react";
@@ -118,6 +119,7 @@ export function PainelOperacional({ estado, modo }: { estado: EstadoSimulacao; m
 export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao }) {
   const { dfc, balanco } = detalhes;
   return <div className="space-y-4">
+    <ResultadoProdutos produtos={(detalhes.operacao.produtos as LinhaProduto[]|undefined)??[]}/>
     <p className="rounded-lg bg-sky-50 p-3 text-xs leading-relaxed text-sky-900">Lucro e caixa medem coisas diferentes. A DRE registra o resultado das vendas e despesas; o fluxo de caixa registra o dinheiro que entrou e saiu. Estoque, prazos, investimentos e financiamentos explicam as diferenças.</p>
     <div className="grid gap-4 lg:grid-cols-2">
       <Cartao titulo="Fluxo de caixa da rodada">

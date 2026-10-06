@@ -159,28 +159,40 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         alertas.append("Máquinas compradas ficam disponíveis na próxima rodada.")
 
     mp_inicial, pa_inicial = deepcopy(mp), deepcopy(pa)
-    unidades_compra = max(0, int(op.get("comprar_mp", 0)))
-    compras = _produto(unidades_compra, p.get("custo_unitario", 40), multiplicador_custo)
-    compra_a_prazo = _produto(compras, _limitar(op.get("compras_prazo", 0), 0, 1))
-    compra_a_vista = _soma([compras, -compra_a_prazo])
-    if compra_a_prazo:
-        s["pagar"].append({"origem": rodada, "vencimento": rodada + op.get("prazo_pagamento", 1),
-                           "valor": compra_a_prazo})
-    mp["quantidade"] += unidades_compra
-    mp["valor"] = _soma([mp["valor"], compras])
-    producao_pedida = max(0, int(op.get("producao", 0)))
-    producao_real = min(producao_pedida, mp["quantidade"], int(math.floor(capacidade_produtiva * 1.30)))
-    utilizacao = producao_real / capacidade_maquinas if capacidade_maquinas > 0 else 0.0
-    taxa_refugo = min(0.15, 0.4 * max(0, utilizacao - 0.90))
-    refugo = min(producao_real, int(math.floor(producao_real * taxa_refugo + 1e-12)))
-    boas = producao_real - refugo
-    custo_consumido = _proporcao(mp["valor"], producao_real, mp["quantidade"])
-    custo_refugo = _proporcao(custo_consumido, refugo, producao_real)
-    custo_boas = _soma([custo_consumido, -custo_refugo])
-    mp["quantidade"] -= producao_real
-    mp["valor"] = _soma([mp["valor"], -custo_consumido])
-    pa["quantidade"] += boas
-    pa["valor"] = _soma([pa["valor"], custo_boas])
+    itens=(d.get("plano_comercial") or {}).get("produtos", [])
+    if itens:
+        from .portfolio import produzir
+        compras, producao_real, refugo, custo_refugo=produzir(s,itens,op,capacidade_produtiva,capacidade_maquinas,multiplicador_custo)
+        mp,pa=s["estoque_mp"],s["estoque_pa"]
+        producao_pedida=max(0,int(op.get("producao",0)))
+        boas=producao_real-refugo
+        utilizacao=producao_real/capacidade_maquinas if capacidade_maquinas else 0
+        compra_a_prazo=_produto(compras,_limitar(op.get("compras_prazo",0),0,1))
+        compra_a_vista=_soma([compras,-compra_a_prazo])
+        if compra_a_prazo: s["pagar"].append({"origem":rodada,"vencimento":rodada+op.get("prazo_pagamento",1),"valor":compra_a_prazo})
+    else:
+        unidades_compra = max(0, int(op.get("comprar_mp", 0)))
+        compras = _produto(unidades_compra, p.get("custo_unitario", 40), multiplicador_custo)
+        compra_a_prazo = _produto(compras, _limitar(op.get("compras_prazo", 0), 0, 1))
+        compra_a_vista = _soma([compras, -compra_a_prazo])
+        if compra_a_prazo:
+            s["pagar"].append({"origem": rodada, "vencimento": rodada + op.get("prazo_pagamento", 1),
+                               "valor": compra_a_prazo})
+        mp["quantidade"] += unidades_compra
+        mp["valor"] = _soma([mp["valor"], compras])
+        producao_pedida = max(0, int(op.get("producao", 0)))
+        producao_real = min(producao_pedida, mp["quantidade"], int(math.floor(capacidade_produtiva * 1.30)))
+        utilizacao = producao_real / capacidade_maquinas if capacidade_maquinas > 0 else 0.0
+        taxa_refugo = min(0.15, 0.4 * max(0, utilizacao - 0.90))
+        refugo = min(producao_real, int(math.floor(producao_real * taxa_refugo + 1e-12)))
+        boas = producao_real - refugo
+        custo_consumido = _proporcao(mp["valor"], producao_real, mp["quantidade"])
+        custo_refugo = _proporcao(custo_consumido, refugo, producao_real)
+        custo_boas = _soma([custo_consumido, -custo_refugo])
+        mp["quantidade"] -= producao_real
+        mp["valor"] = _soma([mp["valor"], -custo_consumido])
+        pa["quantidade"] += boas
+        pa["valor"] = _soma([pa["valor"], custo_boas])
     if producao_real < producao_pedida:
         alertas.append("Produção limitada pelos insumos ou pela capacidade de máquinas e pessoas.")
     if refugo:
@@ -257,11 +269,21 @@ def apurar(preparo: dict, demanda: float,
     cfg, op = p.get("configuracao_simulacao") or {}, d.get("simulacao") or {}
     pa = s["estoque_pa"]
     demanda = max(0, math.floor(demanda))
-    vendas = min(demanda, pa["quantidade"])
-    cmv = _proporcao(pa["valor"], vendas, pa["quantidade"])
-    receita = _produto(vendas, d.get("preco", 100))
-    pa["quantidade"] -= vendas
-    pa["valor"] = _soma([pa["valor"], -cmv])
+    itens=(d.get("plano_comercial") or {}).get("produtos", [])
+    linhas=[]
+    if itens:
+        from .portfolio import vender, atrativos
+        pesos=atrativos(itens,p.get("preco_referencia",100),p.get("custo_referencia_portfolio",40),c["marca"],c["qualidade"])
+        linhas=vender(s,itens,demanda,pesos)
+        vendas=sum(l["vendas"] for l in linhas)
+        cmv=_soma(l["cmv"] for l in linhas);receita=_soma(l["receita"] for l in linhas)
+        pa=s["estoque_pa"]
+    else:
+        vendas = min(demanda, pa["quantidade"])
+        cmv = _proporcao(pa["valor"], vendas, pa["quantidade"])
+        receita = _produto(vendas, d.get("preco", 100))
+        pa["quantidade"] -= vendas
+        pa["valor"] = _soma([pa["valor"], -cmv])
     venda_prazo = _produto(receita, _limitar(op.get("vendas_prazo", 0), 0, 1))
     venda_vista = _soma([receita, -venda_prazo])
     if venda_prazo:
@@ -275,7 +297,7 @@ def apurar(preparo: dict, demanda: float,
     frete = _produto(vendas, custo_frete)
     armazenagem = _produto(pa["valor"], cfg.get("custo_armazenagem", 0.01))
     royalties = _produto(receita, c["taxa_royalties"])
-    comissao_canal = _produto(receita, c["taxa_comissao_canal"])
+    comissao_canal = _soma(l["comissao_canal"] for l in linhas) if linhas else _produto(receita, c["taxa_comissao_canal"])
     dre = {
         "receita": receita, "impostos": impostos, "cmv": cmv, "folha": c["folha"],
         "custos_fixos": _dinheiro(p.get("custos_fixos_mensais", 1500)),
@@ -317,6 +339,7 @@ def apurar(preparo: dict, demanda: float,
                                 "capacidade_produtiva", "capacidade_maquinas", "utilizacao_maquinas",
                                 "estoque_mp_inicial", "estoque_pa_inicial", "turnover")}
     operacao.update(localizacao)
+    operacao["produtos"]=linhas
     operacao.update(demanda=demanda, vendas=vendas, ruptura=ruptura,
                     estoque_mp_final=deepcopy(s["estoque_mp"]), estoque_pa_final=deepcopy(pa),
                     satisfacao=s["satisfacao"], moral=s["rh"]["moral"], qualificacao=s["rh"]["qualificacao"],

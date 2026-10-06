@@ -124,7 +124,7 @@ export interface DetalhesSimulacao {
   modo: ModoJogo;
   estado_inicial: EstadoSimulacao;
   estado_final: EstadoSimulacao;
-  operacao: Record<string, number | string | null>;
+  operacao: Record<string, number | string | null | import("./componentes/ResultadoProdutos").LinhaProduto[]>;
   dfc: FluxoCaixa;
   balanco: BalancoSimulacao;
 }

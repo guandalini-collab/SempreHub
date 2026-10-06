@@ -172,6 +172,7 @@ export interface Dre {
 }
 
 export interface Resultado {
+  produtos_resultado?: import("./componentes/ResultadoProdutos").LinhaProduto[];
   balanco_basico?: {caixa:number;emprestimos:number;cheque_especial:number;ativo_total:number;passivo_total:number;patrimonio_liquido:number} | null;
   detalhes_simulacao: DetalhesSimulacao | null;
   rodada: number;

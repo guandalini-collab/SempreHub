@@ -368,3 +368,14 @@ class RelatorioEmpresarial(Base):
     rodada = Column(Integer, nullable=False)
     texto = Column(String(24000), nullable=False)
     criado_em = Column(DateTime, nullable=False, default=agora)
+
+
+class DiagnosticoEstrategico(Base):
+    __tablename__ = "diagnosticos_estrategicos"
+    __table_args__ = (UniqueConstraint("empresa_id", "rodada", "edicao_id", name="uq_diagnostico_estrategico"),)
+    id = Column(Integer, primary_key=True)
+    empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False, index=True)
+    edicao_id = Column(Integer, ForeignKey("conteudos_mercado.id"), nullable=False)
+    rodada = Column(Integer, nullable=False)
+    dados = Column(JSON, nullable=False)
+    criado_em = Column(DateTime, nullable=False, default=agora)

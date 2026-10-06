@@ -1,3 +1,6 @@
+import DiagnosticosEmpresa from "../../componentes/DiagnosticosEmpresa";
+import ResultadoProdutos from "../../componentes/ResultadoProdutos";
+import ManualMidias from "../../componentes/ManualMidias";
 import { ResumoAnalises } from "../../componentes/FerramentasEstrategicas";
 import { Conquistas, type Jornada } from "../../componentes/Experiencia";
 import LayoutPainel, { SecaoPainel } from "../../componentes/LayoutPainel";
@@ -79,6 +82,7 @@ const ITENS_PAINEL = [
     "simbolo": "→",
     "grupo": "Minha turma"
   },
+  { "id": "midias", "titulo": "Manual de mídias", "descricao": "Formatos, objetivos e custos das campanhas.", "simbolo": "◉", "grupo": "Ajuda" },
   {
     "id": "aprendizagem",
     "titulo": "Manuais e materiais",
@@ -183,6 +187,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       <SecaoPainel id="mercado" ativa={secao}>
       <GestaoMercado turmaId={turmaId} rodada={dados.turma.rodada_atual} empresas={dados.empresas} />
       </SecaoPainel>
+      <SecaoPainel id="midias" ativa={secao}><ManualMidias /></SecaoPainel>
       <SecaoPainel id="aprendizagem" ativa={secao}>
       <BibliotecaAprendizagem mercadoSeparado rodada={turma.rodada_atual} modo={turma.modo_jogo} />
 
@@ -501,6 +506,7 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
             <Dado rotulo="Networking" valor={dados.empresa.networking.toFixed(0)} />
           </div>
           {dados.empresa.estado_simulacao && <PainelOperacional estado={dados.empresa.estado_simulacao} modo={modo} />}
+          <DiagnosticosEmpresa turmaId={turmaId} empresaId={empresaId}/>
           {dados.decisoes.filter(d => d.plano_comercial?.analises).map(d => <ResumoAnalises key={d.rodada} rodada={d.rodada} valor={d.plano_comercial!.analises!} />)}
           {dados.resultados.length === 0 ? (
             <p className="text-sm text-slate-500">A empresa ainda não tem rodadas fechadas.</p>
@@ -560,6 +566,7 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
                   )}
                 </div>
               )}
+              {resultado && !resultado.detalhes_simulacao && <ResultadoProdutos produtos={resultado.produtos_resultado??[]}/>}
               {resultado?.detalhes_simulacao && <RelatorioFinanceiro detalhes={resultado.detalhes_simulacao} />}
             </>
           )}

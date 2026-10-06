@@ -58,9 +58,10 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     build("manual-aluno")
     build("manual-professor")
+    build("manual-midias")
     publicos = ROOT / "frontend" / "public" / "manuais"
     publicos.mkdir(parents=True, exist_ok=True)
-    for nome in ("manual-aluno", "manual-professor"):
+    for nome in ("manual-aluno", "manual-professor", "manual-midias"):
         shutil.copyfile(OUT / f"{nome}.pdf", publicos / f"{nome}.pdf")
 
 

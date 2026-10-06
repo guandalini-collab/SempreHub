@@ -1,3 +1,5 @@
+import ResultadoProdutos from "../../componentes/ResultadoProdutos";
+import ManualMidias from "../../componentes/ManualMidias";
 import { ControleVisual, ResumoNegocio, Conquistas, FeedResultados, ViradaRodada } from "../../componentes/Experiencia";
 import LayoutPainel, { SecaoPainel } from "../../componentes/LayoutPainel";
 import { EditorMix, MercadoPublicado } from "../../componentes/MercadoReal";
@@ -57,6 +59,7 @@ const ITENS_PAINEL = [
     "simbolo": "▤",
     "grupo": "Rodada atual"
   },
+  { "id": "midias", "titulo": "Manual de mídias", "descricao": "Formatos, objetivos e custos das campanhas.", "simbolo": "◉", "grupo": "Estratégia e ajuda" },
   {
     "id": "aprendizagem",
     "titulo": "Estratégia e ajuda",
@@ -266,6 +269,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <FeedResultados jornada={painel.jornada} aoResultados={() => setSecao("resultados")} />
       <MercadoPublicado visao="mercado" empresaId={empresa.id} rodada={turma.rodada_atual} />
       </SecaoPainel>
+      <SecaoPainel id="midias" ativa={secao}><ManualMidias /></SecaoPainel>
       <SecaoPainel id="aprendizagem" ativa={secao}>
       <BibliotecaAprendizagem mercadoSeparado rodada={turma.rodada_atual} modo={turma.modo_jogo} empresaId={empresa.id} />
       </SecaoPainel>
@@ -588,15 +592,15 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
         {conflito && <div className="space-y-2"><Aviso tipo="info">Outra atualização chegou enquanto você editava. Seus campos foram mantidos. Carregue a decisão salva da empresa antes de continuar; essa ação substitui os valores do formulário.</Aviso><Botao type="button" variante="secundario" disabled={carregando} onClick={carregarDecisaoSalva}>Carregar decisão salva</Botao></div>}
         <fieldset disabled={carregando} className="space-y-6">
         <div hidden={area !== "decisoes" && area !== "estrategia"}>
-        <EditorMix visao={area === "estrategia" ? "estrategia" : "mix"} aoNavegar={aoNavegar} empresaId={empresa.id} rodada={turma.rodada_atual} plano={d.plano_comercial} aoMudar={(plano,total)=>setD(atual=>manterRevisoes(atual,{...atual,plano_comercial:plano,marketing:total,simulacao:atual.simulacao?{...atual.simulacao,marketing_digital:0}:null}))} />
+        <EditorMix precoAtual={d.preco} visao={area === "estrategia" ? "estrategia" : "mix"} aoNavegar={aoNavegar} empresaId={empresa.id} rodada={turma.rodada_atual} plano={d.plano_comercial} aoMudar={(plano,total,preco)=>setD(atual=>manterRevisoes(atual,{...atual,plano_comercial:plano,marketing:total,preco:preco??atual.preco,simulacao:atual.simulacao?{...atual.simulacao,marketing_digital:0}:null}))} />
           <div hidden={area !== "decisoes"}><Secao titulo="Mercado e posicionamento">
-          <Campo
+          <div hidden={!!d.plano_comercial?.produtos?.length}><Campo
             rotulo="Preço de venda (por unidade)"
             ajuda={`Preço de referência do mercado: ${reais(p.preco_referencia)}. Custo da mercadoria: ${reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)}.`}
           >
             <ControleVisual rotulo="Preço de venda" valor={d.preco} aoMudar={(v) => atualizar("preco", v)} minimo={0.01} limite={p.preco_referencia * 3} />
           </Campo>
-          <Campo rotulo="Marketing (no mês)" ajuda={`Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
+          </div><Campo rotulo="Marketing (no mês)" ajuda={`Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
             {d.plano_comercial ? <p className="font-semibold">{reais(d.marketing)} · calculado pelas mídias escolhidas</p> : <ControleVisual rotulo="Investimento em marketing" valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} limite={Math.max(1000, empresa.caixa)} />}
           </Campo>
           <Campo rotulo="Pesquisa e desenvolvimento (no mês)" ajuda={`Melhora a qualidade percebida. Índice atual: ${umDecimal(empresa.qualidade)}.`}>
@@ -809,6 +813,7 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
       ["Passivo total",resultado.balanco_basico.passivo_total],
       ["Patrimônio líquido",resultado.balanco_basico.patrimonio_liquido]
     ] as const).map(([nome,valor])=><div key={nome}><dt className="text-sm text-slate-500">{nome}</dt><dd className="font-bold">{reais(valor)}</dd></div>)}</dl></div>}
+    {!detalhes && <ResultadoProdutos produtos={resultado.produtos_resultado??[]}/>}
     {detalhes && <div className="mt-5"><RelatorioFinanceiro detalhes={detalhes} /></div>}
     </details>
   </Cartao>;

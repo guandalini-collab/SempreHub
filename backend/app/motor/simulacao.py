@@ -382,6 +382,10 @@ def _atratividade(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo)
     from .estrategia import avaliar, mensagens
     avaliacao = avaliar(decisao, turma)
     c.alertas.extend(mensagens(avaliacao))
+    itens=(decisao.plano_comercial or {}).get("produtos", [])
+    if itens:
+        from .portfolio import atrativos
+        valor*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade))/sum(p["peso"] for p in itens)/((referencia/preco)**ELASTICIDADE_PRECO_ESCOLHA)
     return valor
 
 
@@ -454,8 +458,16 @@ def _apurar(
     receitas_anteriores = [r.receita for r in empresa.resultados]
     receita_anterior = receitas_anteriores[-1] if receitas_anteriores else None
 
-    receita = c.vendas * decisao.preco
-    cmv = c.vendas * ((c.decisao.plano_comercial or {}).get("custo_unitario", turma.custo_unitario)) * multiplicador_cmv
+    itens=(decisao.plano_comercial or {}).get("produtos", [])
+    if itens:
+        from .portfolio import atrativos
+        pesos=atrativos(itens,turma.preco_referencia,turma.custo_unitario,c.empresa.marca,c.empresa.qualidade)
+        linhas=[{"produto_id":p["produto_id"],"nome":p["produto_nome"],"preco":p["preco"],"vendas":c.vendas*w/sum(pesos),"receita":c.vendas*w/sum(pesos)*p["preco"],"cmv":c.vendas*w/sum(pesos)*p["custo_unitario"]*multiplicador_cmv} for p,w in zip(itens,pesos)]
+        receita=sum(l["receita"] for l in linhas)
+    else:
+        linhas=[]
+        receita = c.vendas * decisao.preco
+    cmv = sum(l["cmv"] for l in linhas) if itens else c.vendas * ((c.decisao.plano_comercial or {}).get("custo_unitario", turma.custo_unitario)) * multiplicador_cmv
     if multiplicador_cmv > 1:
         c.alertas.append(f"Greve na logística: CMV {multiplicador_cmv - 1:.0%} mais caro nesta rodada.")
     folha = empresa.funcionarios * turma.salario_base * FATOR_CLT[empresa.regime_tributario]
@@ -559,6 +571,7 @@ def _apurar(
         Resultado(
             empresa_id=empresa.id,
             rodada=rodada,
+            detalhes_simulacao={"produtos":linhas} if itens else None,
             preco=decisao.preco,
             demanda=c.demanda,
             capacidade=c.capacidade,

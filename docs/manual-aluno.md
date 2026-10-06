@@ -321,3 +321,11 @@ Anote a edição usada pelo professor e cite a fonte no relatório da equipe. A 
 | Resultado antigo não aparece | Abra o histórico da empresa e o relatório da rodada; dados fechados não são apagados pela rodada seguinte. |
 
 <div class="callout green"><strong>Para a discussão:</strong> a melhor decisão não é a que produz o maior número isolado. É a que a equipe consegue explicar, medir e ajustar na rodada seguinte.</div>
+
+## Mix completo e diagnósticos automáticos
+
+Todas as equipes configuram preço, posicionamento, canais e campanhas de **todos os produtos** da edição de mercado utilizada. Revise cada produto antes de enviar. O peso de operação distribui a capacidade compartilhada; o investimento em mídia é a soma das campanhas de cada produto. Os resultados apresentam vendas, receita e custos por produto, além dos demonstrativos consolidados.
+
+Em **Ferramentas e segmentação**, o sistema prepara SWOT, Porter e PESTEL por IA, para consulta. A equipe interpreta o diagnóstico, escolhe a diretriz estratégica e preenche BCG e segmentação. As decisões da equipe continuam influenciando a coerência do mix e o resultado. Os diagnósticos ficam preservados por empresa e rodada.
+
+Consulte **Manual de mídias** na sidebar para pesquisar os formatos do catálogo, entender objetivos, unidades de compra e cuidados. A mesma área oferece o guia completo em PDF.

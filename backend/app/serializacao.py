@@ -93,8 +93,9 @@ def decisao(d: Optional[Decisao]) -> Optional[Dict[str, Any]]:
 
 def resultado(r: Resultado) -> Dict[str, Any]:
     dados = {
-        "detalhes_simulacao": r.detalhes_simulacao,
-        "balanco_basico": None if r.detalhes_simulacao else {
+        "produtos_resultado": (r.detalhes_simulacao or {}).get("produtos") or (r.detalhes_simulacao or {}).get("operacao",{}).get("produtos",[]),
+        "detalhes_simulacao": r.detalhes_simulacao if (r.detalhes_simulacao or {}).get("dfc") else None,
+        "balanco_basico": None if (r.detalhes_simulacao or {}).get("balanco") else {
             "caixa": max(0, r.caixa_final),
             "emprestimos": r.divida_final,
             "cheque_especial": max(0, -r.caixa_final),
