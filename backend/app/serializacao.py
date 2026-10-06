@@ -67,6 +67,7 @@ def decisao(d: Optional[Decisao]) -> Optional[Dict[str, Any]]:
         "rodada": d.rodada,
         "versao": d.versao,
         "simulacao": d.simulacao,
+        "plano_comercial": d.plano_comercial,
         "preco": d.preco,
         "marketing": d.marketing,
         "pd": d.pd,
@@ -92,6 +93,14 @@ def decisao(d: Optional[Decisao]) -> Optional[Dict[str, Any]]:
 def resultado(r: Resultado) -> Dict[str, Any]:
     dados = {
         "detalhes_simulacao": r.detalhes_simulacao,
+        "balanco_basico": None if r.detalhes_simulacao else {
+            "caixa": max(0, r.caixa_final),
+            "emprestimos": r.divida_final,
+            "cheque_especial": max(0, -r.caixa_final),
+            "ativo_total": max(0, r.caixa_final),
+            "passivo_total": r.divida_final + max(0, -r.caixa_final),
+            "patrimonio_liquido": r.caixa_final - r.divida_final,
+        },
         "rodada": r.rodada,
         "preco": r.preco,
         "demanda": r.demanda,

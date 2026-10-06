@@ -1,3 +1,4 @@
+import type { PlanoComercial } from "./componentes/MercadoReal";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, CenarioJogo, PreviaSimulacao } from "./tiposSimulacao";
 
 export type Papel = "ALUNO" | "PROFESSOR";
@@ -91,6 +92,7 @@ export interface Empresa {
 
 export interface Decisao {
   simulacao: DecisaoSimulacao | null;
+  plano_comercial?: PlanoComercial | null;
   versao: number;
   rodada: number;
   preco: number;
@@ -169,6 +171,7 @@ export interface Dre {
 }
 
 export interface Resultado {
+  balanco_basico?: {caixa:number;emprestimos:number;cheque_especial:number;ativo_total:number;passivo_total:number;patrimonio_liquido:number} | null;
   detalhes_simulacao: DetalhesSimulacao | null;
   rodada: number;
   preco: number;

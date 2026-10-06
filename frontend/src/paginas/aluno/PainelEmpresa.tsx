@@ -1,3 +1,4 @@
+import { EditorMix, MercadoPublicado } from "../../componentes/MercadoReal";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, ErroApi } from "../../api";
@@ -137,13 +138,14 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
 
       <section className="rounded-xl border-2 border-ouro bg-amber-50 p-5" aria-label="Ambiente de competição">
         <h2 className="text-lg font-bold text-marinho">Você está em um mercado competitivo</h2>
-        <p className="mt-2 text-sm text-slate-700">Sua empresa disputa clientes com {Math.max(0, painel.total_empresas - 1)} outra(s) empresa(s) da turma e {turma.modo_jogo === "LEGADO" ? 0 : turma.configuracao_simulacao.concorrentes_virtuais} concorrente(s) externo(s) simulados, conforme a configuração do sistema. Preços, produtos, comunicação e capacidade de atendimento influenciam os resultados de cada rodada.</p>
+        <p className="mt-2 text-sm text-slate-700">Sua empresa disputa clientes com {Math.max(0, painel.total_empresas - 1)} outra(s) empresa(s) da turma e {turma.configuracao_simulacao.concorrentes_virtuais} concorrente(s) externo(s) simulados, conforme a configuração do sistema. Preços, produtos, comunicação e capacidade de atendimento influenciam os resultados de cada rodada.</p>
         <p className="mt-2 text-sm font-semibold text-marinho">As decisões das outras empresas também afetam sua participação no mercado.</p>
       </section>
       {ultimo && <IndicadoresFinanceiros resultado={ultimo} />}
       {erro && <Aviso>{erro}</Aviso>}
       {turma.modo_equipe && painel.equipe && <EquipeEmpresa empresaId={empresa.id} equipe={painel.equipe} podeEditar={!encerrada && turma.rodada_atual === 1 && painel.equipe.pode_gerenciar} aoSalvar={carregar} />}
       {empresa.estado_simulacao && <PainelOperacional estado={empresa.estado_simulacao} modo={turma.modo_jogo} />}
+      <MercadoPublicado empresaId={empresa.id} rodada={turma.rodada_atual} />
       <BibliotecaAprendizagem rodada={turma.rodada_atual} modo={turma.modo_jogo} empresaId={empresa.id} />
       <RelatorioPrimeiraRodada empresaId={empresa.id} disponivel={resultados.some(r => r.rodada === 1)} />
 
@@ -291,6 +293,7 @@ function decisaoInicial(painel: PainelAluno): DecisaoEntrada {
   const base = painel.decisao_atual ?? painel.ultima_decisao;
   return {
     simulacao: simulacaoInicial(painel),
+    plano_comercial: base?.plano_comercial ?? null,
     preco: base?.preco ?? painel.turma.parametros?.preco_referencia ?? 100,
     marketing: base?.marketing ?? 0,
     pd: base?.pd ?? 0,
@@ -432,15 +435,16 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
         {turma.modo_equipe && <p className="text-sm text-slate-600">Todos os integrantes podem preparar a decisão. Salvar uma nova versão pede uma nova confirmação de toda a equipe. Revise os valores e a prévia antes de confirmar.</p>}
         {conflito && <div className="space-y-2"><Aviso tipo="info">Outra atualização chegou enquanto você editava. Seus campos foram mantidos. Carregue a decisão salva da empresa antes de continuar; essa ação substitui os valores do formulário.</Aviso><Botao type="button" variante="secundario" disabled={carregando} onClick={carregarDecisaoSalva}>Carregar decisão salva</Botao></div>}
         <fieldset disabled={carregando} className="space-y-6">
-        <Secao titulo="Mercado e posicionamento">
+        <EditorMix empresaId={empresa.id} rodada={turma.rodada_atual} plano={d.plano_comercial} aoMudar={(plano,total)=>setD(atual=>({...atual,plano_comercial:plano,marketing:total,simulacao:atual.simulacao?{...atual.simulacao,marketing_digital:0}:null}))} />
+          <Secao titulo="Mercado e posicionamento">
           <Campo
             rotulo="Preço de venda (por unidade)"
-            ajuda={`Preço de referência do mercado: ${reais(p.preco_referencia)}. Custo da mercadoria: ${reais(p.custo_unitario)}.`}
+            ajuda={`Preço de referência do mercado: ${reais(p.preco_referencia)}. Custo da mercadoria: ${reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)}.`}
           >
             <EntradaNumero moeda valor={d.preco} aoMudar={(v) => atualizar("preco", v)} minimo={0.01} />
           </Campo>
           <Campo rotulo="Marketing (no mês)" ajuda={`Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
-            <EntradaNumero moeda valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} />
+            {d.plano_comercial ? <p className="font-semibold">{reais(d.marketing)} · calculado pelas mídias escolhidas</p> : <EntradaNumero moeda valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} />}
           </Campo>
           <Campo rotulo="Pesquisa e desenvolvimento (no mês)" ajuda={`Melhora a qualidade percebida. Índice atual: ${umDecimal(empresa.qualidade)}.`}>
             <EntradaNumero moeda valor={d.pd} aoMudar={(v) => atualizar("pd", v)} />
@@ -496,7 +500,7 @@ function FormularioDecisao({ painel, aoEnviar }: { painel: PainelAluno; aoEnviar
           </Campo>
         </Secao>
 
-        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} />}
+        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
 
         <div className="rounded-lg bg-slate-50 p-4 text-sm">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Prévia do mês</p>
@@ -636,6 +640,14 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
       </>}
     </dl>
     <p className="mt-3 text-xs text-slate-500">“—” indica ausência de uma base válida para cálculo. Compare com as rodadas anteriores e com os demonstrativos.</p>
+    {resultado.balanco_basico && <div className="mt-5 rounded border p-4"><h3 className="font-semibold">Balanço patrimonial · modelo básico · rodada {resultado.rodada}</h3><p className="my-2 text-xs text-slate-500">O modelo básico opera à vista, sem estoques, imobilizado ou contas a prazo. Saldo de caixa negativo aparece como cheque especial no passivo.</p><dl className="grid gap-3 sm:grid-cols-3">{([
+      ["Caixa e bancos",resultado.balanco_basico.caixa],
+      ["Empréstimos",resultado.balanco_basico.emprestimos],
+      ["Cheque especial",resultado.balanco_basico.cheque_especial],
+      ["Ativo total",resultado.balanco_basico.ativo_total],
+      ["Passivo total",resultado.balanco_basico.passivo_total],
+      ["Patrimônio líquido",resultado.balanco_basico.patrimonio_liquido]
+    ] as const).map(([nome,valor])=><div key={nome}><dt className="text-sm text-slate-500">{nome}</dt><dd className="font-bold">{reais(valor)}</dd></div>)}</dl></div>}
     {detalhes && <div className="mt-5"><RelatorioFinanceiro detalhes={detalhes} /></div>}
   </Cartao>;
 }

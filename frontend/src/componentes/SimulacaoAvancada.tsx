@@ -4,13 +4,14 @@ import { inteiro, percentual, reais, umDecimal } from "../formatos";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, PreviaSimulacao } from "../tiposSimulacao";
 import { Campo, Cartao, EntradaNumero, estiloEntrada } from "./ui";
 
-export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase, marketing }: {
+export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false }: {
   modo: ModoJogo;
   valores: DecisaoSimulacao;
   aoMudar: (valores: DecisaoSimulacao) => void;
   config: ConfiguracaoMotor;
   salarioBase: number;
   marketing: number;
+  mixSelecionado?: boolean;
 }) {
   const mudar = <K extends keyof DecisaoSimulacao>(campo: K, valor: DecisaoSimulacao[K]) => aoMudar({ ...valores, [campo]: valor });
   return <div className="space-y-6">
@@ -46,11 +47,12 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
       <Campo rotulo="Benefício por funcionário" ajuda="Valor mensal por empregado; aparece como despesa de benefícios."><EntradaNumero moeda valor={valores.beneficio} aoMudar={(v) => mudar("beneficio", v)} /></Campo>
       <Campo rotulo="Treinamento do mês" ajuda="Investimento total em capacitação dos funcionários; o desenvolvimento passa para as rodadas seguintes."><EntradaNumero moeda valor={valores.treinamento} aoMudar={(v) => mudar("treinamento", v)} /></Campo>
     </Secao>
-    <Secao titulo="Posicionamento e canais">
+    {!mixSelecionado && <Secao titulo="Posicionamento e canais">
       <Campo rotulo="Estratégia de posicionamento"><select className={estiloEntrada} value={valores.posicionamento} onChange={(e) => mudar("posicionamento", e.target.value as DecisaoSimulacao["posicionamento"])}><option value="CUSTO">Liderança em custo</option><option value="DIFERENCIACAO">Diferenciação</option></select></Campo>
       <Campo rotulo="Canal de venda"><select className={estiloEntrada} value={valores.canal} onChange={(e) => mudar("canal", e.target.value as DecisaoSimulacao["canal"])}><option value="DIRETO">Venda direta</option><option value="DISTRIBUIDOR">Distribuidor</option><option value="DIGITAL">Digital</option></select></Campo>
       <Campo rotulo="Marketing direcionado ao digital" ajuda={`Parcela do orçamento de marketing que vai ao digital. Limite atual: ${reais(marketing)}; este valor já está incluído no marketing total.`}><EntradaNumero moeda max={marketing} valor={valores.marketing_digital} aoMudar={(v) => mudar("marketing_digital", v)} /></Campo>
     </Secao>
+    }
     <Secao titulo="Vendas a prazo">
       <Campo rotulo="Parcela das vendas a prazo" ajuda="A venda gera receita e lucro nesta rodada, mas o dinheiro só chega ao caixa no vencimento."><EntradaNumero valor={valores.vendas_prazo * 100} sufixo="%" aoMudar={(v) => mudar("vendas_prazo", v / 100)} /></Campo>
       <Campo rotulo="Prazo de recebimento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_recebimento} onChange={(e) => mudar("prazo_recebimento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} mês(es)</option>)}</select></Campo>

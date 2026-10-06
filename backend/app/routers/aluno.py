@@ -246,6 +246,8 @@ def previa_decisao(
     aluno: Usuario = Depends(exigir_aluno),
 ):
     empresa = _empresa_do_aluno(db, empresa_id, aluno)
+    from .mercado import validar_plano
+    validar_plano(db, empresa, dados)
     _validar_decisao(empresa, dados)
     return prever_decisao(empresa, Decisao(**dados.model_dump(exclude={"versao", "rodada"})), empresa.turma)
 
@@ -259,6 +261,8 @@ def enviar_decisao(
 ):
     empresa = _empresa_para_alterar(db, empresa_id, aluno)
     turma = empresa.turma
+    from .mercado import validar_plano
+    validar_plano(db, empresa, dados)
     _validar_decisao(empresa, dados)
     decisao = (
         db.query(Decisao)

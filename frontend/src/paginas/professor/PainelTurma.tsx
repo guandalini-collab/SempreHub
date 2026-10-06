@@ -1,3 +1,4 @@
+import { GestaoMercado } from "../../componentes/MercadoReal";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, baixarArquivo } from "../../api";
@@ -112,6 +113,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
 
       {erro && <Aviso>{erro}</Aviso>}
 
+      <GestaoMercado turmaId={turmaId} rodada={dados.turma.rodada_atual} empresas={dados.empresas} />
       <BibliotecaAprendizagem rodada={turma.rodada_atual} modo={turma.modo_jogo} />
 
       <div className="grid gap-6 lg:grid-cols-5">

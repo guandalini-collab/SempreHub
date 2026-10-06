@@ -9,6 +9,7 @@ Ao fechar uma rodada, o professor dispara `processar_rodada`, que:
 6. avança a turma para a rodada seguinte.
 """
 
+from copy import deepcopy
 import math
 import random
 from dataclasses import dataclass, field
@@ -129,6 +130,7 @@ def decisao_vigente(db: Session, empresa: Empresa, rodada: int, turma: Turma) ->
         amortizacao=0.0,
         regime_solicitado=None,
         automatica=1,
+        plano_comercial=deepcopy(anterior.plano_comercial) if anterior and anterior.plano_comercial else None,
         simulacao=(
             {**(anterior.simulacao if anterior and anterior.simulacao else {}),
              "comprar_mp": 0, "comprar_maquinas": 0, "aporte": 0,
@@ -205,10 +207,10 @@ def processar_rodada(
             calculos.append(c)
 
         # 3. Divisão do mercado
-        _dividir_mercado(calculos, turma, rodada, multiplicador_demanda)
+        concorrentes = _dividir_mercado(calculos, turma, rodada, multiplicador_demanda)
 
         # 4. Apuração
-        unidades_totais = sum(c.vendas for c in calculos) or 1.0
+        unidades_totais = sum(c.vendas for c in calculos) + sum(b["vendas"] for b in concorrentes) or 1.0
         for c in calculos:
             _apurar(db, c, turma, rodada, evento, multiplicador_cmv, unidades_totais)
 
@@ -279,7 +281,7 @@ def prever_decisao(empresa: Empresa, decisao: Decisao, turma: Turma) -> dict:
     )
     multiplicador_cmv = turma.cmv_multiplicador if turma.cmv_rodadas_restantes > 0 else 1.0
     royalties = ROYALTIES_FRANQUIA if copia.classe_dornelas == ClasseDornelas.FRANQUIA else 0.0
-    margem = decisao.preco * (1 - royalties) - turma.custo_unitario * multiplicador_cmv
+    margem = decisao.preco * (1 - royalties) - ((decisao.plano_comercial or {}).get("custo_unitario", turma.custo_unitario)) * multiplicador_cmv
     return {
         "rodada": turma.rodada_atual,
         "regime": copia.regime_tributario.value,
@@ -382,9 +384,16 @@ def _atratividade(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo)
 
 def _dividir_mercado(
     calculos: List[_Calculo], turma: Turma, rodada: int, multiplicador_demanda: float
-) -> None:
+) -> list:
     n = len(calculos)
-    preco_medio = sum(max(0.01, c.decisao.preco) for c in calculos) / n
+    from .avancado import forca_concorrente
+    cfg = turma.configuracao_simulacao or {}
+    quantidade = cfg.get("concorrentes_virtuais", 0)
+    # Concorrentes disputam a demanda existente sem consultar decisões privadas.
+    concorrentes = [{"preco": turma.preco_referencia * (.9 + .05 * (i % 5)),
+                     "atratividade": (1 / (.9 + .05 * (i % 5))) ** ELASTICIDADE_PRECO_ESCOLHA * forca_concorrente(cfg, i),
+                     "capacidade": turma.demanda_base_por_empresa} for i in range(quantidade)]
+    preco_medio = (sum(max(0.01, c.decisao.preco) for c in calculos) + sum(b["preco"] for b in concorrentes)) / (n + quantidade)
     demanda_total = (
         turma.demanda_base_por_empresa
         * n
@@ -392,10 +401,13 @@ def _dividir_mercado(
         * (turma.preco_referencia / preco_medio) ** ELASTICIDADE_PRECO_MERCADO
         * multiplicador_demanda
     )
-    soma_atratividade = sum(c.atratividade for c in calculos) or 1.0
+    soma_atratividade = sum(c.atratividade for c in calculos) + sum(b["atratividade"] for b in concorrentes) or 1.0
     for c in calculos:
         c.demanda = demanda_total * c.atratividade / soma_atratividade
         c.vendas = min(c.demanda, c.capacidade)
+
+    for bot in concorrentes:
+        bot["vendas"] = min(bot["capacidade"], demanda_total * bot["atratividade"] / soma_atratividade)
 
     # Clientes não atendidos: parte deles compra de quem ainda tem capacidade ociosa
     nao_atendida = sum(c.demanda - c.vendas for c in calculos) * REAPROVEITAMENTO_DEMANDA
@@ -419,6 +431,8 @@ def _dividir_mercado(
                 f"Capacidade ociosa: a equipe usou apenas {c.vendas / c.capacidade:.0%} da capacidade de produção."
             )
 
+    return concorrentes
+
 
 def _apurar(
     db: Session,
@@ -434,7 +448,7 @@ def _apurar(
     receita_anterior = receitas_anteriores[-1] if receitas_anteriores else None
 
     receita = c.vendas * decisao.preco
-    cmv = c.vendas * turma.custo_unitario * multiplicador_cmv
+    cmv = c.vendas * ((c.decisao.plano_comercial or {}).get("custo_unitario", turma.custo_unitario)) * multiplicador_cmv
     if multiplicador_cmv > 1:
         c.alertas.append(f"Greve na logística: CMV {multiplicador_cmv - 1:.0%} mais caro nesta rodada.")
     folha = empresa.funcionarios * turma.salario_base * FATOR_CLT[empresa.regime_tributario]

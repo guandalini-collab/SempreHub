@@ -236,3 +236,40 @@ frontend/src/
   componentes/SimulacaoAvancada.tsx controles operacionais e demonstrativos
   componentes/RelatorioPedagogico.tsx relatório histórico e CSV do professor
 ```
+
+## Pesquisa de mercado e decisões comerciais
+
+Configure `OPENAI_API_KEY` no serviço backend do Railway. O modelo padrão é
+`gpt-4.1-mini`; `SEMPREHUB_OPENAI_MODEL` permite escolher outro modelo compatível
+com a Responses API e busca na web. A chave fica exclusivamente no servidor.
+O ambiente de desenvolvimento precisa permitir HTTPS para `api.openai.com`.
+
+No painel da turma, **Pesquisa e revisão de mercado** permite escolher setor,
+B2C/B2B/híbrido e quantidades de notícias, análises e produtos por rodada.
+A pesquisa cria um rascunho com datas, fontes e a base documentada dos custos de
+aquisição. O docente revisa o conteúdo antes de liberar. Fontes ausentes,
+respostas incompletas e falhas de integração impedem salvar uma edição pesquisada.
+Edições publicadas são imutáveis; o histórico e o catálogo anterior permanecem
+acessíveis nas rodadas seguintes.
+
+A equipe escolhe produto, preço de venda, posicionamento, distribuição e mídias.
+O servidor usa o custo publicado, nunca o valor informado pelo navegador, e
+confere o total de mídia (quantidade × preço unitário). O catálogo de 62 mídias
+usa a tabela de referência da simulação, não cotações atuais. Estratégia de preço,
+cobertura, intensidade e análises estratégicas registram o plano da equipe;
+preço, custo, investimento e canal operacional alimentam os motores existentes.
+No modo industrial, o produto permanece vinculado à operação para preservar
+estoques e máquinas; serviços digitais usam custo por cliente atendido.
+
+Ao encerrar uma rodada, o servidor tenta preparar relatórios empresariais por
+empresa, usando decisões, resultados e histórico registrados, sem dados pessoais
+dos integrantes. Falhas não desfazem o fechamento: o docente pode repetir a
+geração no painel. Relatórios concluídos são preservados por empresa e rodada.
+A interface do aluno apresenta notícias, análises e relatórios como conteúdo do
+sistema, sem controles ou informações técnicas sobre a geração.
+
+Concorrentes externos também disputam a demanda no modelo básico. Nível,
+estrutura e força são parâmetros didáticos configurados antes da entrada das
+empresas. No modelo básico, o balanço usa caixa e dívidas; caixa negativo é
+classificado como cheque especial. Os modos avançados incluem os ativos e
+obrigações efetivamente registrados pelos respectivos motores.

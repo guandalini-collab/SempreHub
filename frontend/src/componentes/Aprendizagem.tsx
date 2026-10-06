@@ -1,7 +1,8 @@
+import { MercadoPublicado } from "./MercadoReal";
 import React, { useEffect, useMemo, useState } from "react";
 
 import { Botao, Cartao } from "./ui";
-import { CatalogoCompleto, NewsRodada } from "./ConteudoRodada";
+import { CatalogoCompleto } from "./ConteudoRodada";
 import { api, sessaoSalva } from "../api";
 
 type PerfilAprendizagem = "ALUNO" | "PROFESSOR";
@@ -277,7 +278,7 @@ export function BibliotecaAprendizagem({ rodada, modo, empresaId }: { rodada?: n
         ))}
       </div>
 
-      {aba === "NEWS" && (empresaId ? <NewsRodada empresaId={empresaId} rodada={rodada}/> : <p className="text-sm">Abra o painel da empresa para ler as edições do SempreHub News com os eventos e indicadores reais de mercado.</p>)}
+      {aba === "NEWS" && (empresaId ? <MercadoPublicado empresaId={empresaId} rodada={rodada ?? 1}/> : <p className="text-sm">Abra o painel da empresa para ler as edições do SempreHub News com os eventos e indicadores reais de mercado.</p>)}
       {aba === "REFERENCIAS" && <Referencias />}
       {aba === "ANALISES" && <Analises />}
       {aba === "MIDIAS" && <CatalogoCompleto />}

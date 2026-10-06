@@ -77,6 +77,7 @@ def snapshot_decisao(decisao: Decisao) -> dict:
     conteudo.update(rodada=decisao.rodada, versao=decisao.versao)
     from copy import deepcopy
     conteudo["simulacao"] = deepcopy(decisao.simulacao)
+    conteudo["plano_comercial"] = deepcopy(decisao.plano_comercial)
     return conteudo
 
 

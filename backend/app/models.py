@@ -204,6 +204,7 @@ class Decisao(Base):
     amortizacao = Column(Float, nullable=False, default=0.0)
     regime_solicitado = Column(Enum(RegimeTributario), nullable=True)
     simulacao = Column(JSON, nullable=True)
+    plano_comercial = Column(JSON, nullable=True)
     automatica = Column(Integer, nullable=False, default=0)  # 1 = repetida pelo sistema
     # None é intencional em rascunhos de equipe; não aplicar o default nesse caso.
     enviada_em = Column(DateTime().evaluates_none(), default=agora, onupdate=agora)
@@ -345,3 +346,24 @@ class TokenRecuperacao(Base):
     expira_em = Column(DateTime, nullable=False)
     usado_em = Column(DateTime, nullable=True)
     criado_em = Column(DateTime, default=agora)
+
+
+class ConteudoMercado(Base):
+    """Edições revisáveis; publicadas ficam preservadas por rodada."""
+    __tablename__ = "conteudos_mercado"
+    id = Column(Integer, primary_key=True)
+    turma_id = Column(Integer, ForeignKey("turmas.id"), nullable=False, index=True)
+    rodada = Column(Integer, nullable=False)
+    publicado = Column(Boolean, nullable=False, default=False)
+    dados = Column(JSON, nullable=False)
+    criado_em = Column(DateTime, nullable=False, default=agora)
+
+
+class RelatorioEmpresarial(Base):
+    __tablename__ = "relatorios_empresariais"
+    __table_args__ = (UniqueConstraint("empresa_id", "rodada", name="uq_relatorio_empresarial"),)
+    id = Column(Integer, primary_key=True)
+    empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False, index=True)
+    rodada = Column(Integer, nullable=False)
+    texto = Column(String(24000), nullable=False)
+    criado_em = Column(DateTime, nullable=False, default=agora)

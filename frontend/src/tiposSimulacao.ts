@@ -16,6 +16,9 @@ export interface ConfiguracaoMotor {
   churn_base: number;
   aliquota_servico: number;
   concorrentes_virtuais: number;
+  nivel_concorrencia: "BAIXA" | "MEDIA" | "ALTA";
+  estrutura_mercado: "MONOPOLIO" | "OLIGOPOLIO" | "MONOPOLISTICA" | "PERFEITA" | "FRAGMENTADO";
+  forca_concorrentes: "FRACA" | "MEDIA" | "FORTE" | "MUITO_FORTE";
   peso_lucro: number;
   peso_patrimonio: number;
   peso_satisfacao: number;
@@ -137,6 +140,9 @@ export const CONFIGURACAO_MOTOR_PADRAO: ConfiguracaoMotor = {
   churn_base: 0.05,
   aliquota_servico: 0.06,
   concorrentes_virtuais: 0,
+  nivel_concorrencia: "MEDIA",
+  estrutura_mercado: "FRAGMENTADO",
+  forca_concorrentes: "MEDIA",
   peso_lucro: 0.4,
   peso_patrimonio: 0.3,
   peso_satisfacao: 0.2,

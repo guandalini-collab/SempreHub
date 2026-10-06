@@ -4,7 +4,7 @@ import json
 import secrets
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import or_
@@ -180,6 +180,7 @@ def detalhar_empresa(
 @router.post("/turmas/{turma_id}/fechar-rodada")
 def fechar_rodada(
     turma_id: int,
+    background_tasks: BackgroundTasks,
     dados: FecharRodadaEntrada,
     db: Session = Depends(get_db),
     professor: Usuario = Depends(exigir_professor),
@@ -196,6 +197,8 @@ def fechar_rodada(
         db.rollback()
         raise HTTPException(422, str(erro))
     db.refresh(turma)
+    from .mercado import preparar_relatorios_automaticos
+    background_tasks.add_task(preparar_relatorios_automaticos, turma.id, professor.id, evento.rodada)
     return {"evento": ser.evento(evento), "turma": ser.turma(turma, completa=True)}
 
 

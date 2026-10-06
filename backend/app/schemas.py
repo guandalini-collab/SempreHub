@@ -55,6 +55,9 @@ class ConfiguracaoSimulacao(BaseModel):
         description="Alíquota didática para serviços; não representa enquadramento fiscal real.",
     )
     concorrentes_virtuais: int = Field(0, ge=0, le=200)
+    nivel_concorrencia: Literal["BAIXA", "MEDIA", "ALTA"] = "MEDIA"
+    estrutura_mercado: Literal["MONOPOLIO", "OLIGOPOLIO", "MONOPOLISTICA", "PERFEITA", "FRAGMENTADO"] = "FRAGMENTADO"
+    forca_concorrentes: Literal["FRACA", "MEDIA", "FORTE", "MUITO_FORTE"] = "MEDIA"
     peso_lucro: float = Field(0.4, ge=0, le=1)
     peso_patrimonio: float = Field(0.3, ge=0, le=1)
     peso_satisfacao: float = Field(0.2, ge=0, le=1)
@@ -140,6 +143,24 @@ class EntrarTurmaEntrada(BaseModel):
     regime_tributario: RegimeTributario = RegimeTributario.MEI
 
 
+class AlocacaoMidia(BaseModel):
+    id: str = Field(max_length=80)
+    quantidade: int = Field(ge=1, le=1000000)
+
+class PlanoComercial(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False)
+    edicao_id: int = Field(gt=0)
+    produto_id: str = Field(max_length=80)
+    estrategia_preco: Literal["PENETRACAO", "COMPETITIVO", "DESNATAMENTO", "VALOR"]
+    posicionamento: Literal["QUALIDADE", "PRECO", "INOVACAO"]
+    canais: list[Literal["VAREJO", "ECOMMERCE", "MARKETPLACE", "ATACADO", "FRANQUIA", "DIRETO"]] = Field(min_length=1, max_length=6)
+    cobertura: Literal["LOCAL", "REGIONAL", "NACIONAL", "INTERNACIONAL"]
+    intensidade: Literal["BAIXA", "MEDIA", "ALTA", "INTENSIVA"]
+    midias: list[AlocacaoMidia] = Field(default_factory=list, max_length=80)
+    estrategias: dict[str, str] = Field(default_factory=dict)
+    custo_unitario: Optional[float] = Field(None, gt=0, le=1000000)
+    produto_nome: Optional[str] = Field(None, max_length=200)
+
 class DecisaoEntrada(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
 
@@ -155,6 +176,7 @@ class DecisaoEntrada(BaseModel):
     amortizacao: float = Field(0.0, ge=0, le=10_000_000)
     regime_solicitado: Optional[RegimeTributario] = None
     simulacao: Optional[DecisaoSimulacao] = None
+    plano_comercial: Optional[PlanoComercial] = None
 
     @model_validator(mode="after")
     def validar_marketing_digital(self):

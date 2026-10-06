@@ -68,6 +68,10 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0):
     entrada = colunas(decisao)
     entrada["simulacao"] = DecisaoSimulacao.model_validate(entrada["simulacao"] or {}).model_dump()
     p = parametros(turma)
+    if decisao.plano_comercial:
+        p["custo_unitario"] = decisao.plano_comercial["custo_unitario"]
+        if turma.modo_jogo == "STARTUP":
+            p["configuracao_simulacao"]["custo_nuvem_cliente"] = decisao.plano_comercial["custo_unitario"]
     p["multa_evento"] = multa
     p["multas"] = multa
     return motor(turma).preparar(dados, entrada, p, turma.rodada_atual, multiplicador_custo)
@@ -79,11 +83,11 @@ def prever(empresa, decisao, turma):
     if turma.modo_jogo == "TRADICIONAL":
         cfg = config(turma)
         fretes = {"RAPIDO": cfg["frete_rapido"], "PADRAO": cfg["frete_padrao"], "ECONOMICO": cfg["frete_economico"]}
-        custo = turma.custo_unitario * (turma.cmv_multiplicador if turma.cmv_rodadas_restantes > 0 else 1)
+        custo = ((decisao.plano_comercial or {}).get("custo_unitario", turma.custo_unitario)) * (turma.cmv_multiplicador if turma.cmv_rodadas_restantes > 0 else 1)
         margem = decisao.preco * (1 - (0.05 if empresa.classe_dornelas.value == "FRANQUIA" else 0)) - custo - fretes.get(op.get("modal", "PADRAO"), 10)
         producao = calculo.get("producao_planejada", 0)
     else:
-        margem = decisao.preco - config(turma)["custo_nuvem_cliente"]
+        margem = decisao.preco - (decisao.plano_comercial or {}).get("custo_unitario", config(turma)["custo_nuvem_cliente"])
         producao = calculo.get("clientes_adquiridos", 0)
     gastos = calculo.get("gastos_previstos", 0)
     return {
@@ -121,6 +125,14 @@ def _tributar(empresa, turma, receita, cmv, alertas):
     return impostos, aliquota
 
 
+def forca_concorrente(cfg, indice):
+    nivel = {"BAIXA": .8, "MEDIA": 1, "ALTA": 1.2}[cfg.get("nivel_concorrencia", "MEDIA")]
+    forca = {"FRACA": .7, "MEDIA": 1, "FORTE": 1.3, "MUITO_FORTE": 1.6}[cfg.get("forca_concorrentes", "MEDIA")]
+    estrutura = cfg.get("estrutura_mercado", "FRAGMENTADO")
+    concentracao = (1.5 if indice == 0 else .5) if estrutura == "MONOPOLIO" else (1.2 if indice < 3 else .8) if estrutura == "OLIGOPOLIO" else 1
+    return nivel * forca * concentracao
+
+
 def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     cfg = config(turma)
     bots = []
@@ -128,7 +140,7 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
         # Política pública, determinística: não lê as decisões privadas dos alunos.
         preco = turma.preco_referencia * (0.9 + .05 * (i % 5))
         bots.append({"empresa": f"Concorrente virtual {i + 1}", "virtual": True, "preco": preco,
-                     "atratividade": (turma.preco_referencia / preco) ** 2 * (1 + .02 * (rodada - 1)),
+                     "atratividade": (turma.preco_referencia / preco) ** 2 * (1 + .02 * (rodada - 1)) * forca_concorrente(cfg, i),
                      "capacidade": turma.demanda_base_por_empresa})
     precos = [d.preco for d in decisoes] + [b["preco"] for b in bots]
     media = sum(precos) / len(precos)

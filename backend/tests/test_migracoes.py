@@ -26,7 +26,7 @@ from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
 
 
-_HEAD = "0005_simulacao_avancada"
+_HEAD = "0006_mercado"
 
 
 @pytest.fixture()
@@ -282,7 +282,7 @@ def test_migracao_de_equipes_preserva_turma_individual_e_historico_legado(banco_
     novas_colunas = {
         "turmas": {"modo_equipe": False, "modo_jogo": "LEGADO", "cenario": "ZERO", "configuracao_simulacao": None, "versao_motor": 1},
         "empresas": {"codigo_convite": None, "estado_simulacao": None},
-        "decisoes": {"versao": 0, "simulacao": None},
+        "decisoes": {"versao": 0, "simulacao": None, "plano_comercial": None},
         "resultados": {"detalhes_simulacao": None},
     }
     for nome, colunas in novas_colunas.items():
@@ -388,14 +388,15 @@ def test_motor_avancado_preserva_equipes_assinaturas_e_rodadas_existentes(banco_
         novas_colunas = {
             "turmas": {"modo_jogo": "LEGADO", "cenario": "ZERO", "configuracao_simulacao": None, "versao_motor": 1},
             "empresas": {"estado_simulacao": None},
-            "decisoes": {"simulacao": None},
+            "decisoes": {"simulacao": None, "plano_comercial": None},
             "resultados": {"detalhes_simulacao": None},
         }
         for nome, colunas in novas_colunas.items():
             for linha in depois[nome]:
                 for coluna, valor in colunas.items():
                     assert linha.pop(coluna) == valor
-        assert depois == antes
+        assert {nome: depois[nome] for nome in antes} == antes
+        assert all(depois[nome] == [] for nome in depois.keys() - antes.keys())
 
     with _cliente_no_banco(banco_migracoes) as cliente:
         cabecalhos = []

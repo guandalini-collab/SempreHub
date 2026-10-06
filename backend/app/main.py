@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import CORS_ORIGINS, FRONTEND_DIST
 from .migracoes import preparar_banco
-from .routers import aluno, auth, professor, relatorios, educacao, aprendizagem
+from .routers import aluno, auth, professor, relatorios, educacao, aprendizagem, mercado
 
 preparar_banco()
 
@@ -31,6 +31,7 @@ app.include_router(aluno.router)
 app.include_router(relatorios.router)
 app.include_router(educacao.router)
 app.include_router(aprendizagem.router)
+app.include_router(mercado.router)
 
 
 @app.get("/api/saude")

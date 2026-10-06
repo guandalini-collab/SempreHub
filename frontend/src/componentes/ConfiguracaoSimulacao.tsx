@@ -4,7 +4,7 @@ import type { ConfiguracaoJogo, ConfiguracaoMotor } from "../tiposSimulacao";
 import { Campo, EntradaNumero, estiloEntrada } from "./ui";
 
 type CampoConfiguracao = {
-  campo: keyof ConfiguracaoMotor;
+  campo: { [K in keyof ConfiguracaoMotor]: ConfiguracaoMotor[K] extends number ? K : never }[keyof ConfiguracaoMotor];
   rotulo: string;
   ajuda: string;
   tipo: "moeda" | "percentual" | "inteiro";
@@ -63,6 +63,16 @@ export default function ConfiguracaoSimulacao({
           </select>
         </Campo>}
       </div>
+            <Campo rotulo="Concorrentes virtuais" ajuda="Empresas simuladas também disputam o mercado. A quantidade de concorrentes não aumenta a demanda total.">
+              <EntradaNumero inteiro valor={config.concorrentes_virtuais} aoMudar={(valor) => aoMudar({ ...valores, configuracao_simulacao: { ...config, concorrentes_virtuais: valor } })} />
+            </Campo>
+
+      <div className="grid gap-3 sm:grid-cols-3">{([
+        ["nivel_concorrencia", "Nível de concorrência", [["BAIXA","Baixa"],["MEDIA","Média"],["ALTA","Alta"]]],
+        ["estrutura_mercado", "Estrutura de mercado", [["MONOPOLIO","Monopólio"],["OLIGOPOLIO","Oligopólio"],["MONOPOLISTICA","Concorrência monopolística"],["PERFEITA","Concorrência perfeita"],["FRAGMENTADO","Fragmentado"]]],
+        ["forca_concorrentes", "Força dos concorrentes", [["FRACA","Fraca"],["MEDIA","Média"],["FORTE","Forte"],["MUITO_FORTE","Muito forte"]]]
+      ] as const).map(([campo,rotulo,opcoes])=><Campo key={campo} rotulo={rotulo}><select className={estiloEntrada} value={config[campo]} onChange={e=>aoMudar({...valores,configuracao_simulacao:{...config,[campo]:e.target.value}})}>{opcoes.map(([valor,nome])=><option key={valor} value={valor}>{nome}</option>)}</select></Campo>)}</div>
+      <p className="text-xs text-slate-600">Nível e força alteram a atratividade dos concorrentes externos. Monopólio concentra essa força no primeiro concorrente; oligopólio, nos três primeiros. São parâmetros do cenário simulado, não estimativas estatísticas do mercado real.</p>
       {bloqueado && <p className="text-xs text-slate-500">Tipo, cenário e regras operacionais ficam definidos quando a primeira empresa entra na turma.</p>}
       {valores.modo_jogo === "TRADICIONAL" && <p className="text-xs text-slate-600">Os alunos planejam matéria-prima, produção, máquinas, entregas e prazos. O estoque e as obrigações passam para a rodada seguinte.</p>}
       {valores.modo_jogo === "STARTUP" && <p className="text-xs text-slate-600">Os alunos administram aquisição e retenção de clientes, capacidade da nuvem e investimento externo, com acompanhamento de CAC, LTV e participação dos fundadores.</p>}
@@ -72,9 +82,6 @@ export default function ConfiguracaoSimulacao({
           <summary className="cursor-pointer text-sm font-semibold text-marinho">Ajustar operação e avaliação</summary>
           <div className="mt-4 space-y-5">
             <GrupoCampos titulo={valores.modo_jogo === "STARTUP" ? "Serviço digital" : "Produção e entregas"} campos={valores.modo_jogo === "STARTUP" ? CAMPOS_STARTUP : CAMPOS_TRADICIONAL} valores={config} aoMudar={(proxima) => aoMudar({ ...valores, configuracao_simulacao: proxima })} />
-            <Campo rotulo="Concorrentes virtuais" ajuda="Empresas simuladas também disputam o mercado. A quantidade de concorrentes não aumenta a demanda total.">
-              <EntradaNumero inteiro valor={config.concorrentes_virtuais} aoMudar={(valor) => aoMudar({ ...valores, configuracao_simulacao: { ...config, concorrentes_virtuais: valor } })} />
-            </Campo>
             <GrupoCampos titulo="Pesos da avaliação" campos={PESOS} valores={config} aoMudar={(proxima) => aoMudar({ ...valores, configuracao_simulacao: proxima })} />
             <p className={`text-xs font-semibold ${Math.abs(somaPesos - 1) < 0.000001 ? "text-emerald-700" : "text-red-700"}`}>Os pesos devem somar 100%. Soma atual: {(somaPesos * 100).toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%.</p>
           </div>
