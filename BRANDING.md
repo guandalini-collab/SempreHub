@@ -51,7 +51,7 @@ Os arquivos oficiais da marca ficam junto aos recursos visuais da aplicação, e
 | --- | --- | --- |
 | `SempreHub.jpg` | `frontend/src/assets/SempreHub.jpg` | Arte original (1024×1024, fundo branco). Fonte para gerar as demais versões. |
 | `SempreHub.pdf` | `frontend/src/assets/SempreHub.pdf` | Mesma arte em PDF (imagem, não vetorial), para material institucional. |
-| `logo-semprehub.png` | `frontend/src/assets/logo-semprehub.png` | Logo horizontal recortado, fundo transparente. É o arquivo usado na interface. |
+| `logo-semprehub.svg` | `frontend/src/assets/logo-semprehub.svg` | Logo vetorial horizontal recortado, fundo transparente. É o arquivo usado na interface. |
 | `icone-semprehub.png` | `frontend/src/assets/icone-semprehub.png` | Só o símbolo (rede), fundo transparente, para usos quadrados. |
 | `favicon.png` | `frontend/public/favicon.png` | Símbolo em fundo branco (256×256), ícone da aba do navegador. |
 | `semprehub-original.svg` | `frontend/public/marca/semprehub-original.svg` | Arquivo original enviado para comunicação; contém a arte em imagem incorporada, preservada sem alterações. Disponível em `/marca/semprehub-original.svg`. |
@@ -67,7 +67,7 @@ Profundo, o logo fica sempre numa placa branca, porque o "Sempre" em azul-escuro
 
 ### Diretrizes de aplicação
 
-- Preserve a proporção do logo. Não distorça. Use a versão recortada (`logo-semprehub.png`) em vez de reduzir o quadrado original.
+- Preserve a proporção do logo. Não distorça. Use a versão recortada (`logo-semprehub.svg`) em vez de reduzir o quadrado original.
 - Mantenha uma área de respiro equivalente a pelo menos 25% da altura do logo ao seu redor.
 - Sobre fundo escuro, aplique o logo numa placa branca, sem alterar suas cores.
 - Não recolorize, não aplique sombras, gradientes ou contornos fora da paleta institucional.
