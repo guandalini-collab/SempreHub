@@ -9,6 +9,7 @@ Ao fechar uma rodada, o professor dispara `processar_rodada`, que:
 6. avança a turma para a rodada seguinte.
 """
 
+from ..custos_campanhas import investimento_efetivo
 from copy import deepcopy
 import math
 import random
@@ -195,7 +196,7 @@ def processar_rodada(
                 c.alertas.append("Nenhuma decisão enviada: o sistema repetiu as decisões do mês anterior.")
             _preparar_empresa(c, turma, rodada)
 
-            empresa.marca = RETENCAO_MARCA * empresa.marca + math.sqrt(max(0.0, decisao.marketing) / 1000)
+            empresa.marca = RETENCAO_MARCA * empresa.marca + math.sqrt(max(0.0, investimento_efetivo(decisao)) / 1000)
             empresa.qualidade = RETENCAO_QUALIDADE * empresa.qualidade + 0.5 * math.sqrt(
                 max(0.0, decisao.pd) / 1000
             )
@@ -363,7 +364,7 @@ def _atratividade(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo)
         * (1 + empresa.qualidade) ** PESO_QUALIDADE
     )
     limiar_diferenciacao = 0.20 * referencia * turma.demanda_base_por_empresa
-    if preco < 0.95 * referencia and (decisao.marketing + decisao.pd) > limiar_diferenciacao:
+    if preco < 0.95 * referencia and (investimento_efetivo(decisao) + decisao.pd) > limiar_diferenciacao:
         valor *= PENALIDADE_MEIO_TERMO
         c.alertas.append(
             "Porter — meio-termo: preço abaixo do mercado com gasto alto em diferenciação confunde o "
@@ -462,7 +463,7 @@ def _apurar(
     if itens:
         from .portfolio import atrativos
         pesos=atrativos(itens,turma.preco_referencia,turma.custo_unitario,c.empresa.marca,c.empresa.qualidade)
-        linhas=[{"produto_id":p["produto_id"],"nome":p["produto_nome"],"preco":p["preco"],"vendas":c.vendas*w/sum(pesos),"receita":c.vendas*w/sum(pesos)*p["preco"],"cmv":c.vendas*w/sum(pesos)*p["custo_unitario"]*multiplicador_cmv} for p,w in zip(itens,pesos)]
+        linhas=[{"produto_id":p["produto_id"],"nome":p["produto_nome"],"preco":p["preco"],"custos_campanha":deepcopy(p.get("custos_campanha")),"vendas":c.vendas*w/sum(pesos),"receita":c.vendas*w/sum(pesos)*p["preco"],"cmv":c.vendas*w/sum(pesos)*p["custo_unitario"]*multiplicador_cmv} for p,w in zip(itens,pesos)]
         receita=sum(l["receita"] for l in linhas)
     else:
         linhas=[]

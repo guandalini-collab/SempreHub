@@ -194,7 +194,7 @@ def relatorios(empresa_id:int,db:Session=Depends(get_db),usuario:Usuario=Depends
 @router.get("/api/educacao/campanhas")
 def campanhas():
     from ..catalogo_campanhas import catalogo
-    return {"midias":catalogo(),"observacao":"Tabela de custos da simulação. Quantidade × preço unitário determina o investimento. Valores não são cotações comerciais atuais. CPM corresponde a um lote de mil impressões; CPC, a um clique."}
+    return {"midias":catalogo(),"observacao":"Tarifas originais de mídia do jogo, acrescidas dos serviços obrigatórios. Referências públicas têm fonte e escopo; serviços sob consulta exigem orçamento informado pela equipe. CPM compra mil impressões, não mil clientes."}
 
 
 def validar_plano(db,empresa,dados):
@@ -222,6 +222,7 @@ def validar_plano(db,empresa,dados):
     if len({p.produto_id for p in itens})!=len(itens) or {p.produto_id for p in itens}!=set(catalogados):
         raise HTTPException(422,"O mix deve conter todos os produtos do catálogo, uma única vez.")
     if any(not i.revisado for i in itens): raise HTTPException(422,"Revise o mix de cada produto antes de enviar.")
+    from ..custos_campanhas import necessarios, orcamento, validar_dependencias, validar_cotacoes, arredondar
     total=digital=0
     for item in itens:
         produto=catalogados[item.produto_id]
@@ -230,9 +231,20 @@ def validar_plano(db,empresa,dados):
         if len(set(item.canais))!=len(item.canais): raise HTTPException(422,"Canais duplicados no produto.")
         if len({m.id for m in item.midias})!=len(item.midias): raise HTTPException(422,"Mídias duplicadas no produto.")
         if any(m.id not in midias for m in item.midias): raise HTTPException(422,"Mídia inválida.")
-        total+=sum(midias[m.id]["preco_unitario"]*m.quantidade for m in item.midias)
+        selecao=[m.model_dump() for m in item.midias]
+        try: validar_dependencias(selecao)
+        except ValueError as erro: raise HTTPException(422,str(erro)) from None
+        exigidos={s['id']:s['quantidade'] for s in necessarios(selecao)}
+        contratados={s.id:s.quantidade for s in item.servicos}
+        if len(contratados)!=len(item.servicos) or contratados!=exigidos:
+            raise HTTPException(422,'Contrate todos os serviços obrigatórios, nas quantidades indicadas, para '+item.produto_nome+'.')
+        try:validar_cotacoes(selecao,[s.model_dump() for s in item.servicos_cotados])
+        except ValueError as exc:raise HTTPException(422,str(exc)) from exc
+        item.custos_campanha=orcamento(selecao,[s.model_dump() for s in item.servicos],[s.model_dump() for s in item.servicos_cotados])
+        total+=item.custos_campanha['total']
         digital+=sum(midias[m.id]["preco_unitario"]*m.quantidade for m in item.midias if midias[m.id]["categoria"] in ("Digital","Display"))
-    if not isclose(round(total,2),dados.marketing,abs_tol=.01): raise HTTPException(422,"Marketing deve corresponder à soma das mídias de todos os produtos.")
+    if not isclose(round(total,2),dados.marketing,abs_tol=.01): raise HTTPException(422,"Marketing deve corresponder à soma da mídia e dos serviços de todos os produtos.")
+    plano.custos_campanha={'versao':2,**{k:arredondar(sum(i.custos_campanha[k] for i in itens)) for k in ('veiculacao','servicos','total','investimento_efetivo')}}
     pesos=sum(p.peso for p in itens)
     dados.preco=round(sum(p.preco*p.peso for p in itens)/pesos,2)
     plano.custo_unitario=round(sum(p.custo_unitario*p.peso for p in itens)/pesos,6)

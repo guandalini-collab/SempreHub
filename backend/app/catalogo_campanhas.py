@@ -66,4 +66,5 @@ CAMPANHAS = [
 
 def catalogo():
     from .manual_midias import DESCRICOES
-    return [dict(id=i,nome=n,categoria=c,preco_unitario=p,unidade=u,descricao=DESCRICOES[i]) for i,n,c,p,u in CAMPANHAS]
+    from .servicos_midias import metadados
+    return [dict(id=i,nome=n,categoria=c,preco_unitario=p,unidade=u,descricao=DESCRICOES[i],**metadados(i)) for i,n,c,p,u in CAMPANHAS]

@@ -200,14 +200,16 @@ def preparar(
     if preco <= 0:
         raise ValueError("O preço mensal deve ser positivo.")
     marketing = _dinheiro(max(0, decisao.get("marketing", 0)))
-    digital = min(marketing, _dinheiro(max(0, simulacao.get("marketing_digital", 0))))
+    from ..custos_campanhas import investimento_efetivo
+    verba_midia=investimento_efetivo(decisao)
+    digital = min(verba_midia, _dinheiro(max(0, simulacao.get("marketing_digital", 0))))
     canal = _nome(simulacao.get("canal", "DIRETO"))
-    fator_canal = 1.1 + (digital / marketing * 0.1 if marketing else 0) if canal == "DIGITAL" else 1.05 if canal == "DISTRIBUIDOR" else 1.0
+    fator_canal = 1.1 + (digital / verba_midia * 0.1 if verba_midia else 0) if canal == "DIGITAL" else 1.05 if canal == "DISTRIBUIDOR" else 1.0
     posicionamento = _nome(simulacao.get("posicionamento", "CUSTO"))
     fator_diferenciacao = 1 + estado["rh"]["qualificacao"] / 200 if posicionamento == "DIFERENCIACAO" else 1.0
     atratividade = (
         (float(parametros.get("preco_referencia", 100)) / preco) ** 1.4
-        * (1 + max(0, float(empresa.get("marca", 0))) + marketing / 10000) ** 0.3
+        * (1 + max(0, float(empresa.get("marca", 0))) + verba_midia / 10000) ** 0.3
         * (1 + max(0, float(empresa.get("qualidade", 0))) + float(decisao.get("pd", 0)) / 10000) ** 0.25
         * fator_canal * fator_diferenciacao
     )
@@ -277,7 +279,7 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
         ativos=dividir(atendidos,finais)
         estado["clientes_produtos"]={p["produto_id"]:q for p,q in zip(itens,finais)}
         for item,q,f in zip(itens,ativos,finais):
-            linhas.append({"produto_id":item["produto_id"],"nome":item["produto_nome"],"preco":item["preco"],"vendas":q,"clientes_finais":f,"receita":_dinheiro(q*item["preco"]),"cmv":_dinheiro(q*item["custo_unitario"]*preparo["multiplicador_custo"])})
+            linhas.append({"produto_id":item["produto_id"],"nome":item["produto_nome"],"preco":item["preco"],"custos_campanha":deepcopy(item.get("custos_campanha")),"vendas":q,"clientes_finais":f,"receita":_dinheiro(q*item["preco"]),"cmv":_dinheiro(q*item["custo_unitario"]*preparo["multiplicador_custo"])})
         receita=_soma(*(l["receita"] for l in linhas))
         custo_nuvem=_soma(*(l["cmv"] for l in linhas))
     else:

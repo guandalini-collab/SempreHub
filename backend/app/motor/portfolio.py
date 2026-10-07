@@ -26,6 +26,8 @@ def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0):
         canal=1.1 if 'ATACADO' in p['canais'] else 1.05 if any(c in p['canais'] for c in ('ECOMMERCE','MARKETPLACE')) else 1
         pos=.75 if p['posicionamento']!='PRECO' and marca<3 and qualidade<3 else 1
         campanha=sum(custos[m['id']]*m['quantidade'] for m in p.get('midias',[]))
+        if (p.get('custos_campanha') or {}).get('versao')==2:
+            campanha=p['custos_campanha']['investimento_efetivo']
         valores.append(p['peso']*(ref/p['preco'])**2*canal*pos*(1+math.sqrt(campanha/1000))**.3)
     return valores
 
@@ -74,6 +76,6 @@ def vender(estado,itens,demanda,pesos):
         cmv=dinheiro(st['valor']*q/st['quantidade']) if st['quantidade'] else 0
         receita=dinheiro(q*p['preco']);st['quantidade']-=q;st['valor']=dinheiro(st['valor']-cmv)
         comissao=dinheiro(receita*(.05 if 'ATACADO' in p['canais'] else .03 if any(c in p['canais'] for c in ('ECOMMERCE','MARKETPLACE')) else 0))
-        linhas.append({'produto_id':p['produto_id'],'nome':p['produto_nome'],'preco':p['preco'],'demanda':d,'vendas':q,'receita':receita,'cmv':cmv,'comissao_canal':comissao,'estoque_final':deepcopy(st)})
+        linhas.append({'produto_id':p['produto_id'],'nome':p['produto_nome'],'preco':p['preco'],'custos_campanha':deepcopy(p.get('custos_campanha')),'demanda':d,'vendas':q,'receita':receita,'cmv':cmv,'comissao_canal':comissao,'estoque_final':deepcopy(st)})
     sincronizar(estado)
     return linhas

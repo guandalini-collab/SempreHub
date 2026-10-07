@@ -88,3 +88,10 @@ Todas as equipes configuram preço, posicionamento, canais e campanhas de **todo
 Em **Ferramentas e segmentação**, o sistema prepara SWOT, Porter e PESTEL por IA, para consulta. A equipe interpreta o diagnóstico, escolhe a diretriz estratégica e preenche BCG e segmentação. As decisões da equipe continuam influenciando a coerência do mix e o resultado. Os diagnósticos ficam preservados por empresa e rodada.
 
 Consulte **Manual de mídias** na sidebar para pesquisar os formatos do catálogo, entender objetivos, unidades de compra e cuidados. A mesma área oferece o guia completo em PDF.
+
+
+## Mídia e serviços de produção
+
+O mix de cada produto mostra mídia, produção/serviços e total. Selecionar mídia inclui automaticamente os serviços com referência publicada. Para formatos com serviços sob consulta, informe um orçamento total com link do fornecedor. Não é permitido enviar somente veiculação quando o serviço é obrigatório. As fontes e escopos estão no Guia de mídias.
+
+Panfletos vinculam impressão e distribuição; jingle exige veiculação e substitui a produção de áudio simples. Produção é cobrada por formato, produto e mês; materiais físicos acompanham a quantidade. A abertura por produto explica as despesas já incluídas uma vez no marketing da DRE e no caixa. Históricos preservam os valores contratados. Preços publicados «a partir de» não garantem todo escopo ou direito de uso.

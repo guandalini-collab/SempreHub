@@ -116,12 +116,13 @@ def test_midias_por_produto_somadas_e_influenciam_distribuicao(cliente,professor
     itens=d['plano_comercial']['produtos']
     itens[0]['midias']=[{'id':'email','quantidade':100}]
     itens[1]['midias']=[{'id':'email','quantidade':200}]
-    d['marketing']=36
+    for item in itens:item['servicos']=[{'id':'servico-email','quantidade':1}]
+    d['marketing']=1126
     r=cliente.put(f'/api/aluno/empresas/{empresa}/decisao',headers=aluno,json=d)
     assert r.status_code==200,r.text
     saved=r.json()['plano_comercial']['produtos']
     base=deepcopy(saved)
-    for p in base:p['midias']=[]
+    for p in base:p.update(midias=[],custos_campanha=None)
     a=atrativos(saved,100,30);b=atrativos(base,100,30)
     assert a[1]/a[0]>b[1]/b[0]
     d['marketing']=12

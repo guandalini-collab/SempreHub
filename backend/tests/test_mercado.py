@@ -26,7 +26,8 @@ def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch):
     assert cliente.post(docente+f"/{eid}/publicar",headers=professor,json={}).status_code==200
     assert cliente.put(docente+f"/{eid}",headers=professor,json=edicao()).status_code==409
     plano={"edicao_id":eid,"produto_id":"produto-1","estrategia_preco":"COMPETITIVO","posicionamento":"PRECO","canais":["DIRETO"],"cobertura":"LOCAL","intensidade":"MEDIA","midias":[{"id":"email","quantidade":100}],"estrategias":{"SWOT":"Análise da equipe"},"custo_unitario":1}
-    decisao={"preco":60,"marketing":12,"plano_comercial":plano}
+    plano["produtos"]=[{**plano,"produto_id":"produto-1","preco":60,"peso":1,"revisado":True,"servicos":[{"id":"servico-email","quantidade":1}]}]
+    decisao={"preco":60,"marketing":557,"plano_comercial":plano}
     r=cliente.put(base+"/decisao",headers=aluno,json=decisao)
     assert r.status_code==200,r.text
     assert r.json()["plano_comercial"]["custo_unitario"]==30

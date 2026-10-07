@@ -213,14 +213,16 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     despesas_pagas = _soma([folha, beneficios, treinamento, rescisoes, manutencao,
                             custos_fixos, marketing, pd, networking, juros, multas])
 
-    marca = 0.8 * e.get("marca", 0) + math.sqrt(marketing / 1000)
+    from ..custos_campanhas import investimento_efetivo
+    verba_midia=investimento_efetivo(d)
+    marca = 0.8 * e.get("marca", 0) + math.sqrt(verba_midia / 1000)
     qualidade = 0.9 * e.get("qualidade", 0) + 0.5 * math.sqrt(pd / 1000)
     canal = getattr(op.get("canal", "DIRETO"), "value", op.get("canal", "DIRETO"))
-    digital = min(marketing, _dinheiro(max(0, op.get("marketing_digital", 0))))
+    digital = min(verba_midia, _dinheiro(max(0, op.get("marketing_digital", 0))))
     fator_canal = {
         "DIRETO": 1.0,
         "DISTRIBUIDOR": 1.10,
-        "DIGITAL": 1.05 + (0.10 * digital / marketing if marketing else 0),
+        "DIGITAL": 1.05 + (0.10 * digital / verba_midia if verba_midia else 0),
     }.get(canal, 1.0)
     taxa_comissao_canal = {"DIRETO": 0.0, "DISTRIBUIDOR": 0.05, "DIGITAL": 0.03}.get(canal, 0.0)
     # Marketing digital é parte do orçamento já lançado e melhora a marca;

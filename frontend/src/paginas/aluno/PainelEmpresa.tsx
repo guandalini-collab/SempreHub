@@ -600,8 +600,8 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
           >
             <ControleVisual rotulo="Preço de venda" valor={d.preco} aoMudar={(v) => atualizar("preco", v)} minimo={0.01} limite={p.preco_referencia * 3} />
           </Campo>
-          </div><Campo rotulo="Marketing (no mês)" ajuda={`Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
-            {d.plano_comercial ? <p className="font-semibold">{reais(d.marketing)} · calculado pelas mídias escolhidas</p> : <ControleVisual rotulo="Investimento em marketing" valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} limite={Math.max(1000, empresa.caixa)} />}
+          </div><Campo rotulo="Marketing (no mês)" ajuda={d.plano_comercial ? "Inclui mídia, produção e serviços; somente produzir uma peça não compra audiência." : `Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
+            {d.plano_comercial ? <p className="font-semibold">{reais(d.marketing)} · mídia + produção e serviços</p> : <ControleVisual rotulo="Investimento em marketing" valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} limite={Math.max(1000, empresa.caixa)} />}
           </Campo>
           <Campo rotulo="Pesquisa e desenvolvimento (no mês)" ajuda={`Melhora a qualidade percebida. Índice atual: ${umDecimal(empresa.qualidade)}.`}>
             <ControleVisual rotulo="Pesquisa e desenvolvimento" valor={d.pd} aoMudar={(v) => atualizar("pd", v)} limite={Math.max(1000, empresa.caixa)} />

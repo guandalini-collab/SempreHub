@@ -232,6 +232,13 @@ class AnalisesEstrategicas(ItensAnalise):
     segmentacao: SegmentacaoAnalise = Field(default_factory=SegmentacaoAnalise)
 
 
+class ServicoCotado(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False)
+    midia_id: str = Field(min_length=1, max_length=80)
+    valor: float = Field(ge=0.01, le=10_000_000)
+    fonte_url: str = Field(min_length=8, max_length=2000, pattern=r"^https?://[^\s]+$")
+
+
 class MixProduto(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
     produto_id: str = Field(min_length=1, max_length=80)
@@ -243,6 +250,9 @@ class MixProduto(BaseModel):
     canais: list[Literal["VAREJO", "ECOMMERCE", "MARKETPLACE", "ATACADO", "FRANQUIA", "DIRETO"]] = Field(min_length=1, max_length=6)
     cobertura: Literal["LOCAL", "REGIONAL", "NACIONAL", "INTERNACIONAL"]
     intensidade: Literal["BAIXA", "MEDIA", "ALTA", "INTENSIVA"]
+    servicos: list[AlocacaoMidia] = Field(default_factory=list, max_length=160)
+    servicos_cotados: list[ServicoCotado] = Field(default_factory=list, max_length=80)
+    custos_campanha: Optional[dict] = None
     midias: list[AlocacaoMidia] = Field(default_factory=list, max_length=80)
     custo_unitario: Optional[float] = Field(None, gt=0, le=1000000)
     produto_nome: Optional[str] = Field(None, max_length=200)
@@ -250,6 +260,8 @@ class MixProduto(BaseModel):
 
 class PlanoComercial(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
+    versao_custos: Literal[2] = 2
+    custos_campanha: Optional[dict] = None
     edicao_id: int = Field(gt=0)
     produtos: list[MixProduto] = Field(default_factory=list, max_length=10)
     produto_id: str = Field(max_length=80)

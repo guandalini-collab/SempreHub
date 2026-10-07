@@ -66,5 +66,11 @@ DESCRICOES={
 USOS={'Impressa':'Públicos locais ou temáticos; mensagem informativa e presença visual.','Digital':'Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.','Exterior':'Lembrança da marca e alcance geográfico próximo à circulação do público.','Eletrônica':'Campanhas audiovisuais e exposição por programação ou audiência.','Direto':'Contato direcionado e divulgação local.','Relações públicas':'Credibilidade e relacionamento com veículos de comunicação.','Promoção':'Contato e lembrança da marca por meio de objetos úteis.','Product placement':'Associação da marca ao contexto de conteúdo audiovisual.','Display':'Exposição visual em sites e aplicativos.'}
 
 def guia():
-    from .catalogo_campanhas import CAMPANHAS
-    return [dict(id=i,nome=n,categoria=c,preco_unitario=p,unidade=u,descricao=DESCRICOES[i],quando_usar=USOS[c],exemplo=f'10 {u}: R$ {p*10:.2f}.',cuidado='Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.') for i,n,c,p,u in CAMPANHAS]
+    from .catalogo_campanhas import catalogo
+    from .custos_campanhas import necessarios, orcamento
+    itens=[]
+    for m in catalogo():
+        midias=[{'id':m['id'],'quantidade':1}]
+        custos=orcamento(midias,necessarios(midias))
+        itens.append({**m,'quando_usar':USOS[m['categoria']], 'exemplo':f"1 {m['unidade']}: mídia/pacote R$ {m['preco_unitario']:.2f} + serviços R$ {custos['servicos']:.2f}.", 'total_primeira_contratacao':custos['total'],'cuidado':'Total dos itens precificados no jogo. Referências de produção podem ser preços iniciais; licenças, instalação, impostos e escopos especiais não devem ser considerados incluídos sem confirmação. Impressões, pessoas alcançadas e clientes são métricas distintas.'})
+    return itens

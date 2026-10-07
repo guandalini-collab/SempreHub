@@ -1,659 +1,1452 @@
-# SempreHub — Manual de mídias
+<div class="cover">
 
-Guia para alunos e professores. Consulte antes de montar campanhas de cada produto.
+<img src="../frontend/src/assets/logo-semprehub.png" alt="SempreHub" />
 
-## Como comprar mídia no jogo
+<span class="kicker">Simula+ · Planejamento de mídia corporativa</span>
 
-O custo é quantidade × preço unitário. Os valores são didáticos e não constituem cotações atuais.
+# Guia de mídias e serviços
 
-- **CPM:** custo por mil impressões. Quantidade 10 compra 10.000 exibições, não 10.000 pessoas únicas.
-- **CPC:** custo por clique. Um clique não garante uma compra.
-- **CPV:** custo por visualização. A tabela utiliza a unidade visualização.
-- **Inserção:** uma veiculação de anúncio em uma programação ou publicação.
-- **Pacote, licença ou parceria:** unidades contratadas conforme a linha do catálogo.
+<p class="subtitle">Audiência, produção e execução: conheça o custo da campanha antes de contratar.</p>
 
-## Escolha e avaliação
+<p class="meta">Criado por: Professor Guandalini.<br>Referências consultadas em 07/10/2026 · 62 formatos · aluno e professor.</p>
 
-Defina o público, o objetivo e a cobertura de cada produto. Compare o investimento com sua margem e seu caixa. Considere frequência, conteúdo da mensagem e adequação ao canal. Seguidores, impressões, cliques e vendas medem etapas diferentes. Não é necessário selecionar todas as mídias nem gastar todo o orçamento.
+</div>
 
-## Produção e veiculação
+## Como planejar a contratação
 
-Produzir um jingle não inclui sua veiculação. Imprimir panfletos não inclui distribuir. Assessoria e releases não garantem espaço editorial. Na prática, produção, impostos, região, duração e negociação podem alterar custos; o jogo utiliza a tabela publicada.
+| Componente | Leitura correta |
+|---|---|
+| Mídia / pacote | Quantidade × tarifa original do jogo. Tarifas preservadas; não são preços comerciais atuais de veiculação. |
+| Produção / serviço | Criação de arte, filme, áudio, gestão ou execução física. Referência pública com fonte e escopo; preços iniciais não são cotações personalizadas. |
+| Orçamento sob consulta | Serviços sem preço público exato validado exigem valor e link do fornecedor. A equipe informa a cotação; o sistema não a verifica automaticamente. |
+| Total | Mídia + serviços precificados + orçamento informado. Uma única despesa de marketing na DRE e no caixa. |
+
+Produção é cobrada por formato, produto e mês, sem repetir a taxa por inserção. Materiais físicos dependem da quantidade. Reutilização de peças entre meses, cachês especiais e direitos irrestritos não são presumidos. A mesma referência serve a professor e aluno.
+
+## Métricas para analisar
+
+| Indicador | O que mede | O que não demonstra |
+|---|---|---|
+| CPM | Custo por mil impressões/exibições | Mil pessoas diferentes ou mil compradores. |
+| Alcance único | Pessoas distintas expostas | Impressões acumuladas; uma pessoa pode ver várias vezes. |
+| Frequência | Impressões / alcance, quando ambos são conhecidos | Conversão em venda. |
+| CPC | Custo por clique | Compra concluída. |
+| CPV | Custo por visualização conforme a regra da plataforma | Cliente adquirido. |
+| Conversão / CPA | Ação concluída / custo por aquisição | Retorno positivo sem comparar margem e gasto. |
+
+Quantidade 10 em uma linha de CPM significa 10 lotes de mil exibições, não 10 mil clientes. Não inferir alcance único a partir da verba. Target e praça são hipóteses a validar com o perfil da audiência; idade/renda não são propriedades universais de uma mídia.
+
 
 ## Impressa
+
+<div class="media-card">
 
 ### Jornal · página inteira
 
 Anúncio que ocupa uma página inteira de jornal. Dá espaço para uma mensagem detalhada e alcance no público leitor.
 
-**Quando considerar:** Públicos locais ou temáticos; mensagem informativa e presença visual.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 8.500,00 | inserção |
+| Criação e fechamento da arte impressa | R$ 850,20 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 9.350,20** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 8.500,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Públicos locais ou temáticos; mensagem informativa e presença visual.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Jornal · meia página
 
 Anúncio em metade de uma página de jornal. Permite combinar informação e presença com custo menor que a página inteira.
 
-**Quando considerar:** Públicos locais ou temáticos; mensagem informativa e presença visual.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 4.500,00 | inserção |
+| Criação e fechamento da arte impressa | R$ 780,90 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 5.280,90** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 4.500,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Públicos locais ou temáticos; mensagem informativa e presença visual.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Revista · página inteira
 
 Página completa em revista. Útil para públicos ligados ao tema da publicação e para apresentar atributos visuais do produto.
 
-**Quando considerar:** Públicos locais ou temáticos; mensagem informativa e presença visual.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 12.000,00 | inserção |
+| Criação e fechamento da arte impressa | R$ 850,20 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 12.850,20** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 12.000,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Públicos locais ou temáticos; mensagem informativa e presença visual.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Jornal · página dupla
 
 Anúncio nas duas páginas abertas do jornal. Prioriza impacto visual e visibilidade.
 
-**Quando considerar:** Públicos locais ou temáticos; mensagem informativa e presença visual.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 9.000,00 | inserção |
+| Criação e fechamento da arte impressa | R$ 1.200,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 10.200,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 9.000,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Públicos locais ou temáticos; mensagem informativa e presença visual.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Revista · página dupla
 
 Anúncio em duas páginas abertas de revista. Permite uma composição visual ampla para uma campanha de marca.
 
-**Quando considerar:** Públicos locais ou temáticos; mensagem informativa e presença visual.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 12.500,00 | inserção |
+| Criação e fechamento da arte impressa | R$ 1.200,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 13.700,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 12.500,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Públicos locais ou temáticos; mensagem informativa e presença visual.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Jornal · fração de página
 
 Espaço pequeno, como um quarto de página ou rodapé de jornal. Adequado a mensagens curtas e ofertas locais.
 
-**Quando considerar:** Públicos locais ou temáticos; mensagem informativa e presença visual.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 450,00 | inserção |
+| Criação e fechamento da arte impressa | R$ 580,90 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1.030,90** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 450,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Públicos locais ou temáticos; mensagem informativa e presença visual.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Revista · fração de página
 
 Espaço pequeno em revista. Dá presença em um público temático sem comprar uma página inteira.
 
-**Quando considerar:** Públicos locais ou temáticos; mensagem informativa e presença visual.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 650,00 | inserção |
+| Criação e fechamento da arte impressa | R$ 580,90 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1.230,90** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 650,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Públicos locais ou temáticos; mensagem informativa e presença visual.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Revista · meia página
 
 Metade de uma página de revista, em formato horizontal ou vertical. Equilibra espaço e custo.
 
-**Quando considerar:** Públicos locais ou temáticos; mensagem informativa e presença visual.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 6.000,00 | inserção |
+| Criação e fechamento da arte impressa | R$ 780,90 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 6.780,90** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 6.000,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Públicos locais ou temáticos; mensagem informativa e presença visual.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+
+</div>
+
+---
+
+
+### Notas de auditoria de escopo
+
+Produção isolada não compra audiência. Contrate serviços e veiculação necessários; não confunda impressões, alcance único e novos clientes. Escopos especiais e orçamentos informados estão separados das referências públicas.
+
 
 ## Digital
+
+<div class="media-card">
 
 ### Influenciador · até 100 mil seguidores
 
 Parceria paga com criador de conteúdo de até 100 mil seguidores. Pode aproximar a marca de um nicho; avalie aderência e engajamento, não só seguidores.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 1.200,00 | parceria |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1.200,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 1.200,00 por parceria. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Pacote didático de parceria, incluindo criação pelo influenciador. Direitos de reutilização e envio de produtos podem exigir orçamento adicional.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Influenciador · 100 a 500 mil seguidores
 
 Parceria com criador de 100 a 500 mil seguidores. Combina alcance e possibilidade de trabalhar públicos temáticos.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 3.500,00 | parceria |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 3.500,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 3.500,00 por parceria. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Pacote didático de parceria, incluindo criação pelo influenciador. Direitos de reutilização e envio de produtos podem exigir orçamento adicional.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Influenciador · mais de 500 mil seguidores
 
 Parceria com criador acima de 500 mil seguidores. Busca amplo alcance; audiência grande não garante intenção de compra.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 8.000,00 | parceria |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 8.000,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 8.000,00 por parceria. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Pacote didático de parceria, incluindo criação pelo influenciador. Direitos de reutilização e envio de produtos podem exigir orçamento adicional.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### E-mail marketing
 
 Mensagem enviada a uma lista de contatos com permissão. Útil para relacionamento, recompra e ofertas; não confundir envios com mensagens abertas.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 0,12 | envio |
+| Design do e-mail marketing | R$ 545,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 545,12** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 0,12 por envio. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design do e-mail marketing:** Desenho de um e-mail, sem HTML. O pacote de envios do jogo fornece a ferramenta com editor visual; programação personalizada não está incluída. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: We Do Logos · layout de e-mail marketing](https://www.wedologos.com.br/comprar/layoutemailmkt.aspx) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Podcast · inserção
 
 Menção ou anúncio dentro de um episódio de podcast. A seleção do programa deve considerar o tema e o perfil dos ouvintes.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 800,00 | inserção |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 800,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 800,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### SMS marketing
 
 Mensagem curta enviada ao celular. Pode divulgar ofertas ou avisos; exige contatos autorizados e linguagem objetiva.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 0,10 | envio |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 0,10** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 0,10 por envio. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Marketing de conteúdo
 
 Pacote de produção de textos, imagens ou vídeos para canais próprios. Ajuda a explicar produtos e construir confiança ao longo do tempo.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 1.500,00 | pacote mensal |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1.500,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 1.500,00 por pacote mensal. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Pacote mensal do jogo inclui a produção básica de conteúdo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Google Ads
 
 Campanha de anúncios no Google, em pesquisa, display ou YouTube. Pesquisa atende intenção de busca; display e vídeo trabalham presença e lembrança.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 750,00 | campanha |
+| Gestão de campanha Google Ads | R$ 297,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1.047,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 750,00 por campanha. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Gestão de campanha Google Ads:** Referência de honorários mensais; verba paga ao Google é separada. No jogo, gestão por campanha de produto e mês. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: DivulgaAI · gestão Google Ads](https://divulgaai.com.br/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Meta Ads
 
 Campanha de anúncios no Facebook e Instagram. Permite segmentação e diferentes objetivos; atenção à frequência e à coerência da oferta.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 900,00 | campanha |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 900,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 900,00 por campanha. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+> **Orçamento obrigatório, fora do subtotal:** Gestão de campanha e criação das peças não incluídas na verba de mídia. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### YouTube · bumper
 
 Vídeo de até seis segundos no YouTube, não pulável. Exige uma mensagem curta e serve para reforçar lembrança.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 14,00 | mil impressões |
+| Criação de vídeo / motion | R$ 990,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1.004,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 14,00 por mil impressões. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### YouTube · in-stream
 
 Vídeo in-stream pulável após os primeiros segundos. Apresente a proposta cedo; a tabela do jogo cobra por visualização.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 0,25 | visualização |
+| Criação de vídeo / motion | R$ 990,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 990,25** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 0,25 por visualização. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Stories / Reels / TikTok
 
 Vídeo ou imagem vertical para Stories, Reels ou TikTok. Formato móvel que exige comunicação rápida e visual.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 16,00 | mil impressões |
+| Criação de vídeo / motion | R$ 990,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1.006,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 16,00 por mil impressões. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Feed · Instagram / Facebook / LinkedIn
 
 Imagem ou vídeo entre publicações de Instagram, Facebook ou LinkedIn. A mensagem deve fazer sentido no contexto de cada rede.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 20,00 | mil impressões |
+| Design da peça digital | R$ 80,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 100,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 20,00 por mil impressões. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Carrossel
 
 Sequência de imagens ou vídeos deslizantes. Permite mostrar variantes, benefícios ou etapas; no jogo a compra é por clique.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 1,20 | clique |
+| Design do carrossel | R$ 120,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 121,20** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 1,20 por clique. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design do carrossel:** Arte de carrossel; não inclui ensaio fotográfico ou filmagem. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Anúncio de coleção
 
 Anúncio com peça principal e catálogo de produtos. Facilita descoberta e navegação para compra online.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 25,00 | mil impressões |
+| Design da peça digital | R$ 80,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 105,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 25,00 por mil impressões. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Notificação push
 
 Licença para enviar notificações curtas de aplicativo ou navegador a usuários que autorizaram o recebimento. A licença não equivale a alcance garantido.
 
-**Quando considerar:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 300,00 | licença |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 300,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 300,00 por licença. Quantidade × valor unitário.
+**Praça / público:** Busca, descoberta ou relacionamento conforme o canal e o estágio de compra.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Licença do serviço; não garante audiência nem inclui desenvolvimento de aplicativo.
+
+</div>
+
+---
+
+
+### Notas de auditoria de escopo
+
+Produção isolada não compra audiência. Contrate serviços e veiculação necessários; não confunda impressões, alcance único e novos clientes. Escopos especiais e orçamentos informados estão separados das referências públicas.
+
 
 ## Exterior
+
+<div class="media-card">
 
 ### Outdoor fixo
 
 Painel fixo em via de circulação. Comunica rapidamente a quem passa; use pouco texto e contraste forte.
 
-**Quando considerar:** Lembrança da marca e alcance geográfico próximo à circulação do público.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 1.700,00 | painel |
+| Impressão de lona · 9 × 3 m | R$ 1.242,00 | Por unidade de mídia |
+| Criação de arte para painel | R$ 150,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 3.092,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 1.700,00 por painel. Quantidade × valor unitário.
+**Praça / público:** Lembrança da marca e alcance geográfico próximo à circulação do público.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Impressão de lona · 9 × 3 m:** 27 m² × R$ 46/m². Somente impressão. Fixação, projeto de arte e licenças dependem de orçamento; não estão comprovados por esta referência. Preço publicado por m²; 9 × 3 m é uma premissa didática explícita. [Fonte: BannerJÁ · painel em lona](https://www.bannerja.com.br/categoria/painel-lona) · consulta 07/10/2026.
+
+**Criação de arte para painel:** Uma arte para o painel de 9 × 3 m. Instalação é orçada separadamente. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Imprima Aqui · outdoor 9×3](https://imprimaaqui.com.br/produto/comprar/1/outdoor-9x3) · consulta 07/10/2026.
+
+> **Orçamento obrigatório, fora do subtotal:** Fixação e instalação da lona de 9 × 3 m. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Front light
 
 Painel com iluminação frontal. Ajuda a manter a visibilidade noturna; localização e circulação são relevantes.
 
-**Quando considerar:** Lembrança da marca e alcance geográfico próximo à circulação do público.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 4.000,00 | painel |
+| Impressão de lona · 9 × 3 m | R$ 1.242,00 | Por unidade de mídia |
+| Criação de arte para painel | R$ 150,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 5.392,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 4.000,00 por painel. Quantidade × valor unitário.
+**Praça / público:** Lembrança da marca e alcance geográfico próximo à circulação do público.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Impressão de lona · 9 × 3 m:** 27 m² × R$ 46/m², lona simples para iluminação frontal. Não é lona translúcida de backlight. Instalação e licenças exigem orçamento próprio. Referência de lona simples; dimensão assumida pelo exercício, não cotação de frontlight instalado. [Fonte: BannerJÁ · painel em lona](https://www.bannerja.com.br/categoria/painel-lona) · consulta 07/10/2026.
+
+**Criação de arte para painel:** Uma arte para o painel de 9 × 3 m. Instalação é orçada separadamente. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Imprima Aqui · outdoor 9×3](https://imprimaaqui.com.br/produto/comprar/1/outdoor-9x3) · consulta 07/10/2026.
+
+> **Orçamento obrigatório, fora do subtotal:** Fixação e instalação do painel de 9 × 3 m. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Busdoor
 
 Anúncio aplicado na parte externa de ônibus. Circula por trajetos urbanos e oferece exposição repetida.
 
-**Quando considerar:** Lembrança da marca e alcance geográfico próximo à circulação do público.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 900,00 | veículo |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 900,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 900,00 por veículo. Quantidade × valor unitário.
+**Praça / público:** Lembrança da marca e alcance geográfico próximo à circulação do público.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+> **Orçamento obrigatório, fora do subtotal:** Vinil perfurado, criação e aplicação na garagem. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Painel digital
 
 Painel de LED que exibe anúncios e permite alternar peças. Adequado a comunicação visual breve em pontos de circulação.
 
-**Quando considerar:** Lembrança da marca e alcance geográfico próximo à circulação do público.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 1.400,00 | painel |
+| Criação de vídeo / motion | R$ 990,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 2.390,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 1.400,00 por painel. Quantidade × valor unitário.
+**Praça / público:** Lembrança da marca e alcance geográfico próximo à circulação do público.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Mobiliário urbano
 
 Anúncio em abrigos de ônibus, relógios e outros mobiliários de rua. Alcança pedestres e pessoas em deslocamento.
 
-**Quando considerar:** Lembrança da marca e alcance geográfico próximo à circulação do público.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 1.650,00 | painel |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1.650,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 1.650,00 por painel. Quantidade × valor unitário.
+**Praça / público:** Lembrança da marca e alcance geográfico próximo à circulação do público.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+> **Orçamento obrigatório, fora do subtotal:** Arte, impressão no formato e instalação. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Empena
 
 Grande anúncio em parede lateral de prédio. Busca impacto visual, mas envolve estrutura e produção de maior custo.
 
-**Quando considerar:** Lembrança da marca e alcance geográfico próximo à circulação do público.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 45.000,00 | estrutura |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 45.000,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 45.000,00 por estrutura. Quantidade × valor unitário.
+**Praça / público:** Lembrança da marca e alcance geográfico próximo à circulação do público.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+> **Orçamento obrigatório, fora do subtotal:** Arte, lona de grande formato, projeto e instalação especializada em altura. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Envelopamento de frota
 
 Adesivagem de veículos, ônibus ou vagões. Transforma a superfície do veículo em exposição da marca.
 
-**Quando considerar:** Lembrança da marca e alcance geográfico próximo à circulação do público.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 23.000,00 | veículo |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 23.000,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 23.000,00 por veículo. Quantidade × valor unitário.
+**Praça / público:** Lembrança da marca e alcance geográfico próximo à circulação do público.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+> **Orçamento obrigatório, fora do subtotal:** Projeto, adesivo apropriado, preparação e aplicação em veículo. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Telas · elevador / táxi / metrô
 
 Circuito de telas em elevadores, táxis ou metrô. Exposição durante esperas e deslocamentos; considere que pode não haver áudio.
 
-**Quando considerar:** Lembrança da marca e alcance geográfico próximo à circulação do público.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 1.800,00 | circuito |
+| Criação de vídeo / motion | R$ 990,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 2.790,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 1.800,00 por circuito. Quantidade × valor unitário.
+**Praça / público:** Lembrança da marca e alcance geográfico próximo à circulação do público.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+
+### Notas de auditoria de escopo
+
+Produção isolada não compra audiência. Contrate serviços e veiculação necessários; não confunda impressões, alcance único e novos clientes. Escopos especiais e orçamentos informados estão separados das referências públicas.
+
 
 ## Eletrônica
+
+<div class="media-card">
 
 ### Rádio · spot 30 segundos
 
 Anúncio de áudio gravado com 30 segundos. Permite repetição e divulgação de ofertas; cada inserção é uma veiculação.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 500,00 | inserção |
+| Produção de áudio · locução e trilha | R$ 199,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 699,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 500,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Rádio · testemunhal
 
 Anúncio lido por apresentador ou locutor. Usa a identificação da audiência com o programa, com publicidade claramente reconhecível.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 1.200,00 | inserção |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1.200,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 1.200,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Pacote do jogo inclui leitura ao vivo; a equipe deve preparar briefing e texto. Não inclui produção de spot gravado.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### TV · comercial 15 segundos
 
 Comercial de 15 segundos em televisão. Requer mensagem curta e execução visual clara.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 18.000,00 | inserção |
+| Produção do filme publicitário | R$ 3.000,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 21.000,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 18.000,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### TV · comercial 30 segundos
 
 Comercial de 30 segundos em televisão. Oferece mais tempo para explicar a proposta ou demonstrar o produto.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 30.000,00 | inserção |
+| Produção do filme publicitário | R$ 3.000,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 33.000,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 30.000,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Cinema · comercial 30 segundos
 
 Comercial de 30 segundos antes da sessão de cinema. Trabalha presença audiovisual em um ambiente de atenção.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 12.000,00 | inserção |
+| Produção do filme publicitário | R$ 3.000,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 15.000,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 12.000,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### TV · teaser
 
 Vídeo curto que cria expectativa sobre um lançamento. Precisa de continuidade para explicar a oferta posteriormente.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 4.500,00 | inserção |
+| Produção do filme publicitário | R$ 3.000,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 7.500,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 4.500,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### TV · merchandising
 
 Ação comercial integrada a um programa, com apresentação ou interação com o produto. Deve ser identificada como publicidade.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 27.000,00 | ação |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 27.000,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 27.000,00 por ação. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+> **Orçamento obrigatório, fora do subtotal:** Amostras, frete, briefing e apoio técnico; variam conforme produto e emissora. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### TV · vinheta de patrocínio
 
 Mensagem breve de patrocínio na abertura ou fechamento de um bloco. A tabela compra uma cota mensal.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 47.000,00 | cota mensal |
+| Criação de vídeo / motion | R$ 990,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 47.990,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 47.000,00 por cota mensal. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### TV · infocomercial
 
 Demonstração publicitária longa, normalmente de 15 a 30 minutos. Explica uso e benefícios com mais profundidade.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 6.000,00 | inserção |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 6.000,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 6.000,00 por inserção. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+> **Orçamento obrigatório, fora do subtotal:** Roteiro, captação e edição de filme de 15–30 minutos; não usar preço de VT de 30 segundos. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Rádio · produção de jingle
 
 Produção de música curta publicitária. O custo desta linha é a criação; a veiculação em rádio exige contratar inserções separadamente.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 2.400,00 | produção |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 2.400,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 2.400,00 por produção. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original já é a produção do jingle; não inclui veiculação.
+
+> **Dependência obrigatória:** Produção sem audiência: exige veiculação em rádio ou streaming. Substitui a produção de spot simples quando contratado junto.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Rádio · patrocínio de programa
 
 Cota mensal de associação da marca a um programa de rádio. Pode incluir chamadas e vinhetas conforme o pacote.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 4.750,00 | cota mensal |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 4.750,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 4.750,00 por cota mensal. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Rádio · streaming
 
 Anúncio de áudio em plataformas digitais de rádio ou streaming. A tabela compra lotes de mil reproduções.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 40,00 | mil reproduções |
+| Produção de áudio · locução e trilha | R$ 199,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 239,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 40,00 por mil reproduções. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Rádio · publicação social
 
 Publicação nos perfis sociais da emissora. É uma ação digital distinta das inserções no rádio.
 
-**Quando considerar:** Campanhas audiovisuais e exposição por programação ou audiência.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 900,00 | publicação |
+| Design da peça digital | R$ 80,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 980,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 900,00 por publicação. Quantidade × valor unitário.
+**Praça / público:** Campanhas audiovisuais e exposição por programação ou audiência.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+
+### Notas de auditoria de escopo
+
+Produção isolada não compra audiência. Contrate serviços e veiculação necessários; não confunda impressões, alcance único e novos clientes. Escopos especiais e orçamentos informados estão separados das referências públicas.
+
 
 ## Direto
+
+<div class="media-card">
 
 ### Carro de som
 
 Divulgação por veículo com alto-falante em uma região. É uma ação local; observe adequação ao público e regras de ruído.
 
-**Quando considerar:** Contato direcionado e divulgação local.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 350,00 | ação |
+| Produção de áudio · locução e trilha | R$ 199,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 549,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 350,00 por ação. Quantidade × valor unitário.
+**Praça / público:** Contato direcionado e divulgação local.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Panfletos · impressão
 
 Produção física de panfletos. Imprimir não significa distribuir; a distribuição é uma linha separada.
 
-**Quando considerar:** Contato direcionado e divulgação local.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 0,22 | unidade |
+| Design do panfleto até A4 | R$ 350,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 350,22** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 0,22 por unidade. Quantidade × valor unitário.
+**Praça / público:** Contato direcionado e divulgação local.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Tarifa original por unidade de impressão. Arte e distribuição são separadas.
+
+**Design do panfleto até A4:** Criação da arte; impressão e distribuição são contratadas nas linhas próprias. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: ADM Agência · design gráfico](https://admagenciadigital.com.br/tabela-de-precos-de-design-grafico/) · consulta 07/10/2026.
+
+> **Dependência obrigatória:** Contratar impressão e distribuição na mesma quantidade. O design é cobrado uma vez por produto e mês.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Panfletos · distribuição
 
 Entrega dos panfletos em locais de circulação. Este custo não inclui a impressão do material.
 
-**Quando considerar:** Contato direcionado e divulgação local.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 0,18 | unidade |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 0,18** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 0,18 por unidade. Quantidade × valor unitário.
+**Praça / público:** Contato direcionado e divulgação local.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Tarifa original por unidade distribuída. Arte e impressão são separadas.
+
+> **Dependência obrigatória:** Exige impressão na mesma quantidade; distribuição não inclui arte nem impressão.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Mala direta
 
 Material impresso enviado por correio. Na tabela do jogo o custo por peça inclui impressão e postagem.
 
-**Quando considerar:** Contato direcionado e divulgação local.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 1,50 | peça |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1,50** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 1,50 por peça. Quantidade × valor unitário.
+**Praça / público:** Contato direcionado e divulgação local.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Pacote do jogo inclui impressão e postagem da peça.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Telemarketing
 
 Campanha mensal de contato telefônico. Adequada a ofertas que precisam de conversa; use contatos autorizados e respeite preferências.
 
-**Quando considerar:** Contato direcionado e divulgação local.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 1.500,00 | campanha mensal |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 1.500,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 1.500,00 por campanha mensal. Quantidade × valor unitário.
+**Praça / público:** Contato direcionado e divulgação local.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Pacote mensal do jogo inclui operação básica terceirizada.
+
+</div>
+
+---
+
+
+### Notas de auditoria de escopo
+
+Produção isolada não compra audiência. Contrate serviços e veiculação necessários; não confunda impressões, alcance único e novos clientes. Escopos especiais e orçamentos informados estão separados das referências públicas.
+
 
 ## Relações públicas
+
+<div class="media-card">
 
 ### Assessoria de imprensa
 
 Serviço mensal de relacionamento com a imprensa e preparação de pautas. Busca cobertura editorial, sem garantir publicação.
 
-**Quando considerar:** Credibilidade e relacionamento com veículos de comunicação.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 3.800,00 | mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 3.800,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 3.800,00 por mês. Quantidade × valor unitário.
+**Praça / público:** Credibilidade e relacionamento com veículos de comunicação.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Honorários mensais do serviço de assessoria; não garantem publicação.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Comunicado à imprensa
 
 Preparação e envio de comunicado oficial à imprensa. A compra de um release não é compra de espaço editorial.
 
-**Quando considerar:** Credibilidade e relacionamento com veículos de comunicação.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 280,00 | release |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 280,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 280,00 por release. Quantidade × valor unitário.
+**Praça / público:** Credibilidade e relacionamento com veículos de comunicação.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Pacote do jogo inclui redação e envio do comunicado.
+
+</div>
+
+---
+
+
+### Notas de auditoria de escopo
+
+Produção isolada não compra audiência. Contrate serviços e veiculação necessários; não confunda impressões, alcance único e novos clientes. Escopos especiais e orçamentos informados estão separados das referências públicas.
+
 
 ## Promoção
+
+<div class="media-card">
 
 ### Brindes
 
 Objetos promocionais com a marca entregues ao público. O custo é por unidade e a utilidade do item influencia sua lembrança.
 
-**Quando considerar:** Contato e lembrança da marca por meio de objetos úteis.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 8,00 | unidade |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 8,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 8,00 por unidade. Quantidade × valor unitário.
+**Praça / público:** Contato e lembrança da marca por meio de objetos úteis.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** Pacote didático de brinde básico personalizado por unidade; itens especiais e frete variam.
+
+</div>
+
+---
+
+
+### Notas de auditoria de escopo
+
+Produção isolada não compra audiência. Contrate serviços e veiculação necessários; não confunda impressões, alcance único e novos clientes. Escopos especiais e orçamentos informados estão separados das referências públicas.
+
 
 ## Product placement
+
+<div class="media-card">
 
 ### Product placement simples
 
 Presença do produto em uma cena de conteúdo audiovisual. A marca aparece no contexto, sem ser necessariamente um comercial separado.
 
-**Quando considerar:** Associação da marca ao contexto de conteúdo audiovisual.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 6.000,00 | ação |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 6.000,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 6.000,00 por ação. Quantidade × valor unitário.
+**Praça / público:** Associação da marca ao contexto de conteúdo audiovisual.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+> **Orçamento obrigatório, fora do subtotal:** Amostras, frete e direitos de uso; negociação com a produção audiovisual. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Product placement premium
 
 Inserção destacada ou recorrente em conteúdo audiovisual. Busca maior destaque que a inserção simples.
 
-**Quando considerar:** Associação da marca ao contexto de conteúdo audiovisual.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 18.000,00 | ação |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 18.000,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 18.000,00 por ação. Quantidade × valor unitário.
+**Praça / público:** Associação da marca ao contexto de conteúdo audiovisual.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+> **Orçamento obrigatório, fora do subtotal:** Amostras, frete e direitos de uso; negociação com a produção audiovisual. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
+
+</div>
+
+---
+
+
+### Notas de auditoria de escopo
+
+Produção isolada não compra audiência. Contrate serviços e veiculação necessários; não confunda impressões, alcance único e novos clientes. Escopos especiais e orçamentos informados estão separados das referências públicas.
+
 
 ## Display
+
+<div class="media-card">
 
 ### Leaderboard 728×90
 
 Banner horizontal de 728×90 pixels, normalmente no topo de uma página web. A cobrança no jogo é por mil impressões.
 
-**Quando considerar:** Exposição visual em sites e aplicativos.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 10,00 | mil impressões |
+| Design da peça digital | R$ 80,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 90,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 10,00 por mil impressões. Quantidade × valor unitário.
+**Praça / público:** Exposição visual em sites e aplicativos.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Retângulo médio 300×250
 
 Banner retangular de 300×250 pixels, integrado ao conteúdo ou à lateral de uma página. É um formato comum de display.
 
-**Quando considerar:** Exposição visual em sites e aplicativos.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 12,00 | mil impressões |
+| Design da peça digital | R$ 80,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 92,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 12,00 por mil impressões. Quantidade × valor unitário.
+**Praça / público:** Exposição visual em sites e aplicativos.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Half page 300×600
 
 Banner vertical de 300×600 pixels. Oferece grande área visual na lateral da página.
 
-**Quando considerar:** Exposição visual em sites e aplicativos.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 17,00 | mil impressões |
+| Design da peça digital | R$ 80,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 97,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 17,00 por mil impressões. Quantidade × valor unitário.
+**Praça / público:** Exposição visual em sites e aplicativos.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Skyscraper 160×600
 
 Banner vertical estreito de 160×600 pixels. Ocupa uma faixa lateral da página.
 
-**Quando considerar:** Exposição visual em sites e aplicativos.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 8,00 | mil impressões |
+| Design da peça digital | R$ 80,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 88,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 8,00 por mil impressões. Quantidade × valor unitário.
+**Praça / público:** Exposição visual em sites e aplicativos.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Billboard 970×250
 
 Banner grande de 970×250 pixels, normalmente no topo. Busca destaque em telas maiores.
 
-**Quando considerar:** Exposição visual em sites e aplicativos.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 21,00 | mil impressões |
+| Design da peça digital | R$ 80,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 101,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 21,00 por mil impressões. Quantidade × valor unitário.
+**Praça / público:** Exposição visual em sites e aplicativos.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Interstitial
 
 Anúncio que ocupa a tela entre etapas de navegação. Tem grande visibilidade, mas pode interromper a experiência do usuário.
 
-**Quando considerar:** Exposição visual em sites e aplicativos.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 35,00 | mil impressões |
+| Design da peça digital | R$ 80,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 115,00** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 35,00 por mil impressões. Quantidade × valor unitário.
+**Praça / público:** Exposição visual em sites e aplicativos.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+<div class="media-card">
 
 ### Native Ads
 
 Anúncio que acompanha o formato visual do conteúdo de um site. Deve permanecer identificado como publicidade; no jogo é comprado por clique.
 
-**Quando considerar:** Exposição visual em sites e aplicativos.
+| Ativo / despesa | Valor | Unidade / regra |
+|---|---:|---|
+| Mídia / pacote original | R$ 0,50 | clique |
+| Design da peça digital | R$ 80,00 | Por formato, produto e mês |
+| **Subtotal precificado · 1 unidade de mídia** | **R$ 80,50** | Acrescentar orçamento sob consulta quando exigido |
 
-**Compra no jogo:** R$ 0,50 por clique. Quantidade × valor unitário.
+**Praça / público:** Exposição visual em sites e aplicativos.
 
-Valores didáticos da simulação; alcance, cliques e vendas são resultados diferentes. Produção e condições reais de contratação podem variar.
+**Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
+
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+
+</div>
+
+---
+
+## Notas finais de auditoria de escopo
+
+- Panfletos: impressão e distribuição na mesma quantidade; arte separada, cobrada uma vez.
+- Jingle: já é produção. Exige rádio/streaming e substitui o áudio simples, sem cobrança duplicada.
+- Frontlight: iluminação frontal. Lona translúcida com iluminação traseira é característica de backlight, não de todo frontlight.
+- Cinema: adaptar o master às exigências do exibidor e verificar direitos. O piso de filme básico não é garantia de qualquer licenciamento.
+- Custos de instalação, licenciamento, amostras, frete e cachês não estão automaticamente incluídos em um preço de produção simples.
+- O valor de mídia do jogo não é uma cotação atual de espaço publicitário. As fontes de serviços podem conter preços iniciais e condições próprias.
+- Um subtotal sem os serviços sob consulta não representa contratação completa. O envio é bloqueado até informar esses orçamentos.
+- O custo de serviço informado pela equipe tem fonte registrada, mas não é autenticado automaticamente pelo sistema.
+- Despesas aparecem uma vez no marketing; a abertura por produto explica o gasto, sem nova cobrança.
+
+## Fontes de preço de serviços
+
+- [Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) — A partir de R$ 3.000; filme principal master (15s, 30s ou 60s). Consulta 07/10/2026.
+- [Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) — Motion 15–30s — R$ 990+. Consulta 07/10/2026.
+- [Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) — Anúncio revista/jornal: 1/4 página 580,90; 1/2 página 780,90; 1 página 850,20; página dupla 1.200,00. Data editorial não informada. Consulta 07/10/2026.
+- [ADM Agência · design gráfico](https://admagenciadigital.com.br/tabela-de-precos-de-design-grafico/) — Flyer/Panfleto até A4: R$ 350. Não somos gráfica e os custos de impressão não estão inclusos. Consulta 07/10/2026.
+- [GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) — Spot simples a partir de R$ 199,00: locução e trilha. Consulta 07/10/2026.
+- [BannerJÁ · painel em lona](https://www.bannerja.com.br/categoria/painel-lona) — Painel em lona simples: a partir de R$ 46/m². Consulta 07/10/2026.
+- [Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) — Arte de Post Instagram - Unitária R$ 80,00; Arte para Carrossel Instagram R$ 120,00. Consulta 07/10/2026.
+- [DivulgaAI · gestão Google Ads](https://divulgaai.com.br/) — Gestão Google Ads: R$ 297/mês; verba de mídia paga diretamente ao Google. Consulta 07/10/2026.
+- [We Do Logos · layout de e-mail marketing](https://www.wedologos.com.br/comprar/layoutemailmkt.aspx) — Projeto de E-mail Marketing pelo valor de R$ 545,00; um email marketing sem html. Consulta 07/10/2026.
+- [Imprima Aqui · outdoor 9×3](https://imprimaaqui.com.br/produto/comprar/1/outdoor-9x3) — Criação de arte: R$ 150,00 uni. Consulta 07/10/2026.
