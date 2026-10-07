@@ -34,6 +34,7 @@ function Moldura({ children }: { children: React.ReactNode }) {
         </div>
         <footer className="flex flex-col gap-2 border-t border-white/15 pt-5 text-sm sm:flex-row sm:items-center sm:justify-between">
           <p className="font-semibold text-white">Criado por: Professor Guandalini.</p>
+          <p className="text-blue-200"><span className="font-bold text-[#FFC233]">Simula+</span> — Simulações de negócios para decisões reais.</p>
         </footer>
       </div>
     </main>
