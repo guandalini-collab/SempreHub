@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import logoSempreHub from "../assets/logo-semprehub.png";
+import logoSempreHub from "../assets/logo-semprehub.svg";
 import { api, iniciarSessao } from "../api";
 import { Aviso, Botao, Campo, EntradaSenha, estiloEntrada } from "../componentes/ui";
 import type { Papel, Usuario } from "../tipos";

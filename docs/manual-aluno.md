@@ -1,6 +1,6 @@
 <div class="cover">
 
-![Logo SempreHub](../frontend/src/assets/logo-semprehub.png)
+![Logo SempreHub](../frontend/src/assets/logo-semprehub.svg)
 
 <p class="kicker">Simulador de empreendedorismo universitário</p>
 

@@ -1,6 +1,6 @@
 import React from "react";
 
-import logoSempreHub from "../assets/logo-semprehub.png";
+import logoSempreHub from "../assets/logo-semprehub.svg";
 import { NOME_FASE, corFase, reais } from "../formatos";
 import type { Dre, FaseAtual, Usuario } from "../tipos";
 

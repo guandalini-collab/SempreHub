@@ -1,6 +1,6 @@
 <div class="cover">
 
-<img src="../frontend/src/assets/logo-semprehub.png" alt="SempreHub" />
+<img src="../frontend/src/assets/logo-semprehub.svg" alt="SempreHub" />
 
 <span class="kicker">Simula+ · Planejamento de mídia corporativa</span>
 
