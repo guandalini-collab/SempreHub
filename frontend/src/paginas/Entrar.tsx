@@ -13,9 +13,12 @@ function Moldura({ children }: { children: React.ReactNode }) {
       <div aria-hidden="true" className="pointer-events-none absolute -left-32 -top-40 h-[580px] w-[580px] rounded-full bg-blue-600/20 blur-[100px]" />
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 right-0 h-[500px] w-[500px] rounded-full bg-cyan-500/10 blur-[100px]" />
       <div className="relative mx-auto max-w-6xl px-5 py-6 sm:px-8 lg:py-10">
-        <header className="flex flex-wrap items-center justify-between gap-4">
+        <header className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6">
           <img src={logoSempreHub} alt="SempreHub" className="w-48 rounded-xl bg-white px-3 py-2 sm:w-56" />
-          <p className="hidden text-xs font-semibold uppercase tracking-[0.18em] text-blue-200 sm:block">Simulador de empreendedorismo</p>
+          <div className="space-y-1 text-sm sm:border-l sm:border-white/20 sm:pl-6">
+            <p className="font-semibold text-white">Criado por: Professor Guandalini.</p>
+            <p className="text-blue-200"><span className="font-bold text-[#FFC233]">Simula+</span> — Simulações de negócios para decisões reais.</p>
+          </div>
         </header>
         <div className="grid items-center gap-8 py-8 sm:py-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
           <section aria-labelledby="apresentacao-titulo">
@@ -32,10 +35,6 @@ function Moldura({ children }: { children: React.ReactNode }) {
           </section>
           <section aria-label="Acesso ao SempreHub" className="rounded-3xl border border-white/20 bg-white p-6 text-marinho shadow-2xl sm:p-8">{children}</section>
         </div>
-        <footer className="flex flex-col gap-2 border-t border-white/15 pt-5 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-semibold text-white">Criado por: Professor Guandalini.</p>
-          <p className="text-blue-200"><span className="font-bold text-[#FFC233]">Simula+</span> — Simulações de negócios para decisões reais.</p>
-        </footer>
       </div>
     </main>
   );
