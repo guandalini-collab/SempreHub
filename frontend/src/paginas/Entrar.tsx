@@ -34,7 +34,6 @@ function Moldura({ children }: { children: React.ReactNode }) {
         </div>
         <footer className="flex flex-col gap-2 border-t border-white/15 pt-5 text-sm sm:flex-row sm:items-center sm:justify-between">
           <p className="font-semibold text-white">Criado por: Professor Guandalini.</p>
-          <p className="text-blue-200">Instituto Federal Farroupilha</p>
         </footer>
       </div>
     </main>
