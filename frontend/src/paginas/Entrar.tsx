@@ -9,23 +9,21 @@ type Modo = "entrar" | "cadastro" | "recuperar";
 
 function Moldura({ children }: { children: React.ReactNode }) {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#081833] text-white">
+    <main className="relative h-dvh overflow-hidden bg-[#081833] text-white">
       <div aria-hidden="true" className="pointer-events-none absolute -left-32 -top-40 h-[580px] w-[580px] rounded-full bg-blue-600/20 blur-[100px]" />
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 right-0 h-[500px] w-[500px] rounded-full bg-cyan-500/10 blur-[100px]" />
-      <div className="relative mx-auto max-w-6xl px-5 py-6 sm:px-8 lg:py-10">
-        <header className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6">
+      <div className="relative mx-auto flex h-full w-full max-w-6xl flex-col px-5 pt-4 sm:px-8 sm:pt-5">
+        <header className="flex shrink-0 flex-wrap items-center justify-between gap-4">
           <img src={logoSempreHub} alt="SempreHub" className="w-48 rounded-xl bg-white px-3 py-2 sm:w-56" />
-          <div className="space-y-1 text-sm sm:border-l sm:border-white/20 sm:pl-6">
-            <p className="font-semibold text-white">Criado por: Professor Guandalini.</p>
-            <p className="text-blue-200"><span className="font-bold text-[#FFC233]">Simula+</span> — Simulações de negócios para decisões reais.</p>
-          </div>
+          <p className="hidden text-xs font-semibold uppercase tracking-[0.18em] text-blue-200 sm:block">Simulador de empreendedorismo</p>
         </header>
-        <div className="grid items-center gap-8 py-8 sm:py-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+        <div role="region" aria-label="Apresentação e acesso" tabIndex={0} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="grid min-h-full items-center gap-6 py-5 sm:py-6 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
           <section aria-labelledby="apresentacao-titulo">
             <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-2 text-xs font-semibold text-cyan-200"><span aria-hidden="true" className="h-2 w-2 rounded-full bg-cyan-300" />Aprenda empreendendo</p>
             <h1 id="apresentacao-titulo" className="max-w-xl text-4xl font-bold leading-[1.12] tracking-tight sm:text-5xl lg:text-6xl">Suas decisões.<br /><span className="text-[#FFC233]">O futuro da sua empresa.</span></h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-blue-100 sm:text-lg">Enfrente a concorrência, planeje seus investimentos e descubra o impacto de cada escolha em uma simulação de negócios.</p>
-            <div className="mt-7 hidden gap-3 sm:grid sm:grid-cols-3 lg:grid-cols-1">
+            <div className="mt-5 hidden gap-3 sm:grid sm:grid-cols-3">
               {[
                 ["01", "Decida", "Marketing, finanças, produção e logística."],
                 ["02", "Dispute", "Sua empresa compete em um mercado compartilhado."],
@@ -35,6 +33,11 @@ function Moldura({ children }: { children: React.ReactNode }) {
           </section>
           <section aria-label="Acesso ao SempreHub" className="rounded-3xl border border-white/20 bg-white p-6 text-marinho shadow-2xl sm:p-8">{children}</section>
         </div>
+        </div>
+        <footer role="contentinfo" className="flex shrink-0 flex-col gap-1 border-t border-white/15 py-3 text-xs sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-sm" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
+          <p className="font-semibold text-white">Criado por: Professor Guandalini.</p>
+          <p className="text-blue-200"><span className="font-bold text-[#FFC233]">Simula+</span> — Simulações de negócios para decisões reais.</p>
+        </footer>
       </div>
     </main>
   );
