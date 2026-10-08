@@ -225,7 +225,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
         </div>
 
         {empresa.fase_atual === "SOBREVIVENCIA" && (
-          <div className="mt-4 animate-pulse rounded-lg bg-red-600 px-4 py-2 text-sm font-bold uppercase tracking-wide">
+          <div className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-bold uppercase tracking-wide">
             Alerta: estado de sobrevivência — o caixa não cobre um mês de custos fixos
           </div>
         )}
