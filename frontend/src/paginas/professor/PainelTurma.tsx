@@ -4,7 +4,7 @@ import ManualMidias from "../../componentes/ManualMidias";
 import { ResumoAnalises } from "../../componentes/FerramentasEstrategicas";
 import { Conquistas, type Jornada } from "../../componentes/Experiencia";
 import LayoutPainel, { SecaoPainel } from "../../componentes/LayoutPainel";
-import { GestaoMercado } from "../../componentes/MercadoReal";
+import { GestaoMercado, RelatoriosEmpresariaisProfessor } from "../../componentes/MercadoReal";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, baixarArquivo } from "../../api";
@@ -263,6 +263,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         </Cartao>
       </SecaoPainel>
       <SecaoPainel id="resultados" ativa={secao}>
+      <RelatoriosEmpresariaisProfessor turmaId={turmaId} ultimaRodada={rodadasJogadas} empresas={empresas} />
       {rodadasJogadas === 0 && <Cartao titulo="Resultados ainda indisponíveis"><p>Os gráficos e indicadores serão disponibilizados após o encerramento da primeira rodada. As empresas podem ser acompanhadas em Alunos e empresas.</p></Cartao>}
       {turma.modo_jogo !== "LEGADO" && <RelatorioPedagogico turmaId={turma.id} rodada={turma.rodada_atual} temResultados={rodadasJogadas > 0} abrirEmpresa={setEmpresaAberta} />}
 
