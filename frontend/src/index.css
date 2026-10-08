@@ -22,7 +22,7 @@
 @layer base {
   body { background: #f3f5fa; }
   button, summary, input, select, textarea { touch-action: manipulation; }
-  button:focus-visible, summary:focus-visible { outline: 3px solid #FFC233; outline-offset: 3px; }
+  button:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
   input[type="range"] { min-height: 36px; cursor: pointer; }
   [hidden] { display: none !important; }
 }
