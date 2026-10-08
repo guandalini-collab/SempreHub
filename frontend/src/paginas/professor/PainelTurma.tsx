@@ -280,9 +280,9 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
                         {aberta && (
                           <td className="py-2 text-center">
                             {empresa.decisao_enviada ? (
-                              <span className="text-emerald-600" title={turma.modo_equipe ? "Decisão confirmada pela equipe" : "Decisão enviada"}>✔</span>
+                              <span className="text-emerald-600" title={turma.modo_equipe ? "Decisão confirmada pela equipe" : "Decisão enviada"}>{turma.modo_equipe ? "Confirmada" : "Enviada"}</span>
                             ) : (
-                              <span className="text-amber-600" title={empresa.equipe_pendencias?.join("; ") || "Ainda não enviou"}>…</span>
+                              <span className="text-amber-800">Pendente{empresa.equipe_pendencias?.length ? <span className="mt-1 block text-xs">{empresa.equipe_pendencias.join("; ")}</span> : null}</span>
                             )}
                           </td>
                         )}
