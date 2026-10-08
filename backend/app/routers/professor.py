@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from .. import serializacao as ser
 from ..experiencia import jornada_empresa
 from ..database import get_db
-from ..equipes import bloquear_turma, dados_equipe, decisao_atual, pendencias_equipe, pendencias_fechamento, verificar_rodada
+from ..equipes import bloquear_turma, novo_convite, invalidar_aprovacoes, registrar, dados_equipe, decisao_atual, pendencias_equipe, pendencias_fechamento, verificar_rodada
 from ..models import Decisao, Empresa, MembroEmpresa, Papel, Resultado, StatusTurma, Turma, Usuario
 from ..motor.eventos import opcoes_evento
 from ..motor.simulacao import processar_rodada
@@ -71,6 +71,7 @@ def atualizar_parametros(
 ):
     turma = _turma_do_professor(db, turma_id, professor)
     turma = bloquear_turma(db, turma.id)
+    campos_concorrencia = {"concorrentes_virtuais", "nivel_concorrencia", "estrutura_mercado", "forca_concorrentes"}
     for campo in ("modo_jogo", "cenario", "configuracao_simulacao"):
         if campo in dados.model_fields_set:
             atual = getattr(turma, campo)
@@ -78,16 +79,32 @@ def atualizar_parametros(
             if campo == "configuracao_simulacao":
                 from ..motor.avancado import config
                 atual = config(turma)
+                atual = {k: v for k, v in atual.items() if k not in campos_concorrencia}
+                novo = {k: v for k, v in novo.items() if k not in campos_concorrencia}
             if novo != atual and (turma.empresas or turma.rodada_atual > 1):
                 raise HTTPException(422, "Escolha o modo, cenário e configuração da simulação antes de criar empresas.")
-    if "modo_equipe" in dados.model_fields_set and dados.modo_equipe != turma.modo_equipe:
+    converter_equipes = "modo_equipe" in dados.model_fields_set and dados.modo_equipe and not turma.modo_equipe
+    if "modo_equipe" in dados.model_fields_set and not dados.modo_equipe and turma.modo_equipe:
         if turma.rodada_atual > 1 or turma.empresas:
-            raise HTTPException(422, "Escolha o modo de equipes antes de criar empresas ou fechar a primeira rodada.")
+            raise HTTPException(422, "Uma turma com empresas não pode voltar ao modo individual.")
+    if converter_equipes:
+        turma.modo_equipe = True
+        for empresa in turma.empresas:
+            empresa.codigo_convite = empresa.codigo_convite or novo_convite()
+            if not any(m.aluno_id == empresa.aluno_id for m in empresa.membros):
+                db.add(MembroEmpresa(empresa_id=empresa.id, turma_id=turma.id, aluno_id=empresa.aluno_id, cargos=["CEO"]))
+            versao = invalidar_aprovacoes(db, empresa)
+            registrar(db, empresa, empresa.aluno, "CONVERTER_EQUIPE", versao, {"professor_id": professor.id})
     if turma.rodada_atual > 1:
         # Depois da 1ª rodada só o número total de rodadas pode mudar, para não distorcer a competição
         if dados.total_rodadas < turma.rodada_atual - 1:
             raise HTTPException(422, "O total de rodadas não pode ser menor que as rodadas já jogadas.")
         turma.total_rodadas = dados.total_rodadas
+        if "configuracao_simulacao" in dados.model_fields_set:
+            from ..motor.avancado import config
+            configuracao = config(turma)
+            configuracao.update({k: v for k, v in dados.configuracao_simulacao.model_dump().items() if k in campos_concorrencia})
+            turma.configuracao_simulacao = configuracao
         if turma.rodada_atual <= turma.total_rodadas:
             turma.status = StatusTurma.ABERTA
     else:
