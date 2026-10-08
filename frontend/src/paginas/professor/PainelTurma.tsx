@@ -33,63 +33,16 @@ import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
 
 const ITENS_PAINEL = [
-  {
-    "id": "rodada",
-    "titulo": "Acompanhar rodada",
-    "descricao": "Confira o andamento das decisões.",
-    "simbolo": "→",
-    "grupo": "Rodada atual"
-  },
-  {
-    "id": "equipes",
-    "titulo": "Ver alunos, empresas e pendências",
-    "descricao": "Confira equipes, decisões e ranking.",
-    "simbolo": "→",
-    "grupo": "Rodada atual"
-  },
-  {
-    "id": "mercado",
-    "titulo": "Preparar notícias e produtos",
-    "descricao": "Pesquise, revise e publique o mercado.",
-    "simbolo": "→",
-    "grupo": "Rodada atual"
-  },
-  {
-    "id": "resultados",
-    "titulo": "Ver resultados do mês",
-    "descricao": "Compare resultados e análises da turma.",
-    "simbolo": "→",
-    "grupo": "Rodada atual"
-  },
-  {
-    "id": "fechamento",
-    "titulo": "Fechar mês (rodada)",
-    "descricao": "Confira pendências e confirme o encerramento.",
-    "simbolo": "→",
-    "grupo": "Rodada atual"
-  },
-  {
-    "id": "visao",
-    "titulo": "Resumo e código da turma",
-    "descricao": "Dados gerais e código de entrada.",
-    "simbolo": "→",
-    "grupo": "Minha turma"
-  },
-  {
-    "id": "configuracao",
-    "titulo": "Configurações e exportação",
-    "descricao": "Ajuste parâmetros e exporte dados.",
-    "simbolo": "→",
-    "grupo": "Minha turma"
-  },
-  { "id": "midias", "titulo": "Manual de mídias", "descricao": "Formatos, objetivos e custos das campanhas.", "simbolo": "◉", "grupo": "Ajuda" },
-  {
-    "id": "aprendizagem",
-    "titulo": "Manuais e materiais",
-    "descricao": "Ferramentas e apoio à simulação.",
-    "simbolo": "→",
-    "grupo": "Ajuda"
-  }
+  { id: "visao", titulo: "1. Dados e código", descricao: "Confira a turma e compartilhe o código de entrada com os alunos.", simbolo: "", grupo: "Preparar turma" },
+  { id: "configuracao", titulo: "2. Configurar simulação", descricao: "Revise os parâmetros antes de orientar os alunos.", simbolo: "", grupo: "Preparar turma" },
+  { id: "equipes", titulo: "3. Conferir participantes", descricao: "Confira alunos, empresas e pendências de envio.", simbolo: "", grupo: "Preparar turma" },
+  { id: "mercado", titulo: "4. Preparar rodada", descricao: "Pesquise, revise e publique notícias e produtos para os alunos.", simbolo: "", grupo: "Conduzir rodada" },
+  { id: "rodada", titulo: "5. Acompanhar envios", descricao: "Acompanhe as decisões e veja o que falta para encerrar a rodada.", simbolo: "", grupo: "Conduzir rodada" },
+  { id: "fechamento", titulo: "6. Encerrar rodada", descricao: "Confira os envios, escolha o evento e confirme o cálculo dos resultados.", simbolo: "", grupo: "Conduzir rodada" },
+  { id: "resultados", titulo: "7. Consultar resultados", descricao: "Analise os resultados. Para a próxima rodada, retome a etapa 4 no menu lateral.", simbolo: "", grupo: "Consultar resultados" },
+  { id: "aprendizagem", titulo: "Autores e referências", descricao: "Consulte as referências para orientar a atividade.", simbolo: "", grupo: "Apoio" },
+  { id: "analises", titulo: "Ferramentas de análise", descricao: "Consulte os conceitos e as ferramentas para orientar os alunos.", simbolo: "", grupo: "Apoio" },
+  { id: "midias", titulo: "Guia de campanhas", descricao: "Consulte os formatos, objetivos e custos das campanhas.", simbolo: "", grupo: "Apoio" },
 ];
 
 const INTERVALO_ATUALIZACAO_MS = 15000;
@@ -100,7 +53,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const [erro, setErro] = useState<string | null>(null);
   const [empresaAberta, setEmpresaAberta] = useState<number | null>(null);
   const [editandoParametros, setEditandoParametros] = useState(false);
-  const [secao, setSecao] = useState("rodada");
+  const [secao, setSecao] = useState("visao");
   const sequenciaCarga = useRef(0);
   const [historicos, setHistoricos] = useState<Record<number, Resultado[]>>({});
 
@@ -180,7 +133,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       </div>
 
       <Cartao titulo="Prontidão da turma"><p className="mb-3 text-sm text-slate-600">{enviadas} de {empresas.length} empresas prontas nesta rodada</p><div className="h-3 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label="Empresas com decisões enviadas" aria-valuenow={empresas.length ? Math.round(enviadas / empresas.length * 100) : 0} aria-valuemin={0} aria-valuemax={100}><div className="h-full bg-emerald-500 transition-all" style={{ width: `${empresas.length ? enviadas / empresas.length * 100 : 0}%` }} /></div><p className="mt-3 text-xs text-slate-500">As decisões e confirmações das equipes atualizam este painel automaticamente.</p></Cartao>
-      <Cartao titulo="Próximos passos"><div className="grid gap-3 sm:grid-cols-3"><Botao variante="secundario" onClick={() => setSecao("mercado")}>1. Preparar mercado</Botao><Botao variante="secundario" onClick={() => setSecao("equipes")}>2. Acompanhar empresas</Botao><Botao onClick={() => setSecao("rodada")}>3. Gerenciar rodada</Botao></div><p className="mt-4 text-sm">{aberta ? `${enviadas} de ${empresas.length} empresas com decisões enviadas. Confira as pendências antes de encerrar a rodada.` : "Simulação concluída. Consulte os resultados da turma."}</p></Cartao>
+
       </SecaoPainel>
       {erro && <Aviso>{erro}</Aviso>}
 
@@ -189,11 +142,24 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       </SecaoPainel>
       <SecaoPainel id="midias" ativa={secao}><ManualMidias /></SecaoPainel>
       <SecaoPainel id="aprendizagem" ativa={secao}>
-      <BibliotecaAprendizagem mercadoSeparado rodada={turma.rodada_atual} modo={turma.modo_jogo} />
+      <BibliotecaAprendizagem mercadoSeparado conteudo="REFERENCIAS" rodada={turma.rodada_atual} modo={turma.modo_jogo} />
 
       </SecaoPainel>
+      <SecaoPainel id="analises" ativa={secao}><BibliotecaAprendizagem mercadoSeparado conteudo="ANALISES" rodada={turma.rodada_atual} modo={turma.modo_jogo} /></SecaoPainel>
       <SecaoPainel id="rodada" ativa={secao}>
-      <Cartao titulo={`Acompanhar rodada ${Math.min(turma.rodada_atual, turma.total_rodadas)}`}><p className="mb-4">{enviadas} de {empresas.length} empresas com decisões enviadas. Confira as empresas e prepare o mercado por estes atalhos.</p><div className="flex flex-wrap gap-3"><Botao variante="secundario" onClick={() => setSecao("equipes")}>Ver alunos, empresas e pendências</Botao><Botao variante="secundario" onClick={() => setSecao("mercado")}>Preparar notícias e produtos</Botao><Botao variante="secundario" onClick={() => setSecao("resultados")}>Ver resultados da turma</Botao><Botao onClick={() => setSecao("fechamento")}>Ir para fechar mês</Botao></div></Cartao>
+      <Cartao titulo="Situação da rodada">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="rounded-lg bg-slate-50 p-4"><p className="text-sm text-slate-600">Empresas</p><p className="text-2xl font-bold">{empresas.length}</p></div>
+          <div className="rounded-lg bg-emerald-50 p-4"><p className="text-sm text-emerald-800">Decisões prontas</p><p className="text-2xl font-bold">{aberta ? enviadas : "—"}</p></div>
+          <div className="rounded-lg bg-amber-50 p-4"><p className="text-sm text-amber-900">Envios pendentes</p><p className="text-2xl font-bold">{aberta ? empresas.length - enviadas : "—"}</p></div>
+        </div>
+        <div className="mt-5 border-t border-slate-200 pt-4">
+          <h3 className="font-semibold">O que fazer agora</h3>
+          <p className="mt-2 text-sm text-slate-600">{!aberta ? "A simulação terminou. Consulte os resultados das empresas." : empresas.length === 0 ? "Compartilhe o código de entrada para os alunos participarem da turma." : enviadas < empresas.length ? "Confira as empresas com envio pendente antes de encerrar a rodada." : "Todos os envios estão prontos. Confira o evento e encerre a rodada para calcular os resultados."}</p>
+
+          <p className="mt-3 text-xs text-slate-500">Continue pelo menu lateral: etapa 3 para conferir participantes e pendências; etapa 6 quando estiver pronto para encerrar. Os resultados só são calculados após confirmar o encerramento.</p>
+        </div>
+      </Cartao>
       </SecaoPainel>
       <SecaoPainel id="fechamento" ativa={secao}>
           {aberta ? (
@@ -236,7 +202,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
           </Cartao>
       </SecaoPainel>
       <SecaoPainel id="equipes" ativa={secao}>
-        <Cartao titulo={turma.modo_jogo === "LEGADO" ? "Ranking (patrimônio = caixa − dívida)" : "Ranking por patrimônio"} className="lg:col-span-3">
+        <Cartao titulo="Envios e empresas da turma" className="lg:col-span-3">
           {empresas.length === 0 ? (
             <p className="text-sm text-slate-500">
               Nenhum aluno entrou ainda. Divulgue o código <strong className="font-mono">{turma.codigo}</strong>.
@@ -280,9 +246,9 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
                         {aberta && (
                           <td className="py-2 text-center">
                             {empresa.decisao_enviada ? (
-                              <span className="text-emerald-600" title={turma.modo_equipe ? "Decisão confirmada pela equipe" : "Decisão enviada"}>✔</span>
+                              <span className="text-emerald-600" title={turma.modo_equipe ? "Decisão confirmada pela equipe" : "Decisão enviada"}>{turma.modo_equipe ? "Confirmada" : "Enviada"}</span>
                             ) : (
-                              <span className="text-amber-600" title={empresa.equipe_pendencias?.join("; ") || "Ainda não enviou"}>…</span>
+                              <span className="text-amber-800">Pendente{empresa.equipe_pendencias?.length ? <span className="mt-1 block text-xs">{empresa.equipe_pendencias.join("; ")}</span> : null}</span>
                             )}
                           </td>
                         )}
