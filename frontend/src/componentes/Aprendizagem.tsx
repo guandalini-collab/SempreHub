@@ -241,8 +241,9 @@ export function TourGuiado({ perfil }: { perfil: PerfilAprendizagem }) {
   );
 }
 
-export function BibliotecaAprendizagem({ rodada, modo, empresaId, mercadoSeparado = false }: { rodada?: number; modo?: string; empresaId?: number; mercadoSeparado?: boolean }) {
-  const [aba, setAba] = useState<AbaBiblioteca>(mercadoSeparado ? "REFERENCIAS" : "NEWS");
+export function BibliotecaAprendizagem({ rodada, modo, empresaId, mercadoSeparado = false, conteudo }: { rodada?: number; modo?: string; empresaId?: number; mercadoSeparado?: boolean; conteudo?: AbaBiblioteca }) {
+  const [abaSelecionada, setAba] = useState<AbaBiblioteca>(mercadoSeparado ? "REFERENCIAS" : "NEWS");
+  const aba = conteudo ?? abaSelecionada;
   const noticias = useMemo(() => {
     if (!rodada) return noticiasBase;
     return noticiasBase.map((noticia) => ({ ...noticia, titulo: `Rodada ${rodada}: ${noticia.titulo}` }));
@@ -264,7 +265,7 @@ export function BibliotecaAprendizagem({ rodada, modo, empresaId, mercadoSeparad
         Use este material para justificar escolhas da simulação. As referências ajudam a formular hipóteses; os indicadores da sua empresa mostram o efeito de cada decisão.
         {modo === "STARTUP" ? " Em uma startup, observe também aquisição, retenção e capacidade de atendimento." : " Em uma empresa tradicional, conecte mercado, operação, estoque e caixa."}
       </p>
-      <div className="-mx-1 mb-5 flex gap-1 overflow-x-auto px-1 pb-1" role="tablist" aria-label="Biblioteca de aprendizagem">
+      {!conteudo && <div className="-mx-1 mb-5 flex gap-1 overflow-x-auto px-1 pb-1" role="tablist" aria-label="Biblioteca de aprendizagem">
         {abas.map((item) => (
           <button
             key={item.id}
@@ -277,7 +278,7 @@ export function BibliotecaAprendizagem({ rodada, modo, empresaId, mercadoSeparad
             {item.titulo}
           </button>
         ))}
-      </div>
+      </div>}
 
       {aba === "NEWS" && (empresaId ? <MercadoPublicado empresaId={empresaId} rodada={rodada ?? 1}/> : <p className="text-sm">Abra o painel da empresa para ler as edições do SempreHub News com os eventos e indicadores reais de mercado.</p>)}
       {aba === "REFERENCIAS" && <Referencias />}
