@@ -169,16 +169,16 @@ def processar_rodada(
 
     # 1. Efeitos macroeconômicos
     multiplicador_demanda = 1.0
-    if evento.codigo == "GREVE_LOGISTICA":
+    if evento.contem("GREVE_LOGISTICA"):
         turma.cmv_multiplicador = 1 + ev.AUMENTO_CMV_GREVE
         turma.cmv_rodadas_restantes = ev.DURACAO_GREVE_RODADAS
-    elif evento.codigo == "ALTA_SELIC":
+    if evento.contem("ALTA_SELIC"):
         turma.taxa_juros_mensal += ev.VARIACAO_SELIC
-    elif evento.codigo == "QUEDA_SELIC":
+    if evento.contem("QUEDA_SELIC"):
         turma.taxa_juros_mensal = max(ev.TAXA_JUROS_MINIMA, turma.taxa_juros_mensal - ev.VARIACAO_SELIC)
-    elif evento.codigo == "DEMANDA_AQUECIDA":
+    if evento.contem("DEMANDA_AQUECIDA"):
         multiplicador_demanda = 1 + ev.VARIACAO_DEMANDA
-    elif evento.codigo == "RETRACAO_ECONOMICA":
+    if evento.contem("RETRACAO_ECONOMICA"):
         multiplicador_demanda = 1 - ev.VARIACAO_DEMANDA
 
     multiplicador_cmv = turma.cmv_multiplicador if turma.cmv_rodadas_restantes > 0 else 1.0
@@ -519,7 +519,7 @@ def _apurar(
         c.alertas.append(f"Cheque especial: {_reais(juros_cheque)} de juros sobre o caixa negativo.")
 
     multas = 0.0
-    if evento.codigo == "NOTIFICACAO_FISCAL":
+    if evento.contem("NOTIFICACAO_FISCAL"):
         if empresa.networking < ev.NETWORKING_MINIMO_DEFESA_FISCAL:
             multas += ev.MULTA_NOTIFICACAO_FISCAL
             c.alertas.append("Notificação fiscal: sem apoio contábil da sua rede, a empresa pagou multa.")

@@ -90,10 +90,10 @@ export function EditorParametros({
   return (
     <div className="space-y-5">
       {exibirModo && <ConfiguracaoSimulacao valores={valores} aoMudar={(jogo) => aoMudar({ ...valores, ...jogo })} bloqueado={modoBloqueado || somenteRodadas} />}
-      {exibirModo && <Campo rotulo="Participação dos alunos" ajuda={modoBloqueado ? "O modo de participação fica definido quando a primeira empresa entra na turma." : "Em equipes, 3 a 5 alunos dividem os cargos e todos confirmam cada decisão."}>
-        <select className={estiloEntrada} disabled={modoBloqueado || somenteRodadas} value={valores.modo_equipe ? "EQUIPE" : "INDIVIDUAL"} onChange={(e) => aoMudar({ ...valores, modo_equipe: e.target.value === "EQUIPE" })}>
+      {exibirModo && <Campo rotulo="Participação dos alunos" ajuda={modoBloqueado ? "Ao converter para equipes, empresas e resultados são preservados. Cada aluno atual inicia como CEO; complete a equipe e confirme novamente as decisões da rodada atual." : "Em equipes, 3 a 5 alunos dividem os cargos e todos confirmam cada decisão."}>
+        <select className={estiloEntrada} value={valores.modo_equipe ? "EQUIPE" : "INDIVIDUAL"} onChange={(e) => aoMudar({ ...valores, modo_equipe: e.target.value === "EQUIPE" })}>
           <option value="EQUIPE">Equipes de 3 a 5 alunos</option>
-          <option value="INDIVIDUAL">Individual</option>
+          <option value="INDIVIDUAL" disabled={(modoBloqueado || somenteRodadas) && valores.modo_equipe}>Individual</option>
         </select>
       </Campo>}
       {GRUPOS.map((grupo) => (

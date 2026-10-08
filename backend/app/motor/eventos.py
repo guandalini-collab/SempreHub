@@ -6,7 +6,7 @@ O professor pode escolher o evento, sortear ou não aplicar nenhum.
 
 import random
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 
 @dataclass(frozen=True)
@@ -14,6 +14,10 @@ class Evento:
     codigo: str
     titulo: str
     narrativa: str
+    codigos: Tuple[str, ...] = ()
+
+    def contem(self, codigo: str) -> bool:
+        return codigo == self.codigo or codigo in self.codigos
 
 
 NENHUM = Evento(
@@ -79,14 +83,26 @@ def opcoes_evento() -> List[Dict[str, str]]:
 
 
 def escolher_evento(escolha: str, probabilidade: float, rng: Optional[random.Random] = None) -> Evento:
-    """escolha: 'SORTEAR', 'NENHUM' ou o código de um evento."""
+    """Sorteia até três eventos compatíveis, ou aplica uma escolha explícita."""
     rng = rng or random.Random()
     if escolha == "NENHUM":
         return NENHUM
     if escolha == "SORTEAR":
         if rng.random() >= probabilidade:
             return NENHUM
-        return rng.choice(list(EVENTOS.values()))
+        grupos = [
+            ["GREVE_LOGISTICA"], ["NOTIFICACAO_FISCAL"],
+            ["ALTA_SELIC", "QUEDA_SELIC"],
+            ["DEMANDA_AQUECIDA", "RETRACAO_ECONOMICA"],
+        ]
+        selecionados = [EVENTOS[rng.choice(grupo)] for grupo in rng.sample(grupos, rng.randint(1, 3))]
+        if len(selecionados) == 1:
+            return selecionados[0]
+        return Evento(
+            "MULTIPLOS", " + ".join(e.titulo for e in selecionados),
+            "\n\n".join(e.narrativa for e in selecionados),
+            tuple(e.codigo for e in selecionados),
+        )
     if escolha not in EVENTOS:
         raise ValueError(f"Evento desconhecido: {escolha}")
     return EVENTOS[escolha]
