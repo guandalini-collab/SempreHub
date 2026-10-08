@@ -38,7 +38,7 @@ const ITENS_PAINEL = [
   { id: "equipes", titulo: "3. Conferir participantes", descricao: "Confira alunos, empresas e pendências de envio.", simbolo: "", grupo: "Preparar turma" },
   { id: "mercado", titulo: "4. Preparar rodada", descricao: "Pesquise, revise e publique notícias e produtos para os alunos.", simbolo: "", grupo: "Conduzir rodada" },
   { id: "rodada", titulo: "5. Acompanhar envios", descricao: "Acompanhe as decisões e veja o que falta para encerrar a rodada.", simbolo: "", grupo: "Conduzir rodada" },
-  { id: "fechamento", titulo: "6. Encerrar rodada", descricao: "Confira os envios, escolha o evento e confirme o cálculo dos resultados.", simbolo: "", grupo: "Conduzir rodada" },
+  { id: "fechamento", titulo: "6. Encerrar rodada", descricao: "Confira os envios e confirme o encerramento. O sistema sorteia os eventos e calcula os resultados.", simbolo: "", grupo: "Conduzir rodada" },
   { id: "resultados", titulo: "7. Consultar resultados", descricao: "Analise os resultados. Para a próxima rodada, retome a etapa 4 no menu lateral.", simbolo: "", grupo: "Consultar resultados" },
   { id: "aprendizagem", titulo: "Autores e referências", descricao: "Consulte as referências para orientar a atividade.", simbolo: "", grupo: "Apoio" },
   { id: "analises", titulo: "Ferramentas de análise", descricao: "Consulte os conceitos e as ferramentas para orientar os alunos.", simbolo: "", grupo: "Apoio" },
@@ -49,7 +49,6 @@ const INTERVALO_ATUALIZACAO_MS = 15000;
 
 export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const [dados, setDados] = useState<DetalheTurma | null>(null);
-  const [eventos, setEventos] = useState<OpcaoEvento[]>([]);
   const [erro, setErro] = useState<string | null>(null);
   const [empresaAberta, setEmpresaAberta] = useState<number | null>(null);
   const [editandoParametros, setEditandoParametros] = useState(false);
@@ -75,7 +74,6 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
     setEmpresaAberta(null);
     setHistoricos({});
     carregar();
-    api.get<OpcaoEvento[]>("/api/professor/eventos").then(setEventos).catch(() => undefined);
     const intervalo = window.setInterval(carregar, INTERVALO_ATUALIZACAO_MS);
     return () => { window.clearInterval(intervalo); sequenciaCarga.current += 1; };
   }, [carregar]);
@@ -155,7 +153,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         </div>
         <div className="mt-5 border-t border-slate-200 pt-4">
           <h3 className="font-semibold">O que fazer agora</h3>
-          <p className="mt-2 text-sm text-slate-600">{!aberta ? "A simulação terminou. Consulte os resultados das empresas." : empresas.length === 0 ? "Compartilhe o código de entrada para os alunos participarem da turma." : enviadas < empresas.length ? "Confira as empresas com envio pendente antes de encerrar a rodada." : "Todos os envios estão prontos. Confira o evento e encerre a rodada para calcular os resultados."}</p>
+          <p className="mt-2 text-sm text-slate-600">{!aberta ? "A simulação terminou. Consulte os resultados das empresas." : empresas.length === 0 ? "Compartilhe o código de entrada para os alunos participarem da turma." : enviadas < empresas.length ? "Confira as empresas com envio pendente antes de encerrar a rodada." : "Todos os envios estão prontos. Encerre a rodada para calcular os resultados."}</p>
 
           <p className="mt-3 text-xs text-slate-500">Continue pelo menu lateral: etapa 3 para conferir participantes e pendências; etapa 6 quando estiver pronto para encerrar. Os resultados só são calculados após confirmar o encerramento.</p>
         </div>
@@ -163,7 +161,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       </SecaoPainel>
       <SecaoPainel id="fechamento" ativa={secao}>
           {aberta ? (
-            <FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} eventos={eventos} empresas={empresas} aoFechar={carregar} />
+            <FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} empresas={empresas} aoFechar={carregar} />
           ) : (
             <Cartao titulo="Simulação encerrada">
               <p className="text-sm text-slate-600">
@@ -344,18 +342,15 @@ function FecharRodada({
   turmaId,
   rodada,
   modoEquipe,
-  eventos,
   empresas,
   aoFechar,
 }: {
   turmaId: number;
   rodada: number;
   modoEquipe: boolean;
-  eventos: OpcaoEvento[];
   empresas: Empresa[];
   aoFechar: () => Promise<void>;
 }) {
-  const [evento, setEvento] = useState("SORTEAR");
   const [confirmando, setConfirmando] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState<{ tipo: "erro" | "sucesso"; texto: string } | null>(null);
@@ -371,7 +366,7 @@ function FecharRodada({
     setCarregando(true);
     setMensagem(null);
     try {
-      const resposta = await api.post<{ evento: OpcaoEvento }>(`/api/professor/turmas/${turmaId}/fechar-rodada`, { evento, rodada });
+      const resposta = await api.post<{ evento: OpcaoEvento }>(`/api/professor/turmas/${turmaId}/fechar-rodada`, { evento: "SORTEAR", rodada });
       setMensagem({ tipo: "sucesso", texto: `Mês ${rodada} fechado. Evento: ${resposta.evento.titulo}.` });
       setConfirmando(false);
       await aoFechar();
@@ -382,23 +377,11 @@ function FecharRodada({
     }
   }
 
-  const descricao = eventos.find((e) => e.codigo === evento)?.narrativa;
 
   return (
     <Cartao titulo={`Fechar o mês ${rodada}`}>
       <div className="space-y-4">
-        <Campo rotulo="Evento macroeconômico do mês">
-          <select className={estiloEntrada} value={evento} onChange={(e) => setEvento(e.target.value)}>
-            <option value="SORTEAR">Sortear (incerteza de Knight)</option>
-            <option value="NENHUM">Nenhum evento</option>
-            {eventos.map((e) => (
-              <option key={e.codigo} value={e.codigo}>
-                {e.titulo}
-              </option>
-            ))}
-          </select>
-        </Campo>
-        {descricao && <p className="text-xs leading-relaxed text-slate-500">{descricao}</p>}
+        <p className="rounded-lg bg-blue-50 p-4 text-sm">Os eventos são sorteados automaticamente ao encerrar a rodada. Podem ocorrer de um a três eventos, com aumentos ou reduções de demanda, juros e outros efeitos. Todos atingem a mesma turma. Também pode haver uma rodada sem eventos, conforme a probabilidade configurada.</p>
         {pendentes.length > 0 && (
           <Aviso tipo="info">
             {modoEquipe ? <>
