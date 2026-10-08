@@ -191,7 +191,7 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
                 empresa.regime_tributario = RegimeTributario.SIMPLES_NACIONAL
                 c.alertas.append("Mais de um empregado: migração do MEI para o Simples Nacional.")
         empresa.networking = _limitar(empresa.networking - 1 + 2 * math.sqrt(max(0, d.networking) / 500))
-        multa = ev.MULTA_NOTIFICACAO_FISCAL if evento.codigo == "NOTIFICACAO_FISCAL" and empresa.networking < ev.NETWORKING_MINIMO_DEFESA_FISCAL else 0
+        multa = ev.MULTA_NOTIFICACAO_FISCAL if evento.contem("NOTIFICACAO_FISCAL") and empresa.networking < ev.NETWORKING_MINIMO_DEFESA_FISCAL else 0
         p = preparar(empresa, d, turma, multiplicador_custo, multa)
         p["alertas"].extend(c.alertas)
         if d.automatica:
@@ -225,7 +225,7 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         detalhes = deepcopy(a["detalhes"])
         detalhes["avaliacao_estrategica"] = deepcopy(preparo["avaliacao_estrategica"])
         detalhes.update(parametros=parametros(turma), decisao=colunas(d), dre=deepcopy(dre),
-                        concorrentes_virtuais=deepcopy(bots), evento=evento.codigo)
+                        concorrentes_virtuais=deepcopy(bots), evento=evento.codigo, eventos=list(evento.codigos or (evento.codigo,)))
         # Datas ORM não são valores JSON das fotografias.
         detalhes["parametros"].pop("criado_em", None)
         detalhes["decisao"].pop("enviada_em", None)
