@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import MenuManuais from "../componentes/MenuManuais";
 
 import logoSempreHub from "../assets/logo-semprehub.svg";
 import { api, iniciarSessao } from "../api";
@@ -15,7 +16,7 @@ function Moldura({ children }: { children: React.ReactNode }) {
       <div className="relative mx-auto flex h-full w-full max-w-6xl flex-col px-5 pt-4 sm:px-8 sm:pt-5">
         <header className="flex shrink-0 flex-wrap items-center justify-between gap-4">
           <img src={logoSempreHub} alt="SempreHub" className="w-48 rounded-xl bg-white px-3 py-2 sm:w-56" />
-          <p className="hidden text-xs font-semibold uppercase tracking-[0.18em] text-blue-200 sm:block">Simulador de empreendedorismo</p>
+          <div className="flex items-center gap-4"><p className="hidden text-xs font-semibold uppercase tracking-[0.18em] text-blue-200 sm:block">Simulador de empreendedorismo</p><MenuManuais /></div>
         </header>
         <div role="region" aria-label="Apresentação e acesso" tabIndex={0} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <div className="grid min-h-full items-center gap-6 py-5 sm:py-6 lg:grid-cols-[1.15fr_1fr] lg:gap-12">

@@ -1,4 +1,5 @@
 import React from "react";
+import MenuManuais from "./MenuManuais";
 
 import logoSempreHub from "../assets/logo-semprehub.svg";
 import { NOME_FASE, corFase, reais } from "../formatos";
@@ -29,7 +30,8 @@ export function Cabecalho({
             Aceleração de Negócios
           </span>
         </button>
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          <MenuManuais />
           <div className="text-right">
             <p className="font-medium">{usuario.nome}</p>
             <p className="text-xs text-white/60">{usuario.papel === "PROFESSOR" ? "Professor(a)" : "Aluno(a)"}</p>
