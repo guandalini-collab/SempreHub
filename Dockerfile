@@ -3,7 +3,7 @@
 #   docker run -p 8000:8000 --env-file .env semprehub
 
 # 1) Frontend
-FROM node:20-alpine AS frontend
+FROM public.ecr.aws/docker/library/node:20-alpine AS frontend
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci --no-audit --no-fund
@@ -11,7 +11,7 @@ COPY frontend/ ./
 RUN npm run build
 
 # 2) Backend
-FROM python:3.12-slim
+FROM public.ecr.aws/docker/library/python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     SEMPREHUB_AMBIENTE=producao \
