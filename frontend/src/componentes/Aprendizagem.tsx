@@ -241,7 +241,7 @@ export function TourGuiado({ perfil }: { perfil: PerfilAprendizagem }) {
   );
 }
 
-export function BibliotecaAprendizagem({ rodada, modo, empresaId, mercadoSeparado = false, conteudo }: { rodada?: number; modo?: string; empresaId?: number; mercadoSeparado?: boolean; conteudo?: AbaBiblioteca }) {
+export function BibliotecaAprendizagem({ rodada, modo, empresaId, mercadoSeparado = false, conteudo, ferramenta }: { rodada?: number; modo?: string; empresaId?: number; mercadoSeparado?: boolean; conteudo?: AbaBiblioteca; ferramenta?: number }) {
   const [abaSelecionada, setAba] = useState<AbaBiblioteca>(mercadoSeparado ? "REFERENCIAS" : "NEWS");
   const aba = conteudo ?? abaSelecionada;
   const noticias = useMemo(() => {
@@ -282,7 +282,7 @@ export function BibliotecaAprendizagem({ rodada, modo, empresaId, mercadoSeparad
 
       {aba === "NEWS" && (empresaId ? <MercadoPublicado empresaId={empresaId} rodada={rodada ?? 1}/> : <p className="text-sm">Abra o painel da empresa para ler as edições do SempreHub News com os eventos e indicadores reais de mercado.</p>)}
       {aba === "REFERENCIAS" && <Referencias />}
-      {aba === "ANALISES" && <Analises />}
+      {aba === "ANALISES" && <Analises ferramenta={ferramenta} />}
       {aba === "MIDIAS" && <ManualMidias />}
     </Cartao>
   );
@@ -341,11 +341,13 @@ function Referencias() {
   );
 }
 
-function Analises() {
+function Analises({ ferramenta }: { ferramenta?: number }) {
+  const painel = (children: React.ReactNode) => ferramenta === undefined ? children : React.Children.toArray((children as React.ReactElement<{children: React.ReactNode}>).props.children).filter(React.isValidElement).filter((_, indice) => indice === ferramenta).map(elemento => React.cloneElement(elemento as React.ReactElement<{open?: boolean}>, {open: true}));
   return (
     <div className="space-y-3">
       <p className="text-xs leading-relaxed text-slate-500">Comece pelo ambiente e pelo setor, transforme achados em hipóteses e só então registre a decisão. Não existe uma resposta única: explique o raciocínio da equipe.</p>
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className={ferramenta === undefined ? "grid gap-3 lg:grid-cols-2" : "space-y-3"}>
+        {painel(<>
         <details open className="rounded-lg border border-slate-200 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-marinho">5 Forças de Porter · concorrência</summary>
           <div className="mt-3 space-y-2">{porter.map(([titulo, texto]) => <ItemAnalise key={titulo} titulo={titulo} texto={texto} />)}</div>
@@ -384,6 +386,7 @@ function Analises() {
           <div className="mt-3 grid gap-2 sm:grid-cols-2">{segmentacoes.map(([titulo, texto]) => <ItemAnalise key={titulo} titulo={titulo} texto={texto} />)}</div>
           <p className="mt-3 text-xs leading-relaxed text-slate-500">Segmentar ajuda a reduzir desperdício de marketing, escolher canais, ajustar preço e encontrar nichos.</p>
         </details>
+        </>)}
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ export interface ItemPainel {
   simbolo: string;
   grupo?: string;
   estado?: string;
+  pai?: string;
 }
 export function SecaoPainel({
   id,
@@ -87,7 +88,7 @@ export default function LayoutPainel({
                 <span>{grupo}</span><span aria-hidden="true">{expandido ? "▾" : "▸"}</span>
               </button>
               <div id={`submenu-${indice}`} hidden={!expandido} className="ml-3 mt-2 space-y-1 border-l-2 border-blue-300/40 pl-2">
-                {itens.filter(i => (i.grupo ?? "Menu") === grupo).map(i => <button type="button" key={i.id} aria-current={ativa === i.id ? "page" : undefined} aria-controls={`secao-${i.id}`} title={i.descricao} onClick={() => { aoSelecionar(i.id); }} className={`w-full rounded-lg px-3 py-3 text-left text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-ouro ${ativa === i.id ? "bg-ouro font-bold text-marinho" : "text-white hover:bg-white/10"}`}><span className="block">{i.titulo}</span>{i.estado && <span className="mt-1 block text-[11px] opacity-80">{i.estado}</span>}</button>)}
+                {itens.filter(i => (i.grupo ?? "Menu") === grupo && !i.pai).map(i => <React.Fragment key={i.id}><button type="button" key={i.id} aria-current={ativa === i.id ? "page" : undefined} aria-controls={`secao-${i.id}`} title={i.descricao} onClick={() => { aoSelecionar(i.id); }} className={`w-full rounded-lg px-3 py-3 text-left text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-ouro ${ativa === i.id ? "bg-ouro font-bold text-marinho" : "text-white hover:bg-white/10"}`}><span className="block">{i.titulo}</span>{i.estado && <span className="mt-1 block text-[11px] opacity-80">{i.estado}</span>}</button>{itens.some(f => f.pai === i.id) && <div className="ml-3 space-y-1 border-l border-white/30 pl-2" aria-label={`Submenu de ${i.titulo}`}>{itens.filter(f => f.pai === i.id).map(f => <button key={f.id} type="button" aria-current={ativa === f.id ? "page" : undefined} aria-controls={`secao-${f.id}`} onClick={() => aoSelecionar(f.id)} className={`w-full rounded-lg px-3 py-2 text-left text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-ouro ${ativa === f.id ? "bg-ouro font-bold text-marinho" : "text-blue-100 hover:bg-white/10"}`}>{f.titulo}</button>)}</div>}</React.Fragment>)}
               </div>
             </div>;
           })}

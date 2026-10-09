@@ -36,10 +36,13 @@ import type { ModoJogo } from "../../tiposSimulacao";
 import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
 
+const FERRAMENTAS_ANALISE = ["5 Forças de Porter", "PESTEL", "Análise de mercado", "SWOT (FOFA)", "Análise financeira", "Segmentação de mercado"];
+
 const ITENS_PAINEL = [
   {id: "manuais", titulo: "Manuais", descricao: "Consulte ou baixe os manuais em PDF.", simbolo: "", grupo: "Manuais"},
   { id: "visao", titulo: "1. Dados e ingresso", descricao: "Confira o nome da turma e libere seu ingresso para os alunos.", simbolo: "", grupo: "Preparar turma" },
   { id: "configuracao", titulo: "2. Configurar simulação", descricao: "Revise os parâmetros antes de orientar os alunos.", simbolo: "", grupo: "Preparar turma" },
+  { id: "parametros", titulo: "Parâmetros", descricao: "Revise e ajuste os parâmetros da turma.", simbolo: "", grupo: "Preparar turma", pai: "configuracao" },
   { id: "equipes", titulo: "3. Conferir participantes", descricao: "Confira alunos, empresas e pendências de envio.", simbolo: "", grupo: "Preparar turma" },
   { id: "mercado", titulo: "4. Preparar rodada", descricao: "Pesquise, revise e publique notícias e produtos para os alunos.", simbolo: "", grupo: "Conduzir rodada" },
   { id: "rodada", titulo: "5. Acompanhar envios", descricao: "Acompanhe as decisões e veja o que falta para encerrar a rodada.", simbolo: "", grupo: "Conduzir rodada" },
@@ -47,6 +50,7 @@ const ITENS_PAINEL = [
   { id: "resultados", titulo: "7. Consultar resultados", descricao: "Analise os resultados. Para a próxima rodada, retome a etapa 4 no menu lateral.", simbolo: "", grupo: "Consultar resultados" },
   { id: "aprendizagem", titulo: "Autores e referências", descricao: "Consulte as referências para orientar a atividade.", simbolo: "", grupo: "Apoio" },
   { id: "analises", titulo: "Ferramentas de análise", descricao: "Consulte os conceitos e as ferramentas para orientar os alunos.", simbolo: "", grupo: "Apoio" },
+  ...FERRAMENTAS_ANALISE.map((titulo, indice) => ({ id: `analise-${indice}`, titulo, descricao: "Consulte esta ferramenta para orientar a turma.", simbolo: "", grupo: "Apoio", pai: "analises" })),
   { id: "midias", titulo: "Guia de campanhas", descricao: "Consulte os formatos, objetivos e custos das campanhas.", simbolo: "", grupo: "Apoio" },
 ];
 
@@ -108,7 +112,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const rotulos = Array.from({ length: rodadasJogadas }, (_, i) => `M${i + 1}`);
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ turma: turma.nome, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
+    <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={(id) => { setSecao(id); setEditandoParametros(id === "parametros"); }} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ turma: turma.nome, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
       <SecaoPainel id="visao" ativa={secao}>
       <FormacaoTurma turma={turma} aoAtualizar={carregar}/>
       <div className="rounded-xl bg-marinho p-5 text-white shadow-lg">
@@ -151,7 +155,8 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       <BibliotecaAprendizagem mercadoSeparado conteudo="REFERENCIAS" rodada={turma.rodada_atual} modo={turma.modo_jogo} />
 
       </SecaoPainel>
-      <SecaoPainel id="analises" ativa={secao}><BibliotecaAprendizagem mercadoSeparado conteudo="ANALISES" rodada={turma.rodada_atual} modo={turma.modo_jogo} /></SecaoPainel>
+      <SecaoPainel id="analises" ativa={secao}><Cartao titulo="Ferramentas de análise"><p>Selecione a ferramenta desejada no submenu lateral para consultar seu conteúdo.</p></Cartao></SecaoPainel>
+      {FERRAMENTAS_ANALISE.map((_, indice) => <SecaoPainel key={indice} id={`analise-${indice}`} ativa={secao}><BibliotecaAprendizagem mercadoSeparado conteudo="ANALISES" ferramenta={indice} rodada={turma.rodada_atual} modo={turma.modo_jogo} /></SecaoPainel>)}
       <SecaoPainel id="rodada" ativa={secao}>
       <Cartao titulo="Situação da rodada">
         <div className="grid gap-3 sm:grid-cols-3">
@@ -183,9 +188,6 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
             titulo="Parâmetros e dados"
             acao={
               <div className="flex gap-2">
-                <Botao variante="secundario" onClick={() => setEditandoParametros(true)}>
-                  Parâmetros
-                </Botao>
                 <Botao
                   variante="secundario"
                   disabled={rodadasJogadas === 0}
@@ -326,9 +328,10 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
           inicial={turma.parametros!}
           somenteRodadas={turma.rodada_atual > 1}
           modoBloqueado={turma.quantidade_empresas > 0}
-          aoFechar={() => setEditandoParametros(false)}
+          aoFechar={() => { setEditandoParametros(false); setSecao("configuracao"); }}
           aoSalvar={async () => {
             setEditandoParametros(false);
+            setSecao("configuracao");
             await carregar();
           }}
         />
@@ -566,10 +569,9 @@ function EditarParametros({
   }
 
   return (
-    <Modal
+    <Cartao
       titulo="Parâmetros da turma"
-      aoFechar={aoFechar}
-      rodape={
+      acao={
         <>
           <Botao variante="secundario" onClick={aoFechar}>
             Cancelar
@@ -586,7 +588,7 @@ function EditarParametros({
           <Aviso>{erro}</Aviso>
         </div>
       )}
-    </Modal>
+    </Cartao>
   );
 }
 
