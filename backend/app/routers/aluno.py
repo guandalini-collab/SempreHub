@@ -283,6 +283,8 @@ def enviar_decisao(
     empresa = _empresa_para_alterar(db, empresa_id, aluno)
     turma = empresa.turma
     exigir_lider(empresa, aluno)
+    from ..prazos import validar_salvamento
+    validar_salvamento(turma, dados.rodada)
     from .mercado import validar_plano
     validar_plano(db, empresa, dados, rascunho=dados.rascunho)
     _validar_decisao(empresa, dados)
@@ -295,6 +297,8 @@ def enviar_decisao(
         .filter(Decisao.empresa_id == empresa.id, Decisao.rodada == turma.rodada_atual)
         .first()
     )
+    if decisao and decisao.enviada_em:
+        raise HTTPException(403, "Decisão final enviada. Modo de leitura até a próxima rodada.")
     versao_atual = decisao.versao if decisao else 0
     verificar_versao(dados.versao, versao_atual, obrigatoria=turma.modo_equipe)
     valores = dados.model_dump(exclude={"versao", "rodada", "rascunho"})
@@ -331,6 +335,8 @@ def aprovar_decisao(
 ):
     empresa = _empresa_para_alterar(db, empresa_id, aluno)
     exigir_lider(empresa, aluno)
+    from ..prazos import validar_salvamento
+    validar_salvamento(empresa.turma, dados.rodada)
     verificar_rodada(dados.rodada, empresa.turma, obrigatoria=True)
     if empresa.turma.status != StatusTurma.ABERTA:
         raise HTTPException(422, "A turma foi encerrada.")

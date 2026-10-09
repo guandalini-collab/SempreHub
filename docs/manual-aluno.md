@@ -1,6 +1,63 @@
 # SempreHub - Manual do aluno
 
-Versão 2.1 - outubro de 2026
+## Carta do Fundador
+
+Prezado(a) Futuro(a) Empreendedor(a) e Líder Educacional,
+
+Seja muito bem-vindo(a) ao SempreHub.
+
+Quando idealizei e criei este simulador, o meu objetivo não era construir apenas mais uma plataforma digital de negócios ou um repositório de planilhas contábeis tradicionais. Eu queria criar uma ponte viva entre o conhecimento teórico e a realidade do mercado — um espaço onde você pudesse experimentar a adrenalina, os desafios e as conquistas de liderar uma organização de verdade.
+
+O nome SempreHub carrega a essência da metodologia que preparei para a sua jornada. O 'Sempre' representa a constância, a resiliência e o aprendizado contínuo (Lifelong Learning). O 'Hub' define esta plataforma como um centro conector. Olhando para a nossa logomarca, você verá uma rede de pontos interconectados: eles são os departamentos da sua empresa (Marketing, Produção, Logística, P&D, RH e Finanças). Nenhuma decisão sua será isolada; cada escolha impactará toda a organização.
+
+Aqui, o erro não é um ponto final, mas sim uma variável de aprendizado. Se o seu caixa ficar no vermelho ou se uma estratégia de marketing não der o retorno esperado nesta rodada, não desanime. Analise os relatórios reais, observe o movimento dos seus concorrentes em sala de aula e reajuste a sua operação no mês seguinte.
+
+O mercado do SempreHub está aberto e o futuro do ecossistema está inteiramente em suas mãos.
+
+**Prof. Guandalini**
+
+Criador e Fundador do SempreHub — Simulador de Empreendedorismo
+
+## A história e o conceito da logomarca SempreHub
+
+**Autoria e criação: Professor Guandalini.** A marca, o nome e a identidade visual foram idealizados e criados pelo Professor Guandalini para unir o ambiente corporativo à conexão das redes modernas. O símbolo representa uma metodologia de aprendizado viva e integrada, voltada ao Ensino Médio e Superior.
+
+**SEMPRE** evoca constância, aprendizado contínuo e resiliência: empreender exige tentativas, análise dos relatórios, ajustes e evolução. **HUB** representa um centro conector de inteligência, onde estudantes, mercado competitivo e gestão se encontram.
+
+**A rede de decisões.** Os nós azuis e cianos representam os seis departamentos: P&D, Produção, Logística, Marketing, RH e Finanças. As linhas mostram que nenhuma decisão é isolada: mudar a Produção afeta a Logística e as Finanças. Os dois núcleos em Laranja Ouro representam a tomada de decisão do estudante e a dinâmica do mercado.
+
+**Paleta oficial da identidade visual:** Azul Royal **#034AA6** e Azul Absoluto **#0762D9** transmitem credibilidade e robustez; Ciano/Turquesa **#0AADBF** representa dinamismo e modernidade; Laranja Ouro **#D9851E** destaca geração de valor, criatividade e atitude empreendedora; Cinza Soft **#F2F2F2** organiza um fundo limpo para a leitura.
+
+O Azul Profundo **#0B2545** e o Ouro Fosco **#C5A059** permanecem documentados como paleta institucional anterior. A identidade visual atual segue os códigos oficiais apresentados pelo fundador.
+
+## Cockpit do estudante
+
+Comece na **Visão Geral / Mesa do CEO**: confira nome da empresa, mês, caixa e pendências. No menu lateral, escolha um departamento; as decisões aparecem à direita.
+
+1. **P&D:** defina o investimento em tecnologia e melhoria dos produtos.
+2. **Produção:** planeje capacidade, fabricação, máquinas e manutenção.
+3. **Logística:** escolha a modalidade de entrega nos modelos aplicáveis.
+4. **Marketing:** planeje produtos, preços, campanhas e canais.
+5. **RH:** decida contratações, demissões, horas extras e remuneração.
+6. **Finanças:** avalie crédito, pagamentos e escreva a análise financeira da equipe.
+
+Sliders mostram valores mínimos e máximos. Ações opcionais podem permanecer em zero. Confira o checklist; salve rascunhos enquanto estiver discutindo. Ao enviar, confirme no modal: depois do envio final, os valores ficam visíveis em **modo de leitura**, sem alterações até o próximo mês.
+
+## Navegação: escolha à esquerda, trabalhe à direita
+
+O menu lateral é o ponto de partida. Suas categorias e submenus aparecem abertos inicialmente. Você pode recolher uma categoria para organizar a tela e abri-la novamente quando precisar. O submenu selecionado fica destacado, e o conteúdo aparece no painel à direita. Em telas estreitas, o menu permanece disponível acima do conteúdo e possui rolagem própria.
+
+1. Localize no menu o assunto desejado.
+2. Clique uma vez no submenu. Não é necessário abrir outra janela para tomar decisões.
+3. Confira o título do painel à direita antes de alterar qualquer valor.
+4. Ao terminar, salve o rascunho, avance ou envie conforme a etapa.
+5. Para estudar, abra **Manuais - baixar PDF**. Use **Visualizar** para consultar ou **Baixar PDF** para guardar uma cópia.
+
+![Menu lateral e painel de trabalho da SempreHub](diagramas/navegacao-aluno.png)
+
+Os campos de decisão mostram pendências, como **Falta tomar esta decisão** ou **Falta confirmar esta decisão**. Eles não substituem este manual. A confirmação de uma área significa que a equipe conferiu todos os seus campos, incluindo a decisão de manter em zero ações opcionais. Um aviso de campo vazio continua pendente mesmo depois de marcar a revisão. Os estados do menu referem-se à última versão salva; valores ainda não salvos precisam ser registrados.
+
+Versão 3.0 - outubro de 2026
 
 Aprenda a interpretar o mercado, discutir decisões e observar suas consequências. Cada rodada representa um mês. As imagens mostram as telas do programa com nomes e situações ilustrativos.
 
@@ -60,8 +117,9 @@ Leia **Notícias e mercado** e discuta o cenário. Depois, percorra as áreas:
 1. **Produtos e marketing:** preços, canais, campanhas, posicionamento e mix de cada produto.
 2. **Ferramentas e segmentação:** SWOT, Porter, PESTEL, concorrência, diretriz, BCG e público-alvo.
 3. **Finanças:** análise escrita da equipe, margens, custos, crédito, caixa e capital de giro.
-4. **Produção e operação:** produção, pessoas, insumos, tecnologia e capacidade.
-5. **Logística:** frete e localização, quando disponíveis no modo Empresa tradicional.
+4. **Produção:** produção, insumos, máquinas e capacidade.
+5. **P&D e RH:** tecnologia, contratação, demissão, remuneração e capacitação.
+6. **Logística:** frete e localização, quando disponíveis no modo Empresa tradicional.
 
 O líder pode clicar em **Salvar rascunho** ou em **Salvar e ir para a próxima etapa**. O rascunho pode ficar incompleto e ainda não representa a entrega da rodada. Os colegas consultam a versão salva, então combine momentos para revisar juntos.
 
@@ -77,7 +135,9 @@ Confira todas as áreas aplicáveis, os mixes dos produtos, a diretriz estratég
 
 **Comprar máquinas, contratar funcionários, pagar horas extras, solicitar empréstimos e investir em tecnologia são escolhas opcionais.** Zero é válido para essas ações e não impede o envio. A revisão obrigatória serve para confirmar que a equipe considerou a escolha.
 
-Um novo rascunho depois de um envio retira a condição de decisão enviada. O líder deve enviar novamente a versão atual. O professor só fecha a rodada de equipes depois que todas entregarem a decisão final.
+Após o envio final, a decisão fica bloqueada em modo de leitura até o próximo mês. O prazo configurado pelo professor encerra automaticamente a rodada às 23:59:59 de Brasília. O professor também pode forçar o encerramento. Salve rascunhos enquanto a decisão ainda não estiver finalizada.
+
+![Decisões confirmadas e preservadas em modo de leitura](diagramas/decisao-modo-leitura.png)
 
 ## 5. Interprete as ferramentas e compare os concorrentes
 
@@ -160,3 +220,100 @@ Decisões, versões, responsáveis pelo envio, transferências, eventos e result
 - **A prévia não calculou:** corrija os valores indicados e tente novamente; o rascunho pode guardar um planejamento ainda incompleto.
 
 Use as referências de GEM e Dornelas para discutir o perfil empreendedor; Porter, SWOT, PESTEL e BCG para interpretar estratégia; e os demonstrativos para avaliar as consequências. O objetivo é aplicar a teoria, justificar escolhas e aprender com os resultados.
+
+## 10. Sua primeira rodada, passo a passo
+
+Antes de começar, confirme o nome da turma com o professor, entre nela, forme sua equipe e escolha o líder. Os demais integrantes participam da discussão, mas não digitam nem enviam as decisões pela equipe. No modelo de jogo individual, o próprio responsável registra as escolhas.
+
+1. Em **Notícias e mercado**, leia a edição disponível e anote duas oportunidades e dois riscos. Confira a data, o setor e as condições da concorrência. Se o professor ainda não publicou a edição, avise-o; não invente produtos para preencher a etapa.
+2. Em **SWOT**, leia os fatores e escolha uma diretriz coerente com o que a empresa consegue oferecer. Em **Porter** e **PESTEL**, examine pressões e mudanças do ambiente. Esses diagnósticos apoiam sua interpretação; não escolhem preços ou investimentos por você.
+3. Em **Segmentação do mercado**, descreva localização e público, escolha cobertura e canais e informe o preço máximo que esse público aceitaria. Consulte o capítulo 11 para entender cada campo.
+4. Em **BCG**, registre todos os produtos do mix. Confira crescimento, participação relativa, classificação e se são dados ou projeções. Projeções precisam de premissas escritas.
+5. Em **Produtos e marketing**, complete cada produto: quantidade ou peso de atendimento, preço, posicionamento, canais, cobertura, mídias e serviços. Confira os custos e marque o mix como revisado.
+6. Em **Finanças**, escolha crédito, amortização, prazos e regime quando aplicáveis. Escreva a análise financeira com base nos números da equipe; o sistema não escreve essa decisão por você.
+7. Em **Produção**, compare capacidade, demanda esperada, pessoas, estoques e investimento. Escolha contratações, demissões, horas extras e compras quando disponíveis no seu modelo.
+8. Em **Logística**, quando disponível, selecione a entrega. No modelo em que essa decisão não se aplica, o submenu não é apresentado como uma obrigação.
+9. Confirme a revisão de cada área depois de conferir seus campos. Clique em **Salvar rascunho** para guardar sem entregar, ou **Salvar e ir para a próxima etapa** para continuar.
+10. Faça a conferência final e clique em **Enviar decisão final**. Confirme que a tela informa envio concluído. Aguarde o professor encerrar a rodada para consultar resultados.
+
+**Exemplo de organização:** uma equipe divide a leitura do mercado, a comparação de custos e a estimativa de capacidade entre seus integrantes. O líder registra as escolhas acordadas. Essa divisão é uma forma de colaboração, não uma transferência de permissão de edição.
+
+## 11. Dicionário das decisões comerciais e estratégicas
+
+### Produto, preço e posicionamento
+
+O produto é aquilo que será vendido. No catálogo, escolha somente os itens da edição da sua turma. O preço é o valor cobrado por unidade, não o lucro por unidade. Posicionamento é a proposta que orienta a oferta, como preço ou diferenciação. Uma intenção de competir por preço exige verificar se a margem e o volume esperado sustentam os custos.
+
+**Exemplo didático:** preço de R$ 100 e custo unitário de R$ 40 deixam R$ 60 antes de despesas, tributos, juros e outros efeitos. Vender 100 unidades gera R$ 10.000 de receita e R$ 4.000 desse custo. Não conclua que os R$ 6.000 restantes são lucro líquido. Confirme despesas e tributos na prévia e nos demonstrativos.
+
+### Segmentação e canais
+
+Localização define onde está o público. No B2C, descreva características dos consumidores; no B2B, porte, setor e modo de compra das empresas. Canais indicam onde o cliente compra; mídias indicam onde será alcançado. Um anúncio não cria automaticamente um canal de venda. A cobertura escolhida no mix deve ser compatível com a região que você pretende atender.
+
+O preço máximo do público é uma premissa da equipe, não uma tarifa imposta pelo programa. Registre uma hipótese defensável e confronte-a com os concorrentes e com os resultados. Não use uma projeção como se fosse dado confirmado.
+
+### SWOT, Porter, PESTEL e concorrência
+
+Na SWOT, separe aspectos internos (forças e fraquezas) de condições externas (oportunidades e ameaças). Na análise de Porter, considere rivalidade, fornecedores, compradores, entrantes e substitutos. Na PESTEL, observe fatores políticos, econômicos, sociais, tecnológicos, ambientais e legais.
+
+Na comparação de concorrentes, procure diferenças de produto, preço, atendimento, canais e alcance. O concorrente real pesquisado e a outra equipe do jogo são referências diferentes. O mercado do simulador também possui regras de concorrência compartilhada. Interpretar mal uma ameaça pode levar a preço, volume ou investimento inadequados; o efeito aparece por meio dessas escolhas e da operação.
+
+### BCG e projeções
+
+A participação relativa compara seu produto com o maior concorrente. Se a participação do produto for 20% e a do maior concorrente 10%, a relação é 2x. Se forem 5% e 10%, é 0,5x. Alta participação fica à esquerda na matriz. Crescimento alto fica acima do corte didático de 10%.
+
+**Exemplo:** crescimento de 15% e participação de 2x ficam em Estrela. Crescimento de 5% com 2x fica em Vaca leiteira. Crescimento de 15% com 0,5x fica em Interrogação. Crescimento de 5% com 0,5x fica em Abacaxi. A classificação exige interpretação e não garante lucro.
+
+Quando faltar informação, selecione **Projeção** e escreva como chegou à estimativa. Exemplo: expectativa baseada na evolução da rodada anterior e na manutenção da estratégia. Informe limitações e revise a hipótese depois do resultado. Não use percentuais inventados como se fossem estatísticas confirmadas de uma empresa real.
+
+## 12. Dicionário de produção, pessoas e tecnologia
+
+Contratar aumenta a equipe e a capacidade possível, mas cria gastos recorrentes. Demitir reduz a equipe e pode gerar rescisão. Horas extras são uma decisão opcional com custo adicional. Manter todos esses campos em zero pode ser uma escolha válida; confirme a área para registrar que a equipe a conferiu.
+
+No modelo Empresa tradicional, a produção precisa ser compatível com pessoas, máquinas e matéria-prima. Comprar matéria-prima não significa vender produto acabado. Produzir acima da venda provável pode formar estoque e comprometer capital de giro. Produzir abaixo da procura pode limitar as vendas.
+
+Máquinas são investimentos: o pagamento afeta caixa no mês da compra, a ativação segue a rodada indicada, e a depreciação distribui o valor contábil ao longo da vida útil. Confira o valor vigente da sua turma e o mês de ativação antes de contar com a nova capacidade. Manutenção e modernização não são a mesma decisão.
+
+P&D é investimento na melhoria do produto e da tecnologia. Ele reduz recursos disponíveis no presente e pode influenciar qualidade e atratividade. No modelo Startup, compare também capacidade da nuvem, equipe, produto e atendimento. As escolhas de um modelo não são automaticamente oferecidas em outro.
+
+## 13. Dicionário financeiro e análise escrita
+
+**Receita:** valor das vendas. **Custo:** gasto relacionado à produção ou mercadoria. **Despesa:** gasto de operação e administração. **Lucro:** resultado depois dos custos, despesas e demais efeitos. **Caixa:** dinheiro disponível. **Dívida:** obrigação ainda não paga. Uma empresa pode apresentar lucro e, ao mesmo tempo, dificuldade de caixa.
+
+**Capital de giro:** recursos usados para sustentar o funcionamento entre pagamentos e recebimentos. Estoque e valores a receber podem prender recursos; prazos de fornecedores podem mudar o momento do desembolso. Compare recebimentos, compras, folha, despesas e dívida antes de expandir.
+
+Empréstimo não é receita de venda: entra dinheiro e surge obrigação de devolver o principal, além dos juros. Amortizar paga parte do principal e reduz a dívida. Não confunda juros com amortização. O aviso de crédito informa o custo e deve entrar na discussão da equipe.
+
+**Exemplo didático:** se a equipe tomar R$ 10.000 a uma taxa de 2,5% no mês, o custo de juros dessa parcela será R$ 250, antes de outros efeitos. A taxa real do jogo é a indicada na turma e pode mudar. R$ 10.000 recebidos não representam R$ 10.000 de lucro.
+
+Na análise financeira, registre: expectativa de receita; custos e despesas relevantes; dinheiro disponível; diferença entre lucro e caixa; efeito de estoques e prazos; necessidade de giro; risco de crédito; e justificativa das escolhas. Use números da equipe, premissas e limites. Um texto preenchido permite validar a presença da análise, mas não demonstra sozinho sua qualidade.
+
+## 14. Salvar, corrigir e enviar sem se perder
+
+**Pendente** significa que uma informação ou confirmação está faltando. **Rascunho salvo** significa que o trabalho foi guardado, mas ainda não é entrega final. **Enviada** significa que a versão foi entregue para a rodada. Confira a mensagem após cada ação. Valores digitados sem salvar ainda não são a versão registrada.
+
+Ao alterar uma escolha, revise novamente as áreas afetadas. Antes do envio final, você pode corrigir e salvar novos rascunhos. Depois do envio final, a edição fica bloqueada até o próximo mês. Em caso de atualização concorrente, use **Carregar decisão salva** depois de combinar a correção com a equipe; isso substitui os campos locais pela versão registrada.
+
+Se aparecer bloqueio, leia cada pendência, clique no submenu correspondente, complete a informação, confira e salve. Não preencha valores aleatórios apenas para liberar o botão. Solicitar ajuda ao professor é melhor que transformar uma lacuna em uma falsa certeza.
+
+Depois do fechamento, confronte previsão e resultado. Anote o que mudou na demanda, concorrência, capacidade, custo, caixa e dívida. A próxima rodada é uma nova decisão: não repita o planejamento anterior sem conferir suas premissas.
+
+## 15. Prazos, entrega e localização
+
+A parcela de vendas a prazo é a proporção cujo recebimento será adiado. O prazo de recebimento define quando o dinheiro entra. Exemplo didático: em uma venda de R$ 1.000 com 40% a prazo, R$ 400 entram conforme o vencimento definido e R$ 600 correspondem à parcela à vista, antes de outros efeitos. Confira os valores efetivos nos demonstrativos.
+
+A parcela de compras a prazo funciona no pagamento ao fornecedor. Não elimina o custo nem a obrigação: muda o momento do desembolso. Um prazo favorável pode aliviar o caixa hoje e concentrar pagamentos depois. Leia a lista de valores a receber e a pagar no painel operacional.
+
+A entrega tem modalidades com custos e efeitos diferentes. No modelo Empresa tradicional, o frete por unidade vendida afeta custo e caixa. A modalidade escolhida não corrige automaticamente um planejamento de localização. Compare distância, volume e custo.
+
+Quando usar o estudo de centro de gravidade, registre pontos de atendimento, coordenadas e volumes com a mesma unidade. Informe a localização escolhida e uma justificativa. Confira os dados antes de copiar o resultado: coordenadas ou volumes errados levam a uma localização inadequada. O estudo pode afetar o adicional de frete previsto pelo modelo. Consulte a indicação de custo e distância calculada na rodada.
+
+## 16. Salários, benefícios, capacitação e Startup
+
+Em Produção, o bloco Pessoas e desenvolvimento reúne escolhas da equipe de funcionários. Você pode manter o salário-base da turma ou definir salário próprio quando a opção estiver disponível. Benefícios e treinamento são despesas e podem influenciar moral, qualificação e rotatividade. Não confunda capacitação dos funcionários com networking de parceiros.
+
+No modelo Startup, **capacidade da nuvem** indica quantos clientes a operação consegue atender no mês. A base de clientes pode exceder o atendimento disponível. Compare capacidade, receita, custo e satisfação antes de expandir. Esse modelo não usa os mesmos controles industriais de estoques e máquinas da Empresa tradicional.
+
+**Aporte** é capital de investidores. **Valuation antes do aporte** é a avaliação usada para definir a participação. Exemplo didático: valor anterior de R$ 80.000 e aporte de R$ 20.000 compõem R$ 100.000 de referência após o aporte; a parcela de R$ 20.000 representa 20% dessa referência. Confira a participação efetiva no painel, pois aportes acumulados e regras do modelo também importam. Aporte não é receita comercial e não significa lucro.
+
+Nunca escolha aporte ou valuation apenas para aumentar o número mostrado no caixa. Discuta necessidade de capital e participação dos fundadores. O manual explica o conceito; a equipe continua responsável pela decisão.

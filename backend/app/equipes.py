@@ -90,7 +90,7 @@ def registrar(
     db.add(RegistroEquipe(
         empresa_id=empresa.id, aluno_id=aluno.id,
         rodada=empresa.turma.rodada_atual, versao=versao,
-        acao=acao, detalhes=detalhes or {},
+        acao=acao, detalhes={**(detalhes or {}), "autor_conceito": "Professor Guandalini"},
     ))
 
 
@@ -183,7 +183,7 @@ def dados_equipe(
             {
                 "acao": r.acao, "aluno_id": r.aluno_id, "aluno": r.aluno.nome,
                 "rodada": r.rodada, "versao": r.versao,
-                "data": r.data.isoformat() + "Z", "detalhes": r.detalhes,
+                "data": r.data.isoformat() + "Z", "detalhes": {**(r.detalhes or {}), "autor_conceito": "Professor Guandalini"},
             }
             for r in empresa.registros_equipe
         ],

@@ -1,5 +1,4 @@
 import React from "react";
-import MenuManuais from "./MenuManuais";
 
 import logoSempreHub from "../assets/logo-semprehub.svg";
 import { NOME_FASE, corFase, reais } from "../formatos";
@@ -31,7 +30,6 @@ export function Cabecalho({
           </span>
         </button>
         <div className="flex flex-wrap items-center gap-4 text-sm">
-          <MenuManuais perfil={usuario.papel} />
           <div className="text-right">
             <p className="font-medium">{usuario.nome}</p>
             <p className="text-xs text-white/60">{usuario.papel === "PROFESSOR" ? "Professor(a)" : "Aluno(a)"}</p>
@@ -98,30 +96,37 @@ export function Botao({
   );
 }
 
+export const RevisaoCampos = React.createContext<boolean | null>(null);
+
 export function Campo({
   rotulo,
   ajuda,
+  pendente,
   children,
 }: {
+  pendente?: boolean;
   rotulo: string;
   ajuda?: React.ReactNode;
   children: React.ReactElement;
 }) {
+  const revisada = React.useContext(RevisaoCampos);
+  const indicacao = revisada === null ? ajuda : pendente ? "Falta tomar esta decisão." : revisada ? "Decisão conferida." : "Falta confirmar esta decisão.";
   const id = React.useId();
   const idAjuda = `${id}-ajuda`;
   const campo = React.cloneElement(children, {
     id,
-    "aria-describedby": ajuda ? idAjuda : undefined,
+    "aria-describedby": indicacao ? idAjuda : undefined,
   });
   return (
     <div>
       <label htmlFor={id} className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600">
         {rotulo}
+        {/DRE|P&D|Pesquisa e desenvolvimento|Canal|Capital de giro/i.test(rotulo) && <span className="group relative ml-2 inline-flex normal-case"><button type="button" aria-label={`O que significa ${rotulo}?`} className="rounded-full border border-cyan-500 px-1.5 text-xs text-cyan-800">?</button><span role="tooltip" className="pointer-events-none absolute bottom-full left-0 z-40 mb-2 hidden w-64 rounded-lg bg-slate-900 p-3 text-left text-xs font-normal text-white shadow-lg group-hover:block group-focus-within:block">{/DRE/i.test(rotulo) ? "DRE reúne receitas e despesas para mostrar o lucro ou prejuízo do mês." : /Capital de giro/i.test(rotulo) ? "Recursos que sustentam a operação entre pagamentos e recebimentos." : /Canal/i.test(rotulo) ? "Caminho usado para vender e entregar o produto ao cliente." : "P&D é pesquisa e desenvolvimento: investimento em tecnologia e melhoria do produto."}</span></span>}
       </label>
       {campo}
-      {ajuda && (
-        <p id={idAjuda} className="mt-1 text-xs text-slate-500">
-          {ajuda}
+      {indicacao && (
+        <p id={idAjuda} className={`mt-1 text-xs ${revisada !== null && (pendente || !revisada) ? "font-semibold text-amber-800" : "text-slate-500"}`}>
+          {indicacao}
         </p>
       )}
     </div>
@@ -368,9 +373,15 @@ const LINHAS_DRE: { chave: keyof Dre; rotulo: string }[] = [
   { chave: "multas", rotulo: "(−) Multas" },
 ];
 
+export function DicaTermo({termo, texto}: {termo: string; texto: string}) {
+  const id=React.useId();
+  return <span className="group relative ml-2 inline-flex align-middle"><button type="button" aria-label={`O que significa ${termo}?`} aria-describedby={id} className="rounded-full border border-cyan-500 px-1.5 text-xs text-cyan-800">?</button><span id={id} role="tooltip" className="pointer-events-none absolute bottom-full left-0 z-40 mb-2 hidden w-64 rounded-lg bg-slate-900 p-3 text-left text-xs font-normal text-white shadow-lg group-hover:block group-focus-within:block">{texto}</span></span>;
+}
+
 export function TabelaDre({ dre }: { dre: Dre }) {
   return (
     <table className="w-full border-collapse text-sm">
+      <caption className="mb-3 text-left font-semibold">DRE<DicaTermo termo="DRE" texto="Demonstração do Resultado do Exercício: reúne receitas e despesas para mostrar o lucro ou prejuízo do mês." /></caption>
       <tbody>
         <tr className="border-b border-slate-200">
           <td className="py-1.5 font-semibold text-marinho">Receita bruta</td>

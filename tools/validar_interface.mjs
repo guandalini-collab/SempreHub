@@ -20,13 +20,15 @@ let matricula=null,decisao=null;
 const sala={formacao_encerrada:false,disponiveis:[{aluno_id:4,nome:'Daniela'},{aluno_id:5,nome:'Eduardo'}],equipes:[{empresa_id:1,nome:'Equipe exemplo',membros,vagas:2,completa:false}]};
 await page.route('**/api/**',async route=>{
  const req=route.request(),path=new URL(req.url()).pathname;let data={},status=200;
- if(path==='/api/aluno/turmas') data=[turma];
+ if(path==='/api/professor/turmas/1')data={turma,empresas:[],ranking:[],mercado:[],eventos:[]};
+ else if(path==='/api/professor/turmas/1/formacao')data={disponiveis:[],inscritos:[],turmas_destino:[],equipes:[]};
+ else if(path==='/api/aluno/turmas') data=[turma];
  else if(path==='/api/aluno/empresas')data=[];
  else if(path==='/api/aluno/matricula'){if(req.method()==='POST')matricula={turma,sala};data=matricula;}
  else if(path==='/api/aluno/empresas/1/lider')data={...equipe,proximo_lider_id:2,transferencia_rodada:2};
  else if(path==='/api/aluno/empresas/1')data={empresa,turma,equipe:{...equipe,versao_decisao:decisao?.versao??0},decisao_atual:decisao,ultima_decisao:decisao,resultados:[],eventos:[],mercado:[],posicao_ranking:1,total_empresas:1,pendencias_envio:['Revise e confirme Finanças.','Preencha a análise financeira da equipe.']};
  else if(path.endsWith('/previsao'))data={rodada:1,regime:'MEI',funcionarios:0,capacidade:120,folha:0,juros:0,gastos_previstos:1500,margem_unitaria:60,ponto_equilibrio:25,emprestimo_aprovado:0,amortizacao_aplicada:0,divida_prevista:0,caixa_disponivel:20000,alertas:[]};
- else if(path.endsWith('/decisao')){const d=req.postDataJSON();if(!d.rascunho){status=422;data={detail:'Você não pode enviar a decisão final: Revise e confirme a área: Finanças. Preencha a análise financeira da equipe.'};}else{decisao={...d,rodada:1,versao:(decisao?.versao??0)+1,enviada_em:null,automatica:false};data=decisao;}}
+ else if(path.endsWith('/decisao')){const d=req.postDataJSON();if(!d.rascunho && !aceitarFinal){status=422;data={detail:'Você não pode enviar a decisão final: Revise e confirme a área: Finanças. Preencha a análise financeira da equipe.'};}else{decisao={...d,rodada:1,versao:(decisao?.versao??0)+1,enviada_em:d.rascunho?null:new Date().toISOString(),automatica:false};data=decisao;}}
  else if(path.endsWith('/mercado-real'))data={edicoes:[]};
  else if(path.endsWith('/relatorios-empresariais'))data=[];
  else if(path==='/api/educacao/referencias')data={referencias:[]};
@@ -34,6 +36,7 @@ await page.route('**/api/**',async route=>{
  else{status=404;data={detail:'Dados ainda não disponíveis.'};}
  await route.fulfill({status,contentType:'application/json',body:JSON.stringify(data)});
 });
+let aceitarFinal=false;
 fs.mkdirSync('docs/diagramas',{recursive:true});
 const abrir=async modo=>{await page.goto('http://127.0.0.1:4173/qa-manual.html?modo='+modo);await page.waitForLoadState('networkidle');};
 await abrir('ingresso');await page.getByRole('button',{name:/Marketing - exemplo/}).waitFor();await page.getByRole('heading',{name:'Turmas disponíveis'}).locator('xpath=ancestor::section[1]').screenshot({path:'docs/diagramas/ingresso-nome.png'});
@@ -41,7 +44,14 @@ await page.getByRole('button',{name:/Marketing - exemplo/}).click();await page.g
 await abrir('equipe');await page.getByLabel('Integrante para liderança').selectOption('2');await page.locator('main').screenshot({path:'docs/diagramas/transferir-lider.png'});await page.getByRole('button',{name:'Transferir liderança para a próxima rodada'}).click();await page.getByText(/Próximo líder: Bruno/).waitFor();await page.locator('main').screenshot({path:'docs/diagramas/lider-proxima-rodada.png'});
 await abrir('bcg');await page.getByRole('img',{name:/Matriz BCG/}).waitFor();await page.locator('main').screenshot({path:'docs/diagramas/matriz-bcg.png'});
 await page.setViewportSize({width:390,height:900});await abrir('bcg');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));await page.setViewportSize({width:1120,height:1000});
-await abrir('decisao');await page.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await page.getByRole('button',{name:'Enviar decisão final',exact:true}).waitFor();await page.getByRole('button',{name:'Enviar decisão final',exact:true}).click();await page.getByText(/Você não pode enviar a decisão final:/).waitFor();await page.getByText(/Você não pode enviar a decisão final:/).screenshot({path:'docs/diagramas/envio-bloqueado.png'});
-await page.getByRole('button',{name:'Salvar e ir para a próxima etapa →',exact:true}).click();await page.getByRole('heading',{name:/Ferramentas estratégicas e segmentação · mês/}).waitFor();assert(decisao&&decisao.enviada_em===null);
+await abrir('decisao');await page.screenshot({path:'docs/diagramas/navegacao-aluno.png'});await page.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await page.getByRole('button',{name:'Enviar decisão final',exact:true}).waitFor();await page.getByRole('button',{name:'Enviar decisão final',exact:true}).click();await page.getByRole('button',{name:'Confirmar envio final',exact:true}).click();await page.getByText(/Você não pode enviar a decisão final:/).waitFor();await page.getByText(/Você não pode enviar a decisão final:/).screenshot({path:'docs/diagramas/envio-bloqueado.png'});
+await page.getByRole('button',{name:'Salvar e ir para a próxima etapa →',exact:true}).click();await page.getByRole('heading',{name:/P&D - tecnologia e inovação · mês/}).waitFor();assert(decisao&&decisao.enviada_em===null);
+await page.getByRole('button',{name:/^Finanças/}).first().click();await page.getByLabel('Análise financeira da equipe').waitFor();assert(await page.getByLabel('Análise financeira da equipe').locator('xpath=..').getByText('Falta tomar esta decisão.',{exact:true}).isVisible());
+await page.getByRole('button',{name:'SWOT',exact:true}).click();await page.getByRole('heading',{name:'SWOT',exact:true}).waitFor();
+aceitarFinal=true;
+await page.getByRole('button',{name:/^P&D/}).first().click();await page.getByRole('slider',{name:'Tecnologia e melhoria do produto (P&D)'}).waitFor();
+await page.getByRole('button',{name:'Enviar decisão final',exact:true}).click();await page.getByRole('button',{name:'Confirmar envio final',exact:true}).click();await page.getByText(/Decisões salvas! Modo de leitura ativado/).waitFor();assert(await page.getByRole('slider',{name:'Tecnologia e melhoria do produto (P&D)'}).isDisabled());
+await page.screenshot({path:'docs/diagramas/decisao-modo-leitura.png'});
+await abrir('professor');await page.getByRole('button',{name:'Manuais · baixar PDF'}).click();await page.getByRole('link',{name:'Baixar PDF: Manual do professor'}).waitFor();assert.equal(await page.getByRole('link',{name:/Baixar PDF:/}).count(),3);await page.screenshot({path:'docs/diagramas/navegacao-professor.png'});
 assert.deepEqual(erros,[],'Erros de execução na interface');
-await browser.close();console.log('Interface conferida: ingresso, formação, liderança, BCG, bloqueio e rascunho com avanço.');
+await browser.close();console.log('Interface conferida: menus por perfil, ferramentas laterais, pendências nos campos, ingresso, liderança, BCG e envio.');

@@ -53,3 +53,31 @@ if FRONTEND_DIST.is_dir() and (FRONTEND_DIST / "index.html").is_file():
         if caminho and arquivo.is_file() and Path(FRONTEND_DIST.resolve()) in arquivo.parents:
             return FileResponse(arquivo)
         return FileResponse(FRONTEND_DIST / "index.html")
+
+
+@app.on_event("startup")
+async def iniciar_calendario():
+    import asyncio, os
+    if os.getenv("SEMPREHUB_CALENDARIO_TESTE") == "1":
+        return
+    from .prazos import fechar_vencidas
+    async def executar():
+        while True:
+            try:
+                await asyncio.to_thread(fechar_vencidas)
+            except Exception:
+                import logging
+                logging.getLogger(__name__).exception("Calendário temporariamente indisponível; nova tentativa automática.")
+            await asyncio.sleep(1)
+    app.state.calendario = asyncio.create_task(executar())
+
+@app.on_event("shutdown")
+async def parar_calendario():
+    import asyncio
+    tarefa = getattr(app.state, "calendario", None)
+    if tarefa:
+        tarefa.cancel()
+        try:
+            await tarefa
+        except asyncio.CancelledError:
+            pass

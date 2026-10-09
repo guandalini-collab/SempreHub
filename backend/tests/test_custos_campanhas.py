@@ -63,7 +63,7 @@ def test_dependencias_panfletos_e_jingle(cliente,professor,monkeypatch):
         assert cliente.put(endpoint,headers=aluno,json=completar_decisao(d)).status_code==422
     contratar(d,[{'id':'flyer-impressao','quantidade':1000},{'id':'flyer-distribuicao','quantidade':1000}])
     assert d['marketing']==750
-    assert cliente.put(endpoint,headers=aluno,json=completar_decisao(d)).status_code==200
+    assert cliente.put(endpoint,headers=aluno,json=completar_decisao({**d, 'rascunho': True})).status_code==200
     contratar(d,[{'id':'jingle','quantidade':1},{'id':'radio-spot','quantidade':3}])
     assert d['marketing']==3900
     assert not d['plano_comercial']['produtos'][0]['servicos']

@@ -47,6 +47,7 @@ def turma(t: Turma, completa: bool = False) -> Dict[str, Any]:
         "status": t.status.value,
         "rodada_atual": t.rodada_atual,
         "total_rodadas": t.total_rodadas,
+        "prazo_rodada": t.prazo_rodada.isoformat() + "Z" if t.prazo_rodada and t.prazo_numero_rodada == t.rodada_atual else None,
         "modo_equipe": t.modo_equipe,
         "modo_jogo": t.modo_jogo,
         "cenario": t.cenario,

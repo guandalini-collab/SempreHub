@@ -151,7 +151,7 @@ def decisao_vigente(db: Session, empresa: Empresa, rodada: int, turma: Turma) ->
 # Rodada
 # ---------------------------------------------------------------------------
 def processar_rodada(
-    db: Session, turma: Turma, escolha_evento: str = "SORTEAR", rng: Optional[random.Random] = None
+    db: Session, turma: Turma, escolha_evento: str = "SORTEAR", rng: Optional[random.Random] = None, forcar: bool = False
 ) -> EventoRodada:
     if turma.status != StatusTurma.ABERTA:
         raise ValueError("A turma já foi encerrada.")
@@ -159,12 +159,23 @@ def processar_rodada(
     if not empresas:
         raise ValueError("Não há empresas na turma para processar a rodada.")
 
-    if turma.modo_equipe:
+    if turma.modo_equipe and not forcar:
         from ..equipes import pendencias_fechamento
 
         pendencias = pendencias_fechamento(db, turma)
         if pendencias:
             raise ValueError("Equipes pendentes: " + "; ".join(pendencias))
+
+    if forcar:
+        from ..models import agora
+        from ..equipes import registrar, snapshot_decisao
+        for empresa in empresas:
+            decisao = db.query(Decisao).filter_by(empresa_id=empresa.id, rodada=turma.rodada_atual).first()
+            if decisao and not decisao.enviada_em:
+                decisao.automatica = 1
+                decisao.enviada_em = agora()
+                registrar(db, empresa, empresa.aluno, "FECHAMENTO_FORCADO_RASCUNHO", decisao.versao, {"snapshot": snapshot_decisao(decisao), "origem": "sistema", "professor_id": turma.professor_id})
+        db.flush()
 
     rng = rng or random.Random()
     rodada = turma.rodada_atual

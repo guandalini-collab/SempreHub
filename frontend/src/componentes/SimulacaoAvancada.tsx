@@ -28,9 +28,9 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
   const mudar = <K extends keyof DecisaoSimulacao>(campo: K, valor: DecisaoSimulacao[K]) => aoMudar({ ...valores, [campo]: valor });
   return <div className="space-y-6">
     {modo === "TRADICIONAL" && <>
-      <Secao titulo="Horas extras opcionais da equipe" oculto={area !== "producao"}>
+      <Secao titulo="Horas extras opcionais da equipe" oculto={area !== "rh"}>
         <Campo rotulo="Horas extras por funcionário neste mês" ajuda="Pode deixar em zero. Até 40 h por empregado, com adicional de 50% e encargos. Base didática: salário / 220 h. Aumenta a capacidade de trabalho, mas máquinas e matéria-prima ainda limitam a produção; o gasto reduz lucro e caixa.">
-          <EntradaNumero valor={valores.horas_extras ?? 0} max={40} sufixo="h" aoMudar={(v) => mudar("horas_extras", v)} />
+          <ControleVisual rotulo="Horas extras por funcionário" moeda={false} valor={valores.horas_extras ?? 0} limite={40} aoMudar={(v) => mudar("horas_extras", v)} />
         </Campo>
       </Secao>
       <Secao titulo="Produção e investimento" oculto={area !== "producao"}>
@@ -44,16 +44,12 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
       <div hidden={area !== "producao"}><CentroGravidade estudo={valores.centro_gravidade} aoMudar={(estudo) => mudar("centro_gravidade", estudo)} /></div>
       <Secao titulo="Logística e entregas" oculto={area !== "logistica"}>
         <Campo rotulo="Entrega" ajuda="O frete é cobrado por unidade vendida. A experiência da entrega afeta a satisfação futura.">
-          <select className={estiloEntrada} value={valores.modal} onChange={(e) => mudar("modal", e.target.value as DecisaoSimulacao["modal"])}>
-            <option value="RAPIDO">Rápida · {reais(config.frete_rapido)} por unidade</option>
-            <option value="PADRAO">Padrão · {reais(config.frete_padrao)} por unidade</option>
-            <option value="ECONOMICO">Econômica · {reais(config.frete_economico)} por unidade</option>
-          </select>
+          <div role="radiogroup" aria-label="Transportadora" className="grid gap-3 sm:grid-cols-3">{(["RAPIDO", "PADRAO", "ECONOMICO"] as const).map(modal=><button type="button" key={modal} role="radio" aria-checked={valores.modal===modal} onClick={()=>mudar("modal",modal)} className={`rounded-xl border-2 p-4 text-left transition ${valores.modal===modal ? "border-cyan-500 bg-cyan-50 shadow-[0_0_12px_#0AADBF40]" : "border-slate-200 bg-white hover:border-cyan-300"}`}><span className="block font-bold">{modal === "RAPIDO" ? "Rápida" : modal === "PADRAO" ? "Padrão" : "Econômica"}</span><span className="text-sm">{reais(modal === "RAPIDO" ? config.frete_rapido : modal === "PADRAO" ? config.frete_padrao : config.frete_economico)} / unidade</span></button>)}</div>
         </Campo>
       </Secao>
       {area === "logistica" && <div className="rounded-lg bg-blue-50 p-4 text-sm"><h3 className="font-bold">Frete e localização</h3><p className="mt-2">Modalidade: {reais(baseFrete)}/unidade · taxa didática: {reais(taxaKm)}/unidade/km.</p><p className="mt-2">Distância média ponderada: {distancia.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} km · adicional: {reais(adicionalFrete)}/unidade.</p><p className="mt-2 font-bold">Frete estimado: {reais(baseFrete + adicionalFrete)} por unidade vendida.</p><p className="mt-2">{temLocalizacao ? "A localização escolhida em Produção afeta o frete registrado na DRE e no caixa." : "Sem localização definida e volumes positivos, aplica-se apenas o custo da modalidade. Complete o estudo em Produção para incluir as distâncias."}</p></div>}
       <Secao titulo="Compras a prazo" oculto={area !== "financas"}>
-        <Campo rotulo="Parcela das compras a prazo" ajuda="A compra entra no estoque agora; o pagamento ocorre no vencimento. O restante é pago à vista."><EntradaNumero valor={valores.compras_prazo * 100} sufixo="%" aoMudar={(v) => mudar("compras_prazo", v / 100)} /></Campo>
+        <Campo rotulo="Parcela das compras a prazo" ajuda="A compra entra no estoque agora; o pagamento ocorre no vencimento. O restante é pago à vista."><ControleVisual rotulo="Compras a prazo (%)" moeda={false} valor={valores.compras_prazo * 100} limite={100} aoMudar={(v) => mudar("compras_prazo", v / 100)} /></Campo>
         <Campo rotulo="Prazo de pagamento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_pagamento} onChange={(e) => mudar("prazo_pagamento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} mês(es)</option>)}</select></Campo>
       </Secao>
     </>}
@@ -67,7 +63,7 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
     </Secao>
       {area === "logistica" && <div className="rounded-xl bg-blue-50 p-5 text-sm"><h3 className="font-bold">Operação digital</h3><p className="mt-2">A entrega deste serviço acontece pela nuvem. Planeje a capacidade de atendimento em Produção e operação.</p></div>}
     </>}
-    <Secao titulo="Pessoas e desenvolvimento" oculto={area !== "decisoes"}>
+    <Secao titulo="Pessoas e desenvolvimento" oculto={area !== "rh"}>
       <Campo rotulo="Salário da equipe de funcionários" ajuda={`O padrão da turma é ${reais(salarioBase)} por funcionário. Salários, benefícios e treinamento influenciam moral, qualificação e rotatividade.`}>
         <select className={estiloEntrada} value={valores.salario === null ? "PADRAO" : "PROPRIO"} onChange={(e) => mudar("salario", e.target.value === "PADRAO" ? null : salarioBase)}><option value="PADRAO">Usar salário-base da turma</option><option value="PROPRIO">Definir salário da empresa</option></select>
       </Campo>
@@ -77,12 +73,12 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
     </Secao>
     {!mixSelecionado && <Secao titulo="Posicionamento e canais" oculto={area !== "decisoes"}>
       <Campo rotulo="Estratégia de posicionamento"><select className={estiloEntrada} value={valores.posicionamento} onChange={(e) => mudar("posicionamento", e.target.value as DecisaoSimulacao["posicionamento"])}><option value="CUSTO">Liderança em custo</option><option value="DIFERENCIACAO">Diferenciação</option></select></Campo>
-      <Campo rotulo="Canal de venda"><select className={estiloEntrada} value={valores.canal} onChange={(e) => mudar("canal", e.target.value as DecisaoSimulacao["canal"])}><option value="DIRETO">Venda direta</option><option value="DISTRIBUIDOR">Distribuidor</option><option value="DIGITAL">Digital</option></select></Campo>
-      <Campo rotulo="Marketing direcionado ao digital" ajuda={`Parcela do orçamento de marketing que vai ao digital. Limite atual: ${reais(marketing)}; este valor já está incluído no marketing total.`}><EntradaNumero moeda max={marketing} valor={valores.marketing_digital} aoMudar={(v) => mudar("marketing_digital", v)} /></Campo>
+      <Campo rotulo="Canal de venda"><div role="radiogroup" aria-label="Canal de venda" className="grid gap-3">{(["DIRETO", "DISTRIBUIDOR", "DIGITAL"] as const).map(canal=><button type="button" role="radio" aria-checked={valores.canal===canal} key={canal} onClick={()=>mudar("canal",canal)} className={`rounded-xl border-2 p-4 text-left font-semibold ${valores.canal===canal ? "border-cyan-500 bg-cyan-50 shadow-[0_0_12px_#0AADBF40]" : "border-slate-200 bg-white"}`}>{canal === "DIRETO" ? "Venda direta" : canal === "DISTRIBUIDOR" ? "Distribuidor" : "Digital"}</button>)}</div></Campo>
+      <Campo rotulo="Marketing direcionado ao digital" ajuda={`Parcela do orçamento de marketing que vai ao digital. Limite atual: ${reais(marketing)}; este valor já está incluído no marketing total.`}><ControleVisual rotulo="Marketing digital" valor={valores.marketing_digital} limite={marketing} aoMudar={(v) => mudar("marketing_digital", v)} /></Campo>
     </Secao>
     }
     <Secao titulo="Vendas a prazo" oculto={area !== "financas"}>
-      <Campo rotulo="Parcela das vendas a prazo" ajuda="A venda gera receita e lucro nesta rodada, mas o dinheiro só chega ao caixa no vencimento."><EntradaNumero valor={valores.vendas_prazo * 100} sufixo="%" aoMudar={(v) => mudar("vendas_prazo", v / 100)} /></Campo>
+      <Campo rotulo="Parcela das vendas a prazo" ajuda="A venda gera receita e lucro nesta rodada, mas o dinheiro só chega ao caixa no vencimento."><ControleVisual rotulo="Vendas a prazo (%)" moeda={false} valor={valores.vendas_prazo * 100} limite={100} aoMudar={(v) => mudar("vendas_prazo", v / 100)} /></Campo>
       <Campo rotulo="Prazo de recebimento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_recebimento} onChange={(e) => mudar("prazo_recebimento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} mês(es)</option>)}</select></Campo>
     </Secao>
   </div>;

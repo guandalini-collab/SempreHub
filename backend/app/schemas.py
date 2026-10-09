@@ -150,6 +150,7 @@ class TurmaEntrada(ParametrosTurma):
 
 
 class FecharRodadaEntrada(BaseModel):
+    forcar: bool = False
     evento: str = "SORTEAR"
     rodada: Optional[int] = Field(None, ge=1, le=60)
 

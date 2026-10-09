@@ -45,6 +45,7 @@ export interface Parametros {
 }
 
 export interface Turma {
+  prazo_rodada?: string | null;
   visivel_ingresso: boolean;
   formacao_encerrada: boolean;
   modo_jogo: ModoJogo;

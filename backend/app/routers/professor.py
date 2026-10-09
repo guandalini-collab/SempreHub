@@ -1,4 +1,5 @@
 import csv
+from datetime import date
 import io
 import json
 import secrets
@@ -210,10 +211,10 @@ def fechar_rodada(
     turma = bloquear_turma(db, turma.id)
     verificar_rodada(dados.rodada, turma, obrigatoria=turma.modo_jogo != "LEGADO")
     pendencias = pendencias_fechamento(db, turma)
-    if pendencias:
+    if pendencias and not dados.forcar:
         raise HTTPException(422, "Equipes pendentes: " + "; ".join(pendencias))
     try:
-        evento = processar_rodada(db, turma, dados.evento)
+        evento = processar_rodada(db, turma, dados.evento, forcar=dados.forcar)
     except ValueError as erro:
         db.rollback()
         raise HTTPException(422, str(erro))
@@ -460,3 +461,25 @@ def incluir_excepcionalmente(turma_id: int, dados: InclusaoExcepcionalEntrada, d
     registrar(db, empresa, m.aluno, "INCLUSAO_EXCEPCIONAL", versao, {"professor_id": professor.id, "motivo": dados.motivo.strip()})
     db.commit()
     return {"mensagem": "Inclusão excepcional registrada com justificativa."}
+
+
+class PrazoEntrada(BaseModel):
+    data: Optional[date] = None
+    rodada: int = Field(ge=1)
+
+@router.put("/turmas/{turma_id}/prazo")
+def configurar_prazo(turma_id: int, dados: PrazoEntrada, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    from ..prazos import limite_brasilia
+    from ..models import agora
+    _turma_do_professor(db, turma_id, professor)
+    turma = bloquear_turma(db, turma_id)
+    verificar_rodada(dados.rodada, turma, True)
+    if turma.status != StatusTurma.ABERTA:
+        raise HTTPException(409, "A turma está encerrada.")
+    limite = limite_brasilia(dados.data) if dados.data else None
+    if limite and limite <= agora():
+        raise HTTPException(422, "Escolha uma data cujo limite ainda não tenha passado em Brasília.")
+    turma.prazo_rodada = limite
+    turma.prazo_numero_rodada = dados.rodada if limite else None
+    db.commit()
+    return ser.turma(turma, completa=True)

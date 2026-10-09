@@ -108,7 +108,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const rotulos = Array.from({ length: rodadasJogadas }, (_, i) => `M${i + 1}`);
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ turma: turma.nome, codigo: turma.codigo, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
+    <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ turma: turma.nome, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
       <SecaoPainel id="visao" ativa={secao}>
       <FormacaoTurma turma={turma} aoAtualizar={carregar}/>
       <div className="rounded-xl bg-marinho p-5 text-white shadow-lg">
@@ -161,7 +161,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         </div>
         <div className="mt-5 border-t border-slate-200 pt-4">
           <h3 className="font-semibold">O que fazer agora</h3>
-          <p className="mt-2 text-sm text-slate-600">{!aberta ? "A simulação terminou. Consulte os resultados das empresas." : empresas.length === 0 ? "Compartilhe o código de entrada para os alunos participarem da turma." : enviadas < empresas.length ? "Confira as empresas com envio pendente antes de encerrar a rodada." : "Todos os envios estão prontos. Encerre a rodada para calcular os resultados."}</p>
+          <p className="mt-2 text-sm text-slate-600">{!aberta ? "A simulação terminou. Consulte os resultados das empresas." : empresas.length === 0 ? "Disponibilize a turma pelo nome para os alunos ingressarem." : enviadas < empresas.length ? "Confira as empresas com envio pendente antes de encerrar a rodada." : "Todos os envios estão prontos. Encerre a rodada para calcular os resultados."}</p>
 
           <p className="mt-3 text-xs text-slate-500">Continue pelo menu lateral: etapa 3 para conferir participantes e pendências; etapa 6 quando estiver pronto para encerrar. Os resultados só são calculados após confirmar o encerramento.</p>
         </div>
@@ -169,7 +169,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       </SecaoPainel>
       <SecaoPainel id="fechamento" ativa={secao}>
           {aberta ? (
-            <FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} empresas={empresas} aoFechar={carregar} />
+            <><PrazoRodada turmaId={turma.id} rodada={turma.rodada_atual} prazo={turma.prazo_rodada} aoSalvar={carregar} /><FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} empresas={empresas} aoFechar={carregar} /></>
           ) : (
             <Cartao titulo="Simulação encerrada">
               <p className="text-sm text-slate-600">
@@ -370,11 +370,10 @@ function FecharRodada({
   }, [turmaId, rodada]);
 
   async function fechar() {
-    if (modoEquipe && pendentes.length) return;
     setCarregando(true);
     setMensagem(null);
     try {
-      const resposta = await api.post<{ evento: OpcaoEvento }>(`/api/professor/turmas/${turmaId}/fechar-rodada`, { evento: "SORTEAR", rodada });
+      const resposta = await api.post<{ evento: OpcaoEvento }>(`/api/professor/turmas/${turmaId}/fechar-rodada`, { evento: "SORTEAR", rodada, forcar: true });
       setMensagem({ tipo: "sucesso", texto: `Mês ${rodada} fechado. Evento: ${resposta.evento.titulo}.` });
       setConfirmando(false);
       await aoFechar();
@@ -393,9 +392,9 @@ function FecharRodada({
         {pendentes.length > 0 && (
           <Aviso tipo="info">
             {modoEquipe ? <>
-              <p className="font-semibold">{pendentes.length} equipe(s) ainda precisam concluir a decisão. A rodada estará disponível quando todas estiverem prontas.</p>
-              <ul className="mt-2 space-y-2">{pendentes.map((e) => <li key={e.id}><strong>{e.nome}:</strong> {(e.equipe_pendencias?.length ? e.equipe_pendencias : ["Decisão ainda não confirmada por todos"]).join("; ")}.</li>)}</ul>
-            </> : <>{pendentes.length} empresa(s) ainda não enviaram decisões ({pendentes.map((e) => e.nome).join(", ")}). Se você fechar agora, o sistema repetirá as decisões anteriores delas.</>}
+              <p className="font-semibold">{pendentes.length} equipe(s) ainda precisam concluir a decisão. Ao forçar o fechamento, rascunhos serão processados automaticamente; empresas sem decisão repetem as escolhas recorrentes anteriores, sem novos investimentos pontuais.</p>
+              <ul className="mt-2 space-y-2">{pendentes.map((e) => <li key={e.id}><strong>{e.nome}:</strong> {(e.equipe_pendencias?.length ? e.equipe_pendencias : ["Decisão final ainda não enviada pelo líder"]).join("; ")}.</li>)}</ul>
+            </> : <>{pendentes.length} empresa(s) ainda não enviaram decisões ({pendentes.map((e) => e.nome).join(", ")}). Confira as pendências antes de fechar; um rascunho não é entrega final.</>}
           </Aviso>
         )}
         {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}
@@ -405,14 +404,14 @@ function FecharRodada({
             <Botao variante="secundario" onClick={() => setConfirmando(false)}>
               Voltar
             </Botao>
-            <Botao carregando={carregando} disabled={modoEquipe && pendentes.length > 0} onClick={fechar}>
+            <Botao carregando={carregando}  onClick={fechar}>
               Confirmar
             </Botao>
           </div>
         ) : (
           <div className="flex justify-end">
-            <Botao disabled={empresas.length === 0 || (modoEquipe && pendentes.length > 0)} onClick={() => setConfirmando(true)}>
-              Fechar rodada
+            <Botao disabled={empresas.length === 0} onClick={() => setConfirmando(true)}>
+              Forçar Fechamento Imediato da Rodada
             </Botao>
           </div>
         )}
@@ -589,4 +588,19 @@ function EditarParametros({
       )}
     </Modal>
   );
+}
+
+
+function PrazoRodada({turmaId, rodada, prazo, aoSalvar}: {turmaId: number; rodada: number; prazo?: string | null; aoSalvar: () => Promise<void>}) {
+  const [data, setData] = useState("");
+  const [mensagem, setMensagem] = useState<string | null>(null);
+  const [salvando, setSalvando] = useState(false);
+  useEffect(() => { setData(prazo ? new Intl.DateTimeFormat("en-CA", {timeZone: "America/Sao_Paulo"}).format(new Date(prazo)) : ""); }, [prazo, rodada]);
+  async function salvar() {
+    setSalvando(true); setMensagem(null);
+    try { await api.put(`/api/professor/turmas/${turmaId}/prazo`, {data: data || null, rodada}); await aoSalvar(); setMensagem("Prazo salvo para esta rodada."); }
+    catch(e) { setMensagem(e instanceof Error ? e.message : "Erro ao salvar prazo."); }
+    finally { setSalvando(false); }
+  }
+  return <Cartao titulo="Data limite da rodada"><p className="mb-4 text-sm">O sistema bloqueia os envios e encerra automaticamente este mês às 23:59:59 de Brasília da data escolhida. Sem data, o encerramento é manual. Configure um novo prazo para cada mês.</p><Campo rotulo="Data limite"><input type="date" className={estiloEntrada} value={data} onChange={e=>setData(e.target.value)} /></Campo><div className="mt-4 flex justify-end"><Botao carregando={salvando} onClick={salvar}>Salvar prazo</Botao></div>{mensagem && <p role="status" className="mt-3 text-sm">{mensagem}</p>}</Cartao>;
 }

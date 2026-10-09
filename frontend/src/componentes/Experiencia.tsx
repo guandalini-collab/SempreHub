@@ -53,19 +53,7 @@ export function ControleVisual({
         onChange={(e) => aoMudar(Number(e.target.value))}
         className="w-full accent-[#2563EB]"
       />
-      <div className="mt-2">
-        <p className="text-xs font-medium text-slate-600">Valor exato · você pode digitar</p>
-        <div className="mt-2">
-          <EntradaNumero
-            aria-label={`${rotulo} — valor exato`}
-            valor={valor}
-            aoMudar={aoMudar}
-            minimo={minimo}
-            moeda={moeda}
-            inteiro={inteiro}
-          />
-        </div>
-      </div>
+      <div className="mt-2 flex justify-between text-xs font-semibold text-slate-600"><span>Mínimo: {moeda ? reais(minimo) : minimo}</span><span>Máximo: {moeda ? reais(teto) : teto}</span></div>
     </div>
   );
 }

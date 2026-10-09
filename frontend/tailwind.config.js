@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        marinho: "#102A68", // Azul Profundo — cor primária da marca
-        ouro: "#FFC233", // Amarelo vivo — cor de acento
+        marinho: "#034AA6", // Azul Royal — identidade oficial
+        ouro: "#D9851E", // Laranja Ouro — identidade oficial
       },
     },
   },

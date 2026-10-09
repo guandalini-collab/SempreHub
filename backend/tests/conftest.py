@@ -11,6 +11,7 @@ os.environ["DATABASE_URL"] = os.getenv("SEMPREHUB_TESTE_DB", f"sqlite:///{_BANCO
 os.environ["SEMPREHUB_CODIGO_DOCENTE"] = "codigo-teste"
 # Testes nunca usam serviços de e-mail ou credenciais do .env local.
 os.environ["SEMPREHUB_AMBIENTE"] = "desenvolvimento"
+os.environ["SEMPREHUB_CALENDARIO_TESTE"] = "1"
 os.environ["SMTP_HOST"] = ""
 os.environ["RESEND_API_KEY"] = ""
 os.environ["EMAIL_REMETENTE"] = ""

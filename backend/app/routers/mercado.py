@@ -172,6 +172,15 @@ def gerar_relatorio(turma_id:int,empresa_id:int,rodada:int,db:Session=Depends(ge
     dados["plano_marketing"]=(decisao.plano_comercial if decisao else None)
     if dados.get("decisao"):
         dados["decisao"].pop("aprovacoes", None)
+    # Contexto agregado da mesma rodada; sem nomes de alunos ou decisões futuras.
+    dados["concorrencia_da_rodada"] = {"turma_id": turma.id, "rodada": rodada, "empresas": [
+        {"empresa_id": e.id, "nome": e.nome,
+         "decisao": {"preco": d.preco, "marketing": d.marketing, "pd": d.pd} if d else None,
+         "resultado": {"receita": r.receita, "lucro": r.lucro_liquido, "participacao_mercado": r.participacao_mercado}}
+        for e in turma.empresas
+        for r in e.resultados if r.rodada == rodada
+        for d in [next((x for x in e.decisoes if x.rodada == rodada), None)]
+    ]}
     dados["historico"]=[{"rodada":r.rodada,"receita":r.receita,"lucro":r.lucro_liquido,"caixa":r.caixa_final} for r in empresa.resultados if r.rodada<rodada]
     bruto,_=gerar_json('''Redija um relatório empresarial em português com tom frio, objetivo e profissional. JSON {texto:string}. Use apenas os dados fornecidos, não invente indicadores nem atribua causalidade não comprovada. Inclua resultado comercial, DRE, fluxo de caixa, balanço quando disponível, riscos e comparação histórica. Explique os efeitos de alinhamento estratégico registrados nos alertas e na avaliação da rodada, separando o fator comercial de custos, capacidade e eventos. Não atribua julgamento de qualidade aos textos livres. Discuta decisões sem escolher a próxima decisão pela equipe. Não mencione IA, ferramentas, professor ou avaliações pedagógicas. Não trate plano comercial como executado se os dados não comprovam sua execução. Não exponha dados pessoais. Até 8000 caracteres.''',dados)
     texto=bruto.get("texto") if isinstance(bruto,dict) else None

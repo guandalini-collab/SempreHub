@@ -10,7 +10,7 @@ from types import SimpleNamespace
 import pytest
 
 from app.database import SessionLocal
-from app.models import Empresa, Turma
+from app.models import Decisao, Empresa, Turma
 from app.relatorios import gerar_relatorio, indicadores_rodada, relatorio_csv
 
 from .conftest import cadastrar
@@ -92,6 +92,13 @@ def test_relatorio_preserva_assinaturas_de_versoes_anteriores_sem_contar_como_at
     _configurar(cliente, equipe)
     anterior = _salvar(cliente, equipe)
     _aprovar(cliente, equipe, equipe["alunos"][0], anterior["versao"])
+    # Reproduz histórico de versões anteriores à trava de envio final.
+    # O sistema atual impede esta edição pela API; o relatório deve continuar
+    # preservando assinaturas históricas já existentes no banco.
+    with SessionLocal() as db:
+        registro = db.query(Decisao).filter_by(empresa_id=equipe["id"], rodada=1).one()
+        registro.enviada_em = None
+        db.commit()
     atual = _salvar(cliente, equipe, marketing=100)
     _aprovar(cliente, equipe, equipe["alunos"][0], atual["versao"])
     assert _fechar(cliente, equipe, professor).status_code == 200

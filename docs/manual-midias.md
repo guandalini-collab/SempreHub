@@ -1,16 +1,56 @@
-<div class="cover">
+# SempreHub - Manual de mídias e campanhas
 
-<img src="../frontend/src/assets/logo-semprehub.svg" alt="SempreHub" />
+Versão 3.0 - outubro de 2026
 
-<span class="kicker">Simula+ · Planejamento de mídia corporativa</span>
+## A história e o conceito da logomarca SempreHub
 
-# Guia de mídias e serviços
+**Autoria e criação: Professor Guandalini.** A marca, o nome e a identidade visual foram idealizados e criados pelo Professor Guandalini para unir o ambiente corporativo à conexão das redes modernas. O símbolo representa uma metodologia de aprendizado viva e integrada, voltada ao Ensino Médio e Superior.
 
-<p class="subtitle">Audiência, produção e execução: conheça o custo da campanha antes de contratar.</p>
+**SEMPRE** evoca constância, aprendizado contínuo e resiliência: empreender exige tentativas, análise dos relatórios, ajustes e evolução. **HUB** representa um centro conector de inteligência, onde estudantes, mercado competitivo e gestão se encontram.
 
-<p class="meta">Criado por: Professor Guandalini.<br>Referências consultadas em 07/10/2026 · 62 formatos · aluno e professor.</p>
+**A rede de decisões.** Os nós azuis e cianos representam os seis departamentos: P&D, Produção, Logística, Marketing, RH e Finanças. As linhas mostram que nenhuma decisão é isolada: mudar a Produção afeta a Logística e as Finanças. Os dois núcleos em Laranja Ouro representam a tomada de decisão do estudante e a dinâmica do mercado.
 
-</div>
+**Paleta oficial da identidade visual:** Azul Royal **#034AA6** e Azul Absoluto **#0762D9** transmitem credibilidade e robustez; Ciano/Turquesa **#0AADBF** representa dinamismo e modernidade; Laranja Ouro **#D9851E** destaca geração de valor, criatividade e atitude empreendedora; Cinza Soft **#F2F2F2** organiza um fundo limpo para a leitura.
+
+O Azul Profundo **#0B2545** e o Ouro Fosco **#C5A059** permanecem documentados como paleta institucional anterior. A identidade visual atual segue os códigos oficiais apresentados pelo fundador.
+
+
+## Navegação: escolha à esquerda, trabalhe à direita
+
+O menu lateral é o ponto de partida. Suas categorias e submenus aparecem abertos inicialmente. Você pode recolher uma categoria para organizar a tela e abri-la novamente quando precisar. O submenu selecionado fica destacado, e o conteúdo aparece no painel à direita. Em telas estreitas, o menu permanece disponível acima do conteúdo e possui rolagem própria.
+
+1. Localize no menu o assunto desejado.
+2. Clique uma vez no submenu. Não é necessário abrir outra janela para tomar decisões.
+3. Confira o título do painel à direita antes de alterar qualquer valor.
+4. Ao terminar, salve o rascunho, avance ou envie conforme a etapa.
+5. Para estudar, abra **Manuais - baixar PDF**. Use **Visualizar** para consultar ou **Baixar PDF** para guardar uma cópia.
+
+![Menu lateral e painel de trabalho da SempreHub](diagramas/navegacao-aluno.png)
+
+Os campos de decisão mostram pendências, como **Falta tomar esta decisão** ou **Falta confirmar esta decisão**. Eles não substituem este manual. A confirmação de uma área significa que a equipe conferiu todos os seus campos, incluindo a decisão de manter em zero ações opcionais. Um aviso de campo vazio continua pendente mesmo depois de marcar a revisão. Os estados do menu referem-se à última versão salva; valores ainda não salvos precisam ser registrados.
+
+## Primeira campanha: do público ao orçamento
+
+1. Leia a segmentação escolhida pela equipe. O público e a região vêm antes da mídia.
+2. Abra Produtos e marketing no menu lateral e localize o produto.
+3. Escolha o formato de mídia, confira sua unidade e informe a quantidade.
+4. Confira o serviço de produção ou execução necessário. Mídia e serviço podem ser despesas diferentes.
+5. Quando o preço estiver sob consulta, informe orçamento e referência conforme solicitado; sem isso a decisão pode permanecer incompleta.
+6. Confira o total, a margem e o caixa antes de revisar o mix e salvar.
+
+**Exemplo didático:** uma tarifa por inserção multiplicada por três representa três inserções. Uma tarifa por mil exibições com quantidade três representa três lotes de mil exibições, não três mil compradores. Se houver produção, some o serviço conforme a regra do catálogo. Não multiplique taxas sem verificar a unidade.
+
+Escolher zero é uma decisão possível quando a equipe não deseja contratar uma ação opcional. Comprar publicidade sem demanda, margem ou capacidade suficiente pode comprometer a empresa. A audiência não é venda garantida.
+
+## Glossário para quem está começando
+
+**Mídia:** meio ou espaço de divulgação. **Peça:** material produzido, como arte ou vídeo. **Inserção:** ocorrência de um anúncio. **Impressão:** exibição registrada. **Alcance:** pessoas distintas alcançadas quando essa medida estiver disponível. **Conversão:** ação desejada, que pode ser uma compra ou outra ação definida. **Orçamento:** valor previsto para contratar o escopo.
+
+Compare o escopo, a unidade e o total, não apenas o número ao lado do preço. Uma peça produzida sem veiculação não compra audiência. Um pacote de veiculação pode não incluir produção. Uma referência publicada não garante o preço final de um fornecedor.
+
+## Consulta por formato
+
+O catálogo a seguir preserva os formatos, unidades, tarifas didáticas e referências de serviço já documentados. Valores de fontes possuem as datas de consulta indicadas e não devem ser tratados como cotação atual. Confira a edição e o escopo vigentes na turma antes de decidir. As imagens do programa e os exemplos do manual do aluno complementam o uso deste catálogo.
 
 ## Como planejar a contratação
 
@@ -39,7 +79,7 @@ Quantidade 10 em uma linha de CPM significa 10 lotes de mil exibições, não 10
 
 ## Impressa
 
-<div class="media-card">
+
 
 ### Jornal · página inteira
 
@@ -57,11 +97,11 @@ Anúncio que ocupa uma página inteira de jornal. Dá espaço para uma mensagem 
 
 **Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Jornal · meia página
 
@@ -79,11 +119,11 @@ Anúncio em metade de uma página de jornal. Permite combinar informação e pre
 
 **Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Revista · página inteira
 
@@ -101,11 +141,11 @@ Página completa em revista. Útil para públicos ligados ao tema da publicaçã
 
 **Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Jornal · página dupla
 
@@ -123,11 +163,11 @@ Anúncio nas duas páginas abertas do jornal. Prioriza impacto visual e visibili
 
 **Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Revista · página dupla
 
@@ -145,11 +185,11 @@ Anúncio em duas páginas abertas de revista. Permite uma composição visual am
 
 **Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Jornal · fração de página
 
@@ -167,11 +207,11 @@ Espaço pequeno, como um quarto de página ou rodapé de jornal. Adequado a mens
 
 **Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Revista · fração de página
 
@@ -189,11 +229,11 @@ Espaço pequeno em revista. Dá presença em um público temático sem comprar u
 
 **Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Revista · meia página
 
@@ -211,7 +251,7 @@ Metade de uma página de revista, em formato horizontal ou vertical. Equilibra e
 
 **Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
@@ -223,7 +263,7 @@ Produção isolada não compra audiência. Contrate serviços e veiculação nec
 
 ## Digital
 
-<div class="media-card">
+
 
 ### Influenciador · até 100 mil seguidores
 
@@ -238,11 +278,11 @@ Parceria paga com criador de conteúdo de até 100 mil seguidores. Pode aproxima
 
 **Escopo:** Pacote didático de parceria, incluindo criação pelo influenciador. Direitos de reutilização e envio de produtos podem exigir orçamento adicional.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Influenciador · 100 a 500 mil seguidores
 
@@ -257,11 +297,11 @@ Parceria com criador de 100 a 500 mil seguidores. Combina alcance e possibilidad
 
 **Escopo:** Pacote didático de parceria, incluindo criação pelo influenciador. Direitos de reutilização e envio de produtos podem exigir orçamento adicional.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Influenciador · mais de 500 mil seguidores
 
@@ -276,11 +316,11 @@ Parceria com criador acima de 500 mil seguidores. Busca amplo alcance; audiênci
 
 **Escopo:** Pacote didático de parceria, incluindo criação pelo influenciador. Direitos de reutilização e envio de produtos podem exigir orçamento adicional.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### E-mail marketing
 
@@ -298,11 +338,11 @@ Mensagem enviada a uma lista de contatos com permissão. Útil para relacionamen
 
 **Design do e-mail marketing:** Desenho de um e-mail, sem HTML. O pacote de envios do jogo fornece a ferramenta com editor visual; programação personalizada não está incluída. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: We Do Logos · layout de e-mail marketing](https://www.wedologos.com.br/comprar/layoutemailmkt.aspx) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Podcast · inserção
 
@@ -317,11 +357,11 @@ Menção ou anúncio dentro de um episódio de podcast. A seleção do programa 
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### SMS marketing
 
@@ -336,11 +376,11 @@ Mensagem curta enviada ao celular. Pode divulgar ofertas ou avisos; exige contat
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Marketing de conteúdo
 
@@ -355,11 +395,11 @@ Pacote de produção de textos, imagens ou vídeos para canais próprios. Ajuda 
 
 **Escopo:** Pacote mensal do jogo inclui a produção básica de conteúdo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Google Ads
 
@@ -377,11 +417,11 @@ Campanha de anúncios no Google, em pesquisa, display ou YouTube. Pesquisa atend
 
 **Gestão de campanha Google Ads:** Referência de honorários mensais; verba paga ao Google é separada. No jogo, gestão por campanha de produto e mês. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: DivulgaAI · gestão Google Ads](https://divulgaai.com.br/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Meta Ads
 
@@ -398,11 +438,11 @@ Campanha de anúncios no Facebook e Instagram. Permite segmentação e diferente
 
 > **Orçamento obrigatório, fora do subtotal:** Gestão de campanha e criação das peças não incluídas na verba de mídia. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### YouTube · bumper
 
@@ -420,11 +460,11 @@ Vídeo de até seis segundos no YouTube, não pulável. Exige uma mensagem curta
 
 **Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### YouTube · in-stream
 
@@ -442,11 +482,11 @@ Vídeo in-stream pulável após os primeiros segundos. Apresente a proposta cedo
 
 **Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Stories / Reels / TikTok
 
@@ -464,11 +504,11 @@ Vídeo ou imagem vertical para Stories, Reels ou TikTok. Formato móvel que exig
 
 **Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Feed · Instagram / Facebook / LinkedIn
 
@@ -486,11 +526,11 @@ Imagem ou vídeo entre publicações de Instagram, Facebook ou LinkedIn. A mensa
 
 **Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Carrossel
 
@@ -508,11 +548,11 @@ Sequência de imagens ou vídeos deslizantes. Permite mostrar variantes, benefí
 
 **Design do carrossel:** Arte de carrossel; não inclui ensaio fotográfico ou filmagem. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Anúncio de coleção
 
@@ -530,11 +570,11 @@ Anúncio com peça principal e catálogo de produtos. Facilita descoberta e nave
 
 **Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Notificação push
 
@@ -549,7 +589,7 @@ Licença para enviar notificações curtas de aplicativo ou navegador a usuário
 
 **Escopo:** Licença do serviço; não garante audiência nem inclui desenvolvimento de aplicativo.
 
-</div>
+
 
 ---
 
@@ -561,7 +601,7 @@ Produção isolada não compra audiência. Contrate serviços e veiculação nec
 
 ## Exterior
 
-<div class="media-card">
+
 
 ### Outdoor fixo
 
@@ -584,11 +624,11 @@ Painel fixo em via de circulação. Comunica rapidamente a quem passa; use pouco
 
 > **Orçamento obrigatório, fora do subtotal:** Fixação e instalação da lona de 9 × 3 m. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Front light
 
@@ -611,11 +651,11 @@ Painel com iluminação frontal. Ajuda a manter a visibilidade noturna; localiza
 
 > **Orçamento obrigatório, fora do subtotal:** Fixação e instalação do painel de 9 × 3 m. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Busdoor
 
@@ -632,11 +672,11 @@ Anúncio aplicado na parte externa de ônibus. Circula por trajetos urbanos e of
 
 > **Orçamento obrigatório, fora do subtotal:** Vinil perfurado, criação e aplicação na garagem. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Painel digital
 
@@ -654,11 +694,11 @@ Painel de LED que exibe anúncios e permite alternar peças. Adequado a comunica
 
 **Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Mobiliário urbano
 
@@ -675,11 +715,11 @@ Anúncio em abrigos de ônibus, relógios e outros mobiliários de rua. Alcança
 
 > **Orçamento obrigatório, fora do subtotal:** Arte, impressão no formato e instalação. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Empena
 
@@ -696,11 +736,11 @@ Grande anúncio em parede lateral de prédio. Busca impacto visual, mas envolve 
 
 > **Orçamento obrigatório, fora do subtotal:** Arte, lona de grande formato, projeto e instalação especializada em altura. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Envelopamento de frota
 
@@ -717,11 +757,11 @@ Adesivagem de veículos, ônibus ou vagões. Transforma a superfície do veícul
 
 > **Orçamento obrigatório, fora do subtotal:** Projeto, adesivo apropriado, preparação e aplicação em veículo. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Telas · elevador / táxi / metrô
 
@@ -739,7 +779,7 @@ Circuito de telas em elevadores, táxis ou metrô. Exposição durante esperas e
 
 **Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
@@ -751,7 +791,7 @@ Produção isolada não compra audiência. Contrate serviços e veiculação nec
 
 ## Eletrônica
 
-<div class="media-card">
+
 
 ### Rádio · spot 30 segundos
 
@@ -769,11 +809,11 @@ Anúncio de áudio gravado com 30 segundos. Permite repetição e divulgação d
 
 **Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Rádio · testemunhal
 
@@ -788,11 +828,11 @@ Anúncio lido por apresentador ou locutor. Usa a identificação da audiência c
 
 **Escopo:** Pacote do jogo inclui leitura ao vivo; a equipe deve preparar briefing e texto. Não inclui produção de spot gravado.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### TV · comercial 15 segundos
 
@@ -810,11 +850,11 @@ Comercial de 15 segundos em televisão. Requer mensagem curta e execução visua
 
 **Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### TV · comercial 30 segundos
 
@@ -832,11 +872,11 @@ Comercial de 30 segundos em televisão. Oferece mais tempo para explicar a propo
 
 **Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Cinema · comercial 30 segundos
 
@@ -854,11 +894,11 @@ Comercial de 30 segundos antes da sessão de cinema. Trabalha presença audiovis
 
 **Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### TV · teaser
 
@@ -876,11 +916,11 @@ Vídeo curto que cria expectativa sobre um lançamento. Precisa de continuidade 
 
 **Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### TV · merchandising
 
@@ -897,11 +937,11 @@ Ação comercial integrada a um programa, com apresentação ou interação com 
 
 > **Orçamento obrigatório, fora do subtotal:** Amostras, frete, briefing e apoio técnico; variam conforme produto e emissora. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### TV · vinheta de patrocínio
 
@@ -919,11 +959,11 @@ Mensagem breve de patrocínio na abertura ou fechamento de um bloco. A tabela co
 
 **Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### TV · infocomercial
 
@@ -940,11 +980,11 @@ Demonstração publicitária longa, normalmente de 15 a 30 minutos. Explica uso 
 
 > **Orçamento obrigatório, fora do subtotal:** Roteiro, captação e edição de filme de 15–30 minutos; não usar preço de VT de 30 segundos. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Rádio · produção de jingle
 
@@ -961,11 +1001,11 @@ Produção de música curta publicitária. O custo desta linha é a criação; a
 
 > **Dependência obrigatória:** Produção sem audiência: exige veiculação em rádio ou streaming. Substitui a produção de spot simples quando contratado junto.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Rádio · patrocínio de programa
 
@@ -980,11 +1020,11 @@ Cota mensal de associação da marca a um programa de rádio. Pode incluir chama
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Rádio · streaming
 
@@ -1002,11 +1042,11 @@ Anúncio de áudio em plataformas digitais de rádio ou streaming. A tabela comp
 
 **Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Rádio · publicação social
 
@@ -1024,7 +1064,7 @@ Publicação nos perfis sociais da emissora. É uma ação digital distinta das 
 
 **Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
@@ -1036,7 +1076,7 @@ Produção isolada não compra audiência. Contrate serviços e veiculação nec
 
 ## Direto
 
-<div class="media-card">
+
 
 ### Carro de som
 
@@ -1054,11 +1094,11 @@ Divulgação por veículo com alto-falante em uma região. É uma ação local; 
 
 **Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Panfletos · impressão
 
@@ -1078,11 +1118,11 @@ Produção física de panfletos. Imprimir não significa distribuir; a distribui
 
 > **Dependência obrigatória:** Contratar impressão e distribuição na mesma quantidade. O design é cobrado uma vez por produto e mês.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Panfletos · distribuição
 
@@ -1099,11 +1139,11 @@ Entrega dos panfletos em locais de circulação. Este custo não inclui a impres
 
 > **Dependência obrigatória:** Exige impressão na mesma quantidade; distribuição não inclui arte nem impressão.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Mala direta
 
@@ -1118,11 +1158,11 @@ Material impresso enviado por correio. Na tabela do jogo o custo por peça inclu
 
 **Escopo:** Pacote do jogo inclui impressão e postagem da peça.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Telemarketing
 
@@ -1137,7 +1177,7 @@ Campanha mensal de contato telefônico. Adequada a ofertas que precisam de conve
 
 **Escopo:** Pacote mensal do jogo inclui operação básica terceirizada.
 
-</div>
+
 
 ---
 
@@ -1149,7 +1189,7 @@ Produção isolada não compra audiência. Contrate serviços e veiculação nec
 
 ## Relações públicas
 
-<div class="media-card">
+
 
 ### Assessoria de imprensa
 
@@ -1164,11 +1204,11 @@ Serviço mensal de relacionamento com a imprensa e preparação de pautas. Busca
 
 **Escopo:** Honorários mensais do serviço de assessoria; não garantem publicação.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Comunicado à imprensa
 
@@ -1183,7 +1223,7 @@ Preparação e envio de comunicado oficial à imprensa. A compra de um release n
 
 **Escopo:** Pacote do jogo inclui redação e envio do comunicado.
 
-</div>
+
 
 ---
 
@@ -1195,7 +1235,7 @@ Produção isolada não compra audiência. Contrate serviços e veiculação nec
 
 ## Promoção
 
-<div class="media-card">
+
 
 ### Brindes
 
@@ -1210,7 +1250,7 @@ Objetos promocionais com a marca entregues ao público. O custo é por unidade e
 
 **Escopo:** Pacote didático de brinde básico personalizado por unidade; itens especiais e frete variam.
 
-</div>
+
 
 ---
 
@@ -1222,7 +1262,7 @@ Produção isolada não compra audiência. Contrate serviços e veiculação nec
 
 ## Product placement
 
-<div class="media-card">
+
 
 ### Product placement simples
 
@@ -1239,11 +1279,11 @@ Presença do produto em uma cena de conteúdo audiovisual. A marca aparece no co
 
 > **Orçamento obrigatório, fora do subtotal:** Amostras, frete e direitos de uso; negociação com a produção audiovisual. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Product placement premium
 
@@ -1260,7 +1300,7 @@ Inserção destacada ou recorrente em conteúdo audiovisual. Busca maior destaqu
 
 > **Orçamento obrigatório, fora do subtotal:** Amostras, frete e direitos de uso; negociação com a produção audiovisual. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
-</div>
+
 
 ---
 
@@ -1272,7 +1312,7 @@ Produção isolada não compra audiência. Contrate serviços e veiculação nec
 
 ## Display
 
-<div class="media-card">
+
 
 ### Leaderboard 728×90
 
@@ -1290,11 +1330,11 @@ Banner horizontal de 728×90 pixels, normalmente no topo de uma página web. A c
 
 **Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Retângulo médio 300×250
 
@@ -1312,11 +1352,11 @@ Banner retangular de 300×250 pixels, integrado ao conteúdo ou à lateral de um
 
 **Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Half page 300×600
 
@@ -1334,11 +1374,11 @@ Banner vertical de 300×600 pixels. Oferece grande área visual na lateral da p�
 
 **Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Skyscraper 160×600
 
@@ -1356,11 +1396,11 @@ Banner vertical estreito de 160×600 pixels. Ocupa uma faixa lateral da página.
 
 **Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Billboard 970×250
 
@@ -1378,11 +1418,11 @@ Banner grande de 970×250 pixels, normalmente no topo. Busca destaque em telas m
 
 **Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Interstitial
 
@@ -1400,11 +1440,11 @@ Anúncio que ocupa a tela entre etapas de navegação. Tem grande visibilidade, 
 
 **Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 
-<div class="media-card">
+
 
 ### Native Ads
 
@@ -1422,7 +1462,7 @@ Anúncio que acompanha o formato visual do conteúdo de um site. Deve permanecer
 
 **Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
-</div>
+
 
 ---
 

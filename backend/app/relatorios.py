@@ -76,7 +76,7 @@ def _participacao(empresa, decisao, rodada):
         {
             "aluno_id": r.aluno_id, "nome": r.aluno.nome, "acao": r.acao,
             "rodada": r.rodada, "versao": r.versao, "data": _iso(r.data),
-            "detalhes": deepcopy(r.detalhes or {}),
+            "detalhes": {**deepcopy(r.detalhes or {}), "autor_conceito": "Professor Guandalini"},
         }
         for r in registros
     ]

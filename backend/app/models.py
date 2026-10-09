@@ -120,6 +120,8 @@ class Turma(Base):
     cenario = Column(String(10), nullable=False, default="ZERO", server_default="ZERO")
     configuracao_simulacao = Column(JSON, nullable=True)
     versao_motor = Column(Integer, nullable=False, default=1, server_default="1")
+    prazo_rodada = Column(DateTime, nullable=True)
+    prazo_numero_rodada = Column(Integer, nullable=True)
     criado_em = Column(DateTime, default=agora)
 
     # Parâmetros de mercado e de custos (ajustáveis pelo professor antes da 1ª rodada)
