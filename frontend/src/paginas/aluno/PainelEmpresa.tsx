@@ -193,7 +193,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
     <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ turma: turma.nome, empresa: empresa.nome, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · acompanhe a rodada" : "Decisão pendente · prepare e envie" }}>
       <SecaoPainel id="rodada" ativa={secao}>
         <Cartao titulo={encerrada ? "Simulação concluída" : `O que fazer na rodada ${turma.rodada_atual}`}>
-          <p className="mb-5 text-sm text-slate-600">{encerrada ? "Consulte os resultados e os relatórios da sua empresa." : painel.decisao_atual?.enviada_em ? "Sua decisão foi enviada. Consulte a equipe para acompanhar as confirmações e os resultados quando a rodada encerrar." : "Siga os passos abaixo. Produtos, finanças, produção e logística fazem parte de uma única decisão da rodada."}</p>
+          <p className="mb-5 text-sm text-slate-600">{encerrada ? "Consulte os resultados e os relatórios da sua empresa." : painel.decisao_atual?.enviada_em ? "O líder enviou a decisão. Acompanhe os resultados quando a rodada encerrar." : "Siga os passos abaixo. Produtos, finanças, produção e logística fazem parte de uma única decisão da rodada."}</p>
           <p className="mb-4 text-sm">Última versão salva: {AREAS_DECISAO.filter(a => a !== "logistica" || turma.modo_jogo === "TRADICIONAL").map(a => `${a === "decisoes" ? "Marketing" : a === "financas" ? "Finanças" : a === "producao" ? "Produção" : "Logística"}: ${painel.decisao_atual?.revisao_areas?.[a as keyof NonNullable<DecisaoEntrada["revisao_areas"]>] ? "revisado" : "revisar"}`).join(" · ")}</p>
           <div className="grid gap-3 sm:grid-cols-2">{[
             ["mercado", "1. Ler notícias e mercado", "Entenda o cenário antes de decidir."],
@@ -262,7 +262,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       {erro && <Aviso>{erro}</Aviso>}
       <SecaoPainel id="equipe" ativa={secao}>
       {!turma.modo_equipe && <Cartao titulo="Participação individual"><p>Você administra esta empresa individualmente.</p></Cartao>}
-      {turma.modo_equipe && painel.equipe && <EquipeEmpresa empresaId={empresa.id} equipe={painel.equipe} podeEditar={!encerrada && turma.rodada_atual === 1 && painel.equipe.pode_gerenciar} aoSalvar={carregar} />}
+      {turma.modo_equipe && painel.equipe && <EquipeEmpresa empresaId={empresa.id} equipe={painel.equipe} podeEditar={!encerrada && turma.rodada_atual === 1 && painel.equipe.pode_gerenciar} aoSalvar={carregar} rodada={turma.rodada_atual} encerrada={encerrada} />}
       {empresa.estado_simulacao && <PainelOperacional estado={empresa.estado_simulacao} modo={turma.modo_jogo} />}
       </SecaoPainel>
       <SecaoPainel id="conquistas" ativa={secao}><Conquistas jornada={painel.jornada} /></SecaoPainel>
@@ -428,6 +428,7 @@ function decisaoInicial(painel: PainelAluno): DecisaoEntrada {
   const base = painel.decisao_atual ?? painel.ultima_decisao;
   return {
     revisao_areas: painel.decisao_atual?.revisao_areas ?? {},
+    analise_financeira: painel.decisao_atual?.analise_financeira ?? "",
     simulacao: simulacaoInicial(painel),
     plano_comercial: base?.plano_comercial ?? null,
     preco: base?.preco ?? painel.turma.parametros?.preco_referencia ?? 100,
@@ -462,6 +463,9 @@ function manterRevisoes(antes: DecisaoEntrada, depois: DecisaoEntrada): DecisaoE
 function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: PainelAluno; area: string; aoNavegar: (area: string) => void; aoEnviar: () => Promise<PainelAluno | undefined> }) {
   const { empresa, turma } = painel;
   const p = turma.parametros!;
+  const somenteLeitura = turma.modo_equipe && !painel.equipe?.pode_decidir;
+  const sequencia = ["decisoes", "estrategia", "financas", "producao", ...(turma.modo_jogo === "TRADICIONAL" ? ["logistica"] : [])];
+  const proxima = sequencia[sequencia.indexOf(area) + 1];
   const versaoServidor = painel.equipe?.versao_decisao ?? painel.decisao_atual?.versao ?? 0;
   const [d, setD] = useState<DecisaoEntrada>(() => decisaoInicial(painel));
   const [base, setBase] = useState(() => ({ entrada: decisaoInicial(painel), versao: versaoServidor, rodada: turma.rodada_atual }));
@@ -513,7 +517,7 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
     const { d: entrada, empresa: empresaAtual, turma: turmaAtual } = JSON.parse(chavePrevisao);
     const temporizador = window.setTimeout(async () => {
       try {
-        const dados = await api.post<PrevisaoDecisao>(`/api/aluno/empresas/${empresaAtual.id}/previsao`, { ...entrada, rodada: turmaAtual.rodada_atual });
+        const dados = await api.post<PrevisaoDecisao>(`/api/aluno/empresas/${empresaAtual.id}/previsao`, { ...entrada, rascunho: true, rodada: turmaAtual.rodada_atual });
         if (!cancelada) {
           if (dados.rodada !== turmaAtual.rodada_atual) {
             setPrevia({ chave: chavePrevisao, erro: "O sistema avançou a rodada. Aguarde a atualização do painel." });
@@ -531,17 +535,19 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
     };
   }, [chavePrevisao]);
 
-  async function enviar(evento: React.FormEvent) {
-    evento.preventDefault();
-    if (!previsao || carregando || conflito) return;
+  async function salvar(rascunho: boolean, avancar = false) {
+    if (somenteLeitura || carregando || conflito) return;
     setCarregando(true);
     setMensagem(null);
     try {
-      const salva = await api.put<Decisao>(`/api/aluno/empresas/${empresa.id}/decisao`, { ...d, versao: base.versao, rodada: base.rodada });
-      setBase({ entrada: { ...d }, versao: salva.versao, rodada: turma.rodada_atual });
+      const salva = await api.put<Decisao>(`/api/aluno/empresas/${empresa.id}/decisao`, { ...d, rascunho, versao: base.versao, rodada: base.rodada });
+      const entrada = { ...d, preco: salva.preco, marketing: salva.marketing, plano_comercial: salva.plano_comercial, simulacao: salva.simulacao };
+      setD(entrada);
+      setBase({ entrada, versao: salva.versao, rodada: turma.rodada_atual });
       setConflitoServidor(false);
-      setMensagem({ tipo: "sucesso", texto: turma.modo_equipe ? `Rascunho da versão ${salva.versao} salvo. Agora cada integrante deve confirmar essa versão na própria conta.` : "Decisões enviadas. Você pode alterá-las até o fechamento do mês pelo sistema." });
+      setMensagem({ tipo: "sucesso", texto: rascunho ? `Rascunho da versão ${salva.versao} salvo. Ele ainda não foi enviado para a rodada.` : "Decisão final enviada pela equipe. Acompanhe o fechamento da rodada." });
       await aoEnviar();
+      if(avancar && proxima) aoNavegar(proxima);
     } catch (e) {
       if (e instanceof ErroApi && e.status === 409) {
         setConflitoServidor(true);
@@ -553,48 +559,30 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
     }
   }
 
-  async function confirmarDecisao() {
-    if (carregando || alterada || conflito || !painel.decisao_atual) return;
-    setCarregando(true);
-    setMensagem(null);
-    try {
-      await api.post(`/api/aluno/empresas/${empresa.id}/aprovar`, { versao: base.versao, rodada: base.rodada });
-      setMensagem({ tipo: "sucesso", texto: `Você confirmou a versão ${base.versao}. Acompanhe as confirmações dos colegas no quadro da equipe.` });
-      await aoEnviar();
-    } catch (e) {
-      if (e instanceof ErroApi && e.status === 409) {
-        setConflitoServidor(true);
-        await aoEnviar();
-      }
-      setMensagem({ tipo: "erro", texto: e instanceof Error ? e.message : "Erro ao confirmar a decisão." });
-    } finally {
-      setCarregando(false);
-    }
-  }
-
   return (
     <Cartao
       titulo={`${area === "estrategia" ? "Ferramentas estratégicas e segmentação" : area === "financas" ? "Planejamento financeiro" : area === "producao" ? "Produção e operação" : area === "logistica" ? "Logística" : "Decisões comerciais"} · mês ${turma.rodada_atual}`}
       acao={
         painel.decisao_atual ? (
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${!turma.modo_equipe || painel.equipe?.pronta ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{turma.modo_equipe ? (painel.equipe?.pronta ? "Confirmada pela equipe" : `Rascunho · versão ${versaoServidor}`) : "Enviada"}</span>
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${painel.decisao_atual?.enviada_em ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{painel.decisao_atual.enviada_em ? "Decisão final enviada" : `Rascunho · versão ${versaoServidor}`}</span>
         ) : (
           <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">Pendente</span>
         )
       }
     >
-      <form onSubmit={enviar} className="space-y-6">
+      <form onSubmit={e => {e.preventDefault();salvar(false);}} className="space-y-6">
+        {somenteLeitura && <Aviso tipo="info">Você está em modo de visualização. Discuta as decisões com o líder, que registra e envia pela equipe.</Aviso>}
         <p className="rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-900">As escolhas de Marketing, Finanças, Produção e Logística compõem uma única decisão. Ao enviar, todas as áreas preenchidas são registradas juntas.</p>
-        <div className="rounded-xl border border-blue-200 p-4"><h3 className="font-bold">Revisão antes do envio</h3><p className="mt-1 text-sm text-slate-600">Confira cada área e marque a revisão. Alterar escolhas pede nova revisão das áreas afetadas. Valores zero podem ser escolhas válidas; estas marcações não substituem a confirmação da equipe.</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{AREAS_DECISAO.map(id => {
+        <div className="rounded-xl border border-blue-200 p-4"><h3 className="font-bold">Revisão antes do envio</h3><p className="mt-1 text-sm text-slate-600">Confira cada área e marque a revisão. Alterar escolhas pede nova revisão das áreas afetadas. Valores zero são escolhas válidas para ações opcionais. Todas as áreas aplicáveis precisam estar revisadas para o envio final.</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{AREAS_DECISAO.map(id => {
           const aplicavel = id !== "logistica" || turma.modo_jogo === "TRADICIONAL";
           const revisada = !!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>];
           return <button type="button" key={id} onClick={() => aoNavegar(id)} className={`rounded-lg border p-3 text-left text-sm ${aplicavel && revisada ? "border-emerald-300 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>{id === "decisoes" ? "Produtos e marketing" : id === "financas" ? "Finanças" : id === "producao" ? "Produção" : "Logística"} · {aplicavel ? revisada ? "Revisado ✓" : "Revisar →" : "Sem decisão neste modelo"}</button>;
-        })}</div><label className="mt-4 flex items-center gap-3 text-sm font-semibold"><input type="checkbox" disabled={area === "logistica" && turma.modo_jogo !== "TRADICIONAL"} checked={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : area) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e => setD(atual => ({ ...atual, revisao_areas: { ...atual.revisao_areas, [area === "estrategia" ? "decisoes" : area]: e.target.checked } }))} />Conferi os valores desta área</label><p className="mt-2 text-xs text-slate-500">As revisões ficam registradas ao salvar ou enviar esta versão da decisão.</p></div>
-        {turma.modo_equipe && <p className="text-sm text-slate-600">Todos os integrantes podem preparar a decisão. Salvar uma nova versão pede uma nova confirmação de toda a equipe. Revise os valores e a prévia antes de confirmar.</p>}
+        })}</div><label className="mt-4 flex items-center gap-3 text-sm font-semibold"><input type="checkbox" disabled={somenteLeitura || (area === "logistica" && turma.modo_jogo !== "TRADICIONAL")} checked={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : area) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e => setD(atual => ({ ...atual, revisao_areas: { ...atual.revisao_areas, [area === "estrategia" ? "decisoes" : area]: e.target.checked } }))} />Conferi os valores desta área</label><p className="mt-2 text-xs text-slate-500">As revisões ficam registradas ao salvar ou enviar esta versão da decisão.</p></div>
+        {turma.modo_equipe && <p className="text-sm text-slate-600">Somente o líder altera e envia. Todos podem consultar o planejamento e contribuir na discussão. O envio final será bloqueado se houver etapas obrigatórias pendentes.</p>}
         {conflito && <div className="space-y-2"><Aviso tipo="info">Outra atualização chegou enquanto você editava. Seus campos foram mantidos. Carregue a decisão salva da empresa antes de continuar; essa ação substitui os valores do formulário.</Aviso><Botao type="button" variante="secundario" disabled={carregando} onClick={carregarDecisaoSalva}>Carregar decisão salva</Botao></div>}
-        <fieldset disabled={carregando} className="space-y-6">
+        <fieldset disabled={carregando || somenteLeitura} className="space-y-6">
         <div hidden={area !== "decisoes" && area !== "estrategia"}>
-        <EditorMix precoAtual={d.preco} visao={area === "estrategia" ? "estrategia" : "mix"} aoNavegar={aoNavegar} empresaId={empresa.id} rodada={turma.rodada_atual} plano={d.plano_comercial} aoMudar={(plano,total,preco)=>setD(atual=>manterRevisoes(atual,{...atual,plano_comercial:plano,marketing:total,preco:preco??atual.preco,simulacao:atual.simulacao?{...atual.simulacao,marketing_digital:0}:null}))} />
+        <EditorMix precoAtual={d.preco} visao={area === "estrategia" ? "estrategia" : "mix"} aoNavegar={aoNavegar} empresaId={empresa.id} rodada={turma.rodada_atual} plano={d.plano_comercial} aoMudar={(plano,total,preco)=>!somenteLeitura && setD(atual=>manterRevisoes(atual,{...atual,plano_comercial:plano,marketing:total,preco:preco??atual.preco,simulacao:atual.simulacao?{...atual.simulacao,marketing_digital:0}:null}))} />
           <div hidden={area !== "decisoes"}><Secao titulo="Mercado e posicionamento">
           <div hidden={!!d.plano_comercial?.produtos?.length}><Campo
             rotulo="Preço de venda (por unidade)"
@@ -626,6 +614,7 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
 
         </div>
         <div hidden={area !== "financas"}>
+        <Campo rotulo="Análise financeira da equipe" ajuda="Explique margem, custos, fluxo de caixa, capital de giro e riscos das escolhas. Esta análise é responsabilidade da equipe."><textarea aria-label="Análise financeira da equipe" className={`${estiloEntrada} min-h-32`} maxLength={6000} value={d.analise_financeira} onChange={e=>atualizar("analise_financeira",e.target.value)} /></Campo>
         <div className="mb-4 rounded-xl border-l-4 border-blue-600 bg-blue-50 p-4 text-sm"><h3 className="font-bold text-blue-900">Planeje antes de enviar</h3><p className="mt-2">Use preço de venda, custo unitário e despesas para analisar a margem e o ponto de equilíbrio. A prévia abaixo reúne os valores calculados para você conferir seu planejamento.</p><p className="mt-2 font-semibold">Preço escolhido: {reais(d.preco)} · Custo unitário: {reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)} · Caixa atual: {reais(empresa.caixa)}</p></div>
         {d.emprestimo > 0 && <Aviso tipo="info">Atenção: dinheiro do banco tem custo alto e pode comprometer a empresa. Juros estimados deste pedido: até {reais(Math.min(d.emprestimo, Math.max(0, p.limite_credito - empresa.divida)) * p.taxa_juros_mensal)} por mês, além da dívida atual, à taxa de {percentual(p.taxa_juros_mensal, 2)}. Os juros reduzem lucro e capital de giro, podem subir com a Selic e continuam enquanto houver saldo devedor. O principal precisa ser devolvido; crédito depende do caixa e do limite disponível.</Aviso>}
         <Secao titulo="Finanças e tributos">
@@ -713,13 +702,9 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
         </fieldset>
 
         {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}
-        {turma.modo_equipe && alterada && <p className="text-xs text-amber-800">Há alterações no formulário. Salve o rascunho antes de confirmar a decisão.</p>}
-        <div className="flex flex-wrap justify-end gap-2">
-          <Botao type="submit" carregando={carregando} disabled={!previsao || conflito || (turma.modo_equipe && !!painel.decisao_atual && !alterada)}>
-            {turma.modo_equipe ? "Salvar rascunho" : painel.decisao_atual ? "Atualizar decisões" : "Enviar decisões"}
-          </Botao>
-          {turma.modo_equipe && <Botao type="button" variante="secundario" carregando={carregando} disabled={alterada || conflito || !painel.decisao_atual || !!painel.equipe?.aprovada_por_mim} onClick={confirmarDecisao}>{painel.equipe?.aprovada_por_mim && !alterada ? "Você já confirmou esta versão" : `Confirmar decisão${base.versao ? ` · versão ${base.versao}` : ""}`}</Botao>}
-        </div>
+        {!somenteLeitura && <><p className="text-xs text-slate-600">O rascunho pode ficar incompleto. No envio final, o programa informa as pendências e impede o envio até que sejam resolvidas.</p>
+        {!!painel.pendencias_envio?.length && <Aviso tipo="info"><p className="font-bold">Pendências da versão salva:</p><ul className="list-disc pl-5">{painel.pendencias_envio.map(p=><li key={p}>{p}</li>)}</ul></Aviso>}
+        <div className="flex flex-wrap justify-end gap-2"><Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho</Botao>{proxima&&<Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para a próxima etapa →</Botao>}<Botao type="submit" carregando={carregando} disabled={conflito}>Enviar decisão final</Botao></div></>}
       </form>
     </Cartao>
   );

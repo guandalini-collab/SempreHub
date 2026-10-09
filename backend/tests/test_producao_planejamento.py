@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 import json
 from copy import deepcopy
 
@@ -26,7 +27,7 @@ def test_maquinas_bloqueadas_ate_mes_tres_e_estudo_persistido(cliente, professor
             assert 'terceiro mês' in resposta.json()['detail']
         _fechar(cliente, professor, turma, rodada)
     estudo = {"pontos": [{"nome": "A", "x": -10, "y": 20, "volume": 10}, {"nome": "B", "x": 30, "y": 60, "volume": 30}], "local_x": 20, "local_y": 50, "justificativa": "Acesso rodoviário"}
-    resposta = cliente.put(f'/api/aluno/empresas/{empresa}/decisao', headers=aluno, json={**base, 'rodada': 3, 'simulacao': {"comprar_maquinas": 1, "centro_gravidade": estudo}})
+    resposta = cliente.put(f'/api/aluno/empresas/{empresa}/decisao', headers=aluno, json=completar_decisao({**base, 'rodada': 3, 'simulacao': {"comprar_maquinas": 1, "centro_gravidade": estudo}}))
     assert resposta.status_code == 200, resposta.text
     painel = cliente.get(f'/api/aluno/empresas/{empresa}', headers=aluno).json()
     assert painel['decisao_atual']['simulacao']['centro_gravidade'] == estudo
@@ -49,7 +50,7 @@ def test_conversao_apenas_turma_de_teste_e_preserva_historico(cliente, professor
     aluno = cadastrar(cliente, "Ana", "migracao@aluno.iffar.edu.br")
     empresa = _entrar(cliente, aluno, turma['codigo'], 'Fábrica')
     _fechar(cliente, professor, turma, 1)
-    cliente.put(f'/api/aluno/empresas/{empresa}/decisao', headers=aluno, json={'preco': 120})
+    cliente.put(f'/api/aluno/empresas/{empresa}/decisao', headers=aluno, json=completar_decisao({'preco': 120}))
     antes = cliente.get(f'/api/aluno/empresas/{empresa}', headers=aluno).json()
     with SessionLocal.begin() as db:
         with pytest.raises(ValueError):
@@ -82,7 +83,7 @@ def test_localizacao_altera_previa_dre_e_preserva_balanco(cliente, professor):
     previa = cliente.post(base + "/previsao", headers=aluno, json=decisao)
     assert previa.status_code == 200, previa.text
     assert previa.json()["simulacao"]["frete_unitario"] == 25
-    assert cliente.put(base + "/decisao", headers=aluno, json=decisao).status_code == 200
+    assert cliente.put(base + "/decisao", headers=aluno, json=completar_decisao(decisao)).status_code == 200
     assert cliente.get(base, headers=aluno).json()["decisao_atual"]["revisao_areas"] == revisao
     _fechar(cliente, professor, turma, 1)
     resultado = cliente.get(base, headers=aluno).json()["resultados"][0]

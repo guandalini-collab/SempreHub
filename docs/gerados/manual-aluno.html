@@ -1,823 +1,108 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Manual SempreHub</title>
-  <style>
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-  </style>
-  <link rel="stylesheet" href="../manual.css" />
-</head>
-<body>
-<header id="title-block-header">
-<h1 class="title">Manual SempreHub</h1>
-</header>
-<div class="cover">
-<figure>
-<img src="../../frontend/src/assets/logo-semprehub.svg"
-alt="Logo SempreHub" />
-<figcaption aria-hidden="true">Logo SempreHub</figcaption>
-</figure>
-<p class="kicker">
-Simulador de empreendedorismo universitário
-</p>
-<h1 id="manual-do-aluno">Manual do aluno</h1>
-<p class="subtitle">
-Do primeiro acesso à análise dos resultados: um roteiro para tomar
-decisões, trabalhar em equipe e aprender com cada rodada.
-</p>
-<p class="meta">
-<strong>Versão de uso:</strong> 1.0<br>Leia este manual antes de enviar
-a primeira decisão. Guarde as análises e os relatórios da equipe para a
-discussão em sala.
-</p>
-</div>
-<h2 id="como-usar-o-semprehub">1. Como usar o SempreHub</h2>
-<p>O SempreHub é uma simulação em ciclos. Cada <strong>rodada</strong>
-representa um período de operação. Você lê o cenário, toma decisões,
-confirma o envio e depois compara o que planejou com o que aconteceu. O
-sistema mantém o estado da empresa e o histórico de todas as rodadas;
-abrir a rodada seguinte não apaga decisões, assinaturas, resultados ou
-demonstrativos anteriores.</p>
-<figure>
-<img src="../diagramas/fluxo-rodada.svg" alt="Fluxo de uma rodada" />
-<figcaption aria-hidden="true">Fluxo de uma rodada</figcaption>
-</figure>
-<p class="caption">
-Figura 1 — Uma rodada só termina quando decisão, fechamento e leitura do
-resultado acontecem.
-</p>
-<h3 id="antes-de-começar">Antes de começar</h3>
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Manual SempreHub</title><link rel="stylesheet" href="../manual.css"></head><body><h1>SempreHub - Manual do aluno</h1>
+<p>Versão 2.1 - outubro de 2026</p>
+<p>Aprenda a interpretar o mercado, discutir decisões e observar suas consequências. Cada rodada representa um mês. As imagens mostram as telas do programa com nomes e situações ilustrativos.</p>
+<h2>1. Entre na turma indicada pelo professor</h2>
+<ol>
+<li>Crie sua conta de aluno e entre no SempreHub.</li>
+<li>Na tela inicial, consulte <b>Turmas disponíveis</b>.</li>
+<li>Clique no <b>nome da turma</b> indicado pelo professor. O nome é livre: não existe formato obrigatório nem significado automático.</li>
+<li>Depois do ingresso, seu vínculo fica registrado nessa turma. Você não pode entrar em outra sem autorização do professor.</li>
+</ol>
+<figure><img src="../diagramas/ingresso-nome.png" alt="Seleção pelo nome da turma"><figcaption>Seleção pelo nome da turma</figcaption></figure>
+<p>O professor pode deixar apenas uma turma disponível ou ocultar outras. Ocultar o ingresso não retira o acesso dos alunos já vinculados. Se nenhuma turma aparecer, procure o professor; não crie outra conta para contornar a matrícula.</p>
+<h2>2. Forme uma equipe por afinidade</h2>
+<p>Na sua turma, consulte <b>Colegas disponíveis</b> e <b>Equipes da turma</b>. Converse com os colegas para decidir com quem trabalhar. Uma equipe tem <b>no mínimo 3 e no máximo 5 integrantes</b>.</p>
+<ol>
+<li>Para participar de uma equipe com vaga, clique em <b>Entrar nesta equipe</b>.</li>
+<li>Para começar um grupo, clique em <b>Criar uma nova equipe</b> e informe o nome da empresa, seu perfil empreendedor e o regime inicial.</li>
+<li>Os colegas entram na mesma equipe pela própria conta. Não é necessário compartilhar senha ou convite.</li>
+<li>Criar a empresa não torna você automaticamente o líder.</li>
+</ol>
+<figure><img src="../diagramas/formacao-afinidade.png" alt="Colegas e equipes disponíveis"><figcaption>Colegas e equipes disponíveis</figcaption></figure>
+<p>O professor perguntará em sala se todos conseguiram entrar. Depois dessa conferência, ele poderá acionar a distribuição aleatória dos alunos cadastrados que ainda estejam sem equipe. O programa usa apenas vagas em equipes que já tenham pelo menos três integrantes e respeita o máximo de cinco. Se faltarem vagas, a distribuição não ocorre parcialmente: a turma precisa se organizar com o professor.</p>
+<p>O professor não precisa informar a quantidade de alunos. Inclusões manuais são exceções para resolver impedimentos e ficam registradas com justificativa.</p>
+<h2>3. Escolha o líder e entenda as responsabilidades</h2>
+<p>Com três a cinco integrantes, abra <b>Minha empresa e equipe</b>. Cada aluno seleciona um integrante e clica em <b>Registrar minha escolha</b>. O candidato que receber mais da metade das escolhas da equipe será o líder inicial. Conversem antes de registrar as escolhas.</p>
+<p><b>Somente o líder registra, altera, salva e envia as decisões da empresa.</b> Os outros integrantes têm acesso de visualização aos diagnósticos, planejamento, resultados e histórico. Todos participam da discussão; não é necessária uma confirmação de envio por cada aluno.</p>
+<p>O quadro da equipe destaca o líder atual e a regra de transferência. A equipe combina como organizar as responsabilidades de marketing, finanças, operações e pessoas. A liderança define quem envia, não quem pode contribuir.</p>
+<h3>Como transferir a liderança</h3>
+<ol>
+<li>O líder atual abre <b>Minha empresa e equipe</b>.</li>
+<li>Em <b>Transferir liderança</b>, seleciona outro integrante da própria equipe.</li>
+<li>Clica em <b>Transferir liderança para a próxima rodada</b>.</li>
+<li>Confere o aviso com o próximo líder e a rodada em que ele assumirá.</li>
+</ol>
+<figure><img src="../diagramas/transferir-lider.png" alt="Selecione o próximo líder e confirme a transferência"><figcaption>Selecione o próximo líder e confirme a transferência</figcaption></figure>
+<p><b>A troca só vale na próxima rodada.</b> Durante a rodada atual, o líder anterior continua responsável por salvar e enviar. Depois que o professor fecha o mês, o programa efetiva a transferência e atualiza as permissões. Uma transferência programada não pode ser substituída por outra na mesma rodada. Na última rodada não existe uma próxima rodada para transferir.</p>
+<figure><img src="../diagramas/lider-proxima-rodada.png" alt="Aviso do próximo líder e da rodada de vigência"><figcaption>Aviso do próximo líder e da rodada de vigência</figcaption></figure>
+<p>Se o líder precisar trocar de turma, deve transferir a liderança e aguardar sua efetivação antes da autorização do professor. Registros anteriores de liderança e envio permanecem no histórico. Nas equipes que já existiam antes desta versão, o responsável anterior foi mantido como líder para preservar a continuidade.</p>
+<h2>4. Siga a sequência de decisões da rodada</h2>
+<p>Leia <b>Notícias e mercado</b> e discuta o cenário. Depois, percorra as áreas:</p>
+<ol>
+<li><b>Produtos e marketing:</b> preços, canais, campanhas, posicionamento e mix de cada produto.</li>
+<li><b>Ferramentas e segmentação:</b> SWOT, Porter, PESTEL, concorrência, diretriz, BCG e público-alvo.</li>
+<li><b>Finanças:</b> análise escrita da equipe, margens, custos, crédito, caixa e capital de giro.</li>
+<li><b>Produção e operação:</b> produção, pessoas, insumos, tecnologia e capacidade.</li>
+<li><b>Logística:</b> frete e localização, quando disponíveis no modo Empresa tradicional.</li>
+</ol>
+<p>O líder pode clicar em <b>Salvar rascunho</b> ou em <b>Salvar e ir para a próxima etapa</b>. O rascunho pode ficar incompleto e ainda não representa a entrega da rodada. Os colegas consultam a versão salva, então combine momentos para revisar juntos.</p>
+<p>As áreas formam <b>uma única decisão da rodada</b>. O envio final registra o conjunto; avançar uma etapa não encerra a rodada. Depois de conferir uma área, marque <b>Conferi os valores desta área</b>. Alterar escolhas pede uma nova revisão das áreas afetadas.</p>
+<h3>Trava de envio final</h3>
+<p>Clique em <b>Enviar decisão final</b> quando terminar. O programa confere as informações e bloqueia o envio se houver pendências. A mensagem informa o que precisa ser preenchido ou revisado.</p>
+<figure><img src="../diagramas/envio-bloqueado.png" alt="Exemplo de envio bloqueado por informações pendentes"><figcaption>Exemplo de envio bloqueado por informações pendentes</figcaption></figure>
+<p>Confira todas as áreas aplicáveis, os mixes dos produtos, a diretriz estratégica, a segmentação, a BCG e a análise financeira. Orçamentos de serviços de campanha também precisam estar completos quando exigidos. Se a turma avançar ou a versão mudar, atualize o painel antes de tentar salvar novamente.</p>
+<p><b>Comprar máquinas, contratar funcionários, pagar horas extras, solicitar empréstimos e investir em tecnologia são escolhas opcionais.</b> Zero é válido para essas ações e não impede o envio. A revisão obrigatória serve para confirmar que a equipe considerou a escolha.</p>
+<p>Um novo rascunho depois de um envio retira a condição de decisão enviada. O líder deve enviar novamente a versão atual. O professor só fecha a rodada de equipes depois que todas entregarem a decisão final.</p>
+<h2>5. Interprete as ferramentas e compare os concorrentes</h2>
+<p>O programa disponibiliza <b>SWOT, Cinco Forças de Porter, PESTEL e análise de concorrência</b>. Os diagnósticos combinam informações atuais do mercado com os registros da empresa. Eles não escolhem a decisão da equipe.</p>
+<p>Fatos confirmados, interpretações e <b>projeções</b> têm funções diferentes. Quando faltar informação, uma projeção apresenta a estimativa e as premissas usadas. Não trate uma projeção como resultado já ocorrido. O professor pode conferir os registros de pesquisa e acompanhar os diagnósticos de cada empresa e rodada.</p>
 <ul>
-<li>Tenha o <strong>código da turma</strong> fornecido pelo
-professor.</li>
-<li>Em uma turma de equipes, combine um canal de comunicação e horários
-de revisão.</li>
-<li>Leia o número de rodadas, o modo de jogo e o cenário definidos pelo
-professor.</li>
-<li>Separe uma planilha ou caderno para registrar hipóteses; o relatório
-do sistema mostra os resultados, mas não substitui a reflexão da
-equipe.</li>
+<li><b>SWOT:</b> interprete forças, fraquezas, oportunidades e ameaças; escolha a diretriz da equipe depois da leitura.</li>
+<li><b>Porter:</b> avalie rivalidade, poder de fornecedores e compradores, novos entrantes e substitutos. Intensidades representam avaliações do cenário, não estatísticas oficiais.</li>
+<li><b>PESTEL:</b> considere fatores políticos, econômicos, sociais, tecnológicos, ambientais e legais. Separe condições reais do setor das taxas e regras didáticas do simulador.</li>
+<li><b>Concorrência:</b> compare perfil e localização, porte e participação, portfólio, qualidade e diferenciais, preços e pagamento, promoções e frete, canais, presença digital, atendimento e reputação. O programa apresenta uma tabela comparativa com as escolhas atuais da sua empresa.</li>
 </ul>
-<h3 id="o-que-é-preservado">O que é preservado</h3>
-<p>Ao fechar uma rodada, ficam preservados: a decisão enviada, a versão
-confirmada por cada integrante, os cargos, os eventos, os resultados, o
-estado operacional, a DRE, a DFC, o balanço, os indicadores e o
-histórico de participação. Na rodada seguinte, esse conjunto vira o
-ponto de partida. Uma decisão nova pode substituir o rascunho atual, mas
-não reescreve a fotografia de um mês já fechado.</p>
-<div class="callout gold">
-<strong>Regra de ouro:</strong> lucro, caixa e patrimônio são leituras
-diferentes. Sempre observe os três antes de decidir novamente.
-</div>
-<h2 id="primeiro-acesso">2. Primeiro acesso</h2>
-<h3 id="criar-a-conta-e-entrar-na-turma">Criar a conta e entrar na
-turma</h3>
-<ol type="1">
-<li>Abra o endereço do SempreHub e selecione <strong>Criar
-conta</strong>.</li>
-<li>Informe seu nome, e-mail acadêmico e uma senha. Use o e-mail
-permitido pela sua instituição.</li>
-<li>Na tela <strong>Minhas empresas</strong>, clique em <strong>Entrar
-em uma turma</strong>.</li>
-<li>Digite o código de seis caracteres informado pelo professor.</li>
-<li>Se você for abrir uma empresa individualmente ou iniciar uma equipe,
-informe o nome da empresa.</li>
-<li>Na primeira entrada, escolha:
+<p>Se não houver dados suficientes de um concorrente real, pode aparecer um <b>concorrente de referência projetado</b>, identificado como cenário de comparação. Dados internos, faturamento, participação ou reclamações não são tratados como fatos sem confirmação.</p>
+<h3>Como a interpretação afeta a empresa</h3>
+<p>As consequências aparecem <b>por meio das escolhas da equipe</b>. Ignorar uma queda de demanda e produzir demais pode imobilizar dinheiro em estoque. Cobrar acima do limite do público escolhido pode reduzir vendas. Expandir com crédito caro pode comprometer o caixa. Entender oportunidades ajuda a ajustar preço, oferta, canais, capacidade e investimentos.</p>
+<p>O programa confronta escolhas estruturadas de SWOT, BCG e segmentação com o mix. Incompatibilidades podem reduzir a conversão comercial, conforme os critérios mostrados na interface e nos resultados. Não existe garantia de lucro: concorrência, custos, capacidade e eventos também influenciam o desempenho. Textos livres não recebem descontos arbitrários.</p>
+<p><b>A segmentação e a análise financeira são responsabilidade dos alunos.</b> Definam o público, os canais, a localização, a cobertura e o preço máximo aceito. Em Finanças, escrevam a interpretação de margem, despesas, fluxo de caixa, capital de giro e riscos. Os demonstrativos calculados ajudam a analisar; não substituem o raciocínio da equipe.</p>
+<h2>6. Use a matriz BCG no formato tradicional</h2>
+<p>A <b>matriz BCG da Boston Consulting Group</b> organiza o portfólio pelo crescimento do mercado e pela participação relativa de cada produto.</p>
+<figure><img src="../diagramas/matriz-bcg.png" alt="Matriz BCG com os quatro quadrantes tradicionais"><figcaption>Matriz BCG com os quatro quadrantes tradicionais</figcaption></figure>
 <ul>
-<li><strong>GEM:</strong> empreender por oportunidade ou por
-necessidade;</li>
-<li><strong>Dornelas:</strong> empreendedor serial, franqueado,
-corporativo ou social;</li>
-<li><strong>regime tributário inicial:</strong> MEI, Simples Nacional ou
-Lucro Presumido.</li>
-</ul></li>
-<li>Leia as descrições antes de confirmar. Essas escolhas formam o ponto
-de partida didático da empresa.</li>
-</ol>
-<p>Se a turma estiver configurada para equipes, quem abrir a empresa
-será o fundador e receberá o cargo de CEO. Os colegas não devem abrir
-outra empresa com o código da turma: devem usar <strong>Entrar em uma
-equipe</strong> e o código de convite fornecido pelo fundador.</p>
-<h3 id="entrar-em-uma-equipe-existente">Entrar em uma equipe
-existente</h3>
-<ol type="1">
-<li>Na tela <strong>Minhas empresas</strong>, clique em <strong>Entrar
-em uma turma</strong>.</li>
-<li>Selecione <strong>Entrar em uma equipe</strong>.</li>
-<li>Cole o <strong>código de convite da empresa</strong> exatamente como
-recebeu. O convite diferencia maiúsculas e minúsculas.</li>
-<li>Clique em <strong>Entrar na equipe</strong>.</li>
-<li>Confira o nome da empresa, os colegas e o cargo que o CEO atribuiu a
-você.</li>
-</ol>
-<p>O convite não é o mesmo que o código da turma. Se a mensagem de erro
-continuar, peça ao CEO para copiar o convite novamente ou ao professor
-para confirmar se a primeira rodada ainda está aberta.</p>
-<h3 id="o-tour-guiado">O tour guiado</h3>
-<p>Na primeira entrada, siga as orientações do tour na ordem indicada.
-Ao chegar ao final, marque <strong>Não mostrar novamente</strong> se já
-souber onde ficam os itens. A preferência fica associada ao usuário
-nesse navegador. Use <strong>Reabrir orientação inicial</strong> para
-consultar novamente.</p>
-<h2 id="escolher-o-caminho-da-simulação">3. Escolher o caminho da
-simulação</h2>
-<p>O professor escolhe o modo e o cenário da turma antes da entrada da
-primeira empresa. Você não altera essas escolhas pelo painel
-individual.</p>
-<figure>
-<img src="../diagramas/modos-cenarios.svg" alt="Modos e cenários" />
-<figcaption aria-hidden="true">Modos e cenários</figcaption>
-</figure>
-<p class="caption">
-Figura 2 — O modo define o tipo de operação; o cenário define o ponto de
-partida.
-</p>
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Escolha</th>
-<th>O que você acompanha</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Empresa tradicional</strong></td>
-<td>Produção, matéria-prima, máquinas, manutenção, estoque de produtos
-acabados, logística, clientes, contas a receber e a pagar.</td>
-</tr>
-<tr class="even">
-<td><strong>Startup</strong></td>
-<td>Clientes, capacidade de nuvem, aquisição, cancelamentos, CAC, LTV,
-churn, runway e participação dos fundadores.</td>
-</tr>
-<tr class="odd">
-<td><strong>Começar do zero</strong></td>
-<td>A empresa constrói operação, clientes, equipe e ativos ao longo das
-rodadas.</td>
-</tr>
-<tr class="even">
-<td><strong>Recuperação / crise</strong></td>
-<td>A empresa parte de um estado configurado de pressão: caixa, dívida,
-estoque, ativos e moral exigem decisões de recuperação.</td>
-</tr>
-</tbody>
-</table>
-<p>Uma turma pode ter de uma a sessenta rodadas. O professor define a
-quantidade; você deve planejar considerando que decisões de hoje afetam
-o próximo período.</p>
-<h2 id="o-ciclo-de-trabalho-da-equipe">4. O ciclo de trabalho da
-equipe</h2>
-<figure>
-<img src="../diagramas/equipe-cargos.svg" alt="Equipe e cargos" />
-<figcaption aria-hidden="true">Equipe e cargos</figcaption>
-</figure>
-<p class="caption">
-Figura 3 — Os cargos organizam a análise, mas a responsabilidade pelo
-resultado é compartilhada.
-</p>
-<p>Uma equipe tem de 3 a 5 integrantes. O CEO coordena a empresa, mas
-não decide sozinho. O CFO acompanha caixa e relatórios; o CMO acompanha
-demanda e posicionamento; o COO acompanha produção, estoque e logística;
-o CHRO acompanha pessoas. Uma mesma pessoa pode acumular mais de um
-cargo, desde que cada cargo tenha um titular na configuração final.</p>
-<h3 id="checklist-antes-de-salvar">Checklist antes de salvar</h3>
-<ol type="1">
-<li><strong>CEO:</strong> confirme o nome da empresa, o convite e a
-composição da equipe.</li>
-<li><strong>Todos:</strong> abram o painel e leiam a mesma rodada, o
-evento e o SempreHub News.</li>
-<li><strong>CMO:</strong> escreva a hipótese de público, preço, canal e
-posicionamento.</li>
-<li><strong>COO:</strong> verifique capacidade, matéria-prima, estoque,
-máquina e entrega.</li>
-<li><strong>CHRO:</strong> estime o efeito de salário, benefício e
-treinamento sobre moral e qualificação.</li>
-<li><strong>CFO:</strong> compare o plano com caixa, recebimentos,
-pagamentos, dívida e capital de giro.</li>
-<li><strong>Todos:</strong> discutam a decisão e salvem o rascunho.</li>
-<li><strong>Todos:</strong> releiam o resumo e cliquem em
-<strong>Confirmar decisão</strong> na própria conta.</li>
-</ol>
-<p>A equipe só fica pronta quando todos os integrantes confirmam a mesma
-versão. Se alguém editar o rascunho depois de uma confirmação, as
-confirmações anteriores são invalidadas para evitar que um colega assine
-uma decisão diferente.</p>
-<h2 id="tomar-decisões">5. Tomar decisões</h2>
-<h3 id="campos-comuns">Campos comuns</h3>
-<ul>
-<li><strong>Salário:</strong> usar o salário-base da turma ou informar
-outro valor por funcionário.</li>
-<li><strong>Benefício:</strong> valor mensal por funcionário.</li>
-<li><strong>Treinamento:</strong> investimento do período, com efeito
-sobre qualificação e moral ao longo do tempo.</li>
-<li><strong>Posicionamento:</strong> liderança em custo ou
-diferenciação.</li>
-<li><strong>Canal:</strong> venda direta, distribuidor ou digital.</li>
-<li><strong>Vendas a prazo:</strong> parcela das vendas que será
-recebida depois e prazo de recebimento.</li>
-<li><strong>Marketing digital:</strong> parte do orçamento total
-direcionada a canais digitais.</li>
+<li><b>Estrela:</b> alto crescimento e alta participação, no alto à esquerda.</li>
+<li><b>Vaca leiteira:</b> baixo crescimento e alta participação, embaixo à esquerda.</li>
+<li><b>Interrogação:</b> alto crescimento e baixa participação, no alto à direita.</li>
+<li><b>Abacaxi:</b> baixo crescimento e baixa participação, embaixo à direita.</li>
 </ul>
-<p>O motor considera a decisão em conjunto. Preço, marketing, qualidade,
-canal, capacidade e satisfação influenciam a demanda. Não escolha um
-campo isoladamente só porque ele aumenta uma métrica: anote a hipótese
-que explica o conjunto.</p>
-<h3 id="empresa-tradicional">Empresa tradicional</h3>
-<p>Na seção <strong>Produção e investimento</strong>, preencha:</p>
+<p>Na aba BCG, selecione um produto, informe o crescimento e a participação relativa e escolha sua classificação. Registre a base dos dados e as premissas. Adicione todos os produtos do catálogo. Para corrigir um item, exclua-o e registre os valores revisados.</p>
+<p><b>Participação relativa = participação do produto / participação do maior concorrente.</b> Não é o percentual absoluto de participação. O eixo horizontal usa escala logarítmica, com alta participação à esquerda. O corte didático é 1x; o de crescimento é 10%. Os marcadores numerados identificam os produtos e não representam faturamento. Participação zero aparece na borda de baixa participação.</p>
+<p>Se não houver dados suficientes, selecione <b>Projeção da equipe</b> e explique as premissas. O programa não preenche a BCG no lugar do aluno. Uma classificação incompatível com os valores informados afeta a coerência estratégica do mix.</p>
+<h2>7. Produção, máquinas, pessoas e tecnologia</h2>
+<p>No modo <b>Empresa tradicional</b>, a produção depende de pessoas, máquinas, matéria-prima e condições operacionais. Comprar máquinas sem mão de obra ou insumos suficientes não elimina os demais limites. Produzir além da demanda pode aumentar estoque, armazenagem e necessidade de capital de giro.</p>
+<h3>Vida útil e modernização</h3>
+<p>A vida útil contábil padrão de uma máquina é <b>24 meses</b>, configurável pelo professor antes da formação da empresa. A tela de Produção mostra o valor da sua turma; o painel operacional mostra a vida útil e a condição de cada máquina.</p>
+<p>A depreciação mensal reduz o valor contábil ao longo da vida útil. Ela afeta o resultado e o patrimônio, mas não é um pagamento de caixa daquele mês. A máquina não é retirada automaticamente ao zerar o valor contábil: sua condição e a manutenção continuam relevantes para a capacidade produtiva.</p>
+<p>Novas compras são opcionais e ficam disponíveis <b>a partir do mês 3</b>. O pagamento ocorre na compra, e a máquina entra em operação <b>na rodada seguinte</b>. Compare demanda, capacidade, manutenção, condição, custo e caixa antes de investir ou modernizar. Manutenção e expansão são decisões diferentes.</p>
+<h3>Funcionários, horas extras e P&amp;D</h3>
+<p>Contratar e demitir altera capacidade e gastos; demissões podem gerar rescisões. Salários, benefícios e treinamento influenciam custos e condições da equipe de funcionários.</p>
+<p>Horas extras são opcionais no modo Empresa tradicional: até <b>40 horas por funcionário no mês</b>, usando a premissa didática de salário dividido por 220 horas, adicional de 50% e encargos. Elas aumentam capacidade de trabalho e gastos, mas máquinas e insumos ainda podem limitar a produção. A escolha não se repete automaticamente na rodada seguinte.</p>
+<p>O investimento em <b>tecnologia e P&amp;D</b> tem custo e influencia qualidade e atratividade. No modo Startup, considere também infraestrutura, clientes, satisfação, retenção e participação dos fundadores. No modelo básico, nem todos os controles industriais ou digitais estão disponíveis.</p>
+<h2>8. Fluxo de caixa, capital de giro e crédito</h2>
+<p>A <b>DRE</b> mostra receitas, custos, despesas e lucro. A <b>DFC</b> mostra entradas e saídas de dinheiro. O <b>balanço</b> mostra ativos, obrigações e patrimônio. Lucro e caixa não são a mesma coisa.</p>
+<p>Vender a prazo pode registrar receita antes do recebimento; comprar a prazo pode adiar pagamentos. Estoques consomem recursos. A necessidade operacional de capital de giro considera estoques e valores a receber, descontando fornecedores a pagar. O caixa disponível precisa sustentar salários, despesas, parcelas e investimentos até os recebimentos.</p>
+<p><b>Crédito bancário tem custo alto e pode impactar a empresa.</b> Juros reduzem lucro e caixa; o principal precisa ser devolvido. A taxa da rodada e o cheque especial podem agravar o risco. Um aporte de investidores, quando disponível na Startup, não é receita de vendas e pode reduzir a participação dos fundadores.</p>
+<p>A prévia ajuda a conferir gastos e capacidade. Ela não garante vendas ou lucro e pode ser provisória enquanto o planejamento estiver incompleto. Depois do fechamento, compare as premissas com o resultado e atualize a análise financeira para a próxima rodada.</p>
+<h2>9. Histórico, avaliação e problemas de acesso</h2>
+<p>Decisões, versões, responsáveis pelo envio, transferências, eventos e resultados permanecem registrados. A nota de desempenho é calculada automaticamente em escala de <b>0 a 10</b> para acompanhamento do professor. Durante o jogo ela é provisória; a definição de uso na avaliação da disciplina é do professor.</p>
 <ul>
-<li><strong>Produção planejada:</strong> unidades que pretende
-fabricar;</li>
-<li><strong>Comprar matéria-prima:</strong> unidades que entram no
-estoque; o que não for consumido pode seguir para a próxima rodada;</li>
-<li><strong>Comprar máquinas:</strong> investimento que entra em
-operação na rodada seguinte;</li>
-<li><strong>Manutenção do mês:</strong> gasto que protege a condição e a
-capacidade das máquinas;</li>
-<li><strong>Entrega:</strong> rápida, padrão ou econômica. O frete é
-cobrado por unidade vendida e a experiência influencia a satisfação
-futura.</li>
+<li><b>Não vejo minha turma:</b> confirme o nome com o professor e se o ingresso está liberado.</li>
+<li><b>Não consigo entrar em outra turma:</b> a troca exige autorização do professor.</li>
+<li><b>Não tenho equipe:</b> veja os grupos com vagas ou converse com o professor antes de encerrar a formação.</li>
+<li><b>Não consigo editar:</b> confira quem é o líder desta rodada. Integrantes têm visualização.</li>
+<li><b>A liderança ainda não mudou:</b> confira a rodada de vigência; a transferência só vale após o fechamento do mês atual.</li>
+<li><b>Não consigo enviar:</b> leia a mensagem e complete as áreas indicadas. Salvar rascunho não entrega a rodada.</li>
+<li><b>A prévia não calculou:</b> corrija os valores indicados e tente novamente; o rascunho pode guardar um planejamento ainda incompleto.</li>
 </ul>
-<p>Em <strong>Compras a prazo</strong>, defina a parcela da
-matéria-prima comprada a prazo e o vencimento. Lembre que uma compra
-pode entrar no estoque agora e sair do caixa depois.</p>
-<p>Perguntas para a equipe:</p>
-<ol type="1">
-<li>Temos matéria-prima e capacidade para produzir o volume
-planejado?</li>
-<li>A máquina nova será necessária na próxima rodada ou o caixa precisa
-de prioridade?</li>
-<li>O frete escolhido combina com o posicionamento e com a promessa ao
-cliente?</li>
-<li>O estoque final ficará saudável ou imobilizará capital de giro?</li>
-</ol>
-<h3 id="startup">Startup</h3>
-<p>Na seção <strong>Serviço digital e investidores</strong>,
-preencha:</p>
-<ul>
-<li><strong>Capacidade da nuvem:</strong> clientes que podem ser
-atendidos no período;</li>
-<li><strong>Aporte de investidores:</strong> entrada de capital em troca
-de participação; aporte não é receita nem lucro;</li>
-<li><strong>Valuation antes do aporte:</strong> base para calcular a
-diluição dos fundadores.</li>
-</ul>
-<p>Perguntas para a equipe:</p>
-<ol type="1">
-<li>A capacidade atende a base atual sem pagar infraestrutura ociosa
-demais?</li>
-<li>O crescimento de clientes é compatível com aquisição e
-retenção?</li>
-<li>O caixa precisa de aporte ou a empresa consegue operar com seus
-próprios recursos?</li>
-<li>A diluição proposta vale o fôlego que o capital oferece?</li>
-</ol>
-<h3 id="prévia-rascunho-e-versão">Prévia, rascunho e versão</h3>
-<p>Use a <strong>prévia operacional</strong> para verificar produção
-preparada, matéria-prima e participação após aporte. Ela é uma
-estimativa: demanda, vendas, recebimentos, tributos e evento dependem do
-fechamento do mês.</p>
-<p>Clique em <strong>Salvar decisão</strong> para gravar o rascunho.
-Depois, revise os valores e confirme. A tela mostra a versão atual e
-quais integrantes já confirmaram. O botão de confirmação não substitui a
-conversa da equipe.</p>
-<h2 id="semprehub-news-e-leitura-do-mercado">6. SempreHub News e leitura
-do mercado</h2>
-<p>Leia o <strong>SempreHub News</strong> no começo de cada rodada e
-anote três coisas:</p>
-<ol type="1">
-<li>qual fato pode alterar demanda, preço ou custo;</li>
-<li>qual departamento é mais afetado;</li>
-<li>qual decisão e qual indicador verificar depois do fechamento.</li>
-</ol>
-<p>As notícias são insumos para uma hipótese, não uma resposta pronta.
-Compare o texto com o evento macroeconômico selecionado pelo professor e
-com o comportamento das empresas no painel de mercado.</p>
-<h3 id="análise-de-mercado">Análise de mercado</h3>
-<p>Defina o público-alvo, o problema que ele quer resolver, os
-concorrentes diretos e indiretos e a tendência que pode mudar a demanda.
-Registre uma hipótese observável: “se reduzirmos o preço em X e
-mantivermos Y de capacidade, esperamos vender Z”.</p>
-<h3 id="segmentação">Segmentação</h3>
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Base</th>
-<th>Pergunta que a equipe deve responder</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Demográfica</strong></td>
-<td>Quem é o público em idade, renda, profissão, escolaridade ou
-composição familiar?</td>
-</tr>
-<tr class="even">
-<td><strong>Geográfica</strong></td>
-<td>Onde vive e que condições de região, clima, densidade ou logística
-influenciam a compra?</td>
-</tr>
-<tr class="odd">
-<td><strong>Psicográfica</strong></td>
-<td>Quais valores, estilo de vida, crenças e motivações orientam a
-escolha?</td>
-</tr>
-<tr class="even">
-<td><strong>Comportamental</strong></td>
-<td>Com que frequência compra, o que valoriza e que relação tem com a
-marca?</td>
-</tr>
-</tbody>
-</table>
-<p>Uma segmentação útil muda a mensagem, o canal, o preço ou a oferta.
-Se não muda nenhuma decisão, ela ainda está genérica.</p>
-<h3 id="cinco-forças-de-porter">Cinco Forças de Porter</h3>
-<ul>
-<li><strong>Rivalidade:</strong> as empresas brigam por preço,
-marketing, qualidade e capacidade?</li>
-<li><strong>Novos entrantes:</strong> é fácil copiar a proposta ou
-entrar no mercado?</li>
-<li><strong>Fornecedores:</strong> existem alternativas para
-matéria-prima, nuvem, máquinas ou mídia?</li>
-<li><strong>Clientes:</strong> o comprador consegue exigir preço menor
-ou qualidade maior?</li>
-<li><strong>Substitutos:</strong> que outra solução resolve o mesmo
-problema?</li>
-</ul>
-<p>Use as forças para explicar uma decisão, não para produzir apenas uma
-lista. Exemplo: fornecedores concentrados podem justificar estoque de
-segurança, prazo negociado ou investimento em eficiência.</p>
-<h3 id="pestel-swot-e-análise-financeira">PESTEL, SWOT e análise
-financeira</h3>
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Ferramenta</th>
-<th>Use para</th>
-<th>Resultado esperado</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>PESTEL</strong></td>
-<td>Mapear fatores político, econômico, social, tecnológico, ecológico e
-legal.</td>
-<td>Alertas externos que a empresa não controla diretamente.</td>
-</tr>
-<tr class="even">
-<td><strong>SWOT / FOFA</strong></td>
-<td>Organizar forças e fraquezas internas, oportunidades e ameaças
-externas.</td>
-<td>Prioridades de ação para a próxima rodada.</td>
-</tr>
-<tr class="odd">
-<td><strong>Financeira</strong></td>
-<td>Relacionar receita, custo, lucro, caixa, capital de giro e
-risco.</td>
-<td>Decisão que seja viável no caixa e sustentável no tempo.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="mídias-e-orçamento-de-marketing">7. Mídias e orçamento de
-marketing</h2>
-<p>O orçamento de marketing deve ser justificado pela finalidade da
-mídia e pelo momento da empresa. As faixas abaixo são referências de
-estudo; no simulador, use o orçamento e os parâmetros da turma.</p>
-<h3 id="mídias-digitais">Mídias digitais</h3>
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Mídia</th>
-<th>O que é e qual finalidade cumpre</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Meta Ads</strong></td>
-<td>Anúncios no Instagram e Facebook, comprados por impressões ou
-cliques; servem para gerar alcance, consideração e conversões
-segmentadas.</td>
-</tr>
-<tr class="even">
-<td><strong>Google Ads</strong></td>
-<td>Anúncios em buscas e sites parceiros, normalmente por clique;
-capturam pessoas que já demonstraram intenção.</td>
-</tr>
-<tr class="odd">
-<td><strong>YouTube Ads</strong></td>
-<td>Vídeos ou banners em inventário de vídeo; servem para demonstração,
-lembrança e alcance audiovisual.</td>
-</tr>
-<tr class="even">
-<td><strong>TikTok Ads</strong></td>
-<td>Campanhas em formato curto e nativo; servem para descoberta e
-interação em ambientes de vídeo.</td>
-</tr>
-<tr class="odd">
-<td><strong>LinkedIn Ads</strong></td>
-<td>Anúncios por clique ou impressão em rede profissional; servem para
-comunicação institucional e geração de contatos profissionais.</td>
-</tr>
-<tr class="even">
-<td><strong>Mídia programática</strong></td>
-<td>Compra automatizada de banners por leilão; serve para distribuir
-alcance e remarketing em portais.</td>
-</tr>
-<tr class="odd">
-<td><strong>Pinterest Ads</strong></td>
-<td>Pins patrocinados por clique ou impressão; servem para inspiração,
-descoberta e tráfego para uma oferta.</td>
-</tr>
-<tr class="even">
-<td><strong>WhatsApp, SMS e push</strong></td>
-<td>Mensagens enviadas por canais autorizados; servem para
-relacionamento, lembrete e ativação de uma base existente.</td>
-</tr>
-<tr class="odd">
-<td><strong>Conteúdo e redes sociais</strong></td>
-<td>Publicações, vídeos e artigos próprios; servem para educar, criar
-confiança e reduzir dependência de mídia paga.</td>
-</tr>
-<tr class="even">
-<td><strong>SEO</strong></td>
-<td>Melhorias técnicas e editoriais para aparecer organicamente em
-buscadores; serve para aquisição de longo prazo.</td>
-</tr>
-<tr class="odd">
-<td><strong>E-mail marketing e CRM</strong></td>
-<td>Mensagens para contatos que autorizaram relacionamento; servem para
-retenção, ofertas e reativação.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="mídias-tradicionais-exteriores-e-experiências">Mídias
-tradicionais, exteriores e experiências</h3>
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Mídia</th>
-<th>O que é e qual finalidade cumpre</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>TV aberta ou por assinatura</strong></td>
-<td>Inserções audiovisuais em programação; servem para alcance e
-lembrança em grande escala.</td>
-</tr>
-<tr class="even">
-<td><strong>Rádio</strong></td>
-<td>Spots falados ou musicais em pacotes de inserções; servem para
-frequência e presença local.</td>
-</tr>
-<tr class="odd">
-<td><strong>Jornal e revista</strong></td>
-<td>Espaços impressos por coluna, página ou encarte; servem para
-informação, credibilidade e segmentação editorial.</td>
-</tr>
-<tr class="even">
-<td><strong>Outdoor</strong></td>
-<td>Painel fixo por período; serve para visibilidade repetida em uma
-rota geográfica.</td>
-</tr>
-<tr class="odd">
-<td><strong>Painel de LED</strong></td>
-<td>Tela externa com inserções rotativas; serve para alcance visual e
-atualização de mensagens.</td>
-</tr>
-<tr class="even">
-<td><strong>Busdoor / backbus</strong></td>
-<td>Adesivagem em veículos de transporte; serve para circulação da
-mensagem em áreas definidas.</td>
-</tr>
-<tr class="odd">
-<td><strong>Mobiliário urbano</strong></td>
-<td>Abrigos, relógios e painéis em espaços públicos; serve para presença
-no trajeto cotidiano.</td>
-</tr>
-<tr class="even">
-<td><strong>Telas de elevador</strong></td>
-<td>Circuitos em edifícios; servem para frequência em ambientes
-corporativos ou residenciais.</td>
-</tr>
-<tr class="odd">
-<td><strong>Streaming de áudio</strong></td>
-<td>Anúncios em áudio com ou sem banner; serve para alcance durante
-consumo de música e podcasts.</td>
-</tr>
-<tr class="even">
-<td><strong>Podcast</strong></td>
-<td>Testemunhal ou spot apresentado pelo programa; serve para associação
-de contexto e confiança.</td>
-</tr>
-<tr class="odd">
-<td><strong>Cinema</strong></td>
-<td>Vídeo antes da sessão; serve para atenção em ambiente
-audiovisual.</td>
-</tr>
-<tr class="even">
-<td><strong>Influência</strong></td>
-<td>Pacote de entregas de criadores; serve para demonstração, prova
-social e conversa com uma comunidade.</td>
-</tr>
-<tr class="odd">
-<td><strong>Panfletagem</strong></td>
-<td>Material impresso distribuído com promotores; serve para cobertura
-física e chamada para ação.</td>
-</tr>
-<tr class="even">
-<td><strong>Materiais de PDV</strong></td>
-<td>Wobblers, totens e móbiles no ponto de venda; servem para destacar a
-oferta no momento da escolha.</td>
-</tr>
-<tr class="odd">
-<td><strong>Eventos e parcerias</strong></td>
-<td>Presença, patrocínio ou ação conjunta; serve para relacionamento,
-experimentação e geração de contatos.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="como-decidir-o-orçamento">Como decidir o orçamento</h3>
-<p>Para uma empresa iniciante, 5% a 10% do faturamento bruto projetado é
-uma referência didática; para uma empresa estabelecida, 2% a 5% é uma
-referência de manutenção. Não trate essas faixas como regra automática:
-compare retorno esperado, caixa disponível, prazo de recebimento e
-objetivo da rodada.</p>
-<p>No caixa, mídias digitais frequentemente exigem pagamento antecipado
-ou imediato. Mídias tradicionais podem ser faturadas depois da
-veiculação. O prazo de pagamento deve ser lançado junto com as demais
-obrigações, pois uma campanha que parece barata pode pressionar a rodada
-seguinte.</p>
-<h2 id="ler-os-resultados">8. Ler os resultados</h2>
-<figure>
-<img src="../diagramas/demonstrativos.svg" alt="DRE, DFC e balanço" />
-<figcaption aria-hidden="true">DRE, DFC e balanço</figcaption>
-</figure>
-<p class="caption">
-Figura 4 — DRE, DFC e balanço respondem perguntas diferentes.
-</p>
-<h3 id="dre-o-resultado-econômico">DRE — o resultado econômico</h3>
-<p>A DRE explica se a operação gerou lucro ou prejuízo: receita, custos,
-despesas, tributos, juros e depreciação. Uma venda a prazo aparece na
-receita quando ocorre, mesmo que o dinheiro só seja recebido depois.</p>
-<h3 id="dfc-o-dinheiro">DFC — o dinheiro</h3>
-<p>A DFC explica a variação do caixa: recebimentos, pagamentos,
-investimentos e financiamentos. Uma máquina pode reduzir o caixa na
-compra e não aparecer como despesa integral na DRE naquele mesmo mês. Um
-aporte aumenta o caixa, mas não é receita.</p>
-<h3 id="balanço-a-posição">Balanço — a posição</h3>
-<p>O balanço mostra caixa, contas a receber, estoques, máquinas
-líquidas, contas a pagar, dívidas, patrimônio e capital de giro no fim
-da rodada. Use-o para responder “o que a empresa tem e o que deve
-agora?”.</p>
-<h3 id="indicadores-do-painel">Indicadores do painel</h3>
-<ul>
-<li><strong>Participação de mercado:</strong> parte da demanda atendida
-pela empresa.</li>
-<li><strong>Margem e lucro:</strong> relação entre receita, custos e
-despesas.</li>
-<li><strong>Capital de giro:</strong> recursos comprometidos com
-estoques e prazos de clientes e fornecedores.</li>
-<li><strong>Satisfação:</strong> efeito acumulado de preço, entrega,
-capacidade e atendimento.</li>
-<li><strong>CAC:</strong> custo médio para adquirir um cliente na
-startup.</li>
-<li><strong>LTV:</strong> valor estimado do cliente ao longo do
-relacionamento.</li>
-<li><strong>Churn:</strong> taxa de cancelamento da base.</li>
-<li><strong>Runway:</strong> quantos meses o caixa operacional estimado
-sustenta.</li>
-<li><strong>Patrimônio:</strong> ativos menos obrigações; aportes são
-apresentados separadamente na avaliação pedagógica.</li>
-</ul>
-<p>Se um indicador não tiver base válida, ele pode aparecer como “—”.
-Isso significa que a pergunta não pode ser respondida honestamente com
-os dados disponíveis, e não que a empresa tenha resultado zero.</p>
-<h2 id="relatório-da-primeira-rodada">9. Relatório da primeira
-rodada</h2>
-<p>Depois do fechamento da primeira rodada, o sistema disponibiliza o
-relatório da equipe. Leia nesta ordem:</p>
-<ol type="1">
-<li>decisão enviada e hipótese de mercado;</li>
-<li>receita, custos, despesas, lucro e tributos na DRE;</li>
-<li>entradas, saídas e variação do caixa na DFC;</li>
-<li>estoque, recebíveis, dívidas e patrimônio no balanço;</li>
-<li>produção, refugo, ruptura ou clientes atendidos;</li>
-<li>satisfação, participação, CAC/LTV/churn/runway quando
-aplicável;</li>
-<li>diferença entre o planejado e o realizado;</li>
-<li>uma ação que será mantida e uma que será alterada na segunda
-rodada.</li>
-</ol>
-<p>Abra o <strong>Relatório da primeira rodada</strong> no painel da
-empresa após o fechamento. Ele fica disponível automaticamente e
-permanece nas rodadas seguintes. A avaliação pedagógica apoia a
-discussão e não é uma nota institucional automática.</p>
-<h2 id="autores-e-onde-estudar">10. Autores e onde estudar</h2>
-<p>Use a aba <strong>Autores e referências</strong> do sistema para
-consultar a bibliografia selecionada pela disciplina. O quadro abaixo
-organiza o caminho de estudo; capítulos podem variar conforme a edição
-adotada pelo professor.</p>
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Autor / referência</th>
-<th>Procure no livro ou material</th>
-<th>Aplicação no SempreHub</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Philip Kotler e Kevin Keller</strong></td>
-<td>Segmentação, mercado-alvo, posicionamento, produto, preço, praça e
-promoção.</td>
-<td>Demanda, preço, marketing e canais.</td>
-</tr>
-<tr class="even">
-<td><strong>Marcos Cobra</strong></td>
-<td>Administração de marketing, comportamento, composto de marketing e
-decisões de mercado.</td>
-<td>Escolhas de oferta, comunicação e relacionamento.</td>
-</tr>
-<tr class="odd">
-<td><strong>Michael Porter</strong></td>
-<td>Estratégia competitiva, cinco forças e estratégias genéricas.</td>
-<td>Rivalidade, custo, diferenciação e risco de ficar sem
-posicionamento.</td>
-</tr>
-<tr class="even">
-<td><strong>Nigel Slack e colaboradores</strong></td>
-<td>Capacidade, qualidade, estoque, planejamento e operações.</td>
-<td>Produção, máquina, refugo, logística e nível de serviço.</td>
-</tr>
-<tr class="odd">
-<td><strong>Martins e Laugeni</strong></td>
-<td>Administração da produção, materiais, manutenção e
-produtividade.</td>
-<td>Matéria-prima, manutenção e capacidade.</td>
-</tr>
-<tr class="even">
-<td><strong>Assaf Neto</strong></td>
-<td>Análise financeira, capital de giro, fluxo de caixa e decisões de
-financiamento.</td>
-<td>DFC, dívida, recebíveis, pagamentos e caixa.</td>
-</tr>
-<tr class="odd">
-<td><strong>Eliseu Martins e contabilidade gerencial</strong></td>
-<td>DRE, custos, ativos, depreciação e patrimônio.</td>
-<td>Resultado econômico e balanço.</td>
-</tr>
-<tr class="even">
-<td><strong>GEM</strong></td>
-<td>Empreendedorismo por oportunidade e por necessidade.</td>
-<td>Perfil inicial escolhido na entrada da empresa.</td>
-</tr>
-<tr class="odd">
-<td><strong>José Dornelas</strong></td>
-<td>Tipos, processo e fases do empreendedorismo.</td>
-<td>Classe inicial, captação, operação e sobrevivência.</td>
-</tr>
-<tr class="even">
-<td><strong>Knight</strong></td>
-<td>Incerteza, risco e decisão empreendedora.</td>
-<td>Eventos sorteados e aprendizagem sob incerteza.</td>
-</tr>
-</tbody>
-</table>
-<p>Anote a edição usada pelo professor e cite a fonte no relatório da
-equipe. A aba de referências orienta o estudo; ela não substitui a
-leitura do capítulo completo.</p>
-<h2 id="problemas-comuns">11. Problemas comuns</h2>
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Situação</th>
-<th>O que verificar</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Código da turma recusado</td>
-<td>Confirme os seis caracteres, a turma e se a primeira rodada ainda
-está aberta.</td>
-</tr>
-<tr class="even">
-<td>Convite da equipe recusado</td>
-<td>Cole o código completo, respeitando maiúsculas e minúsculas;
-confirme com o CEO.</td>
-</tr>
-<tr class="odd">
-<td>Botão de confirmar indisponível</td>
-<td>Salve o rascunho primeiro e confira se você está na versão
-atual.</td>
-</tr>
-<tr class="even">
-<td>Confirmação desapareceu</td>
-<td>Outro integrante editou a decisão ou os cargos; revise e confirme
-novamente.</td>
-</tr>
-<tr class="odd">
-<td>Não consigo mudar a equipe</td>
-<td>A composição e os cargos só podem ser ajustados antes do fechamento
-da primeira rodada.</td>
-</tr>
-<tr class="even">
-<td>Caixa caiu mesmo com lucro</td>
-<td>Verifique compras, máquinas, estoque, prazos, amortizações e a
-DFC.</td>
-</tr>
-<tr class="odd">
-<td>Startup recebeu aporte mas não teve lucro maior</td>
-<td>Aporte é financiamento; aumenta caixa e pode diluir os fundadores,
-mas não é receita.</td>
-</tr>
-<tr class="even">
-<td>Resultado antigo não aparece</td>
-<td>Abra o histórico da empresa e o relatório da rodada; dados fechados
-não são apagados pela rodada seguinte.</td>
-</tr>
-</tbody>
-</table>
-<div class="callout green">
-<strong>Para a discussão:</strong> a melhor decisão não é a que produz o
-maior número isolado. É a que a equipe consegue explicar, medir e
-ajustar na rodada seguinte.
-</div>
-<h2 id="mix-completo-e-diagnósticos-automáticos">Mix completo e
-diagnósticos automáticos</h2>
-<p>Todas as equipes configuram preço, posicionamento, canais e campanhas
-de <strong>todos os produtos</strong> da edição de mercado utilizada.
-Revise cada produto antes de enviar. O peso de operação distribui a
-capacidade compartilhada; o investimento em mídia é a soma das campanhas
-de cada produto. Os resultados apresentam vendas, receita e custos por
-produto, além dos demonstrativos consolidados.</p>
-<p>Em <strong>Ferramentas e segmentação</strong>, o sistema prepara
-SWOT, Porter e PESTEL por IA, para consulta. A equipe interpreta o
-diagnóstico, escolhe a diretriz estratégica e preenche BCG e
-segmentação. As decisões da equipe continuam influenciando a coerência
-do mix e o resultado. Os diagnósticos ficam preservados por empresa e
-rodada.</p>
-<p>Consulte <strong>Manual de mídias</strong> na sidebar para pesquisar
-os formatos do catálogo, entender objetivos, unidades de compra e
-cuidados. A mesma área oferece o guia completo em PDF.</p>
-<h2 id="mídia-e-serviços-de-produção">Mídia e serviços de produção</h2>
-<p>O mix de cada produto mostra mídia, produção/serviços e total.
-Selecionar mídia inclui automaticamente os serviços com referência
-publicada. Para formatos com serviços sob consulta, informe um orçamento
-total com link do fornecedor. Não é permitido enviar somente veiculação
-quando o serviço é obrigatório. As fontes e escopos estão no Guia de
-mídias.</p>
-<p>Panfletos vinculam impressão e distribuição; jingle exige veiculação
-e substitui a produção de áudio simples. Produção é cobrada por formato,
-produto e mês; materiais físicos acompanham a quantidade. A abertura por
-produto explica as despesas já incluídas uma vez no marketing da DRE e
-no caixa. Históricos preservam os valores contratados. Preços publicados
-«a partir de» não garantem todo escopo ou direito de uso.</p>
-</body>
-</html>
+<p>Use as referências de GEM e Dornelas para discutir o perfil empreendedor; Porter, SWOT, PESTEL e BCG para interpretar estratégia; e os demonstrativos para avaliar as consequências. O objetivo é aplicar a teoria, justificar escolhas e aprender com os resultados.</p></body></html>

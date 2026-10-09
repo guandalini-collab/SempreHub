@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
 
@@ -28,18 +29,18 @@ def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch):
     plano={"edicao_id":eid,"produto_id":"produto-1","estrategia_preco":"COMPETITIVO","posicionamento":"PRECO","canais":["DIRETO"],"cobertura":"LOCAL","intensidade":"MEDIA","midias":[{"id":"email","quantidade":100}],"estrategias":{"SWOT":"Análise da equipe"},"custo_unitario":1}
     plano["produtos"]=[{**plano,"produto_id":"produto-1","preco":60,"peso":1,"revisado":True,"servicos":[{"id":"servico-email","quantidade":1}]}]
     decisao={"preco":60,"marketing":557,"plano_comercial":plano}
-    r=cliente.put(base+"/decisao",headers=aluno,json=decisao)
+    r=cliente.put(base+"/decisao",headers=aluno,json=completar_decisao(decisao))
     assert r.status_code==200,r.text
     assert r.json()["plano_comercial"]["custo_unitario"]==30
-    assert cliente.put(base+"/decisao",headers=aluno,json={**decisao,"marketing":1}).status_code==422
+    assert cliente.put(base+"/decisao",headers=aluno,json=completar_decisao({**decisao,"marketing":1})).status_code==422
     assert cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada",headers=professor,json={"evento":"NENHUM"}).status_code==200
     painel=cliente.get(base,headers=aluno).json()
     resultado=painel["resultados"][0]
     assert abs(resultado["dre"]["cmv"]-resultado["unidades_vendidas"]*30)<.01
     assert cliente.get(base+"/mercado-real",headers=aluno).json()["edicoes"][0]["rodada"]==1
     # O catálogo anterior continua válido e seu custo não pode ser removido.
-    assert cliente.put(base+"/decisao",headers=aluno,json={"preco":60}).status_code==422
-    assert cliente.put(base+"/decisao",headers=aluno,json=decisao).status_code==200
+    assert cliente.put(base+"/decisao",headers=aluno,json=completar_decisao({"preco":60})).status_code==422
+    assert cliente.put(base+"/decisao",headers=aluno,json=completar_decisao(decisao)).status_code==200
     monkeypatch.setattr(mercado,"gerar_json",lambda *a:({"texto":"Relatório empresarial: a rodada registrou vendas e custos conforme os demonstrativos."},set()))
     caminho=f"/api/professor/turmas/{turma['id']}/empresas/{empresa}/relatorio-empresarial/1"
     assert cliente.post(caminho,headers=professor,json={}).status_code==200
@@ -61,7 +62,7 @@ def test_concorrentes_externos_disputam_demanda_no_basico(cliente,professor):
     turma=_criar_turma(cliente,professor,configuracao_simulacao={"concorrentes_virtuais":5})
     aluno=cadastrar(cliente,"Ana","concorrencia-basico@aluno.iffar.edu.br")
     empresa=_entrar(cliente,aluno,turma["codigo"],"Empresa em competição")
-    assert cliente.put(f"/api/aluno/empresas/{empresa}/decisao",headers=aluno,json={"preco":100}).status_code==200
+    assert cliente.put(f"/api/aluno/empresas/{empresa}/decisao",headers=aluno,json=completar_decisao({"preco":100})).status_code==200
     assert cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada",headers=professor,json={"evento":"NENHUM"}).status_code==200
     resultado=cliente.get(f"/api/aluno/empresas/{empresa}",headers=aluno).json()["resultados"][0]
     assert 0<resultado["participacao_mercado"]<.5
@@ -81,7 +82,7 @@ def test_custo_catalogo_aplicado_servico_digital(cliente,professor,monkeypatch):
     eid=cliente.post(docente+"/pesquisar",headers=professor,json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":1}).json()["id"]
     cliente.post(docente+f"/{eid}/publicar",headers=professor,json={})
     plano={"edicao_id":eid,"produto_id":"produto-1","estrategia_preco":"VALOR","posicionamento":"INOVACAO","canais":["ECOMMERCE"],"cobertura":"NACIONAL","intensidade":"BAIXA","midias":[]}
-    resposta=cliente.put(f"/api/aluno/empresas/{empresa}/decisao",headers=aluno,json={"rodada":1,"preco":100,"plano_comercial":plano,"simulacao":{"capacidade_nuvem":300}})
+    resposta=cliente.put(f"/api/aluno/empresas/{empresa}/decisao",headers=aluno,json=completar_decisao({"rodada":1,"preco":100,"plano_comercial":plano,"simulacao":{"capacidade_nuvem":300}}))
     assert resposta.status_code==200,resposta.text
     assert resposta.json()["simulacao"]["canal"]=="DIGITAL"
     assert cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada",headers=professor,json={"rodada":1,"evento":"NENHUM"}).status_code==200

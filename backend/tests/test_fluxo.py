@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 import random
 
 from app.motor.tributos import aliquota_efetiva_simples, calcular_imposto, rbt12
@@ -94,7 +95,7 @@ def test_rodada_completa_com_mercado_compartilhado(cliente, professor):
     e2 = _entrar(cliente, a2, turma["codigo"], "Bruno Doces", regime="SIMPLES_NACIONAL")
 
     # Ana cobra mais barato; Bruno não envia decisão
-    r = cliente.put(f"/api/aluno/empresas/{e1}/decisao", headers=a1, json={"preco": 90, "contratar": 1})
+    r = cliente.put(f"/api/aluno/empresas/{e1}/decisao", headers=a1, json=completar_decisao({"preco": 90, "contratar": 1}))
     assert r.status_code == 200, r.text
 
     detalhe = cliente.get(f"/api/professor/turmas/{turma['id']}", headers=professor).json()
@@ -157,7 +158,7 @@ def test_teto_do_mei_e_desenquadramento(cliente, professor):
     aluno = cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
     e = _entrar(cliente, aluno, turma["codigo"], "Ana MEI", regime="MEI")
     for _ in range(3):
-        cliente.put(f"/api/aluno/empresas/{e}/decisao", headers=aluno, json={"preco": 100})
+        cliente.put(f"/api/aluno/empresas/{e}/decisao", headers=aluno, json=completar_decisao({"preco": 100}))
         cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "NENHUM"})
     painel = cliente.get(f"/api/aluno/empresas/{e}", headers=aluno).json()
     assert painel["empresa"]["regime_tributario"] == "SIMPLES_NACIONAL"
@@ -169,7 +170,7 @@ def test_mei_com_dois_empregados_e_desenquadrado(cliente, professor):
     turma = _criar_turma(cliente, professor)
     aluno = cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
     e = _entrar(cliente, aluno, turma["codigo"], "Ana MEI", regime="MEI")
-    cliente.put(f"/api/aluno/empresas/{e}/decisao", headers=aluno, json={"preco": 100, "contratar": 2})
+    cliente.put(f"/api/aluno/empresas/{e}/decisao", headers=aluno, json=completar_decisao({"preco": 100, "contratar": 2}))
     cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "NENHUM"})
     painel = cliente.get(f"/api/aluno/empresas/{e}", headers=aluno).json()
     assert painel["empresa"]["regime_tributario"] == "SIMPLES_NACIONAL"
@@ -179,7 +180,7 @@ def test_emprestimo_juros_e_selic(cliente, professor):
     turma = _criar_turma(cliente, professor)
     aluno = cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
     e = _entrar(cliente, aluno, turma["codigo"], "Ana", regime="SIMPLES_NACIONAL")
-    cliente.put(f"/api/aluno/empresas/{e}/decisao", headers=aluno, json={"preco": 100, "emprestimo": 80000})
+    cliente.put(f"/api/aluno/empresas/{e}/decisao", headers=aluno, json=completar_decisao({"preco": 100, "emprestimo": 80000}))
     cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "ALTA_SELIC"})
     r = cliente.get(f"/api/aluno/empresas/{e}", headers=aluno).json()
     resultado = r["resultados"][0]
@@ -206,7 +207,7 @@ def test_porter_meio_termo(cliente, professor):
     turma = _criar_turma(cliente, professor)
     aluno = cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
     e = _entrar(cliente, aluno, turma["codigo"], "Ana")
-    cliente.put(f"/api/aluno/empresas/{e}/decisao", headers=aluno, json={"preco": 80, "marketing": 3000, "pd": 2000})
+    cliente.put(f"/api/aluno/empresas/{e}/decisao", headers=aluno, json=completar_decisao({"preco": 80, "marketing": 3000, "pd": 2000}))
     cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "NENHUM"})
     alertas = cliente.get(f"/api/aluno/empresas/{e}", headers=aluno).json()["resultados"][0]["alertas"]
     assert any("meio-termo" in a for a in alertas)
@@ -256,7 +257,7 @@ def test_simulacao_longa_estavel(cliente, professor):
             cliente.put(
                 f"/api/aluno/empresas/{e}/decisao",
                 headers=cab,
-                json={
+                json=completar_decisao({
                     "preco": rng.uniform(60, 160),
                     "marketing": rng.choice([0, 500, 2000, 5000]),
                     "pd": rng.choice([0, 1000, 3000]),
@@ -264,7 +265,7 @@ def test_simulacao_longa_estavel(cliente, professor):
                     "contratar": rng.choice([0, 0, 1]),
                     "demitir": 1 if painel["empresa"]["funcionarios"] > 2 and rng.random() < 0.3 else 0,
                     "emprestimo": rng.choice([0, 0, 10000]),
-                },
+                }),
             )
         r = cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "SORTEAR"})
         assert r.status_code == 200, r.text

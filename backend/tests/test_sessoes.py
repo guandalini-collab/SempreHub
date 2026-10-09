@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 """Redefinir uma senha encerra sessões sem apagar a trajetória da empresa."""
 
 from datetime import datetime, timedelta, timezone
@@ -112,7 +113,7 @@ def test_redefinicao_pelo_professor_preserva_jogo_entre_rodadas(cliente, profess
     resposta = cliente.put(
         f"{caminho_empresa}/decisao",
         headers=aluno,
-        json={"preco": 95, "contratar": 1, "emprestimo": 10000, "marketing": 500},
+        json=completar_decisao({"preco": 95, "contratar": 1, "emprestimo": 10000, "marketing": 500}),
     )
     assert resposta.status_code == 200
     assert cliente.post(caminho_fechar, headers=professor, json={"evento": "NENHUM"}).status_code == 200
@@ -133,7 +134,7 @@ def test_redefinicao_pelo_professor_preserva_jogo_entre_rodadas(cliente, profess
     assert redefinicao.status_code == 200
     for sessao in (aluno, outra_sessao):
         assert cliente.get(caminho_empresa, headers=sessao).status_code == 401
-        assert cliente.put(f"{caminho_empresa}/decisao", headers=sessao, json={"preco": 105}).status_code == 401
+        assert cliente.put(f"{caminho_empresa}/decisao", headers=sessao, json=completar_decisao({"preco": 105})).status_code == 401
     for link in links_pendentes:
         assert _redefinir_pelo_link(cliente, link, "senha-indevida").status_code == 400
     novo_login = _login(cliente, email)
@@ -142,7 +143,7 @@ def test_redefinicao_pelo_professor_preserva_jogo_entre_rodadas(cliente, profess
     assert resposta.json() == antes  # Empresa, caixa, dívida, decisão e histórico intactos.
 
     # A nova sessão continua a mesma empresa e mantém o resultado da rodada 1.
-    decisao = cliente.put(f"{caminho_empresa}/decisao", headers=novo_login, json={"preco": 105})
+    decisao = cliente.put(f"{caminho_empresa}/decisao", headers=novo_login, json=completar_decisao({"preco": 105}))
     assert decisao.status_code == 200
     assert decisao.json()["rodada"] == 2
     assert cliente.post(caminho_fechar, headers=professor, json={"evento": "NENHUM"}).status_code == 200

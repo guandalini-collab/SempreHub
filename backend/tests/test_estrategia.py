@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 from copy import deepcopy
 from types import SimpleNamespace
 import pytest
@@ -58,7 +59,7 @@ def test_segmentacao_afeta_vendas_e_resultado_preserva_historico(cliente, profes
         decisao = {'rodada': 1, 'preco': 100, 'plano_comercial': plano}
         if modo != 'LEGADO':
             decisao['simulacao'] = {'producao': 200, 'comprar_mp': 200, 'capacidade_nuvem': 300}
-        r = cliente.put(f'/api/aluno/empresas/{empresa}/decisao', headers=aluno, json=decisao)
+        r = cliente.put(f'/api/aluno/empresas/{empresa}/decisao', headers=aluno, json=completar_decisao(decisao))
         assert r.status_code == 200, r.text
         assert r.json()['plano_comercial']['analises']['segmentacao']['preco_maximo'] == (120 if i == 0 else 30)
     assert cliente.post(docente + '/fechar-rodada', headers=professor, json={'rodada': 1, 'evento': 'NENHUM'}).status_code == 200

@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 """Migrações versionadas preservam contas e rodadas em SQLite e PostgreSQL."""
 
 import os
@@ -26,7 +27,7 @@ from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
 
 
-_HEAD = "0008_diagnosticos"
+_HEAD = "0009_ingresso_lideranca"
 
 
 @pytest.fixture()
@@ -149,7 +150,7 @@ def test_adota_banco_populado_sem_versao_e_continua_a_segunda_rodada(banco_migra
         decisao = cliente.put(
             f"{empresa_url}/decisao",
             headers=aluno,
-            json={"preco": 95, "contratar": 1, "emprestimo": 12000, "marketing": 500, "pd": 300},
+            json=completar_decisao({"preco": 95, "contratar": 1, "emprestimo": 12000, "marketing": 500, "pd": 300}),
         )
         assert decisao.status_code == 200
         assert cliente.post(fechar_url, headers=professor, json={"evento": "GREVE_LOGISTICA"}).status_code == 200
@@ -172,7 +173,7 @@ def test_adota_banco_populado_sem_versao_e_continua_a_segunda_rodada(banco_migra
         novo_login = cliente.post("/api/auth/login", json={"email": "ana@aluno.iffar.edu.br", "senha": "nova-senha-segura"})
         assert novo_login.status_code == 200
 
-        decisao = cliente.put(f"{empresa_url}/decisao", headers=aluno, json={"preco": 105, "amortizacao": 2000})
+        decisao = cliente.put(f"{empresa_url}/decisao", headers=aluno, json=completar_decisao({"preco": 105, "amortizacao": 2000}))
         assert decisao.status_code == 200
         assert decisao.json()["rodada"] == 2
         assert cliente.post(fechar_url, headers=professor, json={"evento": "NENHUM"}).status_code == 200
@@ -211,7 +212,8 @@ def test_revisao_anterior_e_atualizada_sem_perder_contas(banco_migracoes):
     for usuario in depois["usuarios"]:
         assert usuario.pop("versao_sessao") == 0
     assert {nome: depois[nome] for nome in antes} == antes
-    assert all(depois[nome] == [] for nome in depois.keys() - antes.keys())
+    assert all(depois[nome] == [] for nome in depois.keys() - antes.keys() - {"matriculas_turma"})
+    assert len(depois["matriculas_turma"]) == len(antes["empresas"]) if not antes.get("membros_empresa") else len(depois["matriculas_turma"]) == len(antes["membros_empresa"])
     with Session(banco_migracoes) as sessao:
         assert sessao.get(Usuario, 2).criado_por_id == 1
 
@@ -280,9 +282,9 @@ def test_migracao_de_equipes_preserva_turma_individual_e_historico_legado(banco_
     _confirmar_head(banco_migracoes)
     depois = _snapshot(banco_migracoes)
     novas_colunas = {
-        "turmas": {"modo_equipe": False, "modo_jogo": "LEGADO", "cenario": "ZERO", "configuracao_simulacao": None, "versao_motor": 1},
-        "empresas": {"codigo_convite": None, "estado_simulacao": None},
-        "decisoes": {"versao": 0, "simulacao": None, "plano_comercial": None, "revisao_areas": None},
+        "turmas": {"visivel_ingresso": True, "formacao_encerrada": False, "modo_equipe": False, "modo_jogo": "LEGADO", "cenario": "ZERO", "configuracao_simulacao": None, "versao_motor": 1},
+        "empresas": {"lider_id": None, "proximo_lider_id": None, "votos_lider": {}, "codigo_convite": None, "estado_simulacao": None},
+        "decisoes": {"analise_financeira": "", "versao": 0, "simulacao": None, "plano_comercial": None, "revisao_areas": None},
         "resultados": {"detalhes_simulacao": None},
     }
     for nome, colunas in novas_colunas.items():
@@ -290,7 +292,8 @@ def test_migracao_de_equipes_preserva_turma_individual_e_historico_legado(banco_
             for coluna, valor in colunas.items():
                 assert linha.pop(coluna) == valor
     assert {nome: depois[nome] for nome in antes} == antes
-    assert all(depois[nome] == [] for nome in depois.keys() - antes.keys())
+    assert all(depois[nome] == [] for nome in depois.keys() - antes.keys() - {"matriculas_turma"})
+    assert len(depois["matriculas_turma"]) == len(antes["empresas"]) if not antes.get("membros_empresa") else len(depois["matriculas_turma"]) == len(antes["membros_empresa"])
 
     # A migração não exige integrantes ou assinaturas de jogos individuais já iniciados.
     with _cliente_no_banco(banco_migracoes) as cliente:
@@ -305,7 +308,7 @@ def test_migracao_de_equipes_preserva_turma_individual_e_historico_legado(banco_
         assert painel.json()["turma"]["modo_equipe"] is False
         assert painel.json()["equipe"] is None
         resultado_antigo = painel.json()["resultados"][0]
-        assert cliente.put(f"{empresa_url}/decisao", headers=logins["aluno"], json={"preco": 105, "amortizacao": 2000}).status_code == 200
+        assert cliente.put(f"{empresa_url}/decisao", headers=logins["aluno"], json=completar_decisao({"preco": 105, "amortizacao": 2000})).status_code == 200
         assert cliente.post(f"/api/professor/turmas/{turma_id}/fechar-rodada", headers=logins["professor"], json={"evento": "NENHUM"}).status_code == 200
         final = cliente.get(empresa_url, headers=logins["aluno"]).json()
         assert final["empresa"]["id"] == empresa_id
@@ -386,9 +389,9 @@ def test_motor_avancado_preserva_equipes_assinaturas_e_rodadas_existentes(banco_
         _confirmar_head(banco_migracoes)
         depois = _snapshot(banco_migracoes)
         novas_colunas = {
-            "turmas": {"modo_jogo": "LEGADO", "cenario": "ZERO", "configuracao_simulacao": None, "versao_motor": 1},
-            "empresas": {"estado_simulacao": None},
-            "decisoes": {"simulacao": None, "plano_comercial": None, "revisao_areas": None},
+            "turmas": {"visivel_ingresso": True, "formacao_encerrada": False, "modo_jogo": "LEGADO", "cenario": "ZERO", "configuracao_simulacao": None, "versao_motor": 1},
+            "empresas": {"lider_id": alunos[0], "proximo_lider_id": None, "votos_lider": {}, "estado_simulacao": None},
+            "decisoes": {"analise_financeira": "", "simulacao": None, "plano_comercial": None, "revisao_areas": None},
             "resultados": {"detalhes_simulacao": None},
         }
         for nome, colunas in novas_colunas.items():
@@ -396,7 +399,8 @@ def test_motor_avancado_preserva_equipes_assinaturas_e_rodadas_existentes(banco_
                 for coluna, valor in colunas.items():
                     assert linha.pop(coluna) == valor
         assert {nome: depois[nome] for nome in antes} == antes
-        assert all(depois[nome] == [] for nome in depois.keys() - antes.keys())
+        assert all(depois[nome] == [] for nome in depois.keys() - antes.keys() - {"matriculas_turma"})
+        assert len(depois["matriculas_turma"]) == len(antes["empresas"]) if not antes.get("membros_empresa") else len(depois["matriculas_turma"]) == len(antes["membros_empresa"])
 
     with _cliente_no_banco(banco_migracoes) as cliente:
         cabecalhos = []
@@ -413,12 +417,12 @@ def test_motor_avancado_preserva_equipes_assinaturas_e_rodadas_existentes(banco_
         assert len(painel.json()["equipe"]["membros"]) == 3
         resultado_primeiro = painel.json()["resultados"][0]
         decisao = cliente.put(
-            f"{empresa_url}/decisao", headers=membros[2],
-            json={"preco": 105, "amortizacao": 2000, "versao": 0, "rodada": 2},
+            f"{empresa_url}/decisao", headers=membros[0],
+            json=completar_decisao({"preco": 105, "amortizacao": 2000, "versao": 0, "rodada": 2}),
         )
         assert decisao.status_code == 200
-        for headers in membros:
-            assert cliente.post(f"{empresa_url}/aprovar", headers=headers, json={"versao": decisao.json()["versao"], "rodada": 2}).status_code == 200
+        for headers in membros[1:]:
+            assert cliente.post(f"{empresa_url}/aprovar", headers=headers, json={"versao": decisao.json()["versao"], "rodada": 2}).status_code == 403
         assert cliente.post(f"/api/professor/turmas/{turma_id}/fechar-rodada", headers=professor, json={"evento": "NENHUM", "rodada": 2}).status_code == 200
         final = cliente.get(empresa_url, headers=membros[0]).json()
         assert final["empresa"]["id"] == empresa_id

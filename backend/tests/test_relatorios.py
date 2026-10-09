@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 """Relatórios leem rodadas encerradas, preservam evidências e isolam turmas."""
 
 from copy import deepcopy
@@ -59,7 +60,7 @@ def test_historico_legado_sem_dfc_fabricada_ou_dados_atuais(cliente, professor):
     turma = _criar_turma(cliente, professor, total_rodadas=3)
     aluno = cadastrar(cliente, "Ana", "relatorio-legado@aluno.iffar.edu.br")
     empresa_id = _entrar(cliente, aluno, turma["codigo"], "Histórico Legado")
-    resposta = cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json={"preco": 95})
+    resposta = cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=completar_decisao({"preco": 95}))
     assert resposta.status_code == 200
     _fechar_individual(cliente, turma, professor)
     relatorio = cliente.get(_url(turma["id"]), headers=professor).json()
@@ -92,23 +93,23 @@ def test_relatorio_preserva_assinaturas_de_versoes_anteriores_sem_contar_como_at
     anterior = _salvar(cliente, equipe)
     _aprovar(cliente, equipe, equipe["alunos"][0], anterior["versao"])
     atual = _salvar(cliente, equipe, marketing=100)
-    for aluno in equipe["alunos"]:
-        _aprovar(cliente, equipe, aluno, atual["versao"])
+    _aprovar(cliente, equipe, equipe["alunos"][0], atual["versao"])
     assert _fechar(cliente, equipe, professor).status_code == 200
     relatorio = cliente.get(_url(equipe["turma"]["id"]), headers=professor).json()
     rodada = relatorio["empresas"][0]["rodadas"][0]
     participacao = rodada["participacao"]
     assert participacao["proporcao_confirmada"] == 1.0
-    assert len(participacao["assinaturas"]) == 4
+    assert len(participacao["assinaturas"]) == 2
     assert {a["versao"] for a in participacao["assinaturas"]} == {anterior["versao"], atual["versao"]}
-    assert all(m["confirmou_versao"] for m in participacao["membros"])
+    assert participacao["modo_envio"] == "LIDER"
+    assert all(m["confirmou_versao"] is None for m in participacao["membros"])
     assert {m["aluno_id"] for m in participacao["membros"]} == {a["id"] for a in equipe["alunos"]}
-    assert sum(a["acao"] == "APROVAR_DECISAO" for a in participacao["acoes"]) == 4
+    assert sum(a["acao"] == "ENVIAR_DECISAO" for a in participacao["acoes"]) == 2
     assert all("senha" not in json.dumps(a) for a in participacao["acoes"])
     csv_resposta = cliente.get(_url(equipe["turma"]["id"], True), headers=professor)
     linhas = list(csv.DictReader(io.StringIO(csv_resposta.text.lstrip("\ufeff")), delimiter=";"))
     assert len(linhas) == 1
-    assert len(json.loads(linhas[0]["Assinaturas"])) == 4
+    assert len(json.loads(linhas[0]["Assinaturas"])) == 2
     assert json.loads(linhas[0]["Participação individual"])["proporcao_confirmada"] == 1.0
     assert "attachment" in csv_resposta.headers["Content-Disposition"]
 

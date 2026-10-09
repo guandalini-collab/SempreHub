@@ -86,13 +86,20 @@ def _participacao(empresa, decisao, rodada):
         membro["confirmou_versao"] = membro["aluno_id"] in ids_confirmados if equipe else None
         membro["assinaturas"] = [a for a in assinaturas if a["aluno_id"] == membro["aluno_id"]]
         membro["acoes"] = [a for a in acoes if a["aluno_id"] == membro["aluno_id"]]
-    if equipe:
+    envio_lider = next((a for a in validas if a["conteudo"].get("tipo") == "ENVIO_LIDER"), None)
+    if equipe and envio_lider:
+        proporcao = float(bool(decisao.enviada_em and not decisao.automatica))
+        for membro in membros:
+            membro["confirmou_versao"] = None
+    elif equipe:
         proporcao = len(ids_confirmados.intersection(m["aluno_id"] for m in membros)) / len(membros) if membros else None
     else:
         # Entrega individual autenticada é evidência; não inventar uma assinatura.
         proporcao = float(bool(decisao and not decisao.automatica and decisao.enviada_em))
     return {
         "tipo": "EQUIPE" if equipe else "INDIVIDUAL",
+        "modo_envio": "LIDER" if envio_lider else "CONFIRMACOES" if equipe else "INDIVIDUAL",
+        "lider_id": envio_lider["aluno_id"] if envio_lider else None,
         "proporcao_confirmada": proporcao,
         "membros": membros, "assinaturas": assinaturas, "acoes": acoes,
     }

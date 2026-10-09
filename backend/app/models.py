@@ -24,6 +24,7 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
     false,
+    true,
 )
 from sqlalchemy.orm import relationship
 
@@ -98,7 +99,7 @@ class Usuario(Base):
     criado_por_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
 
     turmas = relationship("Turma", back_populates="professor")
-    empresas = relationship("Empresa", back_populates="aluno")
+    empresas = relationship("Empresa", back_populates="aluno", foreign_keys="Empresa.aluno_id")
 
 
 class Turma(Base):
@@ -111,6 +112,8 @@ class Turma(Base):
     status = Column(Enum(StatusTurma), nullable=False, default=StatusTurma.ABERTA)
     rodada_atual = Column(Integer, nullable=False, default=1)
     total_rodadas = Column(Integer, nullable=False, default=12)
+    visivel_ingresso = Column(Boolean, nullable=False, default=True, server_default=true())
+    formacao_encerrada = Column(Boolean, nullable=False, default=False, server_default=false())
     modo_equipe = Column(Boolean, nullable=False, default=False, server_default=false())
     # O motor histórico é mantido para todas as turmas já existentes.
     modo_jogo = Column(String(20), nullable=False, default="LEGADO", server_default="LEGADO")
@@ -152,6 +155,9 @@ class Empresa(Base):
     id = Column(Integer, primary_key=True)
     turma_id = Column(Integer, ForeignKey("turmas.id"), nullable=False, index=True)
     aluno_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False, index=True)
+    lider_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
+    proximo_lider_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
+    votos_lider = Column(JSON, nullable=False, default=dict, server_default="{}")
     nome = Column(String(120), nullable=False)
     codigo_convite = Column(String(64), nullable=True, unique=True, index=True)
     criado_em = Column(DateTime, default=agora)
@@ -178,7 +184,7 @@ class Empresa(Base):
     estado_simulacao = Column(JSON, nullable=True)
 
     turma = relationship("Turma", back_populates="empresas")
-    aluno = relationship("Usuario", back_populates="empresas")
+    aluno = relationship("Usuario", back_populates="empresas", foreign_keys=[aluno_id])
     decisoes = relationship("Decisao", back_populates="empresa", order_by="Decisao.rodada")
     resultados = relationship("Resultado", back_populates="empresa", order_by="Resultado.rodada")
     membros = relationship("MembroEmpresa", back_populates="empresa", order_by="MembroEmpresa.id")
@@ -205,6 +211,7 @@ class Decisao(Base):
     regime_solicitado = Column(Enum(RegimeTributario), nullable=True)
     revisao_areas = Column(JSON, nullable=True)
     simulacao = Column(JSON, nullable=True)
+    analise_financeira = Column(String(6000), nullable=False, default="", server_default="''")
     plano_comercial = Column(JSON, nullable=True)
     automatica = Column(Integer, nullable=False, default=0)  # 1 = repetida pelo sistema
     # None é intencional em rascunhos de equipe; não aplicar o default nesse caso.
@@ -379,3 +386,13 @@ class DiagnosticoEstrategico(Base):
     rodada = Column(Integer, nullable=False)
     dados = Column(JSON, nullable=False)
     criado_em = Column(DateTime, nullable=False, default=agora)
+
+
+class MatriculaTurma(Base):
+    """Vínculo único atual, independente da formação de uma empresa."""
+    __tablename__ = "matriculas_turma"
+    aluno_id = Column(Integer, ForeignKey("usuarios.id"), primary_key=True)
+    turma_id = Column(Integer, ForeignKey("turmas.id"), nullable=False, index=True)
+    autorizada_turma_id = Column(Integer, ForeignKey("turmas.id"), nullable=True)
+    historico = Column(JSON, nullable=False, default=list)
+    aluno = relationship("Usuario")

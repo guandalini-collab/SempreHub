@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { api } from "../../api";
 import { BibliotecaAprendizagem, ManualRapido, TourGuiado } from "../../componentes/Aprendizagem";
-import { Aviso, Botao, Campo, Carregando, Cartao, SeloFase, estiloEntrada } from "../../componentes/ui";
+import { Aviso, Botao, Campo, Carregando, Cartao, estiloEntrada } from "../../componentes/ui";
 import {
   DESCRICAO_DORNELAS,
   DESCRICAO_GEM,
@@ -19,96 +19,34 @@ interface Item {
   turma: Turma;
 }
 
+interface Sala { formacao_encerrada: boolean; disponiveis: {aluno_id:number;nome:string}[]; equipes: {empresa_id:number;nome:string;vagas:number;completa:boolean;membros:{aluno_id:number;nome:string}[]}[] }
+interface Matricula { turma: Turma; sala: Sala }
+
 export default function InicioAluno({ abrirEmpresa }: { abrirEmpresa: (id: number) => void }) {
-  const [itens, setItens] = useState<Item[] | null>(null);
-  const [erro, setErro] = useState<string | null>(null);
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-
+  const [itens,setItens] = useState<Item[]>([]), [matricula,setMatricula] = useState<Matricula|null>(null);
+  const [turmas,setTurmas] = useState<Turma[]>([]), [pronto,setPronto] = useState(false);
+  const [erro,setErro] = useState(""), [ocupado,setOcupado] = useState(false), [criar,setCriar] = useState(false);
   async function carregar() {
-    try {
-      const lista = await api.get<Item[]>("/api/aluno/empresas");
-      setItens(lista);
-      setMostrarFormulario(lista.length === 0);
-    } catch (e) {
-      setErro(e instanceof Error ? e.message : "Erro ao carregar.");
-    }
+    try { const [empresas,vinculo,disponiveis] = await Promise.all([api.get<Item[]>("/api/aluno/empresas"),api.get<Matricula|null>("/api/aluno/matricula"),api.get<Turma[]>("/api/aluno/turmas")]); setItens(empresas);setMatricula(vinculo);setTurmas(disponiveis);setPronto(true);setErro(""); }
+    catch(e){setErro(e instanceof Error?e.message:"Erro ao carregar a turma.");}
   }
-
-  useEffect(() => {
-    carregar();
-  }, []);
-
-  if (erro) return <Aviso>{erro}</Aviso>;
-  if (!itens) return <Carregando />;
-
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-marinho">Minhas turmas e empresas</h1>
-          <p className="text-sm text-slate-500">Escolha sua turma para acessar a empresa, a rodada e suas decisões.</p>
-        </div>
-        {!mostrarFormulario && (
-          <Botao onClick={() => setMostrarFormulario(true)}>Entrar em uma turma</Botao>
-        )}
-      </div>
-
-      <TourGuiado perfil="ALUNO" />
-
-      {mostrarFormulario && (
-        <FormularioEntrada
-          aoCancelar={itens.length ? () => setMostrarFormulario(false) : undefined}
-          aoEntrar={(id) => abrirEmpresa(id)}
-        />
-      )}
-
-      <div className="grid gap-4 md:grid-cols-2">
-        {itens.map(({ empresa, turma }) => (
-          <button
-            key={empresa.id}
-            onClick={() => abrirEmpresa(empresa.id)}
-            className="rounded-xl bg-white p-5 text-left shadow-sm ring-1 ring-slate-200 transition hover:ring-ouro"
-          >
-            <div className="mb-3 flex items-start justify-between gap-2">
-              <div>
-                <p className="text-lg font-semibold text-marinho">{empresa.nome}</p>
-                <p className="text-xs text-slate-500">
-                  {turma.nome} · Prof. {turma.professor}
-                </p>
-              </div>
-              <SeloFase fase={empresa.fase_atual} />
-            </div>
-            {turma.modo_equipe && <p className="mb-3 text-xs text-slate-500">Equipe · {empresa.equipe_membros?.map((m) => m.nome).join(", ") || "Empresa compartilhada"}</p>}
-            <div className="grid grid-cols-3 gap-2 text-sm">
-              <div>
-                <p className="text-xs text-slate-500">Caixa</p>
-                <p className="font-semibold text-marinho">{reais(empresa.caixa)}</p>
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Regime</p>
-                <p className="font-semibold text-marinho">{NOME_REGIME[empresa.regime_tributario]}</p>
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Rodada</p>
-                <p className="font-semibold text-marinho">
-                  {turma.status === "ENCERRADA" ? "Encerrada" : `${turma.rodada_atual} de ${turma.total_rodadas}`}
-                </p>
-              </div>
-            </div>
-            <span className="mt-4 block rounded-lg bg-blue-700 px-4 py-3 text-center text-sm font-bold text-white">Abrir empresa e rodada atual →</span>
-          </button>
-        ))}
-      </div>
-
-      <ManualRapido perfil="ALUNO" />
-      <BibliotecaAprendizagem />
-    </div>
-  );
+  useEffect(()=>{carregar();const intervalo=window.setInterval(carregar,15000);return()=>window.clearInterval(intervalo);},[]);
+  async function entrar(turmaId:number){setOcupado(true);setErro("");try{await api.post("/api/aluno/matricula",{turma_id:turmaId});setCriar(false);await carregar();}catch(e){setErro(e instanceof Error?e.message:"Não foi possível entrar.");}finally{setOcupado(false);}}
+  async function equipe(empresaId:number){setOcupado(true);setErro("");try{await api.post("/api/aluno/equipes/entrar",{empresa_id:empresaId});abrirEmpresa(empresaId);}catch(e){setErro(e instanceof Error?e.message:"Não foi possível entrar na equipe.");}finally{setOcupado(false);}}
+  if(!pronto&&!erro)return <Carregando/>;
+  return <div className="space-y-6"><h1 className="text-2xl font-bold text-marinho">{matricula?matricula.turma.nome:"Escolha sua turma"}</h1>{erro&&<Aviso>{erro}</Aviso>}
+    {!matricula&&<Cartao titulo="Turmas disponíveis"><p className="mb-4 text-sm">Selecione pelo nome a turma indicada pelo professor. Ao entrar, você fica vinculado a ela; outra turma exige autorização.</p><div className="grid gap-3 sm:grid-cols-2">{turmas.map(t=><Botao key={t.id} disabled={ocupado} onClick={()=>entrar(t.id)}>{t.nome} · Prof. {t.professor}</Botao>)}</div>{!turmas.length&&<p>Nenhuma turma liberada para ingresso. Procure seu professor.</p>}</Cartao>}
+    {matricula&&turmas.some(t=>t.id!==matricula.turma.id)&&<Cartao titulo="Troca autorizada pelo professor">{turmas.filter(t=>t.id!==matricula.turma.id).map(t=><Botao key={t.id} disabled={ocupado} onClick={()=>entrar(t.id)}>Entrar em {t.nome}</Botao>)}</Cartao>}
+    <TourGuiado perfil="ALUNO"/>
+    {matricula&&!itens.length&&<Cartao titulo="Forme sua equipe por afinidade"><p className="mb-4">Converse com os colegas e escolha uma equipe. Cada equipe terá de 3 a 5 integrantes e escolherá seu líder.</p><h3 className="font-bold">Colegas disponíveis</h3><ul className="my-3 flex flex-wrap gap-2">{matricula.sala.disponiveis.map(a=><li key={a.aluno_id} className="rounded-lg bg-slate-100 px-3 py-2">{a.nome}</li>)}</ul><h3 className="mb-3 font-bold">Equipes da turma</h3><div className="grid gap-3 md:grid-cols-2">{matricula.sala.equipes.map(e=><article key={e.empresa_id} className="rounded-xl border p-4"><h4 className="font-bold">{e.nome}</h4><p className="my-2 text-sm">{e.membros.map(m=>m.nome).join(", ")}</p><p className="mb-3 text-sm">{e.membros.length}/5 integrantes · {e.vagas} vagas</p><Botao disabled={ocupado||e.completa||matricula.sala.formacao_encerrada} onClick={()=>equipe(e.empresa_id)}>{e.completa?"Equipe completa":"Entrar nesta equipe"}</Botao></article>)}</div>{matricula.sala.formacao_encerrada?<Aviso tipo="info">A formação foi encerrada. Se você ficou sem equipe, procure o professor para conferir sua distribuição.</Aviso>:<Botao variante="secundario" onClick={()=>setCriar(true)}>{matricula.turma.modo_equipe?"Criar uma nova equipe":"Abrir minha empresa"}</Botao>}</Cartao>}
+    {criar&&matricula&&!itens.length&&!matricula.sala.formacao_encerrada&&<FormularioEntrada turmaId={matricula.turma.id} aoCancelar={()=>setCriar(false)} aoEntrar={abrirEmpresa}/>}
+    <div className="grid gap-4 md:grid-cols-2">{itens.map(({empresa,turma})=><button key={empresa.id} onClick={()=>abrirEmpresa(empresa.id)} className="rounded-xl bg-white p-5 text-left shadow-sm ring-1 ring-slate-200 hover:ring-ouro"><h2 className="text-lg font-bold text-marinho">{empresa.nome}</h2><p className="text-sm">{turma.nome} · Prof. {turma.professor}</p><p className="my-3 text-sm">{empresa.equipe_membros?.map(m=>m.nome).join(", ")}</p><p>Caixa: {reais(empresa.caixa)} · Rodada {turma.rodada_atual}/{turma.total_rodadas}</p><span className="mt-4 block rounded-lg bg-blue-700 p-3 text-center font-bold text-white">Abrir empresa e rodada atual →</span></button>)}</div>
+    <ManualRapido perfil="ALUNO"/><BibliotecaAprendizagem/>
+  </div>;
 }
 
-function FormularioEntrada({ aoEntrar, aoCancelar }: { aoEntrar: (id: number) => void; aoCancelar?: () => void }) {
-  const [modo, setModo] = useState<"CRIAR" | "EQUIPE">("CRIAR");
-  const [codigo, setCodigo] = useState("");
+function FormularioEntrada({ turmaId, aoEntrar, aoCancelar }: { turmaId: number; aoEntrar: (id: number) => void; aoCancelar?: () => void }) {
+  const modo = "CRIAR";
   const [nomeEmpresa, setNomeEmpresa] = useState("");
   const [gem, setGem] = useState<TipoEntradaGem>("OPORTUNIDADE");
   const [classe, setClasse] = useState<ClasseDornelas>("SERIAL");
@@ -121,13 +59,8 @@ function FormularioEntrada({ aoEntrar, aoCancelar }: { aoEntrar: (id: number) =>
     setErro(null);
     setCarregando(true);
     try {
-      if (modo === "EQUIPE") {
-        const resposta = await api.post<{ empresa: Empresa }>("/api/aluno/equipes/entrar", { codigo });
-        aoEntrar(resposta.empresa.id);
-        return;
-      }
       const resposta = await api.post<{ empresa: Empresa }>("/api/aluno/turmas/entrar", {
-        codigo,
+        turma_id: turmaId,
         nome_empresa: nomeEmpresa,
         tipo_entrada_gem: gem,
         classe_dornelas: classe,
@@ -143,24 +76,8 @@ function FormularioEntrada({ aoEntrar, aoCancelar }: { aoEntrar: (id: number) =>
 
   return (
     <Cartao titulo="Participar da simulação">
-      <div className="mb-5 grid gap-2 sm:grid-cols-2" role="group" aria-label="Como participar">
-        <Botao type="button" variante={modo === "CRIAR" ? "primario" : "secundario"} aria-pressed={modo === "CRIAR"} onClick={() => { setModo("CRIAR"); setCodigo(""); setErro(null); }}>Abrir uma empresa</Botao>
-        <Botao type="button" variante={modo === "EQUIPE" ? "primario" : "secundario"} aria-pressed={modo === "EQUIPE"} onClick={() => { setModo("EQUIPE"); setCodigo(""); setErro(null); }}>Entrar em uma equipe</Botao>
-      </div>
       <form onSubmit={enviar} className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Campo rotulo={modo === "EQUIPE" ? "Código de convite da empresa" : "Código da turma"} ajuda={modo === "EQUIPE" ? "Peça o convite ao colega que abriu a empresa. O código da turma serve para abrir uma empresa." : "Informado pelo professor. Em turmas por equipes, quem abre a empresa assume o cargo de CEO e convida os colegas."}>
-            <input
-              className={`${estiloEntrada} ${modo === "CRIAR" ? "uppercase tracking-widest" : "font-mono"}`}
-              value={codigo}
-              onChange={(e) => setCodigo(modo === "CRIAR" ? e.target.value.toUpperCase() : e.target.value)}
-              maxLength={modo === "CRIAR" ? 12 : 80}
-              autoCapitalize={modo === "CRIAR" ? "characters" : "none"}
-              autoComplete="off"
-              spellCheck={false}
-              required
-            />
-          </Campo>
           {modo === "CRIAR" && <Campo rotulo="Nome da empresa">
             <input className={estiloEntrada} value={nomeEmpresa} onChange={(e) => setNomeEmpresa(e.target.value)} required />
           </Campo>}
@@ -190,7 +107,7 @@ function FormularioEntrada({ aoEntrar, aoCancelar }: { aoEntrar: (id: number) =>
           ))}
         </Grupo>
         </>}
-        {modo === "EQUIPE" && <p className="text-sm text-slate-600">Você compartilhará a mesma empresa e o histórico das rodadas com os colegas. Cada integrante usa sua própria conta para confirmar as decisões.</p>}
+
 
         {erro && <Aviso>{erro}</Aviso>}
         <div className="flex justify-end gap-2">
@@ -200,7 +117,7 @@ function FormularioEntrada({ aoEntrar, aoCancelar }: { aoEntrar: (id: number) =>
             </Botao>
           )}
           <Botao type="submit" carregando={carregando}>
-            {modo === "EQUIPE" ? "Entrar na equipe" : "Abrir empresa"}
+            Abrir empresa
           </Botao>
         </div>
       </form>

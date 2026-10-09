@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 from types import SimpleNamespace as S
 from app.experiencia import jornada_empresa
 from .conftest import cadastrar
@@ -38,6 +39,6 @@ def test_painel_entrega_jornada_e_isola_empresas(cliente, professor):
     url = f'/api/aluno/empresas/{id}'
     assert cliente.get(url, headers=outro).status_code == 404
     assert cliente.get(url, headers=aluno).json()['jornada']['rodadas_concluidas'] == 0
-    assert cliente.put(f'{url}/decisao', headers=aluno, json={'preco': 95}).status_code == 200
+    assert cliente.put(f'{url}/decisao', headers=aluno, json=completar_decisao({'preco': 95})).status_code == 200
     conquista = cliente.get(url, headers=aluno).json()['jornada']['conquistas'][0]
     assert conquista['obtida'] and conquista['rodada'] == 1

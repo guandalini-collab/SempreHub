@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 from copy import deepcopy
 import pytest
 from pydantic import ValidationError
@@ -41,7 +42,7 @@ def test_nota_semestre_e_csv_no_professor(cliente, professor):
     empresa = _entrar(cliente, aluno, turma["codigo"], "Empresa")
     url = f"/api/professor/turmas/{turma['id']}/relatorio"
     assert cliente.get(url, headers=professor).json()["ranking"][0]["nota_semestre"] is None
-    cliente.put(f"/api/aluno/empresas/{empresa}/decisao", headers=aluno, json={"preco":100})
+    cliente.put(f"/api/aluno/empresas/{empresa}/decisao", headers=aluno, json=completar_decisao({"preco":100}))
     resposta = cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"rodada":1,"evento":"NENHUM"})
     assert resposta.status_code == 200, resposta.text
     dados = cliente.get(url, headers=professor).json()
@@ -60,8 +61,8 @@ def test_horas_extras_exigem_funcionario_e_nao_repetem(cliente, professor):
     empresa = _entrar(cliente, aluno, turma["codigo"], "Fábrica", regime="SIMPLES_NACIONAL")
     url = f"/api/aluno/empresas/{empresa}/decisao"
     decisao = {"rodada":1,"preco":100,"simulacao":{"horas_extras":20,"comprar_mp":100,"producao":100}}
-    assert cliente.put(url, headers=aluno, json=decisao).status_code == 422
-    resposta = cliente.put(url, headers=aluno, json={**decisao,"contratar":1})
+    assert cliente.put(url, headers=aluno, json=completar_decisao(decisao)).status_code == 422
+    resposta = cliente.put(url, headers=aluno, json=completar_decisao({**decisao,"contratar":1}))
     assert resposta.status_code == 200, resposta.text
     for rodada in (1,2):
         r = cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor,json={"rodada":rodada,"evento":"NENHUM"})

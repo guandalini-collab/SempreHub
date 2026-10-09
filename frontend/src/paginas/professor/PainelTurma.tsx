@@ -1,4 +1,5 @@
 import { CONFIGURACAO_MOTOR_PADRAO } from "../../tiposSimulacao";
+import FormacaoTurma from "../../componentes/FormacaoTurma";
 import DiagnosticosEmpresa from "../../componentes/DiagnosticosEmpresa";
 import ResultadoProdutos from "../../componentes/ResultadoProdutos";
 import ManualMidias from "../../componentes/ManualMidias";
@@ -35,7 +36,7 @@ import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
 
 const ITENS_PAINEL = [
-  { id: "visao", titulo: "1. Dados e código", descricao: "Confira a turma e compartilhe o código de entrada com os alunos.", simbolo: "", grupo: "Preparar turma" },
+  { id: "visao", titulo: "1. Dados e ingresso", descricao: "Confira o nome da turma e libere seu ingresso para os alunos.", simbolo: "", grupo: "Preparar turma" },
   { id: "configuracao", titulo: "2. Configurar simulação", descricao: "Revise os parâmetros antes de orientar os alunos.", simbolo: "", grupo: "Preparar turma" },
   { id: "equipes", titulo: "3. Conferir participantes", descricao: "Confira alunos, empresas e pendências de envio.", simbolo: "", grupo: "Preparar turma" },
   { id: "mercado", titulo: "4. Preparar rodada", descricao: "Pesquise, revise e publique notícias e produtos para os alunos.", simbolo: "", grupo: "Conduzir rodada" },
@@ -107,16 +108,17 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   return (
     <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ turma: turma.nome, codigo: turma.codigo, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
       <SecaoPainel id="visao" ativa={secao}>
+      <FormacaoTurma turma={turma} aoAtualizar={carregar}/>
       <div className="rounded-xl bg-marinho p-5 text-white shadow-lg">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-ouro">Turma</p>
             <h1 className="text-2xl font-bold">{turma.nome}</h1>
-            <p className="mt-1 text-xs text-white/70">{turma.modo_equipe ? "Equipes de 3 a 5 alunos · confirmação de todos os integrantes" : "Participação individual"} · {turma.modo_jogo === "STARTUP" ? "Startup" : turma.modo_jogo === "TRADICIONAL" ? "Empresa tradicional" : "Modelo básico"}{turma.cenario === "CRISE" ? " · recuperação de empresa" : ""}</p>
+            <p className="mt-1 text-xs text-white/70">{turma.modo_equipe ? "Equipes de 3 a 5 alunos · envio pelo líder" : "Participação individual"} · {turma.modo_jogo === "STARTUP" ? "Startup" : turma.modo_jogo === "TRADICIONAL" ? "Empresa tradicional" : "Modelo básico"}{turma.cenario === "CRISE" ? " · recuperação de empresa" : ""}</p>
           </div>
           <div className="text-right">
-            <p className="text-xs uppercase tracking-wide text-white/60">Código para os alunos</p>
-            <p className="font-mono text-3xl tracking-[0.3em] text-ouro">{turma.codigo}</p>
+            <p className="text-xs uppercase tracking-wide text-white/60">Ingresso pelo nome da turma</p>
+            <p className="text-lg font-bold text-ouro">{turma.visivel_ingresso ? "Disponível" : "Oculta para ingresso"}</p>
           </div>
         </div>
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -132,7 +134,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         )}
       </div>
 
-      <Cartao titulo="Prontidão da turma"><p className="mb-3 text-sm text-slate-600">{enviadas} de {empresas.length} empresas prontas nesta rodada</p><div className="h-3 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label="Empresas com decisões enviadas" aria-valuenow={empresas.length ? Math.round(enviadas / empresas.length * 100) : 0} aria-valuemin={0} aria-valuemax={100}><div className="h-full bg-emerald-500 transition-all" style={{ width: `${empresas.length ? enviadas / empresas.length * 100 : 0}%` }} /></div><p className="mt-3 text-xs text-slate-500">As decisões e confirmações das equipes atualizam este painel automaticamente.</p></Cartao>
+      <Cartao titulo="Prontidão da turma"><p className="mb-3 text-sm text-slate-600">{enviadas} de {empresas.length} empresas prontas nesta rodada</p><div className="h-3 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label="Empresas com decisões enviadas" aria-valuenow={empresas.length ? Math.round(enviadas / empresas.length * 100) : 0} aria-valuemin={0} aria-valuemax={100}><div className="h-full bg-emerald-500 transition-all" style={{ width: `${empresas.length ? enviadas / empresas.length * 100 : 0}%` }} /></div><p className="mt-3 text-xs text-slate-500">Os envios finais dos líderes atualizam este painel automaticamente.</p></Cartao>
 
       </SecaoPainel>
       {erro && <Aviso>{erro}</Aviso>}

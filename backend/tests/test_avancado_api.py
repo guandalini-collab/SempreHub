@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 """Fluxos HTTP dos dois motores avançados e congelamento da configuração."""
 
 from copy import deepcopy
@@ -20,7 +21,7 @@ def _decisao_avancada(cliente, aluno, empresa_id, rodada, marketing=0, **simulac
     resposta = cliente.put(
         f"/api/aluno/empresas/{empresa_id}/decisao",
         headers=aluno,
-        json={"rodada": rodada, "preco": 100, "marketing": marketing, "simulacao": simulacao},
+        json=completar_decisao({"rodada": rodada, "preco": 100, "marketing": marketing, "simulacao": simulacao}),
     )
     assert resposta.status_code == 200, resposta.text
     return resposta

@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 from copy import deepcopy
 import pytest
 from .conftest import cadastrar
@@ -28,13 +29,13 @@ def test_portfolio_apura_sem_duplicar_caixa_ou_capacidade(cliente,professor,monk
     _,aluno,empresa,url,eid,d=preparar(cliente,professor,monkeypatch,modo)
     endpoint=f'/api/aluno/empresas/{empresa}/decisao'
     incompleto=deepcopy(d);incompleto['plano_comercial']['produtos'].pop()
-    assert cliente.put(endpoint,headers=aluno,json=incompleto).status_code==422
+    assert cliente.put(endpoint,headers=aluno,json=completar_decisao(incompleto)).status_code==422
     sem_revisao=deepcopy(d);sem_revisao['plano_comercial']['produtos'][1]['revisado']=False
-    assert cliente.put(endpoint,headers=aluno,json=sem_revisao).status_code==422
+    assert cliente.put(endpoint,headers=aluno,json=completar_decisao(sem_revisao)).status_code==422
     duplicado=deepcopy(d);duplicado['plano_comercial']['produtos'][1]['produto_id']='produto-1'
-    assert cliente.put(endpoint,headers=aluno,json=duplicado).status_code==422
+    assert cliente.put(endpoint,headers=aluno,json=completar_decisao(duplicado)).status_code==422
     d['plano_comercial']['produtos'][1]['custo_unitario']=.01
-    r=cliente.put(endpoint,headers=aluno,json=d);assert r.status_code==200,r.text
+    r=cliente.put(endpoint,headers=aluno,json=completar_decisao(d));assert r.status_code==200,r.text
     assert r.json()['preco']==150
     assert r.json()['plano_comercial']['produtos'][1]['custo_unitario']==80
     assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
@@ -65,24 +66,30 @@ def diagnostico():
     for k in ['forcas','fraquezas','oportunidades','ameacas']:a['swot'][k]=['Observação fundamentada no mercado.']
     for k in ['politico','economico','social','tecnologico','ambiental','legal']:a['pestel'][k]=['Hipótese para analisar com as fontes.']
     for v in a['porter'].values():v.update(intensidade=7,justificativa='Concorrência observada nas condições informadas.')
-    return {k:a[k] for k in ['swot','porter','pestel']}
+    retorno = {k:a[k] for k in ['swot','porter','pestel']}
+    retorno["concorrentes"]=[{"nome":"Concorrente de referência (projeção)","tipo":"REFERENCIA_PROJETADA",**{k:"Projeção: cenário de referência do setor para comparação didática." for k in ("perfil","porte_mercado","portfolio","diferencial","precos","promocoes","canais","presenca_digital","reputacao","ponto_fraco")},"fontes":[],"projecoes":[{"campo":"Preço","estimativa":"Projeção: referência de R$ 100","premissas":"Preço de referência do cenário usado como base; não representa uma empresa real."}]}]
+    return retorno
 
 
 def test_diagnostico_cache_autorizacao_e_protecao(cliente,professor,monkeypatch):
     from app.routers import mercado
     _,aluno,empresa,url,eid,d=preparar(cliente,professor,monkeypatch)
     chamadas=[]
-    monkeypatch.setattr(mercado,'gerar_json',lambda *args:(chamadas.append(args) or diagnostico(),set()))
+    monkeypatch.setattr(mercado,'gerar_json',lambda *args, **kwargs:(chamadas.append(args) or diagnostico(),{"https://example.com/produto"}))
     endpoint=f'/api/aluno/empresas/{empresa}/diagnostico/{eid}'
     primeiro=cliente.post(endpoint,headers=aluno,json={});assert primeiro.status_code==200,primeiro.text
     assert cliente.post(endpoint,headers=aluno,json={}).json()==primeiro.json()
     assert len(chamadas)==1
+    assert chamadas[0][2] is True
+    assert "fontes_pesquisa" not in primeiro.json()["dados"]
+    assert "fontes" not in primeiro.json()["dados"]["concorrentes"][0]
+    assert "fontes_pesquisa" in cliente.get(url+f"/empresas/{empresa}/diagnosticos",headers=professor).json()[0]["dados"]
     outro=cadastrar(cliente,'Bia','privacidade@aluno.iffar.edu.br')
     assert cliente.post(endpoint,headers=outro,json={}).status_code in (403,404)
     docente=cliente.get(url+f'/empresas/{empresa}/diagnosticos',headers=professor)
     assert docente.status_code==200 and len(docente.json())==1
     d['plano_comercial']['analises']={'diagnostico_automatico':True,'swot':{'forcas':['Texto adulterado'],'diretriz':'PRECO'},'porter':{'rivalidade':{'intensidade':1}}}
-    salvo=cliente.put(f'/api/aluno/empresas/{empresa}/decisao',headers=aluno,json=d)
+    salvo=cliente.put(f'/api/aluno/empresas/{empresa}/decisao',headers=aluno,json=completar_decisao(d))
     assert salvo.status_code==200,salvo.text
     a=salvo.json()['plano_comercial']['analises']
     assert a['swot']['forcas']==primeiro.json()['dados']['swot']['forcas']
@@ -94,11 +101,11 @@ def test_diagnostico_cache_autorizacao_e_protecao(cliente,professor,monkeypatch)
 def test_diagnostico_invalido_pode_repetir(cliente,professor,monkeypatch):
     from app.routers import mercado
     _,aluno,empresa,url,eid,_=preparar(cliente,professor,monkeypatch)
-    monkeypatch.setattr(mercado,'gerar_json',lambda *args:({'swot':{},'porter':{},'pestel':{}},set()))
+    monkeypatch.setattr(mercado,'gerar_json',lambda *args, **kwargs:({'swot':{},'porter':{},'pestel':{}},set()))
     endpoint=f'/api/aluno/empresas/{empresa}/diagnostico/{eid}'
     assert cliente.post(endpoint,headers=aluno,json={}).status_code==502
     assert cliente.get(url+f'/empresas/{empresa}/diagnosticos',headers=professor).json()==[]
-    monkeypatch.setattr(mercado,'gerar_json',lambda *args:(diagnostico(),set()))
+    monkeypatch.setattr(mercado,'gerar_json',lambda *args, **kwargs:(diagnostico(),{"https://example.com/produto"}))
     assert cliente.post(endpoint,headers=aluno,json={}).status_code==200
 
 
@@ -118,7 +125,7 @@ def test_midias_por_produto_somadas_e_influenciam_distribuicao(cliente,professor
     itens[1]['midias']=[{'id':'email','quantidade':200}]
     for item in itens:item['servicos']=[{'id':'servico-email','quantidade':1}]
     d['marketing']=1126
-    r=cliente.put(f'/api/aluno/empresas/{empresa}/decisao',headers=aluno,json=d)
+    r=cliente.put(f'/api/aluno/empresas/{empresa}/decisao',headers=aluno,json=completar_decisao(d))
     assert r.status_code==200,r.text
     saved=r.json()['plano_comercial']['produtos']
     base=deepcopy(saved)
@@ -126,7 +133,7 @@ def test_midias_por_produto_somadas_e_influenciam_distribuicao(cliente,professor
     a=atrativos(saved,100,30);b=atrativos(base,100,30)
     assert a[1]/a[0]>b[1]/b[0]
     d['marketing']=12
-    assert cliente.put(f'/api/aluno/empresas/{empresa}/decisao',headers=aluno,json=d).status_code==422
+    assert cliente.put(f'/api/aluno/empresas/{empresa}/decisao',headers=aluno,json=completar_decisao(d)).status_code==422
 
 
 def test_estoque_historico_nao_e_clonado_no_portfolio():

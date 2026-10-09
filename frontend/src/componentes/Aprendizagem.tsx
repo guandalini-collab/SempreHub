@@ -30,14 +30,14 @@ const passosAluno = [
   },
   {
     titulo: "3. Registre e acompanhe",
-    texto: "Salve a decisão, confirme com sua equipe e observe DRE, caixa, mercado e histórico.",
+    texto: "Discuta com a equipe; o líder salva e envia. Observe DRE, caixa, mercado e histórico.",
   },
 ];
 
 const passosProfessor = [
   {
     titulo: "1. Prepare a turma",
-    texto: "Defina o modo, o cenário, as rodadas e os parâmetros antes de divulgar o código de acesso.",
+    texto: "Defina o modo, o cenário, as rodadas e os parâmetros antes de liberar o ingresso pelo nome da turma.",
   },
   {
     titulo: "2. Conduza cada rodada",
@@ -421,7 +421,7 @@ export function ManualRapido({ perfil }: { perfil: PerfilAprendizagem }) {
   const [imprimindo, setImprimindo] = useState(false);
   const titulo = perfil === "ALUNO" ? "Manual rápido do aluno" : "Manual rápido do professor";
   const orientacoes = perfil === "ALUNO"
-    ? ["Entre na turma e abra ou aceite uma empresa.", "Leia o evento e o SempreHub News.", "Preencha a decisão e use a prévia para conferir o impacto.", "Salve, confirme a versão e acompanhe o resultado da rodada."]
+    ? ["Entre na turma e abra ou aceite uma empresa.", "Leia o evento e o SempreHub News.", "Preencha a decisão e use a prévia para conferir o impacto.", "O líder salva, envia a decisão final e acompanha o resultado da rodada."]
     : ["Crie a turma e escolha modo, cenário, parâmetros e número de rodadas.", "Acompanhe empresas, equipes e pendências antes do fechamento.", "Escolha o evento e feche uma rodada por vez.", "Use ranking, resultados e relatório para conduzir a devolutiva."];
   return (
     <Cartao titulo={titulo} acao={<a className="text-xs font-semibold text-marinho underline" href={`/manuais/manual-${perfil === "ALUNO" ? "aluno" : "professor"}.pdf`} target="_blank" rel="noreferrer">Abrir / baixar PDF ilustrado</a>}>

@@ -14,7 +14,7 @@ from .. import serializacao as ser
 from ..experiencia import jornada_empresa
 from ..database import get_db
 from ..equipes import bloquear_turma, novo_convite, invalidar_aprovacoes, registrar, dados_equipe, decisao_atual, pendencias_equipe, pendencias_fechamento, verificar_rodada
-from ..models import Decisao, Empresa, MembroEmpresa, Papel, Resultado, StatusTurma, Turma, Usuario
+from ..models import MatriculaTurma, Decisao, Empresa, MembroEmpresa, Papel, Resultado, StatusTurma, Turma, Usuario
 from ..motor.eventos import opcoes_evento
 from ..motor.simulacao import processar_rodada
 from ..schemas import AlunoTesteEntrada, FecharRodadaEntrada, ParametrosTurma, TurmaEntrada
@@ -90,6 +90,7 @@ def atualizar_parametros(
     if converter_equipes:
         turma.modo_equipe = True
         for empresa in turma.empresas:
+            empresa.lider_id = empresa.aluno_id
             empresa.codigo_convite = empresa.codigo_convite or novo_convite()
             if not any(m.aluno_id == empresa.aluno_id for m in empresa.membros):
                 db.add(MembroEmpresa(empresa_id=empresa.id, turma_id=turma.id, aluno_id=empresa.aluno_id, cargos=["CEO"]))
@@ -134,6 +135,7 @@ def detalhar_turma(
         for d in db.query(Decisao).filter(
             Decisao.rodada == turma.rodada_atual,
             Decisao.automatica == 0,
+            Decisao.enviada_em.is_not(None),
             Decisao.empresa_id.in_([e.id for e in turma.empresas] or [0]),
         )
     }
@@ -354,3 +356,107 @@ def redefinir_senha_aluno(
     trocar_senha(db, aluno, nova)
     db.commit()
     return {"aluno": ser.usuario(aluno), "nova_senha": nova}
+
+
+class IngressoTurmaEntrada(BaseModel):
+    visivel_ingresso: bool
+    formacao_encerrada: bool
+
+
+@router.put("/turmas/{turma_id}/ingresso")
+def configurar_ingresso(turma_id: int, dados: IngressoTurmaEntrada, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    turma = _turma_do_professor(db, turma_id, professor)
+    turma = bloquear_turma(db, turma.id)
+    if not dados.formacao_encerrada and (turma.rodada_atual != 1 or turma.status != StatusTurma.ABERTA):
+        raise HTTPException(422, "Não é possível reabrir a formação após o início das rodadas.")
+    turma.visivel_ingresso = dados.visivel_ingresso
+    turma.formacao_encerrada = dados.formacao_encerrada
+    db.commit()
+    return ser.turma(turma)
+
+
+@router.get("/turmas/{turma_id}/formacao")
+def formacao_turma(turma_id: int, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    from ..ingresso import sala
+    turma = _turma_do_professor(db, turma_id, professor)
+    dados = sala(db, turma)
+    dados["inscritos"] = [{"aluno_id": m.aluno_id, "nome": m.aluno.nome, "autorizada_turma_id": m.autorizada_turma_id} for m in db.query(MatriculaTurma).filter_by(turma_id=turma.id)]
+    dados["turmas_destino"] = [{"id": t.id, "nome": t.nome} for t in db.query(Turma).filter(Turma.visivel_ingresso.is_(True), Turma.formacao_encerrada.is_(False), Turma.rodada_atual == 1, Turma.status == StatusTurma.ABERTA) if t.id != turma.id]
+    return dados
+
+
+class AutorizarTrocaEntrada(BaseModel):
+    aluno_id: int = Field(gt=0)
+    destino_id: int = Field(gt=0)
+    motivo: str = Field(min_length=5, max_length=1000)
+
+
+@router.post("/turmas/{turma_id}/autorizar-troca")
+def autorizar_troca(turma_id: int, dados: AutorizarTrocaEntrada, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    _turma_do_professor(db, turma_id, professor)
+    from sqlalchemy import update
+    db.execute(update(Usuario).where(Usuario.id == dados.aluno_id).values(versao_sessao=Usuario.versao_sessao), execution_options={"synchronize_session": False})
+    m = db.query(MatriculaTurma).filter_by(aluno_id=dados.aluno_id).populate_existing().first()
+    destino = db.get(Turma, dados.destino_id)
+    if not m or m.turma_id != turma_id:
+        raise HTTPException(404, "Aluno não vinculado a esta turma.")
+    if not destino or destino.id == turma_id or not destino.visivel_ingresso or destino.formacao_encerrada or destino.rodada_atual != 1 or destino.status != StatusTurma.ABERTA:
+        raise HTTPException(422, "Escolha uma turma de destino disponível para ingresso.")
+    lider = db.query(Empresa).filter_by(turma_id=turma_id, lider_id=dados.aluno_id).first()
+    if lider and lider.turma.status == StatusTurma.ABERTA:
+        raise HTTPException(422, "Este aluno é líder de uma equipe ativa. Transfira a liderança e aguarde a próxima rodada antes de autorizar a troca de turma.")
+    m.autorizada_turma_id = destino.id
+    m.historico = [*(m.historico or []), {"acao": "AUTORIZAR_TROCA", "professor_id": professor.id, "destino": destino.id, "motivo": dados.motivo.strip(), "data": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()}]
+    db.commit()
+    return {"mensagem": "Troca autorizada. O aluno pode selecionar a turma de destino."}
+
+
+@router.post("/turmas/{turma_id}/distribuir-sem-equipe")
+def distribuir_sem_equipe(turma_id: int, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    import secrets
+    from ..ingresso import sala
+    turma = _turma_do_professor(db, turma_id, professor)
+    turma = bloquear_turma(db, turma.id)
+    if not turma.modo_equipe or turma.rodada_atual != 1 or turma.status != StatusTurma.ABERTA:
+        raise HTTPException(422, "A distribuição só ocorre na formação das equipes, antes de fechar a primeira rodada.")
+    livres = sala(db, turma)["disponiveis"]
+    candidatas = [e for e in turma.empresas if 3 <= len(e.membros) < 5]
+    vagas = [e for e in candidatas for _ in range(5-len(e.membros))]
+    if len(vagas) < len(livres):
+        raise HTTPException(422, f"Há {len(livres)} alunos sem equipe e apenas {len(vagas)} vagas em equipes com pelo menos 3 integrantes. Organize novas equipes antes de distribuir.")
+    distribuicao = []
+    for aluno in livres:
+        empresa = secrets.choice(vagas)
+        vagas.remove(empresa)
+        db.add(MembroEmpresa(empresa_id=empresa.id, turma_id=turma.id, aluno_id=aluno["aluno_id"], cargos=[]))
+        versao = invalidar_aprovacoes(db, empresa)
+        registrar(db, empresa, db.get(Usuario, aluno["aluno_id"]), "DISTRIBUIR_EQUIPE", versao, {"professor_id": professor.id})
+        distribuicao.append({"aluno": aluno["nome"], "empresa": empresa.nome})
+    turma.formacao_encerrada = True
+    db.commit()
+    return {"distribuicao": distribuicao, "mensagem": "Formação encerrada; alunos sem equipe distribuídos nas vagas disponíveis."}
+
+
+class InclusaoExcepcionalEntrada(BaseModel):
+    aluno_id: int = Field(gt=0)
+    empresa_id: int = Field(gt=0)
+    motivo: str = Field(min_length=5, max_length=1000)
+
+
+@router.post("/turmas/{turma_id}/inclusao-excepcional")
+def incluir_excepcionalmente(turma_id: int, dados: InclusaoExcepcionalEntrada, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    turma = _turma_do_professor(db, turma_id, professor)
+    turma = bloquear_turma(db, turma.id)
+    m = db.get(MatriculaTurma, dados.aluno_id)
+    empresa = db.get(Empresa, dados.empresa_id)
+    if not turma.modo_equipe or not m or m.turma_id != turma.id or not empresa or empresa.turma_id != turma.id:
+        raise HTTPException(422, "Selecione um aluno cadastrado e uma equipe desta turma.")
+    if turma.status != StatusTurma.ABERTA or len(empresa.membros) >= 5:
+        raise HTTPException(422, "A equipe não tem vaga disponível ou a turma foi encerrada.")
+    if db.query(MembroEmpresa).filter_by(turma_id=turma.id, aluno_id=m.aluno_id).first() or db.query(Empresa).filter_by(turma_id=turma.id, aluno_id=m.aluno_id).first():
+        raise HTTPException(409, "Este aluno já está em uma equipe.")
+    db.add(MembroEmpresa(empresa_id=empresa.id, turma_id=turma.id, aluno_id=m.aluno_id, cargos=[]))
+    versao = invalidar_aprovacoes(db, empresa)
+    registrar(db, empresa, m.aluno, "INCLUSAO_EXCEPCIONAL", versao, {"professor_id": professor.id, "motivo": dados.motivo.strip()})
+    db.commit()
+    return {"mensagem": "Inclusão excepcional registrada com justificativa."}

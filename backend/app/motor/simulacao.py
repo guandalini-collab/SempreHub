@@ -18,6 +18,7 @@ from typing import Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
+from ..models import Usuario
 from ..models import (
     ClasseDornelas,
     Decisao,
@@ -109,8 +110,10 @@ def decisao_vigente(db: Session, empresa: Empresa, rodada: int, turma: Turma) ->
     decisao = (
         db.query(Decisao).filter(Decisao.empresa_id == empresa.id, Decisao.rodada == rodada).first()
     )
-    if decisao:
+    if decisao and (decisao.enviada_em or decisao.automatica):
         return decisao
+    if decisao:
+        raise ValueError("A decisão da empresa " + empresa.nome + " ainda é rascunho. O líder precisa enviar a decisão final.")
 
     anterior = (
         db.query(Decisao)
@@ -230,6 +233,14 @@ def processar_rodada(
         turma.cmv_rodadas_restantes -= 1
         if turma.cmv_rodadas_restantes == 0:
             turma.cmv_multiplicador = 1.0
+    for empresa in empresas:
+        if empresa.proximo_lider_id:
+            from ..equipes import registrar
+            anterior = empresa.lider_id
+            empresa.lider_id = empresa.proximo_lider_id
+            empresa.proximo_lider_id = None
+            empresa.votos_lider = {}
+            registrar(db, empresa, db.get(Usuario, empresa.lider_id), "EFETIVAR_LIDER", detalhes={"anterior": anterior, "vigencia": rodada + 1})
     turma.rodada_atual = rodada + 1
     if turma.rodada_atual > turma.total_rodadas:
         turma.status = StatusTurma.ENCERRADA

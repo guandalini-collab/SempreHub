@@ -1,3 +1,4 @@
+from .decisoes import completar_decisao
 import pytest
 
 from app.database import SessionLocal
@@ -54,7 +55,7 @@ def test_previa_financiamento_corresponde_ao_fechamento(
         assert db.query(Resultado).count() == 0
         assert db.query(EventoRodada).count() == 0
 
-    assert cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=decisao).status_code == 200
+    assert cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=completar_decisao(decisao)).status_code == 200
     assert cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "NENHUM"}).status_code == 200
     resultado = cliente.get(f"/api/aluno/empresas/{empresa_id}", headers=aluno).json()["resultados"][0]
     assert resultado["divida_final"] == previa["divida_prevista"]
@@ -74,7 +75,7 @@ def test_previa_regime_e_capacidade_correspondem_ao_fechamento(cliente, professo
     assert previa["folha"] == pytest.approx(5800)
     assert previa["capacidade"] == pytest.approx(324)
     assert len(previa["alertas"]) == 2
-    cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=decisao)
+    cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=completar_decisao(decisao))
     cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "NENHUM"})
     resultado = cliente.get(f"/api/aluno/empresas/{empresa_id}", headers=aluno).json()["resultados"][0]
     assert resultado["regime"] == previa["regime"]
@@ -87,7 +88,7 @@ def test_previa_segunda_rodada_preserva_estado_e_historico(cliente, professor):
     aluno = cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
     empresa_id = _entrar(cliente, aluno, turma["codigo"], "Franquia", regime="SIMPLES_NACIONAL", classe="FRANQUIA")
     decisao = {"preco": 100, "emprestimo": 5000, "contratar": 1, "marketing": 1000, "pd": 500}
-    cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=decisao)
+    cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=completar_decisao(decisao))
     cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "GREVE_LOGISTICA"})
     antes = cliente.get(f"/api/aluno/empresas/{empresa_id}", headers=aluno).json()
     assert antes["turma"]["rodada_atual"] == 2
@@ -103,7 +104,7 @@ def test_previa_segunda_rodada_preserva_estado_e_historico(cliente, professor):
     # Greve persiste por dois meses e a franquia paga 5% de royalties.
     assert previa["margem_unitaria"] == pytest.approx(100 * 0.95 - 40 * 1.4)
     assert cliente.get(f"/api/aluno/empresas/{empresa_id}", headers=aluno).json() == antes
-    cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=decisao2)
+    cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=completar_decisao(decisao2))
     cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "NENHUM"})
     final = cliente.get(f"/api/aluno/empresas/{empresa_id}", headers=aluno).json()
     assert final["turma"]["status"] == "ENCERRADA"

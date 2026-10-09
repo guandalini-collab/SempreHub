@@ -1,227 +1,67 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Manual SempreHub</title>
-  <style>
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-  </style>
-  <link rel="stylesheet" href="../manual.css" />
-</head>
-<body>
-<header id="title-block-header">
-<h1 class="title">Manual SempreHub</h1>
-</header>
-<div class="cover">
-<figure>
-<img src="../../frontend/src/assets/logo-semprehub.svg"
-alt="Logo SempreHub" />
-<figcaption aria-hidden="true">Logo SempreHub</figcaption>
-</figure>
-<h1 id="manual-do-professor">Manual do professor</h1>
-<p>Guia de condução do simulador de empreendedorismo: preparação,
-acompanhamento das equipes, fechamento das rodadas e devolutiva
-pedagógica.</p>
-</div>
-<h2 id="preparar-a-turma">1. Preparar a turma</h2>
-<ol type="1">
-<li>Acesse o SempreHub, crie sua conta como professor e informe o código
-docente da instituição.</li>
-<li>Em <strong>Minhas turmas</strong>, selecione <strong>Criar
-turma</strong> e dê um nome à atividade.</li>
-<li>Defina o número de rodadas. Cada rodada representa um mês; os
-resultados anteriores permanecem no histórico.</li>
-<li>Escolha participação individual ou <strong>Equipes de 3 a 5
-alunos</strong>.</li>
-<li>Escolha o modo <strong>Empresa tradicional</strong>,
-<strong>Startup</strong> ou mantenha a configuração da turma existente.
-Defina cenário e parâmetros antes da entrada das empresas.</li>
-<li>Divulgue o código de seis caracteres. Em equipes, um aluno abre a
-empresa e os demais usam o convite da empresa.</li>
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Manual SempreHub</title><link rel="stylesheet" href="../manual.css"></head><body><h1>SempreHub - Manual do professor</h1>
+<p>Versão 2.1 - outubro de 2026</p>
+<p>Guia para preparar turmas, acompanhar equipes, conduzir rodadas e avaliar a aprendizagem. As imagens de uso apresentam nomes ilustrativos.</p>
+<h2>1. Crie a turma e controle o ingresso</h2>
+<ol>
+<li>Entre com sua conta de professor e selecione <b>Criar turma</b>.</li>
+<li>Defina um nome livre para a turma. Não existe padrão obrigatório: o aluno seleciona exatamente o nome que você cadastrar.</li>
+<li>Escolha o modo de jogo, cenário, rodadas e parâmetros antes de criar empresas.</li>
+<li>No painel, abra <b>Dados e ingresso</b> e marque <b>Disponível para ingresso dos alunos</b>.</li>
+<li>Informe à sala o nome da turma. Não é necessário divulgar código de turma ou convite de equipe.</li>
 </ol>
-<figure>
-<img src="../diagramas/modos-cenarios.svg" alt="Modos e cenários" />
-<figcaption aria-hidden="true">Modos e cenários</figcaption>
-</figure>
-<p>O modo, cenário e configuração operacional ficam definidos após a
-entrada da primeira empresa. O número total de rodadas pode ser ajustado
-respeitando os períodos já concluídos.</p>
-<h2 id="organizar-equipes-e-responsabilidades">2. Organizar equipes e
-responsabilidades</h2>
-<figure>
-<img src="../diagramas/equipe-cargos.svg" alt="Equipe e cargos" />
-<figcaption aria-hidden="true">Equipe e cargos</figcaption>
-</figure>
-<p>O fundador assume CEO e distribui CFO (finanças), CMO (marketing),
-COO (operações) e CHRO (pessoas). Um aluno pode acumular cargos. Oriente
-a revisão conjunta antes de salvar: todos os integrantes precisam
-confirmar a mesma versão. Alterações na decisão exigem novas
-confirmações. O painel da turma informa as pendências.</p>
-<h2 id="conduzir-cada-rodada">3. Conduzir cada rodada</h2>
-<figure>
-<img src="../diagramas/fluxo-rodada.svg" alt="Fluxo da rodada" />
-<figcaption aria-hidden="true">Fluxo da rodada</figcaption>
-</figure>
-<ol type="1">
-<li>Abra a turma e confira a rodada atual e o número de decisões
-prontas.</li>
-<li>Peça às equipes que leiam o <strong>SempreHub News</strong>,
-consultem a biblioteca e registrem suas hipóteses.</li>
-<li>Acompanhe as empresas e as pendências de equipes. O fechamento só é
-permitido quando as confirmações necessárias estiverem concluídas.</li>
-<li>Na área <strong>Fechar rodada</strong>, escolha um evento ou permita
-o sorteio.</li>
-<li>Feche uma rodada por vez. O sistema registra decisões, resultados e
-eventos e avança o estado da empresa.</li>
-<li>Oriente a comparação entre expectativa e resultado antes da próxima
-decisão.</li>
+<figure><img src="../diagramas/ingresso-nome.png" alt="O aluno seleciona o nome disponível"><figcaption>O aluno seleciona o nome disponível</figcaption></figure>
+<p>Você pode ocultar outras turmas ou liberar somente uma. A visibilidade controla novos ingressos; alunos já vinculados continuam acessando sua turma. O vínculo é único: outra matrícula depende de autorização do professor da turma de origem.</p>
+<p>A quantidade de alunos não precisa ser informada. Eles se cadastram e entram por conta própria. O professor não cadastra participantes nas equipes como procedimento normal.</p>
+<h2>2. Formação por afinidade e distribuição dos alunos restantes</h2>
+<p>Os alunos veem colegas disponíveis e equipes existentes na turma. Escolhem seus grupos por afinidade, com <b>3 a 5 integrantes</b>. A empresa pode começar com menos integrantes durante a formação, mas precisa atingir o mínimo para escolher o líder e concluir uma rodada.</p>
+<figure><img src="../diagramas/formacao-afinidade.png" alt="Tela de colegas e equipes"><figcaption>Tela de colegas e equipes</figcaption></figure>
+<p>Depois de perguntar em sala se todos conseguiram entrar nas equipes:</p>
+<ol>
+<li>Confira a lista <b>Alunos sem equipe</b> no painel de ingresso.</li>
+<li>Se necessário, organize novas equipes para garantir vagas.</li>
+<li>Clique em <b>Encerrar formação e distribuir alunos sem equipe</b>.</li>
+<li>Confira a mensagem com os alunos e suas equipes de destino.</li>
 </ol>
-<p>No jogo individual, a ausência de decisão pode repetir
-automaticamente escolhas anteriores com as restrições previstas pelo
-motor. Confirme o histórico para distinguir entregas do aluno e decisões
-automáticas. O evento é escolhido ou sorteado no fechamento: a edição
-correspondente do jornal passa a estar disponível após o
-processamento.</p>
-<h2 id="ler-os-resultados">4. Ler os resultados</h2>
-<figure>
-<img src="../diagramas/demonstrativos.svg" alt="Demonstrativos" />
-<figcaption aria-hidden="true">Demonstrativos</figcaption>
-</figure>
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Documento</th>
-<th>Pergunta pedagógica</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>DRE</td>
-<td>A operação gerou lucro após custos, despesas e tributos?</td>
-</tr>
-<tr class="even">
-<td>DFC</td>
-<td>Quais recebimentos e pagamentos explicam a variação de caixa?</td>
-</tr>
-<tr class="odd">
-<td>Balanço</td>
-<td>Como se distribuem ativos, obrigações e patrimônio?</td>
-</tr>
-<tr class="even">
-<td>Histórico</td>
-<td>Como as decisões de uma rodada influenciaram os períodos
-seguintes?</td>
-</tr>
-</tbody>
-</table>
-<p>No modo tradicional, conecte produção, matéria-prima, máquinas,
-manutenção, estoques, logística e pessoas. Em Startup, interprete
-aquisição e retenção de clientes, capacidade de nuvem, CAC, LTV, churn,
-runway e diluição por aporte. Demonstrativos que não foram registrados
-no modo legado aparecem como indisponíveis.</p>
-<h2 id="primeira-devolutiva-e-avaliação">5. Primeira devolutiva e
-avaliação</h2>
-<p>O painel da empresa disponibiliza automaticamente o <strong>Relatório
-da primeira rodada</strong> após o fechamento. Ele inclui resultado,
-evento, participação, perguntas de reflexão e catálogo de mídias com
-conceito, finalidade, custos ilustrativos e prazos. A fotografia da
-rodada permanece disponível ao longo da atividade.</p>
-<ol type="1">
-<li>Peça a cada equipe para explicar a relação entre preço,
-investimentos, capacidade e vendas.</li>
-<li>Compare lucro e caixa, destacando prazos, estoques, compras e
-financiamento.</li>
-<li>Discuta uma hipótese que funcionou e outra que deverá ser
-revisada.</li>
-<li>Use o relatório pedagógico da turma e o histórico para acompanhar
-evolução, decisões e participação.</li>
-<li>Exporte os registros em CSV quando necessário. Indicadores e ranking
-apoiam a discussão; a nota institucional depende dos critérios da
-disciplina.</li>
+<p>O programa distribui aleatoriamente os alunos já cadastrados naquela turma, usando somente vagas em equipes com pelo menos três integrantes. Nenhuma equipe ultrapassa cinco. Se o total de vagas for insuficiente, a operação é bloqueada sem distribuição parcial.</p>
+<p>O encerramento impede novas entradas e criação de equipes. Antes de fechar a primeira rodada, você pode usar <b>Reabrir formação</b> para corrigir a organização. Depois do início das rodadas, essa reabertura não fica disponível.</p>
+<h3>Exceções e troca de turma</h3>
+<p>Em <b>Autorizar troca de turma ou inclusão excepcional</b>, selecione o aluno e registre uma justificativa. A inclusão manual atende impedimentos alheios ao aluno e usa uma equipe com vaga da mesma turma. Alunos que já estão em uma equipe não são duplicados.</p>
+<p>Para autorizar troca, escolha uma turma de destino disponível para ingresso. O aluno passa a poder selecionar esse destino; a autorização não o matricula automaticamente. A troca é consumida uma vez e preserva o histórico. Se o aluno for líder de uma equipe ativa, ele precisa transferir a liderança e aguardar a próxima rodada antes de trocar de turma. Sua saída pode deixar a equipe de origem abaixo do mínimo; confira a composição.</p>
+<h2>3. Liderança e permissões</h2>
+<p>A equipe escolhe o líder inicial depois de ter três a cinco integrantes. Cada aluno registra sua escolha. Quem recebe mais da metade das escolhas assume a liderança. Quem criou a empresa não é automaticamente líder nas novas equipes.</p>
+<p><b>O líder registra, salva e envia; os demais visualizam e contribuem na discussão.</b> Não há exigência de confirmação individual de cada integrante. As alterações e o responsável por cada envio ficam registrados.</p>
+<figure><img src="../diagramas/transferir-lider.png" alt="Transferência feita pelo líder atual"><figcaption>Transferência feita pelo líder atual</figcaption></figure>
+<p>O líder pode escolher outro integrante e clicar em <b>Transferir liderança para a próxima rodada</b>. A tela destaca o próximo líder e a rodada de vigência. A permissão não muda no mês atual: a transferência é efetivada somente depois do fechamento. Há uma transferência programada por rodada; não existe transferência para depois da última rodada.</p>
+<figure><img src="../diagramas/lider-proxima-rodada.png" alt="Próximo líder destacado para a equipe"><figcaption>Próximo líder destacado para a equipe</figcaption></figure>
+<p>Para manter a continuidade, equipes existentes antes desta versão mantêm seu responsável anterior como líder. Os registros de confirmações das versões anteriores também são preservados para consulta histórica.</p>
+<h2>4. Prepare mercado e acompanhe as decisões</h2>
+<p>Em <b>Preparar rodada</b>, defina setor, tipo de comércio e quantidades de notícias, análises e produtos. Revise a edição antes de publicá-la. Os alunos consultam o conteúdo disponível da turma e as condições de concorrência do simulador.</p>
+<p>SWOT, Porter, PESTEL e concorrência usam pesquisa atual e informações registradas da empresa. O painel docente permite consultar diagnósticos, datas e fontes de pesquisa. Informações não confirmadas são indicadas como projeções com premissas; não devem ser apresentadas como fatos ocorridos.</p>
+<p>A análise de concorrência cobre perfil, localização e alcance, porte e participação, portfólio, qualidade e diferenciais, preços, pagamento, promoções, canais, presença digital, atendimento e reputação. Quando não existe base suficiente para um concorrente real, o sistema pode usar um concorrente de referência explicitamente projetado.</p>
+<p>O aluno não recebe decisões prontas. <b>BCG, segmentação e análise financeira são responsabilidade da equipe.</b> Os relatórios narrativos do painel docente não substituem a análise escrita dos alunos; na visão deles, o histórico financeiro reúne suas próprias análises e os demonstrativos calculados.</p>
+<h2>5. Envio final e fechamento da rodada</h2>
+<p>O aluno percorre produtos e marketing, ferramentas e segmentação, finanças, produção e logística quando aplicável. O líder pode guardar o trabalho em <b>Salvar rascunho</b> ou <b>Salvar e ir para a próxima etapa</b>.</p>
+<p><b>Rascunho não é entrega.</b> O envio final só ocorre quando todas as informações exigidas estiverem presentes. A mensagem de bloqueio indica as pendências.</p>
+<figure><img src="../diagramas/envio-bloqueado.png" alt="Exemplo da trava de envio"><figcaption>Exemplo da trava de envio</figcaption></figure>
+<p>O programa exige revisão das áreas aplicáveis, mixes completos, diretriz estratégica, segmentação, BCG de todos os produtos e análise financeira. Orçamentos de campanha são exigidos quando o serviço não possui custo público validado. Ações opcionais podem permanecer em zero.</p>
+<ol>
+<li>Acompanhe <b>Envios</b> e as pendências de cada equipe.</li>
+<li>Confira se todas as equipes têm entre três e cinco integrantes e líder definido.</li>
+<li>Feche a rodada somente depois dos envios finais.</li>
+<li>Escolha o evento ou use o sorteio.</li>
+<li>Compare resultados e hipóteses com a turma antes da próxima rodada.</li>
 </ol>
-<h2 id="biblioteca-e-fontes">6. Biblioteca e fontes</h2>
-<p>A aba <strong>Autores e referências</strong> informa obras e
-capítulos ou seções relevantes. Confira a edição adotada pela
-instituição. Porter orienta as cinco forças; Fahey e Narayanan apoiam a
-leitura do macroambiente; Kotler e Keller tratam de mercado, segmentação
-e marketing; Gitman e Zutter orientam finanças; Dornelas e GEM apoiam a
-discussão do empreendedorismo.</p>
-<p>PESTEL examina fatores políticos, econômicos, sociais, tecnológicos,
-ecológicos e legais. Porter examina rivalidade, entrantes, fornecedores,
-clientes e substitutos. Use ambas para formular oportunidades e ameaças
-da SWOT e confronte forças e fraquezas com os indicadores da
-empresa.</p>
-<h2 id="mídias-e-planejamento-financeiro">7. Mídias e planejamento
-financeiro</h2>
-<p>O catálogo inclui digital, televisão, rádio, imprensa, mídia
-exterior, áudio, cinema, influência, panfletagem e PDV. Cada item
-explica finalidade, unidade de compra, faixa de custo, pagamento e
-efeito no caixa. Não determina qual canal a equipe deve escolher. As
-faixas são referências do exercício, sujeitas a cotação e contrato.</p>
-<p>Discuta investimentos em tráfego pago, conteúdo, SEO, e-mail/CRM,
-identidade visual, eventos e parcerias. Percentuais de faturamento podem
-ser hipóteses iniciais, mas devem ser confrontados com objetivos, margem
-e disponibilidade de caixa. IOF de 3,5% é uma hipótese didática para
-operação internacional, cuja incidência deve ser conferida. Retenções e
-prazos dependem da operação, legislação e contrato.</p>
-<h2 id="apoio-aos-alunos">8. Apoio aos alunos</h2>
-<p>Em <strong>Alunos de teste</strong>, crie contas para demonstração
-quando necessário. Use a função de redefinição de senha para alunos de
-suas turmas. A recuperação por e-mail depende do envio configurado no
-sistema. Oriente os alunos a consultar o manual separado e a reabrir a
-orientação inicial. O tour pode ser ocultado com <strong>Não mostrar
-novamente</strong>; a escolha fica no navegador do usuário.</p>
-<p>Antes de encerrar a atividade, faça a devolutiva final com evidências
-de várias rodadas, evitando avaliar apenas a posição no ranking.</p>
-<h2 id="mix-completo-e-diagnósticos-automáticos">Mix completo e
-diagnósticos automáticos</h2>
-<p>Todas as equipes configuram preço, posicionamento, canais e campanhas
-de <strong>todos os produtos</strong> da edição de mercado utilizada.
-Revise cada produto antes de enviar. O peso de operação distribui a
-capacidade compartilhada; o investimento em mídia é a soma das campanhas
-de cada produto. Os resultados apresentam vendas, receita e custos por
-produto, além dos demonstrativos consolidados.</p>
-<p>Em <strong>Ferramentas e segmentação</strong>, o sistema prepara
-SWOT, Porter e PESTEL por IA, para consulta. A equipe interpreta o
-diagnóstico, escolhe a diretriz estratégica e preenche BCG e
-segmentação. As decisões da equipe continuam influenciando a coerência
-do mix e o resultado. Os diagnósticos ficam preservados por empresa e
-rodada.</p>
-<p>Consulte <strong>Manual de mídias</strong> na sidebar para pesquisar
-os formatos do catálogo, entender objetivos, unidades de compra e
-cuidados. A mesma área oferece o guia completo em PDF.</p>
-<h2 id="mídia-e-serviços-de-produção">Mídia e serviços de produção</h2>
-<p>O mix de cada produto mostra mídia, produção/serviços e total.
-Selecionar mídia inclui automaticamente os serviços com referência
-publicada. Para formatos com serviços sob consulta, informe um orçamento
-total com link do fornecedor. Não é permitido enviar somente veiculação
-quando o serviço é obrigatório. As fontes e escopos estão no Guia de
-mídias.</p>
-<p>Panfletos vinculam impressão e distribuição; jingle exige veiculação
-e substitui a produção de áudio simples. Produção é cobrada por formato,
-produto e mês; materiais físicos acompanham a quantidade. A abertura por
-produto explica as despesas já incluídas uma vez no marketing da DRE e
-no caixa. Históricos preservam os valores contratados. Preços publicados
-«a partir de» não garantem todo escopo ou direito de uso.</p>
-</body>
-</html>
+<p>O fechamento calcula o mercado compartilhado, custos, produção e finanças; preserva os registros e avança o mês. Também efetiva as transferências de liderança previstas para a nova rodada. Uma decisão que voltou a rascunho precisa de novo envio.</p>
+<h2>6. BCG e consequências das escolhas</h2>
+<figure><img src="../diagramas/matriz-bcg.png" alt="BCG no formato tradicional"><figcaption>BCG no formato tradicional</figcaption></figure>
+<p>A matriz da Boston Consulting Group usa crescimento no eixo vertical e participação relativa no horizontal. Alta participação fica à esquerda: Estrela no alto à esquerda e Vaca leiteira embaixo; Interrogação no alto à direita e Abacaxi embaixo. O corte didático de crescimento é 10%, e o de participação é 1x. O eixo horizontal é logarítmico.</p>
+<p>Os alunos informam crescimento, participação, classificação e base dos dados. Projeções exigem premissas. A participação relativa é a participação do produto dividida pela participação do maior concorrente. Marcadores numerados identificam produtos; não indicam faturamento.</p>
+<p>Interpretações se traduzem em escolhas de preço, posicionamento, público, produção e investimento. Coerência estruturada entre SWOT, BCG, segmentação e mix pode afetar a conversão comercial. Outros efeitos são econômicos: excesso de estoque imobiliza caixa, crédito gera juros, expansão aumenta capacidade e custos, e P&amp;D afeta qualidade. O sistema não pune textos livres arbitrariamente nem garante lucro por uma classificação correta.</p>
+<h2>7. Máquinas, crédito e demonstrativos</h2>
+<p>A vida útil contábil padrão de máquinas é <b>24 meses</b>, configurável antes da entrada das empresas. O aluno consulta o valor vigente na Produção e a condição de cada máquina no painel operacional. Depreciação reduz o valor contábil; a máquina não é removida automaticamente ao fim da depreciação.</p>
+<p>Novas compras são opcionais a partir do mês 3, com pagamento no mês da compra e ativação na rodada seguinte. Funcionários, horas extras, insumos e máquinas impõem limites conjuntos à capacidade. Horas extras usam a premissa didática de até 40 horas por funcionário, adicional de 50%, salário/220 e encargos.</p>
+<p>A DRE mostra resultado, a DFC mostra dinheiro, e o balanço mostra ativos e obrigações. A análise escrita deve discutir margem, caixa, recebimentos, pagamentos, estoques e capital de giro. Solicitar crédito exibe aviso de custo alto e risco ao lucro e caixa. Em Startup, aporte de investidores não entra como receita comercial e pode diluir os fundadores.</p>
+<h2>8. Avaliação automática e auditoria</h2>
+<p>O relatório pedagógico calcula <b>nota de desempenho de 0 a 10</b> a partir da pontuação ponderada do simulador. Ela é provisória enquanto houver rodadas e final ao encerrar a simulação. Os critérios incluem lucro, patrimônio, satisfação quando disponível e entrega das decisões; critérios sem dados têm pesos redistribuídos.</p>
+<p>No novo fluxo de equipes, um envio válido pelo líder comprova a entrega da equipe. Os demais alunos não perdem pontuação por não confirmar individualmente. Acessar o sistema comprova acesso, não aprendizagem ou contribuição efetiva; use a discussão e a justificativa das decisões para sua devolutiva pedagógica.</p>
+<p>Consulte resultados, demonstrativos, histórico de liderança, decisões e diagnósticos por empresa e rodada. Exporte os relatórios quando precisar registrar a avaliação. A decisão de incorporar essa nota à avaliação formal da disciplina continua sob responsabilidade do professor.</p></body></html>

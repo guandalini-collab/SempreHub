@@ -45,6 +45,8 @@ export interface Parametros {
 }
 
 export interface Turma {
+  visivel_ingresso: boolean;
+  formacao_encerrada: boolean;
   modo_jogo: ModoJogo;
   cenario: CenarioJogo;
   configuracao_simulacao: ConfiguracaoMotor;
@@ -91,6 +93,7 @@ export interface Empresa {
 }
 
 export interface Decisao {
+  analise_financeira: string;
   revisao_areas?: Partial<Record<"decisoes" | "financas" | "producao" | "logistica", boolean>>;
   simulacao: DecisaoSimulacao | null;
   plano_comercial?: PlanoComercial | null;
@@ -118,6 +121,11 @@ export interface MembroEquipe {
 }
 
 export interface Equipe {
+  pode_decidir: boolean;
+  lider_id: number | null;
+  proximo_lider_id: number | null;
+  transferencia_rodada: number | null;
+  votos_lider: Record<string,number>;
   codigo_convite: string | null;
   membros: MembroEquipe[];
   meus_cargos: CargoEquipe[];
@@ -219,6 +227,7 @@ export interface LinhaRanking {
 }
 
 export interface PainelAluno {
+  pendencias_envio: string[];
   equipe?: Equipe | null;
   empresa: Empresa;
   turma: Turma;

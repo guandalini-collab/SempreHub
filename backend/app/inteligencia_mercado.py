@@ -50,7 +50,7 @@ def _solicitar(corpo, chave):
     return texto, fontes
 
 
-def gerar_json(instrucoes, dados, pesquisar=False, schema=None):
+def gerar_json(instrucoes, dados, pesquisar=False, schema=None, permitir_projecoes=False):
     chave = os.getenv("OPENAI_API_KEY") or os.getenv("SEMPREHUB_OPENAI_API_KEY")
     if not chave:
         raise HTTPException(503, "Integração de pesquisa indisponível. Configure a credencial no serviço.")
@@ -71,10 +71,11 @@ def gerar_json(instrucoes, dados, pesquisar=False, schema=None):
     if pesquisar:
         if not texto or not fontes:
             raise HTTPException(502, "A busca não encontrou evidências com fontes confirmadas. Nenhuma edição foi salva.")
+        regra_projecao = " Quando solicitado, inclua projeções separadas dos fatos confirmados, identificadas como Projeção e acompanhadas das premissas usadas; nunca apresente essas estimativas como fatos." if permitir_projecoes else ""
         resultado, _ = gerar_json(
-            instrucoes + " Organize exclusivamente a evidência fornecida. Use somente URLs confirmadas. Não faça afirmações adicionais nem invente custos, datas ou URLs. Cada id de produto deve ser uma string. Se faltarem evidências, retorne menos itens nos respectivos arrays; nunca complete quantidades com dados inventados.",
+            instrucoes + regra_projecao + " Organize exclusivamente a evidência fornecida. Use somente URLs confirmadas. Não faça afirmações factuais adicionais nem invente custos, datas ou URLs. Quando autorizadas acima, projeções devem ser identificadas e acompanhadas das premissas, sem se passar por evidência. Cada id de produto deve ser uma string. Se faltarem evidências, retorne menos itens nos respectivos arrays; nunca complete quantidades com dados inventados.",
             {"solicitacao": dados, "evidencia": texto, "fontes_confirmadas": sorted(fontes)},
-            False, schema,
+            False, schema, permitir_projecoes,
         )
         return resultado, fontes
     try:

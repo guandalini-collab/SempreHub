@@ -31,12 +31,14 @@ def cliente():
     Base.metadata.drop_all(bind=engine)
     with engine.begin() as conexao:
         conexao.execute(text("DROP TABLE IF EXISTS alembic_version"))
+        conexao.execute(text("DROP TABLE IF EXISTS semprehub_manutencao_backup"))
     Base.metadata.create_all(bind=engine)
     with TestClient(app) as c:
         yield c
     Base.metadata.drop_all(bind=engine)
     with engine.begin() as conexao:
         conexao.execute(text("DROP TABLE IF EXISTS alembic_version"))
+        conexao.execute(text("DROP TABLE IF EXISTS semprehub_manutencao_backup"))
 
 
 def cadastrar(cliente, nome, email, papel="ALUNO", codigo=None):

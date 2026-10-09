@@ -26,3 +26,7 @@ build/
 
 # Testes
 .pytest_cache/
+
+# Ambiente local para exemplos do manual
+/frontend/qa-manual*
+/tmp/

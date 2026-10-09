@@ -105,7 +105,7 @@ function NovaTurma({ aoCriar, aoCancelar }: { aoCriar: (t: Turma) => void; aoCan
     <Cartao titulo="Nova turma">
       <form onSubmit={enviar} className="space-y-5">
         <Campo rotulo="Nome da turma" ajuda="Ex.: Empreendedorismo — 3º ano Técnico em Administração — 2026/2">
-          <input className={estiloEntrada} value={nome} onChange={(e) => setNome(e.target.value)} required minLength={3} />
+          <input className={estiloEntrada} value={nome} onChange={(e) => setNome(e.target.value)} required minLength={1} />
         </Campo>
         <ConfiguracaoSimulacao valores={parametros} aoMudar={(jogo) => setParametros({ ...parametros, ...jogo })} />
         <Campo rotulo="Participação dos alunos" ajuda="Equipes dividem os cargos de gestão e confirmam as decisões em conjunto.">

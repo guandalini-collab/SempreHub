@@ -146,7 +146,7 @@ class ParametrosTurma(BaseModel):
 
 
 class TurmaEntrada(ParametrosTurma):
-    nome: str = Field(min_length=3, max_length=120)
+    nome: str = Field(min_length=1, max_length=120)
 
 
 class FecharRodadaEntrada(BaseModel):
@@ -155,7 +155,8 @@ class FecharRodadaEntrada(BaseModel):
 
 
 class EntrarTurmaEntrada(BaseModel):
-    codigo: str = Field(min_length=4, max_length=12)
+    turma_id: Optional[int] = Field(None, gt=0)
+    codigo: Optional[str] = Field(None, min_length=4, max_length=12)
     nome_empresa: str = Field(min_length=2, max_length=120)
     tipo_entrada_gem: TipoEntradaGem
     classe_dornelas: ClasseDornelas
@@ -197,6 +198,8 @@ class ProdutoBCG(ItensAnalise):
     crescimento: float = Field(ge=-100, le=1000)
     participacao: float = Field(ge=0, le=100)
     classificacao: Literal["ESTRELA", "VACA", "INTERROGACAO", "ABACAXI"]
+    base: Literal["DADO", "PROJECAO"] = "DADO"
+    premissas: str = Field("", max_length=2000)
 
 
 class PESTELAnalise(ItensAnalise):
@@ -282,6 +285,8 @@ class DecisaoEntrada(BaseModel):
 
     versao: Optional[int] = Field(None, ge=0)
     rodada: Optional[int] = Field(None, ge=1, le=60)
+    rascunho: bool = False
+    analise_financeira: str = Field("", max_length=6000)
     revisao_areas: dict[Literal["decisoes", "financas", "producao", "logistica"], bool] = Field(default_factory=dict)
     preco: float = Field(gt=0, le=100000)
     marketing: float = Field(0.0, ge=0, le=10_000_000)
@@ -303,7 +308,8 @@ class DecisaoEntrada(BaseModel):
 
 
 class EntrarEquipeEntrada(BaseModel):
-    codigo: str = Field(min_length=16, max_length=64)
+    empresa_id: Optional[int] = Field(None, gt=0)
+    codigo: Optional[str] = Field(None, min_length=16, max_length=64)
 
 
 class MembroEquipeEntrada(BaseModel):
