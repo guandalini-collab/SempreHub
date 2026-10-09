@@ -34,6 +34,7 @@ import { CONFIGURACAO_MOTOR_PADRAO, DECISAO_SIMULACAO_PADRAO } from "../../tipos
 import type { DecisaoSimulacao } from "../../tiposSimulacao";
 
 const FERRAMENTAS = ["SWOT", "PORTER", "BCG", "PESTEL", "SEGMENTACAO"];
+const ANALISES_APRENDIZAGEM = ["5 Forças de Porter", "PESTEL", "Análise de mercado", "SWOT (FOFA)", "Análise financeira", "Segmentação de mercado"];
 const ITENS_PAINEL = [
   {id: "manuais", titulo: "Manuais", descricao: "Consulte ou baixe os manuais em PDF.", simbolo: "", grupo: "Manuais"},
   {
@@ -67,11 +68,13 @@ const ITENS_PAINEL = [
   { "id": "midias", "titulo": "Manual de mídias", "descricao": "Formatos, objetivos e custos das campanhas.", "simbolo": "◉", "grupo": "Estratégia e ajuda" },
   {
     "id": "aprendizagem",
-    "titulo": "Estratégia e ajuda",
-    "descricao": "Análises estratégicas, manuais e mídias.",
+    "titulo": "Autores e referências",
+    "descricao": "Consulte as referências para apoiar suas decisões.",
     "simbolo": "◇",
     "grupo": "Estratégia e ajuda"
   },
+  {id: "analises", titulo: "Ferramentas de análise", descricao: "Selecione uma ferramenta no submenu lateral.", simbolo: "", grupo: "Estratégia e ajuda"},
+  ...ANALISES_APRENDIZAGEM.map((titulo, indice) => ({id: `analise-${indice}`, titulo, descricao: "Consulte os conceitos para apoiar suas decisões.", simbolo: "", grupo: "Estratégia e ajuda", pai: "analises"})),
   {
     "id": "decisoes",
     "titulo": "Produtos e marketing",
@@ -82,7 +85,7 @@ const ITENS_PAINEL = [
   {id: "pd", titulo: "P&D", descricao: "Tecnologia e melhoria dos produtos.", simbolo: "", grupo: "Decisões da rodada"},
   {id: "rh", titulo: "RH", descricao: "Funcionários, remuneração e capacitação.", simbolo: "", grupo: "Decisões da rodada"},
   { "id": "estrategia", "titulo": "Ferramentas e segmentação", "descricao": "SWOT, Porter, BCG, PESTEL e público-alvo.", "simbolo": "◇", "grupo": "Decisões da rodada" },
-  ...FERRAMENTAS.map(id => ({id: `ferramenta-${id}`, titulo: id === "PORTER" ? "Porter - 5 forças" : id === "SEGMENTACAO" ? "Segmentação do mercado" : id, descricao: "Consulte e registre as escolhas desta ferramenta.", simbolo: "", grupo: "Ferramentas e segmentação"})),
+  ...FERRAMENTAS.map(id => ({id: `ferramenta-${id}`, titulo: id === "PORTER" ? "Porter - 5 forças" : id === "SEGMENTACAO" ? "Segmentação do mercado" : id, descricao: "Consulte e registre as escolhas desta ferramenta.", simbolo: "", grupo: "Decisões da rodada", pai: "estrategia"})),
   {
     "id": "financas",
     "titulo": "Finanças",
@@ -282,8 +285,10 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <SecaoPainel id="manuais" ativa={secao}><CentralManuais perfil="ALUNO" /></SecaoPainel>
       <SecaoPainel id="midias" ativa={secao}><ManualMidias /></SecaoPainel>
       <SecaoPainel id="aprendizagem" ativa={secao}>
-      <BibliotecaAprendizagem mercadoSeparado rodada={turma.rodada_atual} modo={turma.modo_jogo} empresaId={empresa.id} />
+      <BibliotecaAprendizagem mercadoSeparado conteudo="REFERENCIAS" rodada={turma.rodada_atual} modo={turma.modo_jogo} empresaId={empresa.id} />
       </SecaoPainel>
+      <SecaoPainel id="analises" ativa={secao}><Cartao titulo="Ferramentas de análise"><p>Selecione a ferramenta desejada no submenu lateral para consultar seu conteúdo.</p></Cartao></SecaoPainel>
+      {ANALISES_APRENDIZAGEM.map((_, indice) => <SecaoPainel key={indice} id={`analise-${indice}`} ativa={secao}><BibliotecaAprendizagem mercadoSeparado conteudo="ANALISES" ferramenta={indice} rodada={turma.rodada_atual} modo={turma.modo_jogo} empresaId={empresa.id} /></SecaoPainel>)}
       <SecaoPainel id="relatorios" ativa={secao}>
       <MercadoPublicado visao="relatorios" empresaId={empresa.id} rodada={turma.rodada_atual} />
       <RelatorioPrimeiraRodada empresaId={empresa.id} disponivel={resultados.some(r => r.rodada === 1)} />
