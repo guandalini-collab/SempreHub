@@ -1,3 +1,4 @@
+import CentralManuais from "../../componentes/CentralManuais";
 import ResultadoProdutos from "../../componentes/ResultadoProdutos";
 import ManualMidias from "../../componentes/ManualMidias";
 import { ControleVisual, ResumoNegocio, Conquistas, FeedResultados, ViradaRodada } from "../../componentes/Experiencia";
@@ -32,6 +33,7 @@ import { CONFIGURACAO_MOTOR_PADRAO, DECISAO_SIMULACAO_PADRAO } from "../../tipos
 import type { DecisaoSimulacao } from "../../tiposSimulacao";
 
 const ITENS_PAINEL = [
+  {id: "manuais", titulo: "Manuais", descricao: "Consulte ou baixe os manuais em PDF.", simbolo: "", grupo: "Manuais"},
   {
     "id": "visao",
     "titulo": "Início",
@@ -271,6 +273,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <FeedResultados jornada={painel.jornada} aoResultados={() => setSecao("resultados")} />
       <MercadoPublicado visao="mercado" empresaId={empresa.id} rodada={turma.rodada_atual} />
       </SecaoPainel>
+      <SecaoPainel id="manuais" ativa={secao}><CentralManuais perfil="ALUNO" /></SecaoPainel>
       <SecaoPainel id="midias" ativa={secao}><ManualMidias /></SecaoPainel>
       <SecaoPainel id="aprendizagem" ativa={secao}>
       <BibliotecaAprendizagem mercadoSeparado rodada={turma.rodada_atual} modo={turma.modo_jogo} empresaId={empresa.id} />

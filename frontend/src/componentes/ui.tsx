@@ -31,7 +31,7 @@ export function Cabecalho({
           </span>
         </button>
         <div className="flex flex-wrap items-center gap-4 text-sm">
-          <MenuManuais />
+          <MenuManuais perfil={usuario.papel} />
           <div className="text-right">
             <p className="font-medium">{usuario.nome}</p>
             <p className="text-xs text-white/60">{usuario.papel === "PROFESSOR" ? "Professor(a)" : "Aluno(a)"}</p>

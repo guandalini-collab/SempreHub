@@ -67,7 +67,7 @@ export default function LayoutPainel({
     window.addEventListener("keydown", fechar);
     return () => window.removeEventListener("keydown", fechar);
   }, []);
-  const item = itens.find((i) => i.id === ativa) ?? itens[0];
+  const item = itens.find((i) => i.id === ativa) ?? itens.find(i => i.id === "visao") ?? itens[0];
   const progresso = Math.min(
     100,
     Math.round((concluidas / Math.max(1, total)) * 100),
@@ -94,7 +94,8 @@ export default function LayoutPainel({
           aria-label={`Navegação do ${perfil}`}
           className={`${aberto ? "block" : "hidden"} mt-4 space-y-1 lg:block`}
         >
-          {grupos.map((grupo, indice) => {
+          <button type="button" aria-current={ativa === "manuais" ? "page" : undefined} aria-controls="secao-manuais" onClick={() => aoSelecionar("manuais")} className={`mb-2 w-full rounded-lg border border-ouro/50 px-3 py-3 text-left text-sm font-bold ${ativa === "manuais" ? "bg-ouro text-marinho" : "text-white hover:bg-white/10"}`}>Manuais · baixar PDF</button>
+          {grupos.filter(grupo => grupo !== "Manuais").map((grupo, indice) => {
             const expandido = gruposAbertos.includes(grupo);
             const contemAtiva = grupoAtivo === grupo;
             return <div key={grupo} className="py-1">

@@ -1,3 +1,4 @@
+import CentralManuais from "../../componentes/CentralManuais";
 import { CONFIGURACAO_MOTOR_PADRAO } from "../../tiposSimulacao";
 import FormacaoTurma from "../../componentes/FormacaoTurma";
 import DiagnosticosEmpresa from "../../componentes/DiagnosticosEmpresa";
@@ -36,6 +37,7 @@ import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
 
 const ITENS_PAINEL = [
+  {id: "manuais", titulo: "Manuais", descricao: "Consulte ou baixe os manuais em PDF.", simbolo: "", grupo: "Manuais"},
   { id: "visao", titulo: "1. Dados e ingresso", descricao: "Confira o nome da turma e libere seu ingresso para os alunos.", simbolo: "", grupo: "Preparar turma" },
   { id: "configuracao", titulo: "2. Configurar simulação", descricao: "Revise os parâmetros antes de orientar os alunos.", simbolo: "", grupo: "Preparar turma" },
   { id: "equipes", titulo: "3. Conferir participantes", descricao: "Confira alunos, empresas e pendências de envio.", simbolo: "", grupo: "Preparar turma" },
@@ -143,6 +145,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       <CompetitividadeMercado config={turma.parametros?.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} equipes={empresas.length} />
       <GestaoMercado turmaId={turmaId} rodada={dados.turma.rodada_atual} empresas={dados.empresas} />
       </SecaoPainel>
+      <SecaoPainel id="manuais" ativa={secao}><CentralManuais perfil="PROFESSOR" /></SecaoPainel>
       <SecaoPainel id="midias" ativa={secao}><ManualMidias /></SecaoPainel>
       <SecaoPainel id="aprendizagem" ativa={secao}>
       <BibliotecaAprendizagem mercadoSeparado conteudo="REFERENCIAS" rodada={turma.rodada_atual} modo={turma.modo_jogo} />
