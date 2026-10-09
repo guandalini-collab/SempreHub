@@ -201,20 +201,12 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   }
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL.map(i => ({...i, estado: i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL" ? "Sem decisão neste modelo" : (AREAS_DECISAO.includes(i.id) || ["pd", "rh"].includes(i.id)) ? painel.decisao_atual?.enviada_em ? "Enviada" : painel.decisao_atual?.revisao_areas?.[(AREA_REVISAO[i.id] || i.id) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>] ? "Rascunho salvo · conferido" : "Decisão pendente" : undefined}))} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · acompanhe a rodada" : "Decisão pendente · prepare e envie" }}>
+    <LayoutPainel itens={ITENS_PAINEL.map(i => ({...i, ...(["mercado", "decisoes", "financas", "producao", "logistica", "equipe", "resultados"].includes(i.id) ? {grupo: "Rodada atual", pai: "rodada"} : {}), estado: i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL" ? "Sem decisão neste modelo" : (AREAS_DECISAO.includes(i.id) || ["pd", "rh"].includes(i.id)) ? painel.decisao_atual?.enviada_em ? "Enviada" : painel.decisao_atual?.revisao_areas?.[(AREA_REVISAO[i.id] || i.id) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>] ? "Rascunho salvo · conferido" : "Decisão pendente" : undefined}))} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · acompanhe a rodada" : "Decisão pendente · prepare e envie" }}>
       <SecaoPainel id="rodada" ativa={secao}>
         <Cartao titulo={encerrada ? "Simulação concluída" : `O que fazer na rodada ${turma.rodada_atual}`}>
-          <p className="mb-5 text-sm text-slate-600">{encerrada ? "Consulte os resultados e os relatórios da sua empresa." : painel.decisao_atual?.enviada_em ? "O líder enviou a decisão. Acompanhe os resultados quando a rodada encerrar." : "Siga os passos abaixo. Produtos, finanças, produção e logística fazem parte de uma única decisão da rodada."}</p>
+          <p className="mb-5 text-sm text-slate-600">{encerrada ? "Consulte os resultados e os relatórios da sua empresa." : painel.decisao_atual?.enviada_em ? "O líder enviou a decisão. Acompanhe os resultados quando a rodada encerrar." : "Siga os passos no menu lateral. Produtos, finanças, produção e logística fazem parte de uma única decisão da rodada."}</p>
           <p className="mb-4 text-sm">Última versão salva: {AREAS_DECISAO.filter(a => a !== "logistica" || turma.modo_jogo === "TRADICIONAL").map(a => `${a === "decisoes" ? "Marketing" : a === "financas" ? "Finanças" : a === "producao" ? "Produção" : "Logística"}: ${painel.decisao_atual?.revisao_areas?.[a as keyof NonNullable<DecisaoEntrada["revisao_areas"]>] ? "revisado" : "revisar"}`).join(" · ")}</p>
-          <div className="grid gap-3 sm:grid-cols-2">{[
-            ["mercado", "1. Ler notícias e mercado", "Entenda o cenário antes de decidir."],
-            ["decisoes", "2. Escolher produtos e marketing", "Configure preços e campanhas; salve ou envie a decisão."],
-            ["financas", "3. Planejar as finanças", "Confira cálculos, crédito e pagamentos."],
-            ["producao", "4. Organizar a produção", "Planeje equipe e capacidade de operação."],
-            ["logistica", "5. Escolher a entrega", "Confira os fretes disponíveis no seu modelo."],
-            ["equipe", "6. Conferir a equipe", "Confira integrantes e liderança."],
-            ["resultados", "Ver resultados, DRE e balanço", "Disponíveis após o encerramento da rodada."],
-          ].map(([id, titulo, descricao]) => <button key={id} type="button" onClick={() => setSecao(id)} className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-left hover:border-blue-600 hover:bg-blue-100"><span className="block font-bold text-blue-800">{titulo} →</span><span className="mt-1 block text-sm text-slate-600">{descricao}</span></button>)}</div>
+          <p className="mt-5 text-sm text-slate-600">Use o submenu “O que fazer nesta rodada”, à esquerda, para abrir cada área.</p>
         </Cartao>
       </SecaoPainel>
       <SecaoPainel id="visao" ativa={secao}>
