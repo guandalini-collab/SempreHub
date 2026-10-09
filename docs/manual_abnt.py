@@ -4,7 +4,7 @@ A4, margens 3/2 cm, corpo 12, entrelinha 1,5, seções e sumário navegável.
 from pathlib import Path
 from io import BytesIO
 import html,re,shutil
-from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,PageBreak,Image,KeepTogether,Table,TableStyle,Flowable
+from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,PageBreak,Image,KeepTogether,Table,TableStyle,Flowable,CondPageBreak
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
@@ -17,15 +17,15 @@ LEFT=TOP=3*cm;RIGHT=BOTTOM=2*cm;WIDTH=A4[0]-LEFT-RIGHT
 BLUE=colors.HexColor('#013B9D');CYAN=colors.HexColor('#06A9BF');GOLD=colors.HexColor('#DF9317')
 BLACK=colors.black
 STYLES={
- 'Body':ParagraphStyle('Body',fontName='Helvetica',fontSize=12,leading=18,textColor=BLACK,alignment=4,spaceAfter=12,allowWidows=0,allowOrphans=0),
+ 'Body':ParagraphStyle('Body',fontName='Helvetica',fontSize=12,leading=18,textColor=BLACK,alignment=4,spaceAfter=8,allowWidows=0,allowOrphans=0),
  'List':ParagraphStyle('List',fontName='Helvetica',fontSize=12,leading=18,textColor=BLACK,spaceAfter=8,leftIndent=12,firstLineIndent=-12,allowWidows=0,allowOrphans=0),
  'Chapter':ParagraphStyle('Chapter',fontName='Helvetica-Bold',fontSize=12,leading=18,textColor=BLACK,spaceAfter=18,keepWithNext=True),
- 'Sub':ParagraphStyle('Sub',fontName='Helvetica-Bold',fontSize=12,leading=18,textColor=BLACK,spaceBefore=18,spaceAfter=18,keepWithNext=True),
+ 'Sub':ParagraphStyle('Sub',fontName='Helvetica-Bold',fontSize=12,leading=18,textColor=BLACK,spaceBefore=12,spaceAfter=12,keepWithNext=True),
  'Small':ParagraphStyle('Small',fontName='Helvetica',fontSize=10,leading=12,textColor=BLACK,spaceAfter=12,allowWidows=0,allowOrphans=0),
  'Cell':ParagraphStyle('Cell',fontName='Helvetica',fontSize=10,leading=12,textColor=BLACK,spaceAfter=0),
  'Center':ParagraphStyle('Center',fontName='Helvetica',fontSize=12,leading=18,textColor=BLACK,alignment=1,spaceAfter=18),
- 'TOC':ParagraphStyle('TOC',fontName='Helvetica',fontSize=12,leading=18,textColor=BLACK,spaceBefore=8,leftIndent=0,firstLineIndent=0,rightIndent=25),
- 'TOCSub':ParagraphStyle('TOCSub',fontName='Helvetica',fontSize=12,leading=18,textColor=BLACK,spaceBefore=5,leftIndent=16,firstLineIndent=0,rightIndent=25),
+ 'TOC':ParagraphStyle('TOC',fontName='Helvetica',fontSize=12,leading=13,textColor=BLACK,spaceBefore=0,leftIndent=0,firstLineIndent=0,rightIndent=25),
+ 'TOCSub':ParagraphStyle('TOCSub',fontName='Helvetica',fontSize=12,leading=13,textColor=BLACK,spaceBefore=0,leftIndent=16,firstLineIndent=0,rightIndent=25),
 }
 def inline(text):
  text=html.escape(text.strip()).replace('—','-').replace('–','-')
@@ -59,10 +59,7 @@ def build(stem):
  source=(DOCS/f'{stem}.md').read_text()
  blocks=[b.strip() for b in re.split(r'\n\s*\n',source) if b.strip()]
  covertitle=ParagraphStyle('CoverTitle',parent=STYLES['Center'],fontName='Helvetica-Bold',textColor=BLUE)
- story=[Spacer(1,145),Paragraph('PROFESSOR GUANDALINI',STYLES['Center']),Spacer(1,40),Paragraph('SEMPREHUB',covertitle),Paragraph(title.upper(),covertitle),Paragraph(subtitle,STYLES['Center']),Spacer(1,36),Paragraph(audience,STYLES['Center']),Paragraph('Autor e Fundador: Professor Guandalini',STYLES['Center']),Spacer(1,30),Paragraph('Edição 3.3<br/>2026',STYLES['Center']),PageBreak()]
- story += [Paragraph('PROFESSOR GUANDALINI',STYLES['Center']),Spacer(1,120),Paragraph('SEMPREHUB',covertitle),Paragraph(title.upper(),covertitle),Paragraph(subtitle,STYLES['Center']),Spacer(1,45)]
- nature=ParagraphStyle('Nature',parent=STYLES['Body'],leading=12,leftIndent=WIDTH/2,alignment=4)
- story += [Paragraph('Manual institucional do SempreHub destinado a '+audience.lower()+'. Orienta o uso pedagógico do simulador e a compreensão das decisões empresariais. Conceito, marca e autoria: Professor Guandalini.',nature),Spacer(1,70),Paragraph('Edição 3.3<br/>2026',STYLES['Center']),PageBreak()]
+ story=[Spacer(1,145),Paragraph('PROFESSOR GUANDALINI',STYLES['Center']),Spacer(1,40),Paragraph('SEMPREHUB',covertitle),Paragraph(title.upper(),covertitle),Paragraph(subtitle,STYLES['Center']),Spacer(1,36),Paragraph(audience,STYLES['Center']),Paragraph('Autor e Fundador: Professor Guandalini',STYLES['Center']),Spacer(1,30),Paragraph('Edição 3.4<br/>2026',STYLES['Center']),PageBreak()]
  toc=TableOfContents();toc.levelStyles=[STYLES['TOC'],STYLES['TOCSub']];toc.dotsMinLevel=0
  chapter=sub=figure=tablecount=0;toc_added=False;lastheading='';markup=[];placements={}
  for block in blocks:
@@ -76,7 +73,7 @@ def build(stem):
      if not toc_added:
       if stem=='manual-aluno' or stem=='manual-professor':story.append(PageBreak())
       story += [Paragraph('SUMÁRIO',ParagraphStyle('TOCHeading',parent=STYLES['Chapter'],alignment=1)),toc,PageBreak()];toc_added=True
-     else:story.append(PageBreak())
+     else:story += [CondPageBreak(130),Spacer(1,12)]
      chapter+=1;sub=0
      p=Paragraph(f'{chapter} {inline(plain)}',STYLES['Chapter']);p.bookmark=f'section-{chapter}';p.outline_level=0;p.toc_level=0;p.starts_text=True;story.append(p)
    else:
@@ -87,7 +84,7 @@ def build(stem):
    caption,rel=match.groups();path=DOCS/rel
    if path.suffix=='.pdf':
     figure+=1
-    story += [PageBreak(),KeepTogether([Paragraph(f'Figura {figure} - {inline(caption)}',STYLES['Small']),VectorFigure(path,placements),Spacer(1,8),Paragraph('Fonte: Professor Guandalini (2026). Diagrama explicativo sobre a logomarca oficial.',STYLES['Small'])])]
+    story += [KeepTogether([Paragraph(f'Figura {figure} - {inline(caption)}',STYLES['Small']),VectorFigure(path,placements),Spacer(1,8),Paragraph('Fonte: Professor Guandalini (2026). Diagrama explicativo sobre a logomarca oficial.',STYLES['Small'])])]
     markup.append(f'<figure><object data="../{rel}" type="application/pdf"></object><figcaption>{inline(caption)}</figcaption></figure>')
     continue
    with PILImage.open(path) as im:w,h=im.size
@@ -118,7 +115,7 @@ def build(stem):
    canvas.setFillColor(BLUE);canvas.setFont('Helvetica',8);canvas.drawRightString(w-RIGHT,h-68,title)
    canvas.setStrokeColor(CYAN);canvas.setLineWidth(.5);canvas.line(LEFT,h-73,w-RIGHT,h-73)
    canvas.setFont('Helvetica',8);canvas.setFillColor(BLUE);canvas.drawString(LEFT,35,'Conceito e marca: Professor Guandalini')
-   canvas.drawRightString(w-RIGHT,35,'SempreHub | Edição 3.3')
+   canvas.drawRightString(w-RIGHT,35,'SempreHub | Edição 3.4')
    if doc.text_start is not None and doc.page>=doc.text_start:
     canvas.setFillColor(BLACK);canvas.setFont('Helvetica',10);canvas.drawRightString(w-RIGHT,h-2*cm,str(doc.page-1))
   canvas.restoreState()
@@ -137,4 +134,4 @@ def build(stem):
  pdf=OUT/f'{stem}.pdf'
  with pdf.open('wb') as f:writer.write(f)
  (OUT/f'{stem}.html').write_text('<!doctype html><html lang="pt-BR"><meta charset="UTF-8"><title>'+title+'</title><link rel="stylesheet" href="../manual.css"><body><h1>'+title+'</h1>'+ '\n'.join(markup)+'</body></html>')
- shutil.copyfile(pdf,PUBLIC/pdf.name);print(f'{stem}: {len(writer.pages)} páginas, edição 3.3, marca vetorial e formatação ABNT adaptada.')
+ shutil.copyfile(pdf,PUBLIC/pdf.name);print(f'{stem}: {len(writer.pages)} páginas, edição 3.4, marca vetorial e formatação ABNT adaptada.')

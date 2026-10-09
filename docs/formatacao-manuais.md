@@ -1,13 +1,13 @@
-# Apresentação dos manuais do aluno e do professor - edição 3.2
+# Apresentação dos manuais do aluno e do professor - edição 3.4
 
 A apresentação utiliza regras aplicáveis da ABNT NBR 14724:2024 (versão corrigida de 01/04/2025), ABNT NBR 6024:2012 e ABNT NBR 6027:2012. A NBR 14724 trata de trabalhos acadêmicos; estes documentos continuam sendo manuais institucionais. Não se atribui certificação ABNT, nem se criam folha de aprovação, banca, resumos de tese ou local de publicação não informado.
 
 - Papel A4, composição em anverso; margens de 3 cm à esquerda e no alto e 2 cm à direita e embaixo.
 - Corpo Helvetica sem serifas em 12 pt, entrelinha de 18 pt (1,5), texto preto e justificado; família escolhida editorialmente, não imposta pela ABNT.
 - Notas, legendas, fontes e tabelas com tamanho menor uniforme e entrelinha simples.
-- Capa, folha de rosto, carta do fundador e sumário antes da parte textual. A carta não entra no sumário.
-- Paginação conta desde a folha de rosto e aparece a partir da primeira seção textual, no alto à direita. Capa não é contada.
-- Seções primárias em novas páginas, numeração progressiva e sumário com a mesma grafia e páginas correspondentes. Subdivisões também constam no sumário.
+- Capa, carta do fundador e sumário antes da parte textual. A folha de rosto separada foi removida a pedido do autor. A carta não entra no sumário.
+- Paginação conta desde a carta do fundador e aparece a partir da primeira seção textual, no alto à direita. Capa não é contada.
+- Seções em fluxo contínuo para reduzir áreas vazias, conforme orientação editorial do autor; numeração progressiva e sumário com a mesma grafia e páginas correspondentes. Subdivisões também constam no sumário.
 - Ilustrações identificadas acima, com fonte abaixo; imagens de navegação contêm situações ilustrativas.
 - Marca vetorial branca original sem recoloração. Azul #013B9D, turquesa #06A9BF e dourado #DF9317 nos elementos gráficos; gradientes próprios preservados. Códigos conceituais do fundador documentados no capítulo da marca.
 - Conteúdo sobre IA reservado ao professor; o aluno lê sobre decisões e resposta do mercado.
