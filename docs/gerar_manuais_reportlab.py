@@ -67,6 +67,9 @@ class Livro(SimpleDocTemplate):
    self.notify('TOCEntry',(0,title,self.page-1,key))
 
 def build(stem):
+ if stem != "manual-midias":
+  from manual_abnt import build as build_abnt
+  return build_abnt(stem)
  title={'manual-aluno':'Manual do aluno','manual-professor':'Manual do professor','manual-midias':'Manual de mídias e campanhas'}[stem]
  subtitle={'manual-aluno':'Aprenda a decidir, acompanhe sua empresa e transforme resultados em aprendizagem.','manual-professor':'Prepare a turma, conduza as rodadas e acompanhe a aprendizagem das equipes.','manual-midias':'Planeje público, mídia, produção e orçamento antes de contratar uma campanha.'}[stem]
  audience={'manual-aluno':'ENSINO MÉDIO E SUPERIOR','manual-professor':'PROFESSORES, COORDENADORES E FACILITADORES','manual-midias':'PLANEJAMENTO DE MÍDIAS E CAMPANHAS'}[stem]
@@ -154,4 +157,6 @@ def build(stem):
 
 if __name__=='__main__':
  OUT.mkdir(parents=True,exist_ok=True);PUBLIC.mkdir(parents=True,exist_ok=True)
- for stem in ['manual-aluno','manual-professor','manual-midias']:build(stem)
+ import sys
+ stems=['manual-midias'] if '--midias' in sys.argv else ['manual-aluno','manual-professor']
+ for stem in stems:build(stem)

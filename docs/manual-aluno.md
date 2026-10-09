@@ -20,15 +20,36 @@ Criador e Fundador do SempreHub — Simulador de Empreendedorismo
 
 ## A história e o conceito da logomarca SempreHub
 
-**Autoria e criação: Professor Guandalini.** A marca, o nome e a identidade visual foram idealizados e criados pelo Professor Guandalini para unir o ambiente corporativo à conexão das redes modernas. O símbolo representa uma metodologia de aprendizado viva e integrada, voltada ao Ensino Médio e Superior.
+**Autoria e criação: Professor Guandalini.** O nome, a marca e a identidade visual do SempreHub foram idealizados e criados pelo Professor Guandalini. A marca aproxima o ambiente corporativo da conexão das redes modernas e representa uma metodologia de aprendizagem integrada, voltada ao Ensino Médio e Superior.
 
-**SEMPRE** evoca constância, aprendizado contínuo e resiliência: empreender exige tentativas, análise dos relatórios, ajustes e evolução. **HUB** representa um centro conector de inteligência, onde estudantes, mercado competitivo e gestão se encontram.
+**SEMPRE** expressa constância, aprendizado contínuo e resiliência. Empreender é um ciclo de tentativas, análise de resultados, ajustes e evolução. **HUB** identifica um centro conector: estudantes, departamentos, gestão e mercado competitivo se encontram em um mesmo ecossistema.
 
-**A rede de decisões.** Os nós azuis e cianos representam os seis departamentos: P&D, Produção, Logística, Marketing, RH e Finanças. As linhas mostram que nenhuma decisão é isolada: mudar a Produção afeta a Logística e as Finanças. Os dois núcleos em Laranja Ouro representam a tomada de decisão do estudante e a dinâmica do mercado.
+### O símbolo: a rede de gestão
 
-**Paleta oficial da identidade visual:** Azul Royal **#034AA6** e Azul Absoluto **#0762D9** transmitem credibilidade e robustez; Ciano/Turquesa **#0AADBF** representa dinamismo e modernidade; Laranja Ouro **#D9851E** destaca geração de valor, criatividade e atitude empreendedora; Cinza Soft **#F2F2F2** organiza um fundo limpo para a leitura.
+Os nós periféricos, em azul e ciano, representam os seis departamentos vitais: Pesquisa e Desenvolvimento (P&D), Produção, Logística, Marketing, Recursos Humanos (RH) e Finanças. Eles mostram uma empresa cujas áreas trabalham em conjunto.
 
-O Azul Profundo **#0B2545** e o Ouro Fosco **#C5A059** permanecem documentados como paleta institucional anterior. A identidade visual atual segue os códigos oficiais apresentados pelo fundador.
+As linhas conectoras representam a interdependência das decisões. Alterar o preço no Marketing pode mudar a demanda e o faturamento nas Finanças. Aumentar a Produção modifica a necessidade de materiais, de pessoas e de capacidade logística. Nenhuma decisão é isolada.
+
+Os dois núcleos em Laranja Ouro representam a tomada de decisão do estudante e a resposta do mercado simulado. Sua posição central destaca que cada escolha encontra consequências na dinâmica da empresa e da concorrência.
+
+### As cores e seu significado
+
+**Azul Royal (#034AA6) e Azul Médio (#0762D9): rigor acadêmico.** Associam a identidade ao ambiente corporativo, à credibilidade e à seriedade pedagógica. A intenção visual é comunicar confiança e valorizar a aprendizagem empresarial.
+
+**Ciano/Turquesa (#0AADBF): inovação e fluidez.** Relaciona a marca à tecnologia e à navegação intuitiva. Aproxima o universo da gestão de estudantes iniciantes e reforça uma experiência leve, organizada e acessível.
+
+**Laranja Ouro (#D9851E): núcleo de decisão e geração de valor.** Destaca criatividade, iniciativa e competitividade. Na rede, orienta o olhar para os pontos centrais onde as decisões e suas consequências se conectam.
+
+Na logomarca, os gradientes conectam as tonalidades azuis, cianas e douradas. O fundo branco valoriza o contraste da rede e do nome e organiza uma apresentação limpa para os conteúdos do manual.
+
+### A tipografia: identidade corporativa acessível
+
+A escrita sem serifas, com formas modernas e suaves, expressa democratização do conhecimento. O SempreHub foi concebido para estudantes de diferentes áreas, como Saúde, Humanas e Exatas. A organização visual ajuda a localizar decisões e compreender relações entre departamentos.
+
+### Como ler a marca na prática
+
+Ao observar a rede, lembre-se de verificar as consequências de cada escolha nas outras áreas. A marca traduz o propósito pedagógico do simulador: discutir, decidir, acompanhar resultados e aprender com os ajustes. Uma interpretação correta das ferramentas pode apoiar decisões melhores; resultados dependem das escolhas da equipe e do mercado simulado.
+
 
 ## Cockpit do estudante
 
@@ -57,7 +78,7 @@ O menu lateral é o ponto de partida. Suas categorias e submenus aparecem aberto
 
 Os campos de decisão mostram pendências, como **Falta tomar esta decisão** ou **Falta confirmar esta decisão**. Eles não substituem este manual. A confirmação de uma área significa que a equipe conferiu todos os seus campos, incluindo a decisão de manter em zero ações opcionais. Um aviso de campo vazio continua pendente mesmo depois de marcar a revisão. Os estados do menu referem-se à última versão salva; valores ainda não salvos precisam ser registrados.
 
-Versão 3.1 - outubro de 2026
+Versão 3.2 - outubro de 2026
 
 Aprenda a interpretar o mercado, discutir decisões e observar suas consequências. Cada rodada representa um mês. As imagens mostram as telas do programa com nomes e situações ilustrativos.
 
@@ -227,7 +248,7 @@ Antes de começar, confirme o nome da turma com o professor, entre nela, forme s
 
 1. Em **Notícias e mercado**, leia a edição disponível e anote duas oportunidades e dois riscos. Confira a data, o setor e as condições da concorrência. Se o professor ainda não publicou a edição, avise-o; não invente produtos para preencher a etapa.
 2. Em **SWOT**, leia os fatores e escolha uma diretriz coerente com o que a empresa consegue oferecer. Em **Porter** e **PESTEL**, examine pressões e mudanças do ambiente. Esses diagnósticos apoiam sua interpretação; não escolhem preços ou investimentos por você.
-3. Em **Segmentação do mercado**, descreva localização e público, escolha cobertura e canais e informe o preço máximo que esse público aceitaria. Consulte o capítulo 11 para entender cada campo.
+3. Em **Segmentação do mercado**, descreva localização e público, escolha cobertura e canais e informe o preço máximo que esse público aceitaria. Consulte a seção Dicionário das decisões comerciais e estratégicas para entender cada campo.
 4. Em **BCG**, registre todos os produtos do mix. Confira crescimento, participação relativa, classificação e se são dados ou projeções. Projeções precisam de premissas escritas.
 5. Em **Produtos e marketing**, complete cada produto: quantidade ou peso de atendimento, preço, posicionamento, canais, cobertura, mídias e serviços. Confira os custos e marque o mix como revisado.
 6. Em **Finanças**, escolha crédito, amortização, prazos e regime quando aplicáveis. Escreva a análise financeira com base nos números da equipe; o sistema não escreve essa decisão por você.
