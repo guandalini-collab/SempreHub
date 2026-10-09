@@ -101,6 +101,7 @@ class DecisaoSimulacao(BaseModel):
     centro_gravidade: Optional[EstudoCentroGravidade] = None
     producao: int = Field(0, ge=0, le=1_000_000)
     comprar_mp: int = Field(0, ge=0, le=1_000_000)
+    horas_extras: float = Field(0.0, ge=0, le=40, description="Horas opcionais por empregado no mês; premissa didática.")
     comprar_maquinas: int = Field(0, ge=0, le=100)
     manutencao: float = Field(0.0, ge=0, le=10_000_000)
     modal: Literal["RAPIDO", "PADRAO", "ECONOMICO"] = "PADRAO"

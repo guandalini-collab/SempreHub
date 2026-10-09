@@ -1,3 +1,4 @@
+import { CONFIGURACAO_MOTOR_PADRAO } from "../../tiposSimulacao";
 import DiagnosticosEmpresa from "../../componentes/DiagnosticosEmpresa";
 import ResultadoProdutos from "../../componentes/ResultadoProdutos";
 import ManualMidias from "../../componentes/ManualMidias";
@@ -5,6 +6,7 @@ import { ResumoAnalises } from "../../componentes/FerramentasEstrategicas";
 import { Conquistas, type Jornada } from "../../componentes/Experiencia";
 import LayoutPainel, { SecaoPainel } from "../../componentes/LayoutPainel";
 import { GestaoMercado, RelatoriosEmpresariaisProfessor } from "../../componentes/MercadoReal";
+import CompetitividadeMercado from "../../componentes/CompetitividadeMercado";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, baixarArquivo } from "../../api";
@@ -136,6 +138,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       {erro && <Aviso>{erro}</Aviso>}
 
       <SecaoPainel id="mercado" ativa={secao}>
+      <CompetitividadeMercado config={turma.parametros?.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} equipes={empresas.length} />
       <GestaoMercado turmaId={turmaId} rodada={dados.turma.rodada_atual} empresas={dados.empresas} />
       </SecaoPainel>
       <SecaoPainel id="midias" ativa={secao}><ManualMidias /></SecaoPainel>

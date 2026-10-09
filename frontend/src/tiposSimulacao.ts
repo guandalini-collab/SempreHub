@@ -40,6 +40,7 @@ export interface EstudoCentroGravidade {
 }
 
 export interface DecisaoSimulacao {
+  horas_extras: number;
   centro_gravidade?: EstudoCentroGravidade | null;
   producao: number;
   comprar_mp: number;
@@ -160,6 +161,7 @@ export const CONFIGURACAO_MOTOR_PADRAO: ConfiguracaoMotor = {
 };
 
 export const DECISAO_SIMULACAO_PADRAO: DecisaoSimulacao = {
+  horas_extras: 0,
   producao: 0,
   comprar_mp: 0,
   comprar_maquinas: 0,

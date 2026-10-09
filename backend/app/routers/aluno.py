@@ -236,6 +236,11 @@ def _validar_decisao(empresa: Empresa, dados: DecisaoEntrada) -> None:
         raise HTTPException(422, "Novos investimentos em máquinas estão disponíveis a partir do terceiro mês, após as duas primeiras rodadas.")
     if empresa.turma.status != StatusTurma.ABERTA:
         raise HTTPException(422, "A turma foi encerrada; não há mais rodadas para decidir.")
+    if dados.simulacao and dados.simulacao.horas_extras:
+        if empresa.turma.modo_jogo != "TRADICIONAL":
+            raise HTTPException(422, "Horas extras de produção estão disponíveis no modo Empresa tradicional.")
+        if empresa.funcionarios + dados.contratar - dados.demitir <= 0:
+            raise HTTPException(422, "Horas extras exigem funcionários; você pode contratar nesta rodada.")
     if dados.demitir > empresa.funcionarios:
         raise HTTPException(422, f"Você só pode demitir até {empresa.funcionarios} funcionário(s).")
     if dados.amortizacao > empresa.divida + dados.emprestimo + 0.01:

@@ -89,6 +89,8 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0):
     avaliacao = avaliar(decisao, turma)
     preparo["avaliacao_estrategica"] = avaliacao
     preparo["alertas"].extend(mensagens(avaliacao))
+    if decisao.emprestimo > 0:
+        preparo["alertas"].append("Crédito bancário tem custo alto: juros mensais reduzem lucro e capital de giro, podem subir com a Selic, e o principal precisa ser devolvido.")
     return preparo
 
 

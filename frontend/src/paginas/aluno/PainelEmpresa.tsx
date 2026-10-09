@@ -3,6 +3,7 @@ import ManualMidias from "../../componentes/ManualMidias";
 import { ControleVisual, ResumoNegocio, Conquistas, FeedResultados, ViradaRodada } from "../../componentes/Experiencia";
 import LayoutPainel, { SecaoPainel } from "../../componentes/LayoutPainel";
 import { EditorMix, MercadoPublicado } from "../../componentes/MercadoReal";
+import CompetitividadeMercado from "../../componentes/CompetitividadeMercado";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, ErroApi } from "../../api";
@@ -266,6 +267,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       </SecaoPainel>
       <SecaoPainel id="conquistas" ativa={secao}><Conquistas jornada={painel.jornada} /></SecaoPainel>
       <SecaoPainel id="mercado" ativa={secao}>
+      <CompetitividadeMercado config={turma.parametros?.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} equipes={painel.total_empresas} />
       <FeedResultados jornada={painel.jornada} aoResultados={() => setSecao("resultados")} />
       <MercadoPublicado visao="mercado" empresaId={empresa.id} rodada={turma.rodada_atual} />
       </SecaoPainel>
@@ -410,9 +412,9 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
 
 function simulacaoInicial(painel: PainelAluno): DecisaoSimulacao | null {
   if (!painel.turma.modo_jogo || painel.turma.modo_jogo === "LEGADO") return null;
-  if (painel.decisao_atual?.simulacao) return { ...painel.decisao_atual.simulacao };
+  if (painel.decisao_atual?.simulacao) return { ...DECISAO_SIMULACAO_PADRAO, ...painel.decisao_atual.simulacao };
   const ultima = painel.ultima_decisao?.simulacao;
-  if (ultima) return { ...DECISAO_SIMULACAO_PADRAO, ...ultima, comprar_mp: 0, comprar_maquinas: 0, aporte: 0 };
+  if (ultima) return { ...DECISAO_SIMULACAO_PADRAO, ...ultima, comprar_mp: 0, comprar_maquinas: 0, aporte: 0, horas_extras: 0 };
   if (painel.turma.modo_jogo === "STARTUP") return { ...DECISAO_SIMULACAO_PADRAO };
   // Sugestão de quantidade inicial; a prévia do servidor calcula o efeito real.
   const estado = painel.empresa.estado_simulacao;
@@ -444,7 +446,7 @@ function decisaoInicial(painel: PainelAluno): DecisaoEntrada {
 function assinaturaArea(d: DecisaoEntrada, area: string) {
   const op = d.simulacao;
   if (area === "decisoes") return JSON.stringify([d.preco, d.marketing, d.pd, d.networking, d.plano_comercial, op?.posicionamento, op?.canal, op?.marketing_digital, op?.salario, op?.beneficio, op?.treinamento]);
-  if (area === "producao") return JSON.stringify([d.contratar, d.demitir, op?.producao, op?.comprar_mp, op?.comprar_maquinas, op?.manutencao, op?.capacidade_nuvem, op?.centro_gravidade, op?.salario, op?.beneficio, op?.treinamento]);
+  if (area === "producao") return JSON.stringify([d.contratar, d.demitir, op?.horas_extras, op?.producao, op?.comprar_mp, op?.comprar_maquinas, op?.manutencao, op?.capacidade_nuvem, op?.centro_gravidade, op?.salario, op?.beneficio, op?.treinamento]);
   if (area === "logistica") return JSON.stringify([op?.modal, op?.centro_gravidade]);
   const { revisao_areas, ...valores } = d;
   return JSON.stringify(valores);
@@ -604,7 +606,7 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
             {d.plano_comercial ? <p className="font-semibold">{reais(d.marketing)} · mídia + produção e serviços</p> : <ControleVisual rotulo="Investimento em marketing" valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} limite={Math.max(1000, empresa.caixa)} />}
           </Campo>
           <Campo rotulo="Pesquisa e desenvolvimento (no mês)" ajuda={`Melhora a qualidade percebida. Índice atual: ${umDecimal(empresa.qualidade)}.`}>
-            <ControleVisual rotulo="Pesquisa e desenvolvimento" valor={d.pd} aoMudar={(v) => atualizar("pd", v)} limite={Math.max(1000, empresa.caixa)} />
+            <ControleVisual rotulo="Tecnologia e melhoria do produto (P&D)" valor={d.pd} aoMudar={(v) => atualizar("pd", v)} limite={Math.max(1000, empresa.caixa)} />
           </Campo>
           <Campo rotulo="Networking e capacitação (no mês)" ajuda="Rede de contadores e parceiros. Networking ≥ 30 evita multas em fiscalizações.">
             <ControleVisual rotulo="Networking e capacitação" valor={d.networking} aoMudar={(v) => atualizar("networking", v)} limite={Math.max(1000, empresa.caixa)} />
@@ -625,6 +627,7 @@ function FormularioDecisao({ painel, aoEnviar, area, aoNavegar }: { painel: Pain
         </div>
         <div hidden={area !== "financas"}>
         <div className="mb-4 rounded-xl border-l-4 border-blue-600 bg-blue-50 p-4 text-sm"><h3 className="font-bold text-blue-900">Planeje antes de enviar</h3><p className="mt-2">Use preço de venda, custo unitário e despesas para analisar a margem e o ponto de equilíbrio. A prévia abaixo reúne os valores calculados para você conferir seu planejamento.</p><p className="mt-2 font-semibold">Preço escolhido: {reais(d.preco)} · Custo unitário: {reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)} · Caixa atual: {reais(empresa.caixa)}</p></div>
+        {d.emprestimo > 0 && <Aviso tipo="info">Atenção: dinheiro do banco tem custo alto e pode comprometer a empresa. Juros estimados deste pedido: até {reais(Math.min(d.emprestimo, Math.max(0, p.limite_credito - empresa.divida)) * p.taxa_juros_mensal)} por mês, além da dívida atual, à taxa de {percentual(p.taxa_juros_mensal, 2)}. Os juros reduzem lucro e capital de giro, podem subir com a Selic e continuam enquanto houver saldo devedor. O principal precisa ser devolvido; crédito depende do caixa e do limite disponível.</Aviso>}
         <Secao titulo="Finanças e tributos">
           <Campo
             rotulo="Novo empréstimo"

@@ -273,3 +273,13 @@ estrutura e força são parâmetros didáticos configurados antes da entrada das
 empresas. No modelo básico, o balanço usa caixa e dívidas; caixa negativo é
 classificado como cheque especial. Os modos avançados incluem os ativos e
 obrigações efetivamente registrados pelos respectivos motores.
+
+## Produção, crédito e avaliação (outubro de 2026)
+
+No modo Empresa tradicional, máquinas e contratação continuam sendo escolhas da equipe. As máquinas compradas passam a produzir no mês seguinte, com depreciação e manutenção; a expansão permanece disponível a partir do mês 3. Horas extras também são opcionais: de 0 a 40 horas mensais por empregado, base didática de 220 horas e adicional de 50%, com os encargos do regime. Aumentam a capacidade de pessoas; máquinas, insumos e demanda continuam limitando o resultado. O custo entra na DRE e no fluxo de caixa. Horas extras não são repetidas automaticamente na rodada seguinte.
+
+Pedidos de empréstimo mostram aviso do custo e estimativa dos juros antes do envio; o servidor também registra o alerta. P&D melhora a qualidade e atratividade do produto e consome caixa. O painel Mercado mostra a quantidade de equipes e concorrentes externos, nível, força e estrutura do cenário.
+
+Os demonstrativos em Consultar resultados mostram a DFC e a necessidade operacional de capital de giro: estoques + contas a receber − contas a pagar. O quadro de liquidez separa essa necessidade do dinheiro em caixa e dos desembolsos. Os demonstrativos avançados se aplicam aos modos Empresa tradicional e Startup; o modelo básico preserva os registros históricos.
+
+O professor recebe uma nota automática de 0 a 10 na Avaliação pedagógica, com exportação CSV: pontuação didática ponderada / 10. Mantêm-se os pesos configuráveis de lucro, patrimônio sem aportes, satisfação e participação. Lucro e patrimônio são comparados entre as equipes (empate = 50/100); critérios sem dados redistribuem os pesos. A nota fica provisória enquanto a turma está aberta e final após encerramento. Sem rodadas não há nota. Investir ou comprar não gera pontos diretamente. O lançamento da nota acadêmica é feito pelo professor.

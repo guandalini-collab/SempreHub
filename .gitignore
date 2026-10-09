@@ -3,6 +3,7 @@ node_modules/
 backend/venv/
 venv/
 .venv/
+.venv-validacao/
 
 # Python
 __pycache__/

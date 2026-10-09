@@ -135,7 +135,7 @@ def decisao_vigente(db: Session, empresa: Empresa, rodada: int, turma: Turma) ->
         simulacao=(
             {**(anterior.simulacao if anterior and anterior.simulacao else {}),
              "comprar_mp": 0, "comprar_maquinas": 0, "aporte": 0,
-             "manutencao": 0, "treinamento": 0}
+             "manutencao": 0, "treinamento": 0, "horas_extras": 0}
             if turma.modo_jogo != "LEGADO" else None
         ),
     )
@@ -337,6 +337,8 @@ def _aplicar_pessoal(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calcu
 
 def _aplicar_financiamento(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo) -> None:
     pedido = max(0.0, decisao.emprestimo)
+    if pedido:
+        c.alertas.append("Crédito bancário tem custo alto: juros reduzem lucro e capital de giro; o principal também precisa ser devolvido.")
     if pedido > 0:
         if empresa.caixa < 0:
             c.alertas.append("Empréstimo negado: o banco não concede crédito a empresa com caixa negativo.")

@@ -126,6 +126,8 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     regime = e.get("regime_tributario", "SIMPLES_NACIONAL")
     fatores = {"MEI": 1.45, "SIMPLES_NACIONAL": 1.45, "LUCRO_PRESUMIDO": 1.82}
     folha = _produto(funcionarios, salario, fatores.get(regime, 1.45))
+    horas_extras = max(0, min(40, op.get("horas_extras", 0))) if funcionarios else 0
+    custo_horas_extras = _produto(funcionarios, salario / 220, horas_extras, 1.5, fatores.get(regime, 1.45))
     beneficios = _produto(funcionarios, beneficio)
     rescisoes = _produto(demitidos, salario)
     fator_rh = 0.75 + 0.25 * rh["moral"] / 100 + 0.002 * rh["qualificacao"]
@@ -133,7 +135,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     if e.get("autoeficacia", 60) < 30:
         produtividade *= 0.9
         alertas.append("Autoeficácia baixa: produtividade reduzida em 10%.")
-    capacidade_trabalho = (1 + funcionarios) * produtividade * fator_rh
+    capacidade_trabalho = (1 + funcionarios + funcionarios * horas_extras / 220) * produtividade * fator_rh
 
     manutencao = _dinheiro(max(0, op.get("manutencao", 0)))
     ativas = [m for m in s["maquinas"] if m["ativacao"] <= rodada]
@@ -210,7 +212,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     custos_fixos = _dinheiro(p.get("custos_fixos_mensais", 1500))
     marketing, pd, networking = (_dinheiro(d.get(k, 0)) for k in ("marketing", "pd", "networking"))
     multas = _dinheiro(p.get("multas", 0))
-    despesas_pagas = _soma([folha, beneficios, treinamento, rescisoes, manutencao,
+    despesas_pagas = _soma([folha, custo_horas_extras, beneficios, treinamento, rescisoes, manutencao,
                             custos_fixos, marketing, pd, networking, juros, multas])
 
     from ..custos_campanhas import investimento_efetivo
@@ -247,6 +249,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         "capacidade": pa["quantidade"], "capacidade_produtiva": capacidade_produtiva,
         "capacidade_maquinas": capacidade_maquinas, "utilizacao_maquinas": utilizacao,
         "atratividade": atratividade, "marca": marca, "qualidade": qualidade,
+        "horas_extras": horas_extras, "custo_horas_extras": custo_horas_extras,
         "folha": folha, "juros": juros, "juros_cheque": juros_cheque,
         "gastos_previstos": _soma([despesas_pagas, depreciacao, custo_refugo]),
         "beneficios": beneficios, "treinamento": treinamento, "rescisoes": rescisoes,
@@ -302,6 +305,7 @@ def apurar(preparo: dict, demanda: float,
     comissao_canal = _soma(l["comissao_canal"] for l in linhas) if linhas else _produto(receita, c["taxa_comissao_canal"])
     dre = {
         "receita": receita, "impostos": impostos, "cmv": cmv, "folha": c["folha"],
+        "horas_extras": c["custo_horas_extras"],
         "custos_fixos": _dinheiro(p.get("custos_fixos_mensais", 1500)),
         "marketing": _dinheiro(d.get("marketing", 0)), "pd": _dinheiro(d.get("pd", 0)),
         "networking": _dinheiro(d.get("networking", 0)), "rescisoes": c["rescisoes"],
@@ -339,7 +343,7 @@ def apurar(preparo: dict, demanda: float,
            "financiamento": financiamento, "variacao": variacao, "caixa_final": caixa}
     operacao = {k: c[k] for k in ("producao_planejada", "producao_real", "producao_boa", "refugo",
                                 "capacidade_produtiva", "capacidade_maquinas", "utilizacao_maquinas",
-                                "estoque_mp_inicial", "estoque_pa_inicial", "turnover")}
+                                "estoque_mp_inicial", "estoque_pa_inicial", "turnover", "horas_extras", "custo_horas_extras")}
     operacao.update(localizacao)
     operacao["produtos"]=linhas
     operacao.update(demanda=demanda, vendas=vendas, ruptura=ruptura,

@@ -149,6 +149,7 @@ export interface PrevisaoDecisao {
 }
 
 export interface Dre {
+  horas_extras?: number;
   refugos?: number;
   frete?: number;
   armazenagem?: number;

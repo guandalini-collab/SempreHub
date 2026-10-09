@@ -235,6 +235,8 @@ def gerar_relatorio(turma: Turma) -> dict:
         ranking.append({
             "empresa_id": empresa["id"], "empresa": empresa["nome"],
             "pontuacao_didatica": round(pontuacao, 2) if pontuacao is not None else None,
+            "nota_semestre": round(min(10.0, max(0.0, pontuacao / 10)), 2) if pontuacao is not None else None,
+            "nota_provisoria": turma.rodada_atual <= turma.total_rodadas,
             "componentes": {c: round(v, 2) if v is not None else None for c, v in componentes.items()},
             **{chave: resumo[chave] for chave in ("lucro_acumulado", "patrimonio_sem_aportes", "satisfacao", "participacao")},
         })
@@ -248,7 +250,7 @@ def gerar_relatorio(turma: Turma) -> dict:
             "rodada_atual": turma.rodada_atual, "total_rodadas": turma.total_rodadas,
         },
         "rubrica": {
-            "tipo": "PONTUACAO_DIDATICA", "escala": [0, 100], "pesos": pesos,
+            "tipo": "PONTUACAO_DIDATICA", "escala": [0, 100], "escala_nota": [0, 10], "formula_nota": "pontuacao_didatica / 10", "pesos": pesos,
             "criterios": {
                 "lucro": "Lucro acumulado: comparação entre empresas, de 0 a 100; empate recebe 50.",
                 "patrimonio": "Patrimônio do último encerramento menos aportes: comparação entre empresas; empate recebe 50.",
@@ -283,7 +285,7 @@ def relatorio_csv(relatorio: dict) -> str:
     escritor.writerow([
         "Empresa", "Rodada", "Modo", "Pontuação didática (não é nota)", "Receita", "Lucro líquido",
         "Margem líquida", "Endividamento", "ROE", "Capital de giro", "Satisfação", "CAC", "LTV", "Churn", "Runway",
-        "DRE", "DFC", "Balanço", "Operação", "Decisão", "Assinaturas", "Participação individual", "Alertas", "Rubrica",
+        "DRE", "DFC", "Balanço", "Operação", "Decisão", "Assinaturas", "Participação individual", "Alertas", "Rubrica", "Nota automática / 10", "Situação da nota",
     ])
     pontuacoes = {r["empresa_id"]: r["pontuacao_didatica"] for r in relatorio["ranking"]}
     codificar = lambda valor: json.dumps(valor, ensure_ascii=False, allow_nan=False) if valor is not None else ""
@@ -297,5 +299,7 @@ def relatorio_csv(relatorio: dict) -> str:
                 *[codificar(rodada[k]) for k in ("dre", "dfc", "balanco", "operacao", "decisao")],
                 codificar(rodada["participacao"]["assinaturas"]), codificar(rodada["participacao"]),
                 codificar(rodada["alertas"]), codificar(relatorio["rubrica"]),
+                _csv_numero(next((r.get("nota_semestre") for r in relatorio["ranking"] if r["empresa_id"] == empresa["id"]), None)),
+                "Provisória" if next((r.get("nota_provisoria", True) for r in relatorio["ranking"] if r["empresa_id"] == empresa["id"]), True) else "Final",
             ])
     return "\ufeff" + saida.getvalue()

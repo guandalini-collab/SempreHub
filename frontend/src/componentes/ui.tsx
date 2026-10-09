@@ -351,6 +351,7 @@ const LINHAS_DRE: { chave: keyof Dre; rotulo: string }[] = [
   { chave: "frete", rotulo: "(−) Frete de entrega" },
   { chave: "armazenagem", rotulo: "(−) Armazenagem" },
   { chave: "depreciacao", rotulo: "(−) Depreciação das máquinas" },
+  { chave: "horas_extras", rotulo: "(−) Horas extras com encargos" },
   { chave: "folha", rotulo: "(−) Folha de pagamento com encargos" },
   { chave: "beneficios", rotulo: "(−) Benefícios dos funcionários" },
   { chave: "treinamento", rotulo: "(−) Treinamento" },

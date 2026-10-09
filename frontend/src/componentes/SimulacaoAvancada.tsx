@@ -28,6 +28,11 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
   const mudar = <K extends keyof DecisaoSimulacao>(campo: K, valor: DecisaoSimulacao[K]) => aoMudar({ ...valores, [campo]: valor });
   return <div className="space-y-6">
     {modo === "TRADICIONAL" && <>
+      <Secao titulo="Horas extras opcionais da equipe" oculto={area !== "producao"}>
+        <Campo rotulo="Horas extras por funcionário neste mês" ajuda="Pode deixar em zero. Até 40 h por empregado, com adicional de 50% e encargos. Base didática: salário / 220 h. Aumenta a capacidade de trabalho, mas máquinas e matéria-prima ainda limitam a produção; o gasto reduz lucro e caixa.">
+          <EntradaNumero valor={valores.horas_extras ?? 0} max={40} sufixo="h" aoMudar={(v) => mudar("horas_extras", v)} />
+        </Campo>
+      </Secao>
       <Secao titulo="Produção e investimento" oculto={area !== "producao"}>
         <Campo rotulo="Produção planejada" ajuda="Unidades a produzir neste mês. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><ControleVisual rotulo="producao" moeda={false} inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} limite={10000} /></Campo>
         <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar neste mês. O que não for consumido continua no estoque para as próximas rodadas."><ControleVisual rotulo="comprar mp" moeda={false} inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} limite={10000} /></Campo>
@@ -146,10 +151,20 @@ export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao 
           ["Total do passivo", balanco.pagar + balanco.divida],
           ["Patrimônio líquido", balanco.patrimonio],
           ["Passivo + patrimônio líquido", balanco.pagar + balanco.divida + balanco.patrimonio],
-          ["Capital de giro", balanco.capital_giro],
+          ["Necessidade de capital de giro (estoques + receber − pagar)", balanco.receber + balanco.estoques - balanco.pagar],
         ]} />
       </Cartao>
     </div>
+    <Cartao titulo="Capital de giro e liquidez">
+      <ListaFinanceira linhas={[
+        ["Dinheiro disponível no caixa", balanco.caixa],
+        ["Recursos presos no ciclo operacional", balanco.receber + balanco.estoques - balanco.pagar],
+        ["Contas a pagar pendentes", balanco.pagar],
+        ["Desembolsos operacionais deste mês", dfc.pagamentos],
+      ]} />
+      <p className="mt-3 text-xs text-slate-600">Estoque e vendas a prazo exigem financiamento até o dinheiro entrar. Contratação, horas extras, P&D e juros consomem caixa; máquinas geram saída de investimento. Caixa negativo exige atenção. A necessidade operacional não é dinheiro disponível.</p>
+      {balanco.caixa < 0 && <p className="mt-2 font-semibold text-red-700">Caixa negativo: a empresa depende de financiamento e pode pagar cheque especial.</p>}
+    </Cartao>
     <Cartao titulo={detalhes.modo === "STARTUP" ? "Aquisição e retenção de clientes" : "Produção e entregas da rodada"}>
       <dl className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
         {detalhes.modo === "STARTUP" ? <>
@@ -164,6 +179,8 @@ export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao 
           <Operacao detalhes={detalhes} campo="runway" rotulo="Meses de caixa estimados" tipo="decimal" />
           <Operacao detalhes={detalhes} campo="participacao_fundadores" rotulo="Participação dos fundadores" tipo="percentual" />
         </> : <>
+          <Operacao detalhes={detalhes} campo="horas_extras" rotulo="Horas extras por funcionário" tipo="decimal" />
+          <Operacao detalhes={detalhes} campo="custo_horas_extras" rotulo="Custo das horas extras" tipo="moeda" />
           <Operacao detalhes={detalhes} campo="producao_planejada" rotulo="Produção planejada" />
           <Operacao detalhes={detalhes} campo="producao_real" rotulo="Produção realizada" />
           <Operacao detalhes={detalhes} campo="producao_boa" rotulo="Produtos aproveitáveis" />
