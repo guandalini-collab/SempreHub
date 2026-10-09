@@ -1,6 +1,6 @@
 # SempreHub - Manual de mídias e campanhas
 
-Versão 3.0 - outubro de 2026
+Versão 3.1 - outubro de 2026
 
 ## A história e o conceito da logomarca SempreHub
 

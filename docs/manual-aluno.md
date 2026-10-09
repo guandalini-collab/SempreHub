@@ -57,7 +57,7 @@ O menu lateral é o ponto de partida. Suas categorias e submenus aparecem aberto
 
 Os campos de decisão mostram pendências, como **Falta tomar esta decisão** ou **Falta confirmar esta decisão**. Eles não substituem este manual. A confirmação de uma área significa que a equipe conferiu todos os seus campos, incluindo a decisão de manter em zero ações opcionais. Um aviso de campo vazio continua pendente mesmo depois de marcar a revisão. Os estados do menu referem-se à última versão salva; valores ainda não salvos precisam ser registrados.
 
-Versão 3.0 - outubro de 2026
+Versão 3.1 - outubro de 2026
 
 Aprenda a interpretar o mercado, discutir decisões e observar suas consequências. Cada rodada representa um mês. As imagens mostram as telas do programa com nomes e situações ilustrativos.
 
