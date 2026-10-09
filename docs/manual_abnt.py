@@ -4,7 +4,7 @@ A4, margens 3/2 cm, corpo 12, entrelinha 1,5, seções e sumário navegável.
 from pathlib import Path
 from io import BytesIO
 import html,re,shutil
-from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,PageBreak,Image,KeepTogether,Table,TableStyle
+from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,PageBreak,Image,KeepTogether,Table,TableStyle,Flowable
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
@@ -33,6 +33,14 @@ def inline(text):
  text=re.sub(r'\*\*(.+?)\*\*',r'<b>\1</b>',text)
  text=re.sub(r'`(.+?)`',r'\1',text)
  return text
+class VectorFigure(Flowable):
+ def __init__(self,path,placements):
+  super().__init__();self.path=path;self.placements=placements
+  page=PdfReader(path).pages[0];self.width=WIDTH;self.height=WIDTH*float(page.mediabox.height)/float(page.mediabox.width)
+ def draw(self):
+  # multiBuild repeats layout; replace the previous pass's placement by key.
+  x,y=self.canv.absolutePosition(0,0)
+  self.placements[self.path]=(self.canv.getPageNumber()-1,x,y,self.width)
 class Manual(SimpleDocTemplate):
  def beforeDocument(self):self.text_start=None
  def afterFlowable(self,f):
@@ -51,12 +59,12 @@ def build(stem):
  source=(DOCS/f'{stem}.md').read_text()
  blocks=[b.strip() for b in re.split(r'\n\s*\n',source) if b.strip()]
  covertitle=ParagraphStyle('CoverTitle',parent=STYLES['Center'],fontName='Helvetica-Bold',textColor=BLUE)
- story=[Spacer(1,145),Paragraph('PROFESSOR GUANDALINI',STYLES['Center']),Spacer(1,40),Paragraph('SEMPREHUB',covertitle),Paragraph(title.upper(),covertitle),Paragraph(subtitle,STYLES['Center']),Spacer(1,36),Paragraph(audience,STYLES['Center']),Paragraph('Autor e Fundador: Professor Guandalini',STYLES['Center']),Spacer(1,30),Paragraph('Edição 3.2<br/>2026',STYLES['Center']),PageBreak()]
+ story=[Spacer(1,145),Paragraph('PROFESSOR GUANDALINI',STYLES['Center']),Spacer(1,40),Paragraph('SEMPREHUB',covertitle),Paragraph(title.upper(),covertitle),Paragraph(subtitle,STYLES['Center']),Spacer(1,36),Paragraph(audience,STYLES['Center']),Paragraph('Autor e Fundador: Professor Guandalini',STYLES['Center']),Spacer(1,30),Paragraph('Edição 3.3<br/>2026',STYLES['Center']),PageBreak()]
  story += [Paragraph('PROFESSOR GUANDALINI',STYLES['Center']),Spacer(1,120),Paragraph('SEMPREHUB',covertitle),Paragraph(title.upper(),covertitle),Paragraph(subtitle,STYLES['Center']),Spacer(1,45)]
  nature=ParagraphStyle('Nature',parent=STYLES['Body'],leading=12,leftIndent=WIDTH/2,alignment=4)
- story += [Paragraph('Manual institucional do SempreHub destinado a '+audience.lower()+'. Orienta o uso pedagógico do simulador e a compreensão das decisões empresariais. Conceito, marca e autoria: Professor Guandalini.',nature),Spacer(1,70),Paragraph('Edição 3.2<br/>2026',STYLES['Center']),PageBreak()]
+ story += [Paragraph('Manual institucional do SempreHub destinado a '+audience.lower()+'. Orienta o uso pedagógico do simulador e a compreensão das decisões empresariais. Conceito, marca e autoria: Professor Guandalini.',nature),Spacer(1,70),Paragraph('Edição 3.3<br/>2026',STYLES['Center']),PageBreak()]
  toc=TableOfContents();toc.levelStyles=[STYLES['TOC'],STYLES['TOCSub']];toc.dotsMinLevel=0
- chapter=sub=figure=tablecount=0;toc_added=False;lastheading='';markup=[]
+ chapter=sub=figure=tablecount=0;toc_added=False;lastheading='';markup=[];placements={}
  for block in blocks:
   if block=='---' or block.startswith('<') or block.startswith('# ') or block.startswith('Versão '):continue
   if block.startswith('##'):
@@ -77,6 +85,11 @@ def build(stem):
   match=re.fullmatch(r'!\[(.*?)\]\((.*?)\)',block)
   if match:
    caption,rel=match.groups();path=DOCS/rel
+   if path.suffix=='.pdf':
+    figure+=1
+    story += [PageBreak(),KeepTogether([Paragraph(f'Figura {figure} - {inline(caption)}',STYLES['Small']),VectorFigure(path,placements),Spacer(1,8),Paragraph('Fonte: Professor Guandalini (2026). Diagrama explicativo sobre a logomarca oficial.',STYLES['Small'])])]
+    markup.append(f'<figure><object data="../{rel}" type="application/pdf"></object><figcaption>{inline(caption)}</figcaption></figure>')
+    continue
    with PILImage.open(path) as im:w,h=im.size
    scale=min(WIDTH/w,390/h);figure+=1
    story.append(KeepTogether([Paragraph(f'Figura {figure} - {inline(caption)}',STYLES['Small']),Image(str(path),width=w*scale,height=h*scale),Spacer(1,6),Paragraph('Fonte: SempreHub, acervo do Professor Guandalini (2026). Tela com dados ilustrativos.',STYLES['Small'])]));markup.append(f'<figure><img src="../{rel}"><figcaption>{inline(caption)}</figcaption></figure>');continue
@@ -105,7 +118,7 @@ def build(stem):
    canvas.setFillColor(BLUE);canvas.setFont('Helvetica',8);canvas.drawRightString(w-RIGHT,h-68,title)
    canvas.setStrokeColor(CYAN);canvas.setLineWidth(.5);canvas.line(LEFT,h-73,w-RIGHT,h-73)
    canvas.setFont('Helvetica',8);canvas.setFillColor(BLUE);canvas.drawString(LEFT,35,'Conceito e marca: Professor Guandalini')
-   canvas.drawRightString(w-RIGHT,35,'SempreHub | Edição 3.2')
+   canvas.drawRightString(w-RIGHT,35,'SempreHub | Edição 3.3')
    if doc.text_start is not None and doc.page>=doc.text_start:
     canvas.setFillColor(BLACK);canvas.setFont('Helvetica',10);canvas.drawRightString(w-RIGHT,h-2*cm,str(doc.page-1))
   canvas.restoreState()
@@ -118,7 +131,10 @@ def build(stem):
   scale=width/float(logo.mediabox.width);height=float(logo.mediabox.height)*scale
   y=A4[1]-TOP-height if index==0 else A4[1]-69
   p.merge_transformed_page(logo,Transformation().scale(scale).translate(LEFT,y),over=True,expand=False)
+ for path,(index,x,y,width) in placements.items():
+  diagram=PdfReader(path).pages[0];scale=width/float(diagram.mediabox.width)
+  writer.pages[index].merge_transformed_page(diagram,Transformation().scale(scale).translate(x,y),over=True,expand=False)
  pdf=OUT/f'{stem}.pdf'
  with pdf.open('wb') as f:writer.write(f)
  (OUT/f'{stem}.html').write_text('<!doctype html><html lang="pt-BR"><meta charset="UTF-8"><title>'+title+'</title><link rel="stylesheet" href="../manual.css"><body><h1>'+title+'</h1>'+ '\n'.join(markup)+'</body></html>')
- shutil.copyfile(pdf,PUBLIC/pdf.name);print(f'{stem}: {len(writer.pages)} páginas, edição 3.2, marca vetorial e formatação ABNT adaptada.')
+ shutil.copyfile(pdf,PUBLIC/pdf.name);print(f'{stem}: {len(writer.pages)} páginas, edição 3.3, marca vetorial e formatação ABNT adaptada.')

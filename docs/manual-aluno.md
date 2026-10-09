@@ -24,6 +24,8 @@ Criador e Fundador do SempreHub — Simulador de Empreendedorismo
 
 **SEMPRE** expressa constância, aprendizado contínuo e resiliência. Empreender é um ciclo de tentativas, análise de resultados, ajustes e evolução. **HUB** identifica um centro conector: estudantes, departamentos, gestão e mercado competitivo se encontram em um mesmo ecossistema.
 
+![Anatomia da logomarca SempreHub: departamentos, conexões, tipografia e núcleos centrais](diagramas/anatomia-marca-aluno.pdf)
+
 ### O símbolo: a rede de gestão
 
 Os nós periféricos, em azul e ciano, representam os seis departamentos vitais: Pesquisa e Desenvolvimento (P&D), Produção, Logística, Marketing, Recursos Humanos (RH) e Finanças. Eles mostram uma empresa cujas áreas trabalham em conjunto.
@@ -78,7 +80,7 @@ O menu lateral é o ponto de partida. Suas categorias e submenus aparecem aberto
 
 Os campos de decisão mostram pendências, como **Falta tomar esta decisão** ou **Falta confirmar esta decisão**. Eles não substituem este manual. A confirmação de uma área significa que a equipe conferiu todos os seus campos, incluindo a decisão de manter em zero ações opcionais. Um aviso de campo vazio continua pendente mesmo depois de marcar a revisão. Os estados do menu referem-se à última versão salva; valores ainda não salvos precisam ser registrados.
 
-Versão 3.2 - outubro de 2026
+Versão 3.3 - outubro de 2026
 
 Aprenda a interpretar o mercado, discutir decisões e observar suas consequências. Cada rodada representa um mês. As imagens mostram as telas do programa com nomes e situações ilustrativos.
 
