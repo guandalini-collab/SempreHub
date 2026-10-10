@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import CORS_ORIGINS, FRONTEND_DIST
 from .migracoes import preparar_banco
-from .routers import aluno, auth, professor, relatorios, educacao, aprendizagem, mercado
+from .routers import aluno, auth, professor, relatorios, educacao, aprendizagem, mercado, manuais
 
 preparar_banco()
 
@@ -32,6 +32,7 @@ app.include_router(relatorios.router)
 app.include_router(educacao.router)
 app.include_router(aprendizagem.router)
 app.include_router(mercado.router)
+app.include_router(manuais.router)
 
 
 @app.get("/api/saude")
@@ -47,6 +48,8 @@ if FRONTEND_DIST.is_dir() and (FRONTEND_DIST / "index.html").is_file():
 
     @app.get("/{caminho:path}", include_in_schema=False)
     def frontend(caminho: str):
+        if caminho.startswith("manuais/"):
+            raise HTTPException(401, "Entre no sistema para acessar os manuais.")
         if caminho.startswith("api/"):
             raise HTTPException(404, "Rota não encontrada.")
         arquivo = (FRONTEND_DIST / caminho).resolve()

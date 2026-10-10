@@ -21,6 +21,7 @@ interface Relatorio {
     satisfacao: number | null;
     participacao: number | null;
   }[];
+  empresas?: {id:number;nome:string;rodadas:{rodada:number;engine_version?:string}[]}[];
   observacoes: string[];
 }
 
@@ -77,6 +78,7 @@ export default function RelatorioPedagogico({ turmaId, rodada, temResultados, ab
           <tbody>{dados.ranking.map((r) => <tr key={r.empresa_id} className="border-t border-slate-100"><td className="py-2 font-semibold text-ouro">{r.posicao == null ? "—" : `${r.posicao}º`}</td><td className="py-2"><button className="font-semibold text-marinho underline" onClick={() => abrirEmpresa(r.empresa_id)}>{r.empresa}</button></td><td className="py-2 text-right font-semibold text-marinho">{r.nota_semestre == null ? "—" : r.nota_semestre.toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2})}<span className="block text-xs font-normal text-slate-500">{r.nota_semestre == null ? "Sem rodadas" : r.nota_provisoria ? "Provisória" : "Final"}</span></td><td className="py-2 text-right">{reais(r.lucro_acumulado)}</td><td className="py-2 text-right">{r.patrimonio_sem_aportes == null ? "—" : reais(r.patrimonio_sem_aportes)}</td><td className="py-2 text-right">{r.satisfacao == null ? "—" : umDecimal(r.satisfacao)}</td><td className="py-2 text-right">{r.participacao == null ? "—" : percentual(r.participacao)}</td></tr>)}</tbody>
         </table>
       </div>
+      <details className="mt-4 rounded-lg border border-blue-100 p-3"><summary className="cursor-pointer font-semibold">Versão das regras por rodada</summary><ul className="mt-2 space-y-1 text-xs">{dados.empresas?.flatMap(e=>e.rodadas.map(r=><li key={`${e.id}-${r.rodada}`}>{e.nome} · rodada {r.rodada}: {r.engine_version??'1.0.0-legacy'}</li>))}</ul></details>
       {dados.observacoes.length > 0 && <ul className="mt-4 space-y-1 text-xs text-slate-500">{dados.observacoes.map((o) => <li key={o}>{o}</li>)}</ul>}
       <p className="mt-3 text-xs text-slate-500">O arquivo completo inclui todas as rodadas, decisões, demonstrativos e registros de participação da equipe.</p>
     </>}

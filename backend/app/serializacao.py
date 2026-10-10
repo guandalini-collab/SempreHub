@@ -1,5 +1,7 @@
 """Conversão dos modelos em dicionários enviados ao navegador."""
 
+from .motor.versionamento import versao_snapshot, snapshot_para_leitura
+
 from typing import Any, Dict, List, Optional
 
 from .models import Decisao, Empresa, EventoRodada, Resultado, Turma, Usuario
@@ -97,8 +99,9 @@ def decisao(d: Optional[Decisao]) -> Optional[Dict[str, Any]]:
 
 def resultado(r: Resultado) -> Dict[str, Any]:
     dados = {
+        "engine_version": versao_snapshot(r.detalhes_simulacao),
         "produtos_resultado": (r.detalhes_simulacao or {}).get("produtos") or (r.detalhes_simulacao or {}).get("operacao",{}).get("produtos",[]),
-        "detalhes_simulacao": r.detalhes_simulacao if (r.detalhes_simulacao or {}).get("dfc") else None,
+        "detalhes_simulacao": snapshot_para_leitura(r.detalhes_simulacao) if (r.detalhes_simulacao or {}).get("dfc") else None,
         "balanco_basico": None if (r.detalhes_simulacao or {}).get("balanco") else {
             "caixa": max(0, r.caixa_final),
             "emprestimos": r.divida_final,

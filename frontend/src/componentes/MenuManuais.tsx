@@ -1,3 +1,4 @@
+import LinkManual from "./LinkManual";
 import React, {useEffect, useRef} from "react";
 
 export const manuais = [
@@ -25,8 +26,8 @@ export default function MenuManuais({perfil}: {perfil?: string}) {
         <p className="font-semibold">{m.titulo}</p>
         <p className="mt-1 text-xs text-slate-600">{m.descricao}</p>
         <div className="mt-2 flex gap-4 text-xs font-semibold">
-          <a href={`/manuais/${m.arquivo}.pdf`} download={`SempreHub-${m.arquivo}.pdf`} className="rounded bg-marinho px-3 py-2 text-white hover:bg-blue-800" aria-label={`Baixar PDF: ${m.titulo}`}>Baixar PDF</a>
-          <a href={`/manuais/${m.arquivo}.pdf`} target="_blank" rel="noopener noreferrer" className="py-2 underline" aria-label={`Visualizar: ${m.titulo}`}>Visualizar</a>
+          <LinkManual arquivo={m.arquivo} baixar className="rounded bg-marinho px-3 py-2 text-white hover:bg-blue-800" aria-label={`Baixar PDF: ${m.titulo}`}>Baixar PDF</LinkManual>
+          <LinkManual arquivo={m.arquivo} className="py-2 underline" aria-label={`Visualizar: ${m.titulo}`}>Visualizar</LinkManual>
         </div>
       </li>)}</ul>
     </nav>

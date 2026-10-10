@@ -49,7 +49,10 @@ def test_portfolio_apura_sem_duplicar_caixa_ou_capacidade(cliente,professor,monk
         estado=painel['empresa']['estado_simulacao'];stocks=estado['estoques_produtos']
         assert sum(s['estoque_pa']['quantidade'] for s in stocks.values())==estado['estoque_pa']['quantidade']
         assert sum(s['estoque_pa']['valor'] for s in stocks.values())==pytest.approx(estado['estoque_pa']['valor'])
-        assert sum(l['vendas']+l['estoque_final']['quantidade'] for l in linhas)==100
+        op=resultado['detalhes_simulacao']['operacao']
+        assert sum(l['vendas']+l['estoque_final']['quantidade'] for l in linhas)+op['refugo']==op['producao_real']
+        assert op['producao_real']==100
+        assert op['refugo']==2
     if modo!='LEGADO':
         b=resultado['detalhes_simulacao']['balanco'];dfc=resultado['detalhes_simulacao']['dfc']
         assert b['caixa']+b['receber']+b['estoques']+b['imobilizado']==pytest.approx(b['pagar']+b['divida']+b['patrimonio'],abs=.01)

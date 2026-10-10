@@ -1,3 +1,4 @@
+import IndicadoresDepartamentais, { AREAS_INDICADORES } from "../../componentes/IndicadoresDepartamentais";
 import CentralManuais from "../../componentes/CentralManuais";
 import ResultadoProdutos from "../../componentes/ResultadoProdutos";
 import ManualMidias from "../../componentes/ManualMidias";
@@ -114,6 +115,10 @@ const ITENS_PAINEL = [
     "simbolo": "▥",
     "grupo": "Resultados e evolução"
   },
+  ...AREAS_INDICADORES.map(a => ({id: `resultado-${a.id}`, titulo: a.titulo, descricao: "Consulte os valores da rodada e interprete-os com sua equipe usando o manual.", simbolo: "", grupo: "Resultados e evolução", pai: "resultados"})),
+  {id:"demonstrativos",titulo:"DRE e balanço",descricao:"Demonstrativos e resultado do mês.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
+  {id:"evolucao",titulo:"Evolução por rodada",descricao:"Compare caixa, lucro e participação ao longo do tempo.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
+  {id:"historico",titulo:"Histórico detalhado",descricao:"Consulte as decisões e os resultados anteriores.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {
     "id": "relatorios",
     "titulo": "Relatórios da empresa",
@@ -201,7 +206,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   }
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL.map(i => ({...i, ...(["mercado", "decisoes", "financas", "producao", "logistica", "equipe", "resultados"].includes(i.id) ? {grupo: "Rodada atual", pai: "rodada"} : {}), estado: i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL" ? "Sem decisão neste modelo" : (AREAS_DECISAO.includes(i.id) || ["pd", "rh"].includes(i.id)) ? painel.decisao_atual?.enviada_em ? "Enviada" : painel.decisao_atual?.revisao_areas?.[(AREA_REVISAO[i.id] || i.id) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>] ? "Rascunho salvo · conferido" : "Decisão pendente" : undefined}))} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · acompanhe a rodada" : "Decisão pendente · prepare e envie" }}>
+    <LayoutPainel itens={ITENS_PAINEL.map(i => ({...i, ...(["mercado", "decisoes", "financas", "producao", "logistica", "equipe"].includes(i.id) ? {grupo: "Rodada atual", pai: "rodada"} : {}), estado: i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL" ? "Sem decisão neste modelo" : (AREAS_DECISAO.includes(i.id) || ["pd", "rh"].includes(i.id)) ? painel.decisao_atual?.enviada_em ? "Enviada" : painel.decisao_atual?.revisao_areas?.[(AREA_REVISAO[i.id] || i.id) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>] ? "Rascunho salvo · conferido" : "Decisão pendente" : undefined}))} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · acompanhe a rodada" : "Decisão pendente · prepare e envie" }}>
       <SecaoPainel id="rodada" ativa={secao}>
         <Cartao titulo={encerrada ? "Simulação concluída" : `O que fazer na rodada ${turma.rodada_atual}`}>
           <p className="mb-5 text-sm text-slate-600">{encerrada ? "Consulte os resultados e os relatórios da sua empresa." : painel.decisao_atual?.enviada_em ? "O líder enviou a decisão. Acompanhe os resultados quando a rodada encerrar." : "Siga os passos no menu lateral. Produtos, finanças, produção e logística fazem parte de uma única decisão da rodada."}</p>
@@ -303,7 +308,9 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
           )}
         </div>
       </SecaoPainel>
-      <SecaoPainel id="resultados" ativa={secao}>
+      <SecaoPainel id="resultados" ativa={secao}><Cartao titulo="Resultados da empresa"><p>Selecione uma área no submenu lateral. Compare os valores e consulte o manual do aluno para interpretar os indicadores antes de decidir a próxima rodada.</p>{ultimo&&<p className="mt-4 font-semibold">Última rodada concluída: {ultimo.rodada} · Caixa: {reais(ultimo.caixa_final)} · Lucro líquido: {reais(ultimo.dre.lucro_liquido)}</p>}</Cartao></SecaoPainel>
+      {AREAS_INDICADORES.map(a=><SecaoPainel key={a.id} id={`resultado-${a.id}`} ativa={secao}><IndicadoresDepartamentais area={a.id} resultado={ultimo}/></SecaoPainel>)}
+      <SecaoPainel id="demonstrativos" ativa={secao}>
       {ultimo && <IndicadoresFinanceiros resultado={ultimo} />}
         <div className="grid gap-6 xl:grid-cols-2">
           <Cartao titulo={ultimo ? `Resultado do mês ${ultimo.rodada}` : "Resultado do mês"}>
@@ -369,6 +376,8 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
           </Cartao>
         </div>
 
+      </SecaoPainel>
+      <SecaoPainel id="evolucao" ativa={secao}>
       {resultados.length > 0 && (
         <div className="grid gap-6 lg:grid-cols-2">
           <Cartao titulo="Caixa e lucro mensal">
@@ -390,7 +399,9 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
         </div>
       )}
 
-      {resultados.length > 0 && <Historico painel={painel} />}
+      </SecaoPainel>
+      <SecaoPainel id="historico" ativa={secao}>
+      {resultados.length > 0 ? <Historico painel={painel} /> : <Cartao titulo="Histórico"><p>Aguarde a primeira rodada concluída.</p></Cartao>}
 
       </SecaoPainel>
       <ViradaRodada painel={painel} podeAbrir={!eventoAberto} />
@@ -787,8 +798,8 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
   const { dre, detalhes_simulacao: detalhes } = resultado;
   const margem = dre.receita > 0 ? dre.lucro_liquido / dre.receita : null;
   const b = detalhes?.balanco;
-  const ativos = b ? b.caixa + b.receber + b.estoques + b.imobilizado : null;
-  const passivos = b ? b.pagar + b.divida : null;
+  const ativos = b ? (b.ativo_total ?? Math.max(0,b.caixa) + b.receber + b.estoques + b.imobilizado) : null;
+  const passivos = b ? (b.passivo_total ?? b.pagar + b.divida + Math.max(0,-b.caixa)) : null;
   return <Cartao titulo={`KPIs e indicadores financeiros · rodada ${resultado.rodada}`}>
     <dl className="grid gap-4 sm:grid-cols-3">
       <div><dt className="text-sm text-slate-500">Margem líquida</dt><dd className="font-bold text-marinho">{margem === null ? "—" : percentual(margem)}</dd><p className="text-xs text-slate-500">Lucro líquido dividido pela receita.</p></div>

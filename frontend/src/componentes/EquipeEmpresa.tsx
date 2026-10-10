@@ -1,3 +1,4 @@
+import LinkManual from "./LinkManual";
 import React, {useState} from "react";
 import {api} from "../api";
 import type {Equipe} from "../tipos";
@@ -11,7 +12,7 @@ export default function EquipeEmpresa({empresaId,equipe,podeEditar:_podeEditar=f
  <ul className="divide-y">{equipe.membros.map(m=><li key={m.aluno_id} className="py-2">{m.nome}{m.aluno_id===equipe.lider_id?" · Líder":m.aluno_id===equipe.proximo_lider_id?" · Próximo líder":" · Integrante"}</li>)}</ul>
  {!encerrada&&(!equipe.lider_id||equipe.pode_decidir)&&!equipe.proximo_lider_id&&<div className="rounded-xl border p-4"><h3 className="font-bold">{equipe.lider_id?"Transferir liderança":"Escolher o líder inicial"}</h3><p className="my-2 text-sm">{equipe.lider_id?"Combine a troca com a equipe e selecione o integrante que assumirá na próxima rodada.":"Com 3 a 5 integrantes, cada aluno registra sua escolha. O candidato com mais da metade dos votos assume a liderança inicial."}</p><select aria-label="Integrante para liderança" className={estiloEntrada} value={escolhido} onChange={e=>setEscolhido(e.target.value)}><option value="">Selecione um integrante</option>{equipe.membros.filter(m=>m.aluno_id!==equipe.lider_id).map(m=><option key={m.aluno_id} value={m.aluno_id}>{m.nome}</option>)}</select><Botao disabled={ocupado||!escolhido||equipe.membros.length<3} onClick={escolher}>{equipe.lider_id?"Transferir liderança para a próxima rodada":"Registrar minha escolha"}</Botao>{!equipe.lider_id&&<p className="mt-2 text-sm">{Object.keys(equipe.votos_lider).length} escolhas registradas.</p>}</div>}
  {equipe.pendencias.length>0&&<Aviso tipo="info"><ul className="list-disc pl-5">{equipe.pendencias.map(p=><li key={p}>{p}</li>)}</ul></Aviso>}{equipe.pronta&&<Aviso tipo="sucesso">O líder enviou a decisão final. A equipe está pronta para o fechamento.</Aviso>}{erro&&<Aviso>{erro}</Aviso>}
- <a className="text-sm underline" href="/manuais/manual-aluno.pdf" target="_blank" rel="noreferrer">Consultar o manual: equipe, liderança e envio</a>
+ <LinkManual className="text-sm underline" arquivo="manual-aluno">Consultar o manual: equipe, liderança e envio</LinkManual>
  {!!equipe.historico.length&&<details><summary>Histórico da equipe</summary><ul className="mt-3 max-h-64 overflow-auto text-sm">{[...equipe.historico].reverse().map((h,i)=><li className="py-2" key={i}>{h.aluno} · {h.acao.replace(/_/g," ").toLowerCase()} · rodada {h.rodada} · {new Date(h.data).toLocaleString("pt-BR")}</li>)}</ul></details>}
  </div></Cartao>;
 }

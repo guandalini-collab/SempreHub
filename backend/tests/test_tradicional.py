@@ -74,19 +74,40 @@ class TestTradicional(unittest.TestCase):
     def test_estoque_lucro_caixa_e_venda_na_rodada_seguinte(self):
         empresa, decisao, parametros = base()
         primeiro = apurar(preparar(empresa, decisao, parametros, 1), 40, sem_tributos)
-        self.assertEqual(primeiro["dre"]["lucro_liquido"], 2400)
+        self.assertEqual(primeiro["dre"]["refugos"], 80)
+        self.assertEqual(primeiro["dre"]["cmv"], 1600)
+        self.assertEqual(primeiro["dre"]["lucro_liquido"], 2320)
         self.assertEqual(primeiro["detalhes"]["dfc"]["variacao"], 0)
-        self.assertEqual(primeiro["estado"]["estoque_pa"], {"quantidade": 60, "valor": 2400.0})
+        self.assertEqual(primeiro["estado"]["estoque_pa"], {"quantidade": 58, "valor": 2320.0})
         self.assert_reconciliacao(empresa, primeiro)
         fotografia_primeiro = deepcopy(primeiro)
         segunda_empresa = proxima_empresa(empresa, primeiro)
         segundo = apurar(preparar(segunda_empresa, {"preco": 100, "simulacao": {}}, parametros, 2), 60, sem_tributos)
-        self.assertEqual(segundo["dre"]["lucro_liquido"], 3600)
-        self.assertEqual(segundo["detalhes"]["dfc"]["variacao"], 6000)
+        self.assertEqual(segundo["dre"]["lucro_liquido"], 3480)
+        self.assertEqual(segundo["dre"]["refugos"], 0)
+        self.assertEqual(segundo["detalhes"]["dfc"]["variacao"], 5800)
         self.assertEqual(segundo["estado"]["estoque_pa"], {"quantidade": 0, "valor": 0.0})
         self.assertEqual(segundo["detalhes"]["estado_inicial"], primeiro["estado"])
         self.assertEqual(primeiro, fotografia_primeiro)
         self.assert_reconciliacao(segunda_empresa, segundo)
+
+    def test_refugo_preserva_custo_medio_de_insumos_e_produtos_antigos(self):
+        empresa, decisao, parametros = base()
+        empresa["estado_simulacao"]["estoque_mp"] = {"quantidade": 100, "valor": 6000.0}
+        empresa["estado_simulacao"]["estoque_pa"] = {"quantidade": 20, "valor": 1600.0}
+        # Compra 100 a R$ 40: MP média R$ 50; produz 100, perde 2.
+        preparo = preparar(empresa, decisao, parametros, 1)
+        resultado = apurar(preparo, 50, sem_tributos)
+        self.assertEqual(preparo["producao_real"], 100)
+        self.assertEqual(preparo["refugo"], 2)
+        self.assertEqual(resultado["dre"]["refugos"], 100)
+        # PA disponível: 20 antigos + 98 novos, valor 1600 + 4900.
+        self.assertEqual(resultado["dre"]["cmv"], 2754.24)
+        self.assertEqual(resultado["estado"]["estoque_pa"], {"quantidade": 68, "valor": 3745.76})
+        self.assertEqual(resultado["estado"]["estoque_mp"], {"quantidade": 100, "valor": 5000.0})
+        self.assertEqual(20 + preparo["producao_real"], resultado["vendas"] + resultado["estado"]["estoque_pa"]["quantidade"] + preparo["refugo"])
+        self.assertEqual(1600 + 5000, resultado["dre"]["cmv"] + resultado["estado"]["estoque_pa"]["valor"] + resultado["dre"]["refugos"])
+        self.assert_reconciliacao(empresa, resultado)
 
     def test_credito_receita_agora_caixa_no_vencimento(self):
         empresa, decisao, parametros = base()
@@ -135,11 +156,11 @@ class TestTradicional(unittest.TestCase):
         decisao["simulacao"].update(producao=312, comprar_mp=312)
         preparo = preparar(empresa, decisao, parametros, 1)
         resultado = apurar(preparo, 500, sem_tributos)
-        self.assertEqual(preparo["producao_real"], 312)
-        self.assertEqual(preparo["refugo"], 46)  # 15% máximo, unidades inteiras.
-        self.assertEqual(resultado["vendas"], 266)
-        self.assertEqual(resultado["dre"]["cmv"] + resultado["dre"]["refugos"], 312 * 40)
-        self.assertEqual(resultado["estado"]["estoque_mp"]["quantidade"], 0)
+        self.assertEqual(preparo["producao_real"], 226)
+        self.assertEqual(preparo["refugo"], 4)  # Piso inteiro de 226 x 2%.
+        self.assertEqual(resultado["vendas"], 222)
+        self.assertEqual(resultado["dre"]["cmv"] + resultado["dre"]["refugos"], 226 * 40)
+        self.assertEqual(resultado["estado"]["estoque_mp"]["quantidade"], 86)
         self.assert_reconciliacao(empresa, resultado)
 
     def test_imutabilidade_e_centavos_com_custo_medio(self):
@@ -186,7 +207,8 @@ class TestTradicional(unittest.TestCase):
         resultado = apurar(preparo, 40, sem_tributos)
         self.assertEqual(resultado["dre"]["frete"], 200)
         self.assertEqual(resultado["detalhes"]["dfc"]["variacao"], -200)
-        self.assertEqual(resultado["estado"]["satisfacao"], 76)
+        self.assertEqual(resultado["detalhes"]["operacao"]["pedidos_com_falha"], 5)
+        self.assertEqual(resultado["estado"]["satisfacao"], 80 + 2 - 30 * (5 / 40))
         self.assertEqual(preparo["estado"]["satisfacao"], 80)
         empresa2 = proxima_empresa(empresa, resultado)
         baixa = preparar(empresa2, {"preco": 100}, parametros, 2)
@@ -227,7 +249,9 @@ class TestTradicional(unittest.TestCase):
         empresa["estado_simulacao"]["estoque_mp"] = {"quantidade": 100, "valor": 4000}
         decisao["simulacao"] = {"producao": 100}
         resultado = apurar(preparar(empresa, decisao, parametros, 1, multiplicador_custo=2), 100, sem_tributos)
-        self.assertEqual(resultado["dre"]["cmv"], 4000)
+        self.assertEqual(resultado["dre"]["cmv"], 3920)
+        self.assertEqual(resultado["dre"]["refugos"], 80)
+        self.assertEqual(resultado["dre"]["cmv"] + resultado["dre"]["refugos"], 4000)
         self.assert_reconciliacao(empresa, resultado)
 
 

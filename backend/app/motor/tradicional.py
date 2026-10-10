@@ -5,6 +5,9 @@ não são CPV, máquinas não são despesas e títulos não são dinheiro recebi
 As regras de RH e de capacidade são hipóteses didáticas deste perfil.
 """
 
+from .versionamento import ENGINE_VERSION, inicializar_indicadores
+from .financeiros import reconciliar_financeiros
+from .indicadores import oee, otif, enps, capacidades_producao
 from .localizacao import estimar_frete
 from copy import deepcopy
 from decimal import Decimal, ROUND_HALF_UP
@@ -58,6 +61,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     e, d, p = deepcopy(empresa), deepcopy(decisao), deepcopy(parametros)
     s = deepcopy(e.get("estado_simulacao") or {})
     inicial = deepcopy(s)
+    inicializar_indicadores(s)
     cfg = p.get("configuracao_simulacao") or {}
     op = d.get("simulacao") or {}
     alertas = []
@@ -139,12 +143,11 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
 
     manutencao = _dinheiro(max(0, op.get("manutencao", 0)))
     ativas = [m for m in s["maquinas"] if m["ativacao"] <= rodada]
-    necessidade_manutencao = _soma(_produto(m["custo"], 0.01) for m in ativas)
-    cobertura = min(1.0, manutencao / necessidade_manutencao) if necessidade_manutencao > 0 else 0.0
-    for maquina in ativas:
-        maquina["condicao"] = _limitar(maquina["condicao"] + 0.10 * cobertura, 0.1, 1)
-    capacidade_maquinas = sum(m["capacidade"] * m["condicao"] for m in ativas)
-    capacidade_produtiva = min(capacidade_trabalho, capacidade_maquinas)
+    capacidade_maquinas = sum(m["capacidade"] for m in ativas)
+    kpis_oee = oee(s, manutencao, treinamento, funcionarios, ativas, max(0, op.get("producao", 0)))
+    capacidades = capacidades_producao(capacidade_maquinas, funcionarios, produtividade, fator_rh, horas_extras, kpis_oee["disponibilidade"], kpis_oee["performance"])
+    capacidade_produtiva = capacidades["capacidade_produtiva"]
+    kpis_rh = enps(s, funcionarios, salario, salario_base, beneficio, horas_extras)
     depreciacao = 0.0
     for maquina in ativas:
         parcela = min(maquina["valor_liquido"], _proporcao(maquina["custo"], 1, max(1, maquina["vida_util"])))
@@ -156,7 +159,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     for _ in range(maquinas_compradas):
         s["maquinas"].append({"custo": _dinheiro(preco_maquina), "valor_liquido": _dinheiro(preco_maquina),
                               "capacidade": cfg.get("capacidade_maquina", 240), "condicao": 1.0,
-                              "ativacao": rodada + 1, "vida_util": cfg.get("vida_util_maquina", 24)})
+                              "ativacao": rodada + 1, "vida_util": cfg.get("vida_util_maquina", 24), "risco_quebra": 0.0})
     if maquinas_compradas:
         alertas.append("Máquinas compradas ficam disponíveis na próxima rodada.")
 
@@ -168,7 +171,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         mp,pa=s["estoque_mp"],s["estoque_pa"]
         producao_pedida=max(0,int(op.get("producao",0)))
         boas=producao_real-refugo
-        utilizacao=producao_real/capacidade_maquinas if capacidade_maquinas else 0
+        utilizacao=producao_real/capacidades["capacidade_nominal_periodo"] if capacidades["capacidade_nominal_periodo"] else 0
         compra_a_prazo=_produto(compras,_limitar(op.get("compras_prazo",0),0,1))
         compra_a_vista=_soma([compras,-compra_a_prazo])
         if compra_a_prazo: s["pagar"].append({"origem":rodada,"vencimento":rodada+op.get("prazo_pagamento",1),"valor":compra_a_prazo})
@@ -183,9 +186,9 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         mp["quantidade"] += unidades_compra
         mp["valor"] = _soma([mp["valor"], compras])
         producao_pedida = max(0, int(op.get("producao", 0)))
-        producao_real = min(producao_pedida, mp["quantidade"], int(math.floor(capacidade_produtiva * 1.30)))
-        utilizacao = producao_real / capacidade_maquinas if capacidade_maquinas > 0 else 0.0
-        taxa_refugo = min(0.15, 0.4 * max(0, utilizacao - 0.90))
+        producao_real = min(producao_pedida, mp["quantidade"], int(math.floor(capacidade_produtiva + 1e-12)))
+        utilizacao = producao_real / capacidades["capacidade_nominal_periodo"] if capacidades["capacidade_nominal_periodo"] > 0 else 0.0
+        taxa_refugo = kpis_oee["taxa_defeito"]
         refugo = min(producao_real, int(math.floor(producao_real * taxa_refugo + 1e-12)))
         boas = producao_real - refugo
         custo_consumido = _proporcao(mp["valor"], producao_real, mp["quantidade"])
@@ -198,9 +201,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     if producao_real < producao_pedida:
         alertas.append("Produção limitada pelos insumos ou pela capacidade de máquinas e pessoas.")
     if refugo:
-        alertas.append(f"Sobrecarga: {refugo} unidade(s) refugadas; insumos consumidos não geram estoque vendável.")
-    for maquina in ativas:
-        maquina["condicao"] = round(_limitar(maquina["condicao"] - 0.02 * utilizacao * (1 - cobertura), 0.1, 1), 8)
+        alertas.append(f"Refugo de produção: {refugo} unidade(s) perdidas; insumos consumidos não geram estoque vendável.")
     sobrecarga_trabalho = max(0, producao_real / capacidade_trabalho - 0.90) if capacidade_trabalho else 0
     rh["moral"] = round(_limitar(rh["moral"] - 10 * sobrecarga_trabalho), 8)
 
@@ -243,6 +244,9 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     taxa_royalties = p.get("taxa_royalties", 0.05 if e.get("classe_dornelas") == "FRANQUIA" else 0)
     return {
         "empresa": e, "decisao": d, "parametros": p, "rodada": rodada,
+        "kpis": {**kpis_oee, **kpis_rh, **capacidades,
+                 "qualidade_observada": boas / producao_real if producao_real else None,
+                 "oee_observado": kpis_oee["disponibilidade"] * kpis_oee["performance"] * boas / producao_real if kpis_oee["oee"] is not None and producao_real else None},
         "estado_inicial": inicial, "estado": s, "funcionarios": funcionarios,
         "emprestimo": emprestimo, "amortizacao": amortizacao, "amortizacao_obrigatoria": obrigatoria,
         "divida": divida, "caixa_inicio": caixa_inicio, "caixa_disponivel": _soma([caixa_obrigacoes, emprestimo, -amortizacao]),
@@ -254,7 +258,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         "gastos_previstos": _soma([despesas_pagas, depreciacao, custo_refugo]),
         "beneficios": beneficios, "treinamento": treinamento, "rescisoes": rescisoes,
         "manutencao": manutencao, "depreciacao": depreciacao, "custo_refugo": custo_refugo,
-        "despesas_pagas": despesas_pagas, "compras_a_vista": compra_a_vista,
+        "despesas_pagas": despesas_pagas, "compras_a_vista": compra_a_vista, "compras_mes": compras,
         "pagamentos_vencidos": pagamentos_vencidos, "recebimentos_vencidos": recebimentos,
         "investimento": investimento, "taxa_royalties": taxa_royalties,
         "canal": canal, "marketing_digital": digital,
@@ -324,13 +328,19 @@ def apurar(preparo: dict, demanda: float,
     variacao = _soma([operacional, investimento, financiamento])
     caixa = _soma([c["caixa_inicio"], variacao])
     ruptura = demanda - vendas
-    atraso = {"RAPIDO": 0, "PADRAO": 0.05, "ECONOMICO": 0.20}[modal]
+    indicadores_entrega = otif(demanda, vendas, modal)
+    falhas_transporte = indicadores_entrega["pedidos_com_falha"] - indicadores_entrega["pedidos_nao_atendidos"]
+    atraso = falhas_transporte / vendas if vendas else 0
     s["satisfacao"] = round(_limitar(s["satisfacao"] + (2 - 30 * atraso if vendas else 0)
                                     - (20 * ruptura / demanda if demanda else 0)), 8)
+    if c["kpis"]["oee"] is not None:
+        c["alertas"].append(f"OEE simulado: {c['kpis']['oee'] * 100:.2f}%. Manutenção e treinamento alteram disponibilidade, ritmo e defeitos.")
+    if c["kpis"]["enps"] is not None:
+        c["alertas"].append(f"eNPS simulado: {c['kpis']['enps']:+.0f}. Salários, benefícios e horas extras recorrentes definem as respostas.")
     if ruptura:
         c["alertas"].append(f"Ruptura: {ruptura} unidade(s) de demanda sem estoque disponível.")
     if vendas and atraso:
-        c["alertas"].append("Atrasos do modal reduzem a satisfação usada na próxima rodada.")
+        c["alertas"].append("Falhas de transporte reduzem a satisfação usada na próxima rodada.")
     receber, pagar = (_soma(t["valor"] for t in s[nome]) for nome in ("receber", "pagar"))
     estoques = _soma(s[nome]["valor"] for nome in ("estoque_mp", "estoque_pa", "estoque_obsoleto"))
     imobilizado = _soma(m["valor_liquido"] for m in s["maquinas"])
@@ -344,6 +354,10 @@ def apurar(preparo: dict, demanda: float,
     operacao = {k: c[k] for k in ("producao_planejada", "producao_real", "producao_boa", "refugo",
                                 "capacidade_produtiva", "capacidade_maquinas", "utilizacao_maquinas",
                                 "estoque_mp_inicial", "estoque_pa_inicial", "turnover", "horas_extras", "custo_horas_extras")}
+    operacao.update(c["kpis"])
+    operacao.update(reconciliar_financeiros(balanco, s, dre, c["rodada"], p.get("taxa_cheque_especial", 0.08), c["compras_mes"]))
+    operacao.update(indicadores_entrega)
+    operacao.update(admissoes=max(0, int(d.get("contratar", 0))), demissoes=max(0, int(d.get("demitir", 0))), treinamento=c["treinamento"], manutencao=c["manutencao"])
     operacao.update(localizacao)
     operacao["produtos"]=linhas
     operacao.update(demanda=demanda, vendas=vendas, ruptura=ruptura,
@@ -351,7 +365,7 @@ def apurar(preparo: dict, demanda: float,
                     satisfacao=s["satisfacao"], moral=s["rh"]["moral"], qualificacao=s["rh"]["qualificacao"],
                     amortizacao_obrigatoria=c["amortizacao_obrigatoria"], canal=c["canal"],
                     marketing_digital=c["marketing_digital"], comissao_canal=comissao_canal)
-    detalhes = {"versao_motor": 1, "modo": "TRADICIONAL", "configuracao": deepcopy(p),
+    detalhes = {"versao_motor": 1, "engine_version": ENGINE_VERSION, "modo": "TRADICIONAL", "configuracao": deepcopy(p),
                 "estado_inicial": deepcopy(c["estado_inicial"]), "estado_final": deepcopy(s),
                 "operacao": operacao, "dfc": dfc, "balanco": balanco}
     return {"estado": deepcopy(s), "caixa": caixa, "divida": c["divida"], "funcionarios": c["funcionarios"],

@@ -138,16 +138,17 @@ export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao 
       </Cartao>
       <Cartao titulo="Balanço patrimonial ao fim da rodada">
         <ListaFinanceira linhas={[
-          ["Caixa", balanco.caixa],
+          ["Disponibilidades (caixa e bancos)", balanco.disponibilidades ?? Math.max(0,balanco.caixa)],
           ["Contas a receber", balanco.receber],
           ["Estoques", balanco.estoques],
           ["Máquinas líquidas de depreciação", balanco.imobilizado],
-          ["Total do ativo", balanco.caixa + balanco.receber + balanco.estoques + balanco.imobilizado],
+          ["Total do ativo", balanco.ativo_total ?? Math.max(0,balanco.caixa) + balanco.receber + balanco.estoques + balanco.imobilizado],
           ["Contas a pagar", balanco.pagar],
           ["Dívida", balanco.divida],
-          ["Total do passivo", balanco.pagar + balanco.divida],
+          ["Cheque especial", balanco.cheque_especial ?? Math.max(0,-balanco.caixa)],
+          ["Total do passivo", balanco.pagar + balanco.divida + (balanco.cheque_especial ?? Math.max(0,-balanco.caixa))],
           ["Patrimônio líquido", balanco.patrimonio],
-          ["Passivo + patrimônio líquido", balanco.pagar + balanco.divida + balanco.patrimonio],
+          ["Passivo + patrimônio líquido", balanco.pagar + balanco.divida + (balanco.cheque_especial ?? Math.max(0,-balanco.caixa)) + balanco.patrimonio],
           ["Necessidade de capital de giro (estoques + receber − pagar)", balanco.receber + balanco.estoques - balanco.pagar],
         ]} />
       </Cartao>

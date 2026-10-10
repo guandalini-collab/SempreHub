@@ -48,9 +48,9 @@ def produzir(estado, itens, op, capacidade, maquinas, multiplicador):
         st['estoque_mp']['quantidade']+=un;st['estoque_mp']['valor']=dinheiro(st['estoque_mp']['valor']+valor)
         disponiveis.append(st['estoque_mp']['quantidade'])
     producao=[min(q,disp) for q,disp in zip(pedidas,disponiveis)]
-    limite=max(0,math.floor(capacidade*1.3))
+    limite=max(0,math.floor(capacidade+1e-12))
     if sum(producao)>limite: producao=dividir(limite,producao)
-    real=sum(producao); taxa=min(.15,.4*max(0,(real/maquinas if maquinas else 0)-.9))
+    real=sum(producao); taxa=estado.get("indicadores_didaticos",{}).get("taxa_defeito",.02)
     refugos=dividir(math.floor(real*taxa+1e-12),producao)
     perda=0
     for p,q,ref in zip(itens,producao,refugos):

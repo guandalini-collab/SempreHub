@@ -40,7 +40,7 @@ def test_tradicional_preserva_estoque_e_snapshot_da_rodada(cliente, professor):
     primeira = cliente.get(f"/api/aluno/empresas/{empresa_id}", headers=aluno).json()
     estado_primeiro = deepcopy(primeira["resultados"][0]["detalhes_simulacao"]["estado_final"])
     assert primeira["resultados"][0]["detalhes_simulacao"]["modo"] == "TRADICIONAL"
-    assert estado_primeiro["estoque_pa"]["quantidade"] == 60
+    assert estado_primeiro["estoque_pa"]["quantidade"] == 58
     assert primeira["resultados"][0]["detalhes_simulacao"]["dfc"]["investimento"] == 0
 
     _decisao_avancada(cliente, aluno, empresa_id, 2, producao=0)
@@ -48,7 +48,7 @@ def test_tradicional_preserva_estoque_e_snapshot_da_rodada(cliente, professor):
     final = cliente.get(f"/api/aluno/empresas/{empresa_id}", headers=aluno).json()
     assert len(final["resultados"]) == 2
     assert final["resultados"][0]["detalhes_simulacao"]["estado_final"] == estado_primeiro
-    assert final["resultados"][1]["detalhes_simulacao"]["estado_inicial"]["estoque_pa"]["quantidade"] == 60
+    assert final["resultados"][1]["detalhes_simulacao"]["estado_inicial"]["estoque_pa"]["quantidade"] == 58
     assert final["resultados"][1]["detalhes_simulacao"]["operacao"]["vendas"] == 40
 
 

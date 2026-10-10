@@ -113,3 +113,17 @@ export async function baixarArquivo(caminho: string, nome: string) {
   link.click();
   URL.revokeObjectURL(url);
 }
+
+
+export async function visualizarArquivo(caminho: string) {
+  const aba = window.open('about:blank', '_blank');
+  if (aba) aba.opener = null;
+  try {
+    const resposta = await fetch(`${BASE}${caminho}`, {headers: token ? {Authorization: `Bearer ${token}`} : {}});
+    if (!resposta.ok) throw new ErroApi('Não foi possível abrir o manual. Confira sua sessão e permissão.', resposta.status);
+    const url = URL.createObjectURL(await resposta.blob());
+    if (aba) aba.location.href = url;
+    else {const link = document.createElement('a');link.href=url;link.download='SempreHub-manual.pdf';link.click();}
+    window.setTimeout(()=>URL.revokeObjectURL(url),60000);
+  } catch (erro) {aba?.close();throw erro;}
+}

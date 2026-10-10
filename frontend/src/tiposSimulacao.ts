@@ -110,6 +110,10 @@ export interface FluxoCaixa {
 }
 
 export interface BalancoSimulacao {
+  disponibilidades?: number;
+  cheque_especial?: number;
+  ativo_total?: number;
+  passivo_total?: number;
   caixa: number;
   receber: number;
   pagar: number;
@@ -121,6 +125,7 @@ export interface BalancoSimulacao {
 }
 
 export interface DetalhesSimulacao {
+  engine_version?: string;
   versao_motor: number;
   modo: ModoJogo;
   estado_inicial: EstadoSimulacao;

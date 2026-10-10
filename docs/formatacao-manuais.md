@@ -1,4 +1,4 @@
-# Apresentação dos manuais do aluno e do professor - edição 3.4
+# Apresentação dos manuais do aluno e do professor - edição 3.5
 
 A apresentação utiliza regras aplicáveis da ABNT NBR 14724:2024 (versão corrigida de 01/04/2025), ABNT NBR 6024:2012 e ABNT NBR 6027:2012. A NBR 14724 trata de trabalhos acadêmicos; estes documentos continuam sendo manuais institucionais. Não se atribui certificação ABNT, nem se criam folha de aprovação, banca, resumos de tese ou local de publicação não informado.
 
@@ -9,9 +9,9 @@ A apresentação utiliza regras aplicáveis da ABNT NBR 14724:2024 (versão corr
 - Paginação conta desde a carta do fundador e aparece a partir da primeira seção textual, no alto à direita. Capa não é contada.
 - Seções em fluxo contínuo para reduzir áreas vazias, conforme orientação editorial do autor; numeração progressiva e sumário com a mesma grafia e páginas correspondentes. Subdivisões também constam no sumário.
 - Ilustrações identificadas acima, com fonte abaixo; imagens de navegação contêm situações ilustrativas.
-- Marca vetorial branca original sem recoloração. Azul #013B9D, turquesa #06A9BF e dourado #DF9317 nos elementos gráficos; gradientes próprios preservados. Códigos conceituais do fundador documentados no capítulo da marca.
+- Marca vetorial branca original sem recoloração. Azul #034AA6, turquesa #0AADBF e laranja ouro #D9851E nos elementos gráficos; gradientes próprios preservados. Códigos conceituais do fundador documentados no capítulo da marca.
 - Conteúdo sobre IA reservado ao professor; o aluno lê sobre decisões e resposta do mercado.
-- Nenhuma alteração no manual de mídia, no frontend ou no backend nesta revisão.
+- Manual de mídias preservado. Edição 3.5 sincroniza os indicadores e métodos dos manuais do aluno e professor com as novas regras determinísticas.
 
 ## Fontes de normalização consultadas
 

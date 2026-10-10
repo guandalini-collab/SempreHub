@@ -14,7 +14,7 @@ from PIL import Image as PILImage
 from pypdf import PdfReader,PdfWriter,Transformation
 ROOT=Path(__file__).resolve().parents[1];DOCS=ROOT/'docs';OUT=DOCS/'gerados';PUBLIC=ROOT/'frontend/public/manuais'
 LEFT=TOP=3*cm;RIGHT=BOTTOM=2*cm;WIDTH=A4[0]-LEFT-RIGHT
-BLUE=colors.HexColor('#013B9D');CYAN=colors.HexColor('#06A9BF');GOLD=colors.HexColor('#DF9317')
+BLUE=colors.HexColor('#034AA6');CYAN=colors.HexColor('#0AADBF');GOLD=colors.HexColor('#D9851E')
 BLACK=colors.black
 STYLES={
  'Body':ParagraphStyle('Body',fontName='Helvetica',fontSize=12,leading=18,textColor=BLACK,alignment=4,spaceAfter=8,allowWidows=0,allowOrphans=0),
@@ -59,7 +59,7 @@ def build(stem):
  source=(DOCS/f'{stem}.md').read_text()
  blocks=[b.strip() for b in re.split(r'\n\s*\n',source) if b.strip()]
  covertitle=ParagraphStyle('CoverTitle',parent=STYLES['Center'],fontName='Helvetica-Bold',textColor=BLUE)
- story=[Spacer(1,145),Paragraph('PROFESSOR GUANDALINI',STYLES['Center']),Spacer(1,40),Paragraph('SEMPREHUB',covertitle),Paragraph(title.upper(),covertitle),Paragraph(subtitle,STYLES['Center']),Spacer(1,36),Paragraph(audience,STYLES['Center']),Paragraph('Autor e Fundador: Professor Guandalini',STYLES['Center']),Spacer(1,30),Paragraph('Edição 3.4<br/>2026',STYLES['Center']),PageBreak()]
+ story=[Spacer(1,145),Paragraph('PROFESSOR GUANDALINI',STYLES['Center']),Spacer(1,40),Paragraph('SEMPREHUB',covertitle),Paragraph(title.upper(),covertitle),Paragraph(subtitle,STYLES['Center']),Spacer(1,36),Paragraph(audience,STYLES['Center']),Paragraph('Autor e Fundador: Professor Guandalini',STYLES['Center']),Spacer(1,30),Paragraph('Edição 3.5<br/>2026',STYLES['Center']),PageBreak()]
  toc=TableOfContents();toc.levelStyles=[STYLES['TOC'],STYLES['TOCSub']];toc.dotsMinLevel=0
  chapter=sub=figure=tablecount=0;toc_added=False;lastheading='';markup=[];placements={}
  for block in blocks:
@@ -115,7 +115,7 @@ def build(stem):
    canvas.setFillColor(BLUE);canvas.setFont('Helvetica',8);canvas.drawRightString(w-RIGHT,h-68,title)
    canvas.setStrokeColor(CYAN);canvas.setLineWidth(.5);canvas.line(LEFT,h-73,w-RIGHT,h-73)
    canvas.setFont('Helvetica',8);canvas.setFillColor(BLUE);canvas.drawString(LEFT,35,'Conceito e marca: Professor Guandalini')
-   canvas.drawRightString(w-RIGHT,35,'SempreHub | Edição 3.4')
+   canvas.drawRightString(w-RIGHT,35,'SempreHub | Edição 3.5')
    if doc.text_start is not None and doc.page>=doc.text_start:
     canvas.setFillColor(BLACK);canvas.setFont('Helvetica',10);canvas.drawRightString(w-RIGHT,h-2*cm,str(doc.page-1))
   canvas.restoreState()
@@ -134,4 +134,4 @@ def build(stem):
  pdf=OUT/f'{stem}.pdf'
  with pdf.open('wb') as f:writer.write(f)
  (OUT/f'{stem}.html').write_text('<!doctype html><html lang="pt-BR"><meta charset="UTF-8"><title>'+title+'</title><link rel="stylesheet" href="../manual.css"><body><h1>'+title+'</h1>'+ '\n'.join(markup)+'</body></html>')
- shutil.copyfile(pdf,PUBLIC/pdf.name);print(f'{stem}: {len(writer.pages)} páginas, edição 3.4, marca vetorial e formatação ABNT adaptada.')
+ shutil.copyfile(pdf,PUBLIC/pdf.name);print(f'{stem}: {len(writer.pages)} páginas, edição 3.5, marca vetorial e formatação ABNT adaptada.')

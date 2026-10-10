@@ -322,6 +322,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         <DetalheEmpresa turmaId={turma.id} empresaId={empresaAberta} modo={turma.modo_jogo} aoFechar={() => setEmpresaAberta(null)} />
       )}
 
+      <SecaoPainel id="parametros" ativa={secao}>
       {editandoParametros && (
         <EditarParametros
           turmaId={turma.id}
@@ -336,6 +337,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
           }}
         />
       )}
+      </SecaoPainel>
     </LayoutPainel>
   );
 }

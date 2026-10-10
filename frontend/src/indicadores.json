@@ -1,0 +1,266 @@
+[
+  {
+    "id": "kpi-0",
+    "area": "liquidez",
+    "nome": "Liquidez Corrente",
+    "mede": "Capacidade de pagar obrigações de curto prazo com ativos de curto prazo.",
+    "formula": "Ativo Circulante / Passivo Circulante",
+    "orientacao": "Acima de 1 significa mais ativos circulantes que obrigações; verifique também os prazos e a qualidade desses ativos."
+  },
+  {
+    "id": "kpi-1",
+    "area": "liquidez",
+    "nome": "Liquidez Seca",
+    "mede": "Capacidade de pagar contas sem vender o estoque.",
+    "formula": "(Ativo Circulante - Estoques) / Passivo Circulante",
+    "orientacao": "Compare com a liquidez corrente: uma diferença grande sinaliza dependência do estoque."
+  },
+  {
+    "id": "kpi-2",
+    "area": "liquidez",
+    "nome": "Liquidez Imediata",
+    "mede": "Cobertura das obrigações de curto prazo apenas com dinheiro disponível.",
+    "formula": "Disponibilidades / Passivo Circulante",
+    "orientacao": "Uma cobertura baixa pede atenção ao calendário de recebimentos; uma cobertura alta pode representar caixa ocioso."
+  },
+  {
+    "id": "kpi-3",
+    "area": "liquidez",
+    "nome": "Liquidez Geral",
+    "mede": "Cobertura das obrigações totais por direitos de curto e longo prazo.",
+    "formula": "(Ativo Circulante + Realizável a Longo Prazo) / (Passivo Circulante + Passivo Não Circulante)",
+    "orientacao": "Não inclua máquinas no realizável a longo prazo. Compare o vencimento das dívidas com o recebimento dos direitos."
+  },
+  {
+    "id": "kpi-4",
+    "area": "marketing",
+    "nome": "ROI de Marketing",
+    "mede": "Retorno da receita atribuída às campanhas em relação ao gasto.",
+    "formula": "(Receita Gerada - Custo do Marketing) / Custo do Marketing",
+    "orientacao": "Multiplique por 100 para percentual. Esta fórmula mede retorno sobre receita, sem deduzir todos os custos do produto; não equivale ao lucro líquido da campanha."
+  },
+  {
+    "id": "kpi-5",
+    "area": "marketing",
+    "nome": "CAC",
+    "mede": "Gasto médio em marketing e vendas para conquistar um cliente novo.",
+    "formula": "Investimentos em Marketing e Vendas / Novos Clientes",
+    "orientacao": "Compare com o LTV usando a mesma população de clientes; nenhuma aquisição significa ausência de base para calcular."
+  },
+  {
+    "id": "kpi-6",
+    "area": "marketing",
+    "nome": "LTV",
+    "mede": "Valor acumulado por cliente durante o relacionamento.",
+    "formula": "Compra Média x Compras por Ano x Anos de Relacionamento",
+    "orientacao": "Esta fórmula usa receita, sem margem. No modelo de assinatura, o valor pode ser estimado pelo ticket mensal e pelo cancelamento, com a hipótese identificada."
+  },
+  {
+    "id": "kpi-7",
+    "area": "marketing",
+    "nome": "Relação LTV / CAC",
+    "mede": "Quanto o valor do cliente representa em relação ao custo de aquisição.",
+    "formula": "LTV / CAC",
+    "orientacao": "3:1 é uma referência didática, não uma regra universal. Considere margem, retenção e tempo de recuperação do investimento."
+  },
+  {
+    "id": "kpi-8",
+    "area": "marketing",
+    "nome": "Taxa de Conversão",
+    "mede": "Percentual de visitantes ou contatos que compram.",
+    "formula": "(Vendas / Visitantes ou Leads) x 100",
+    "orientacao": "Use a mesma etapa do funil e o mesmo período; unidades vendidas não são necessariamente clientes ou pedidos."
+  },
+  {
+    "id": "kpi-9",
+    "area": "financas",
+    "nome": "Margem Bruta",
+    "mede": "Parcela das vendas que sobra após o custo dos produtos vendidos.",
+    "formula": "(Lucro Bruto / Receita Total) x 100",
+    "orientacao": "Lucro bruto é receita líquida de tributos sobre vendas menos CMV. Declare a base da receita usada ao comparar empresas."
+  },
+  {
+    "id": "kpi-10",
+    "area": "financas",
+    "nome": "Margem Líquida",
+    "mede": "Parcela da receita que sobra após todas as despesas.",
+    "formula": "(Lucro Líquido / Receita Total) x 100",
+    "orientacao": "Uma margem negativa significa prejuízo. Compare com volume de vendas, juros e custos, sem confundir lucro com caixa."
+  },
+  {
+    "id": "kpi-11",
+    "area": "financas",
+    "nome": "EBITDA (Lajida)",
+    "mede": "Resultado antes de juros, impostos sobre o lucro, depreciação e amortização.",
+    "formula": "Resultado Operacional antes do Resultado Financeiro e Tributos sobre o Lucro + Depreciação + Amortização",
+    "orientacao": "Não some indiscriminadamente impostos sobre vendas nem amortização de empréstimos. EBITDA não é o saldo de caixa."
+  },
+  {
+    "id": "kpi-12",
+    "area": "financas",
+    "nome": "Ponto de Equilíbrio",
+    "mede": "Receita necessária para cobrir custos fixos e variáveis.",
+    "formula": "Custos Fixos Totais / Margem de Contribuição (fração)",
+    "orientacao": "Se a margem de contribuição for 40%, use 0,40. Margem nula ou negativa não produz um ponto de equilíbrio finito."
+  },
+  {
+    "id": "kpi-13",
+    "area": "financas",
+    "nome": "Prazo Médio de Recebimento (PMR)",
+    "mede": "Tempo médio para receber vendas a prazo.",
+    "formula": "(Contas a Receber / Faturamento do Período) x Dias do Período",
+    "orientacao": "365 aplica-se a faturamento anual; para uma rodada mensal use os dias do mês, ou a convenção didática de 30 dias explicitada. Prefira saldos médios."
+  },
+  {
+    "id": "kpi-14",
+    "area": "financas",
+    "nome": "Prazo Médio de Pagamento (PMP)",
+    "mede": "Tempo médio para pagar fornecedores.",
+    "formula": "(Fornecedores / Compras do Período) x Dias do Período",
+    "orientacao": "365 exige compras anuais. Não substitua compras pelo CMV; compare PMP e PMR junto com o giro dos estoques."
+  },
+  {
+    "id": "kpi-15",
+    "area": "rh",
+    "nome": "Turnover",
+    "mede": "Movimentação de admissões e desligamentos em relação à equipe.",
+    "formula": "((Admissões + Demissões) / 2) / Funcionários Ativos x 100",
+    "orientacao": "Declare a base da equipe usada e o período. Saídas voluntárias isoladas não representam toda a fórmula."
+  },
+  {
+    "id": "kpi-16",
+    "area": "rh",
+    "nome": "Absenteísmo",
+    "mede": "Horas de trabalho perdidas por ausências.",
+    "formula": "(Horas de Ausência / Horas Previstas) x 100",
+    "orientacao": "Compare com segurança, clima e capacidade; separar ausências de horas extras evita distorções."
+  },
+  {
+    "id": "kpi-17",
+    "area": "rh",
+    "nome": "Receita por Funcionário",
+    "mede": "Faturamento médio por colaborador.",
+    "formula": "Faturamento Bruto / Funcionários",
+    "orientacao": "Observe qualidade e carga de trabalho antes de concluir que uma equipe menor é melhor."
+  },
+  {
+    "id": "kpi-18",
+    "area": "rh",
+    "nome": "ROI de Treinamento",
+    "mede": "Retorno financeiro atribuível à capacitação.",
+    "formula": "(Ganho com Treinamento - Custo do Treinamento) / Custo do Treinamento",
+    "orientacao": "Multiplique por 100 para percentual. É necessário separar o ganho do treinamento de outros fatores; não atribua todo o lucro ao curso."
+  },
+  {
+    "id": "kpi-19",
+    "area": "rh",
+    "nome": "Custo por Contratação (CPH)",
+    "mede": "Gasto médio para preencher uma vaga.",
+    "formula": "Custos de Recrutamento e Seleção / Contratações",
+    "orientacao": "Inclua os custos de seleção; salário e rescisão não substituem esses dados."
+  },
+  {
+    "id": "kpi-20",
+    "area": "rh",
+    "nome": "eNPS",
+    "mede": "Lealdade e recomendação dos funcionários sobre o ambiente de trabalho.",
+    "formula": "% Promotores (9 e 10) - % Detratores (0 a 6)",
+    "orientacao": "Notas 7 e 8 são neutras, mas entram no total de respondentes. A escala vai de -100 a +100; não transforme moral da equipe em uma pesquisa que não ocorreu."
+  },
+  {
+    "id": "kpi-21",
+    "area": "producao",
+    "nome": "OEE",
+    "mede": "Eficiência combinada de disponibilidade, performance e qualidade.",
+    "formula": "Disponibilidade x Performance x Qualidade",
+    "orientacao": "Converta percentuais em frações antes de multiplicar. Um fator baixo limita o resultado, mesmo se os outros forem altos."
+  },
+  {
+    "id": "kpi-22",
+    "area": "producao",
+    "nome": "Produtividade da Mão de Obra",
+    "mede": "Itens produzidos por hora de trabalho.",
+    "formula": "Itens Produzidos / Horas de Trabalho",
+    "orientacao": "Compare com refugo e qualidade; produzir mais peças defeituosas não significa melhor desempenho."
+  },
+  {
+    "id": "kpi-23",
+    "area": "producao",
+    "nome": "Taxa de Refugo",
+    "mede": "Parcela da produção perdida por defeitos.",
+    "formula": "(Itens Defeituosos / Itens Produzidos) x 100",
+    "orientacao": "Quanto maior, maior o desperdício. Relacione manutenção, treinamento e ritmo de produção."
+  },
+  {
+    "id": "kpi-24",
+    "area": "producao",
+    "nome": "Capacidade Instalada Utilizada",
+    "mede": "Parcela do potencial máximo da fábrica usada.",
+    "formula": "(Produção Atual / Capacidade Máxima) x 100",
+    "orientacao": "Uma taxa baixa indica ociosidade; uma taxa alta exige atenção a gargalos, demanda e manutenção antes de expandir."
+  },
+  {
+    "id": "kpi-25",
+    "area": "producao",
+    "nome": "Lead Time de Produção",
+    "mede": "Tempo entre o início e a conclusão da fabricação.",
+    "formula": "Fim da Produção - Início da Produção",
+    "orientacao": "Use a mesma unidade de tempo; não substitua esse indicador pelo prazo de transporte."
+  },
+  {
+    "id": "kpi-26",
+    "area": "producao",
+    "nome": "Giro de Estoque de Matéria-Prima",
+    "mede": "Renovação do estoque de insumos no período.",
+    "formula": "Custo da Matéria-Prima Consumida / Estoque Médio de Matéria-Prima",
+    "orientacao": "Um giro alto pode reduzir capital parado, mas também elevar o risco de falta de material."
+  },
+  {
+    "id": "kpi-27",
+    "area": "logistica",
+    "nome": "OTIF",
+    "mede": "Percentual de pedidos entregues no prazo e completos, sem erros.",
+    "formula": "(Pedidos no Prazo e Corretos / Pedidos Entregues) x 100",
+    "orientacao": "Conte cada pedido uma única vez; uma entrega atrasada e incompleta não deve ser descontada duas vezes."
+  },
+  {
+    "id": "kpi-28",
+    "area": "logistica",
+    "nome": "Order Cycle Time",
+    "mede": "Tempo entre a confirmação do pedido e a entrega ao cliente.",
+    "formula": "Entrega ao Cliente - Confirmação do Pedido",
+    "orientacao": "Inclui processamento, produção quando aplicável e transporte. Compare com a promessa ao cliente."
+  },
+  {
+    "id": "kpi-29",
+    "area": "logistica",
+    "nome": "Custo Logístico / Faturamento",
+    "mede": "Peso da logística na receita bruta.",
+    "formula": "(Custos Logísticos Totais / Faturamento Bruto) x 100",
+    "orientacao": "Inclua fretes, armazenagem e demais custos logísticos registrados. Uma taxa menor precisa preservar o nível de serviço."
+  },
+  {
+    "id": "kpi-30",
+    "area": "logistica",
+    "nome": "Acuracidade do Estoque",
+    "mede": "Conformidade entre o estoque físico e o registro.",
+    "formula": "(Itens Físicos Corretos / Itens Registrados) x 100",
+    "orientacao": "Exige contagem física e critérios de conferência; um registro contábil sozinho não comprova acuracidade."
+  },
+  {
+    "id": "kpi-31",
+    "area": "logistica",
+    "nome": "Ocupação do Armazém",
+    "mede": "Uso do espaço disponível de armazenagem.",
+    "formula": "(Espaço Utilizado / Capacidade do Armazém) x 100",
+    "orientacao": "Compare grandezas iguais, como m³ ou posições; unidades de produtos não equivalem automaticamente a volume."
+  },
+  {
+    "id": "kpi-32",
+    "area": "logistica",
+    "nome": "Custo da Última Milha",
+    "mede": "Custo médio da etapa final por entrega.",
+    "formula": "Custos de Entrega Final / Entregas Realizadas",
+    "orientacao": "Separe a etapa final do frete total. Avalie distância, consolidação e qualidade da entrega."
+  }
+]

@@ -80,7 +80,7 @@ O menu lateral é o ponto de partida. Suas categorias e submenus aparecem aberto
 
 Os campos de decisão mostram pendências, como **Falta tomar esta decisão** ou **Falta confirmar esta decisão**. Eles não substituem este manual. A confirmação de uma área significa que a equipe conferiu todos os seus campos, incluindo a decisão de manter em zero ações opcionais. Um aviso de campo vazio continua pendente mesmo depois de marcar a revisão. Os estados do menu referem-se à última versão salva; valores ainda não salvos precisam ser registrados.
 
-Versão 3.4 - outubro de 2026
+Versão 3.5 - outubro de 2026
 
 Aprenda a interpretar o mercado, discutir decisões e observar suas consequências. Cada rodada representa um mês. As imagens mostram as telas do programa com nomes e situações ilustrativos.
 
@@ -340,3 +340,382 @@ No modelo Startup, **capacidade da nuvem** indica quantos clientes a operação 
 **Aporte** é capital de investidores. **Valuation antes do aporte** é a avaliação usada para definir a participação. Exemplo didático: valor anterior de R$ 80.000 e aporte de R$ 20.000 compõem R$ 100.000 de referência após o aporte; a parcela de R$ 20.000 representa 20% dessa referência. Confira a participação efetiva no painel, pois aportes acumulados e regras do modelo também importam. Aporte não é receita comercial e não significa lucro.
 
 Nunca escolha aporte ou valuation apenas para aumentar o número mostrado no caixa. Discuta necessidade de capital e participação dos fundadores. O manual explica o conceito; a equipe continua responsável pela decisão.
+
+
+## Interpretar os indicadores para decidir em equipe
+
+Os indicadores estão nos submenus de Resultados: Liquidez, Marketing, Finanças, Recursos Humanos, Produção e Logística. Consulte o valor e a rodada na tela; use este capítulo para compreender o que ele representa. A equipe deve comparar períodos, identificar causas, discutir alternativas e registrar suas próprias decisões. Ler um indicador não altera o resultado: as escolhas de preço, produção, investimento, pessoas, crédito e entrega é que afetam a empresa. Nenhum indicador isolado garante lucro.
+
+Um traço significa que não há dados suficientes ou que o denominador é zero, nunca um resultado igual a zero. O simulador apresenta apenas valores que consegue sustentar com seus registros; exemplos do manual não são resultados da sua empresa. Todos os valores pertencem à simulação.
+
+### Liquidez e segurança financeira
+
+**Liquidez Corrente**
+
+**O que mede:** Capacidade de pagar obrigações de curto prazo com ativos de curto prazo.
+
+**Fórmula:** Ativo Circulante / Passivo Circulante
+
+**Como interpretar:** Acima de 1 significa mais ativos circulantes que obrigações; verifique também os prazos e a qualidade desses ativos.
+
+**Liquidez Seca**
+
+**O que mede:** Capacidade de pagar contas sem vender o estoque.
+
+**Fórmula:** (Ativo Circulante - Estoques) / Passivo Circulante
+
+**Como interpretar:** Compare com a liquidez corrente: uma diferença grande sinaliza dependência do estoque.
+
+**Liquidez Imediata**
+
+**O que mede:** Cobertura das obrigações de curto prazo apenas com dinheiro disponível.
+
+**Fórmula:** Disponibilidades / Passivo Circulante
+
+**Como interpretar:** Uma cobertura baixa pede atenção ao calendário de recebimentos; uma cobertura alta pode representar caixa ocioso.
+
+**Liquidez Geral**
+
+**O que mede:** Cobertura das obrigações totais por direitos de curto e longo prazo.
+
+**Fórmula:** (Ativo Circulante + Realizável a Longo Prazo) / (Passivo Circulante + Passivo Não Circulante)
+
+**Como interpretar:** Não inclua máquinas no realizável a longo prazo. Compare o vencimento das dívidas com o recebimento dos direitos.
+
+### Marketing e clientes
+
+**ROI de Marketing**
+
+**O que mede:** Retorno da receita atribuída às campanhas em relação ao gasto.
+
+**Fórmula:** (Receita Gerada - Custo do Marketing) / Custo do Marketing
+
+**Como interpretar:** Multiplique por 100 para percentual. Esta fórmula mede retorno sobre receita, sem deduzir todos os custos do produto; não equivale ao lucro líquido da campanha.
+
+**CAC**
+
+**O que mede:** Gasto médio em marketing e vendas para conquistar um cliente novo.
+
+**Fórmula:** Investimentos em Marketing e Vendas / Novos Clientes
+
+**Como interpretar:** Compare com o LTV usando a mesma população de clientes; nenhuma aquisição significa ausência de base para calcular.
+
+**LTV**
+
+**O que mede:** Valor acumulado por cliente durante o relacionamento.
+
+**Fórmula:** Compra Média x Compras por Ano x Anos de Relacionamento
+
+**Como interpretar:** Esta fórmula usa receita, sem margem. No modelo de assinatura, o valor pode ser estimado pelo ticket mensal e pelo cancelamento, com a hipótese identificada.
+
+**Relação LTV / CAC**
+
+**O que mede:** Quanto o valor do cliente representa em relação ao custo de aquisição.
+
+**Fórmula:** LTV / CAC
+
+**Como interpretar:** 3:1 é uma referência didática, não uma regra universal. Considere margem, retenção e tempo de recuperação do investimento.
+
+**Taxa de Conversão**
+
+**O que mede:** Percentual de visitantes ou contatos que compram.
+
+**Fórmula:** (Vendas / Visitantes ou Leads) x 100
+
+**Como interpretar:** Use a mesma etapa do funil e o mesmo período; unidades vendidas não são necessariamente clientes ou pedidos.
+
+### Finanças e rentabilidade
+
+**Margem Bruta**
+
+**O que mede:** Parcela das vendas que sobra após o custo dos produtos vendidos.
+
+**Fórmula:** (Lucro Bruto / Receita Líquida de Tributos sobre Vendas) x 100
+
+**Como interpretar:** Lucro bruto é receita líquida de tributos sobre vendas menos CMV. Declare a base da receita usada ao comparar empresas.
+
+**Margem Líquida**
+
+**O que mede:** Parcela da receita que sobra após todas as despesas.
+
+**Fórmula:** (Lucro Líquido / Receita Total) x 100
+
+**Como interpretar:** Uma margem negativa significa prejuízo. Compare com volume de vendas, juros e custos, sem confundir lucro com caixa.
+
+**EBITDA (Lajida)**
+
+**O que mede:** Resultado antes de juros, impostos sobre o lucro, depreciação e amortização.
+
+**Fórmula:** Resultado Operacional antes do Resultado Financeiro e Tributos sobre o Lucro + Depreciação + Amortização
+
+**Como interpretar:** Não some indiscriminadamente impostos sobre vendas nem amortização de empréstimos. EBITDA não é o saldo de caixa.
+
+**Ponto de Equilíbrio**
+
+**O que mede:** Receita necessária para cobrir custos fixos e variáveis.
+
+**Fórmula:** Custos Fixos Totais / Margem de Contribuição (fração)
+
+**Como interpretar:** Se a margem de contribuição for 40%, use 0,40. Margem nula ou negativa não produz um ponto de equilíbrio finito.
+
+**Prazo Médio de Recebimento (PMR)**
+
+**O que mede:** Tempo médio para receber vendas a prazo.
+
+**Fórmula:** (Contas a Receber / Faturamento do Período) x Dias do Período
+
+**Como interpretar:** 365 aplica-se a faturamento anual; para uma rodada mensal use os dias do mês, ou a convenção didática de 30 dias explicitada. Prefira saldos médios.
+
+**Prazo Médio de Pagamento (PMP)**
+
+**O que mede:** Tempo médio para pagar fornecedores.
+
+**Fórmula:** (Fornecedores / Compras do Período) x Dias do Período
+
+**Como interpretar:** 365 exige compras anuais. Não substitua compras pelo CMV; compare PMP e PMR junto com o giro dos estoques.
+
+### Recursos humanos
+
+**Turnover**
+
+**O que mede:** Movimentação de admissões e desligamentos em relação à equipe.
+
+**Fórmula:** ((Admissões + Demissões) / 2) / Funcionários Ativos x 100
+
+**Como interpretar:** Declare a base da equipe usada e o período. Saídas voluntárias isoladas não representam toda a fórmula.
+
+**Absenteísmo**
+
+**O que mede:** Horas de trabalho perdidas por ausências.
+
+**Fórmula:** (Horas de Ausência / Horas Previstas) x 100
+
+**Como interpretar:** Compare com segurança, clima e capacidade; separar ausências de horas extras evita distorções.
+
+**Receita por Funcionário**
+
+**O que mede:** Faturamento médio por colaborador.
+
+**Fórmula:** Faturamento Bruto / Funcionários
+
+**Como interpretar:** Observe qualidade e carga de trabalho antes de concluir que uma equipe menor é melhor.
+
+**ROI de Treinamento**
+
+**O que mede:** Retorno financeiro atribuível à capacitação.
+
+**Fórmula:** (Ganho com Treinamento - Custo do Treinamento) / Custo do Treinamento
+
+**Como interpretar:** Multiplique por 100 para percentual. É necessário separar o ganho do treinamento de outros fatores; não atribua todo o lucro ao curso.
+
+**Custo por Contratação (CPH)**
+
+**O que mede:** Gasto médio para preencher uma vaga.
+
+**Fórmula:** Custos de Recrutamento e Seleção / Contratações
+
+**Como interpretar:** Inclua os custos de seleção; salário e rescisão não substituem esses dados.
+
+**eNPS**
+
+**O que mede:** Lealdade e recomendação dos funcionários sobre o ambiente de trabalho.
+
+**Fórmula:** % Promotores (nota >= 9,0) - % Detratores (nota < 7,0)
+
+**Como interpretar:** Notas fracionárias de 7,0 até menos de 9,0 são neutras e entram no total de respondentes. Essa classificação é uma adaptação didática do modelo. A escala vai de -100 a +100; as notas do SempreHub representam colaboradores simulados, e não uma pesquisa realizada com pessoas reais.
+
+**Exemplo:** entre 50 respondentes, 30 promotores, 10 neutros e 10 detratores: 60% - 20% = +40 pontos. A classificação em zonas depende da referência adotada; discuta o resultado com o professor e investigue as causas.
+
+### Produção
+
+**OEE**
+
+**O que mede:** Eficiência combinada de disponibilidade, performance e qualidade.
+
+**Fórmula:** Disponibilidade x Performance x Qualidade
+
+**Como interpretar:** Converta percentuais em frações antes de multiplicar. Um fator baixo limita o resultado, mesmo se os outros forem altos.
+
+**Exemplo:** disponibilidade de 90%, performance de 85% e qualidade de 95%: 0,90 x 0,85 x 0,95 = 0,72675, ou 72,675% (72,68% arredondado a duas casas).
+
+**Produtividade da Mão de Obra**
+
+**O que mede:** Itens produzidos por hora de trabalho.
+
+**Fórmula:** Itens Produzidos / Horas de Trabalho
+
+**Como interpretar:** Compare com refugo e qualidade; produzir mais peças defeituosas não significa melhor desempenho.
+
+**Taxa de Refugo**
+
+**O que mede:** Parcela da produção perdida por defeitos.
+
+**Fórmula:** (Itens Defeituosos / Itens Produzidos) x 100
+
+**Como interpretar:** Quanto maior, maior o desperdício. Relacione manutenção, treinamento e ritmo de produção.
+
+**Capacidade Instalada Utilizada**
+
+**O que mede:** Parcela do potencial máximo da fábrica usada.
+
+**Fórmula:** (Produção Atual / Capacidade Máxima) x 100
+
+**Como interpretar:** Uma taxa baixa indica ociosidade; uma taxa alta exige atenção a gargalos, demanda e manutenção antes de expandir.
+
+**Lead Time de Produção**
+
+**O que mede:** Tempo entre o início e a conclusão da fabricação.
+
+**Fórmula:** Fim da Produção - Início da Produção
+
+**Como interpretar:** Use a mesma unidade de tempo; não substitua esse indicador pelo prazo de transporte.
+
+**Giro de Estoque de Matéria-Prima**
+
+**O que mede:** Renovação do estoque de insumos no período.
+
+**Fórmula:** Custo da Matéria-Prima Consumida / Estoque Médio de Matéria-Prima
+
+**Como interpretar:** Um giro alto pode reduzir capital parado, mas também elevar o risco de falta de material.
+
+### Logística
+
+**OTIF**
+
+**O que mede:** Percentual de pedidos entregues no prazo e completos, sem erros.
+
+**Fórmula:** (Pedidos no Prazo e Corretos / Pedidos Entregues) x 100
+
+**Como interpretar:** Conte cada pedido uma única vez; uma entrega atrasada e incompleta não deve ser descontada duas vezes.
+
+**Exemplo:** em 100 entregas, 5 atrasaram e 3 tiveram erro de item. Se forem pedidos distintos, 92 cumpriram ambos os requisitos: OTIF de 92%. Se dois dos pedidos com erro também atrasaram, são 6 pedidos com falha e o OTIF é 94%.
+
+**Order Cycle Time**
+
+**O que mede:** Tempo entre a confirmação do pedido e a entrega ao cliente.
+
+**Fórmula:** Entrega ao Cliente - Confirmação do Pedido
+
+**Como interpretar:** Inclui processamento, produção quando aplicável e transporte. Compare com a promessa ao cliente.
+
+**Custo Logístico / Faturamento**
+
+**O que mede:** Peso da logística na receita bruta.
+
+**Fórmula:** (Custos Logísticos Totais / Faturamento Bruto) x 100
+
+**Como interpretar:** Inclua fretes, armazenagem e demais custos logísticos registrados. Uma taxa menor precisa preservar o nível de serviço.
+
+**Acuracidade do Estoque**
+
+**O que mede:** Conformidade entre o estoque físico e o registro.
+
+**Fórmula:** (Itens Físicos Corretos / Itens Registrados) x 100
+
+**Como interpretar:** Exige contagem física e critérios de conferência; um registro contábil sozinho não comprova acuracidade.
+
+**Ocupação do Armazém**
+
+**O que mede:** Uso do espaço disponível de armazenagem.
+
+**Fórmula:** (Espaço Utilizado / Capacidade do Armazém) x 100
+
+**Como interpretar:** Compare grandezas iguais, como m³ ou posições; unidades de produtos não equivalem automaticamente a volume.
+
+**Custo da Última Milha**
+
+**O que mede:** Custo médio da etapa final por entrega.
+
+**Fórmula:** Custos de Entrega Final / Entregas Realizadas
+
+**Como interpretar:** Separe a etapa final do frete total. Avalie distância, consolidação e qualidade da entrega.
+
+
+## Guia metodológico: como os indicadores funcionam no SempreHub
+
+Os 33 indicadores do capítulo anterior são organizados por departamento para apoiar a análise da equipe. Cada verbete apresenta significado, fórmula e orientação de interpretação. As fórmulas conceituais não significam que todos os dados já sejam registrados em todos os modelos de empresa. Nunca substitua uma informação ausente por zero.
+
+### Finanças: capacidade de pagamento e rentabilidade
+
+Liquidez corrente, seca e imediata tratam da cobertura das obrigações de curto prazo; liquidez geral considera também direitos e obrigações de longo prazo. Um índice baixo sinaliza risco, mas não comprova insolvência automática. Compare vencimentos, capacidade de receber e qualidade do estoque. Sem passivo no denominador, não interprete o indicador como zero.
+
+A margem bruta do painel usa receita líquida de tributos sobre vendas: lucro bruto = receita líquida - CMV. A margem líquida usa lucro líquido dividido pela receita total. EBITDA exclui resultado financeiro e tributos sobre o lucro, acrescentando depreciação e amortização de ativos. Amortização do principal de empréstimos não integra esse acréscimo. EBITDA não é fluxo de caixa.
+
+No ponto de equilíbrio, use a margem de contribuição como fração: 40% corresponde a 0,40. Se a margem for zero ou negativa, a fórmula não fornece um ponto de equilíbrio viável. PMR e PMP devem usar bases compatíveis com a duração do período. Para a convenção mensal de 30 dias, PMR = contas a receber / faturamento mensal x 30; PMP = fornecedores / compras mensais x 30. Compras não são sinônimo de CMV. O painel usa os saldos ainda pendentes originados na rodada atual para PMR e PMP; títulos herdados de outras rodadas não entram nesses numeradores. Sem registro de compras do mês, PMP fica indisponível.
+
+Um saldo financeiro negativo representa necessidade de financiamento e pode gerar juros de cheque especial. O motor conserva o saldo assinado no fluxo de caixa para mostrar o déficit, mas o balanço apresenta disponibilidades iguais a zero e o valor do déficit como cheque especial no passivo. Essa apresentação não cria uma segunda dívida. Os juros parametrizados incidem na rodada seguinte sobre o déficit inicial, sem cobrança adicional na rodada de origem. Não há abertura de conta bancária real.
+
+### Marketing: aquisição, recorrência e competição
+
+Taxa de conversão compara compradores com leads; CAC compara investimento de aquisição com novos clientes. Sem registro de leads, clientes novos ou atribuição de receita, esses indicadores não podem ser deduzidos apenas das unidades vendidas. Um cliente pode comprar mais de uma unidade.
+
+LTV estima o valor do relacionamento com o cliente. Ticket, frequência de compra e retenção precisam usar períodos compatíveis; o modelo Startup possui uma estimativa própria baseada em assinatura e cancelamento. A estimativa de recorrência para empresas tradicionais não deve ser presumida sem dados. A relação LTV/CAC ajuda a avaliar sustentabilidade, mas uma referência de 3:1 não garante resultado saudável: observe margem, retenção e prazo de retorno.
+
+ROI de marketing exige receita atribuível à campanha. Receita total não pode ser automaticamente atribuída aos anúncios. Mesmo quando calculado com receita atribuível, esse ROI não equivale ao lucro da campanha, pois outros custos podem existir. O orçamento de marketing participa da disputa de demanda com outras equipes; não garante clientes ou vendas. O sistema atual não apresenta um Share of Voice separado como indicador calculado.
+
+### Recursos humanos: notas simuladas e limites dos dados
+
+O eNPS varia de -100 a +100. Na adaptação didática com notas fracionárias, promotores têm nota maior ou igual a 9,0; neutros têm nota maior ou igual a 7,0 e estritamente menor que 9,0; detratores têm nota estritamente menor que 7,0. Todos entram no total de respondentes. Sem funcionários, o indicador não se aplica.
+
+Na regra determinística atual, cada colaborador começa com nota 7. Salário acima da referência acrescenta 1 ponto; abaixo retira 2; benefício de pelo menos R$ 150 por funcionário acrescenta 1; horas extras em duas ou mais rodadas consecutivas retiram 1. A nota fica entre 0 e 10. Colaboradores do mesmo perfil nas mesmas condições recebem a mesma nota; resultados extremos ainda podem ocorrer. Não há distribuição normal nem sorteio de notas. O campo de benefício é o valor mensal por funcionário; abaixo de R$ 150 continua tendo custo e efeitos no clima, mas não acrescenta esse ponto no eNPS. A nota é recalculada a partir de 7 em cada rodada, sem acumular bônus anteriores. Uma rodada sem horas extras ou sem funcionários reinicia a sequência de recorrência. Referência salarial igual a zero não permite comparação com o mercado e não gera bônus ou penalidade salarial.
+
+Turnover considera admissões e saídas, incluindo desligamentos voluntários registrados. Receita por funcionário relaciona faturamento e colaboradores ativos. Absenteísmo requer horas de ausência; custo por contratação requer despesas de recrutamento; ROI de treinamento exige ganho financeiro atribuível à capacitação. Melhorar a produtividade não identifica, sozinho, qual parte do lucro veio do treinamento.
+
+A equipe simulada é distribuída em três perfis fixos: Padrão (40%), Exigente (40%) e Engajado (resíduo, aproximadamente 20%). As quantidades dos dois primeiros são arredondadas para baixo, com pelo menos um funcionário no perfil Padrão quando há funcionários; o Engajado recebe o restante. Em equipes pequenas, as proporções diferem de 40%/40%/20%, mas a soma sempre corresponde ao total. Não há sorteio nem identificação de pessoas reais.
+
+Todos os perfis começam na nota 7, garantindo eNPS inicial zero. O Padrão usa os modificadores base. O Exigente multiplica por 1,5 a penalidade de salário abaixo da referência e de horas extras recorrentes. O Engajado multiplica por 1,5 o bônus de salário acima da referência e de benefício mínimo. A ausência de benefício não possui uma penalidade adicional própria.
+
+Exemplo: dez funcionários, salário acima da referência, benefício de R$ 150 por pessoa e horas extras recorrentes. Quatro funcionários Padrão recebem nota 8; quatro Exigentes, 7,5; dois Engajados, 9. São dois promotores e oito neutros: eNPS = +20. O valor é preservado sem truncamento; a apresentação pode arredondar casas decimais. A nota média registrada é ponderada pelas quantidades de cada perfil e não substitui a classificação individual.
+
+### Produção: capacidade, manutenção e desperdício
+
+OEE = disponibilidade x performance x qualidade, usando frações. Equipamentos novos começam com disponibilidade e performance de 100% e qualidade esperada de 98%. Sem máquinas ativas ou com produção planejada igual a zero, OEE não se aplica.
+
+A referência de manutenção é R$ 1.000 para a frota ativa. Investimento integral zera o risco operacional acumulado; abaixo disso, acrescenta até 5 pontos percentuais por rodada proporcionalmente à insuficiência. Esse risco reduz disponibilidade. A depreciação contábil segue custo e vida útil do equipamento e não é uma segunda quebra operacional nem um pagamento em dinheiro.
+
+A cada R$ 100 de treinamento por funcionário, a performance aumenta 2 pontos percentuais, limitada a 100%, e o defeito esperado cai 0,5 ponto percentual, com piso de 0,5%. Sem treinamento, a performance cai 0,5 ponto percentual por rodada. O treinamento proporcional exige funcionários. A produção também respeita mão de obra, matéria-prima e máquinas; não há capacidade adicional oculta de 130%.
+
+Horas extras ampliam explicitamente o tempo operacional e geram custos. A referência regular é de 220 horas mensais; as horas extras são limitadas a 40 por funcionário na rodada. A utilização das máquinas compara produção com capacidade nominal do período, incluindo esse tempo adicional. O proprietário contribui para a capacidade de trabalho regular do modelo; horas extras são atribuídas aos funcionários contratados.
+
+O OEE esperado usa a taxa teórica de qualidade. O refugo físico é limitado a unidades inteiras; por isso, a qualidade observada de um lote pequeno pode ser diferente da esperada. O custo do refugo é lançado na DRE como desperdício e não é novamente incluído no CMV. Os estoques remanescentes e o CMV preservam o custo médio dos insumos e produtos, inclusive os adquiridos em rodadas anteriores.
+
+Lead time requer início e fim de fabricação; produtividade por hora requer horas efetivamente utilizadas; giro de matéria-prima requer consumo e estoque médio compatíveis. Quando esses dados não estiverem disponíveis no resultado, não estime um valor como se tivesse sido medido.
+
+### Logística: OTIF sem dupla penalização
+
+Cada unidade demandada representa um pedido didático de uma unidade. O simulador ainda não cadastra pedidos individuais com múltiplos itens. O denominador do OTIF é a demanda total, incluindo unidades não atendidas. Falta de estoque reduz o atendimento; somente unidades despachadas recebem falhas de transporte.
+
+Transportadora Econômica: 10% de atrasos e 5% de incompletos, com metade dos incompletos também atrasados; falha única esperada de 12,5%. Padrão: 4% de atrasos e 2% de incompletos, com sobreposição de 30%; falha única de 5,4%. Premium: 1% de falha geral, sem atribuir uma causa não especificada.
+
+O motor arredonda primeiro as falhas únicas para pedidos inteiros, com 0,5 para cima, e concilia atrasos, incompletos e sobreposição. Um pedido atrasado e incompleto conta uma vez. Em lotes pequenos, as proporções físicas podem diferir das taxas teóricas. Falta de estoque não recebe novamente uma falha de transporte.
+
+Exemplo: 15 pedidos econômicos totalmente despachados x 12,5% = 1,875 falha esperada; arredondamento = 2 falhas; pedidos perfeitos = 13; OTIF = 13 / 15 x 100 = 86,67%. Sem pedidos, OTIF não se aplica. As mesmas falhas de transporte afetam a satisfação usada nas rodadas seguintes, enquanto a ruptura mantém seu efeito separado.
+
+Ciclo do pedido requer datas de confirmação e entrega; acuracidade exige contagem física independente; ocupação requer volume e capacidade de armazenagem; última milha exige custos e entregas dessa etapa. Frete total não identifica automaticamente o custo da última milha. O custo logístico disponível no modelo tradicional considera frete e armazenagem registrados.
+
+### Como ler a disponibilidade de um indicador
+
+Valor calculado: a fórmula foi aplicada aos registros da simulação. Esses registros representam a empresa simulada, não uma operação física real.
+
+Estimativa do modelo: depende de hipóteses didáticas, como defeitos esperados, falhas de transporte, notas de colaboradores e retenção de clientes. A estimativa pode ser determinística; não implica sorteio ou distribuição estatística.
+
+Dado indisponível: aparece como traço acompanhado de informação sobre ausência de dados, ou como disponível após o fechamento. Não significa zero e não deve fundamentar uma conclusão numérica.
+
+Não se aplica: aparece explicitamente quando não há condição de aplicação, como OEE sem máquinas ou plano de produção, OTIF sem pedidos e eNPS sem funcionários. Não confunda ausência de funcionários com pesquisa de satisfação negativa.
+
+Para decidir, a equipe deve identificar o problema, relacionar indicadores de departamentos diferentes, comparar rodadas e justificar sua escolha. Uma contratação aumenta capacidade, mas também despesas; reduzir frete pode piorar entregas; produzir mais pode imobilizar caixa em estoque. Nenhum indicador isolado determina a melhor decisão.
+
+
+### Bases financeiras do painel
+
+O curto prazo compreende vencimentos até 12 meses após a rodada, inclusive o limite de 12. Contas a receber e fornecedores são classificados pelas rodadas de vencimento. O cheque especial é sempre de curto prazo. Um empréstimo com vencimento único registrado é classificado por esse vencimento; sem cronograma ou vencimento registrado, a liquidez de curto prazo fica indisponível. Não se presume que toda a dívida vença no mês.
+
+Liquidez geral usa direitos e obrigações totais, incluindo cheque especial e excluindo máquinas do realizável; títulos sem vencimentos registrados impedem esse cálculo. Denominador zero não produz índice igual a zero: não há base de divisão.
+
+EBITDA é calculado somente com juros e depreciação isolados na DRE. O motor guarda o EBIT derivado (lucro líquido mais despesas financeiras) e soma a depreciação e a amortização de ativos, quando registrada. Impostos atuais são tributos sobre vendas e permanecem como despesa operacional; amortização de empréstimos não é somada. No modelo Startup, sem depreciação isolada, o indicador permanece indisponível.
+
+O ponto de equilíbrio tradicional é uma estimativa baseada na estrutura de despesas da rodada. Custos variáveis registrados: impostos sobre vendas, CMV, royalties, comissões, frete e refugo. As demais despesas operacionais registradas, incluindo folha, horas extras, campanhas, P&D, networking, rescisões, multas, armazenagem, depreciação, benefícios, treinamento e manutenção, são compromissos do período para essa estimativa. Juros não integram o ponto de equilíbrio operacional. A classificação é didática e não presume que esses custos sejam fixos em qualquer empresa real.
+
+Margem de contribuição positiva permite dividir esses compromissos pela margem. Margem negativa mostra Não se aplica (Margem Negativa); margem nula mostra Não se aplica (Margem Zero). Sem receita ou sem despesas suficientemente discriminadas, aparece Dados indisponíveis. O resultado não é uma previsão garantida de vendas.
+
+LTV tradicional permanece Dados indisponíveis, pois não há retenção e frequência de compra registradas para sustentar seu cálculo. A estimativa de LTV do modelo Startup segue sua própria regra de assinaturas e cancelamentos.

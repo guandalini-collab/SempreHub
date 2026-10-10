@@ -5,6 +5,9 @@ MEI/comercial. DRE usa competência; DFC usa os recebimentos e pagamentos efetiv
 Nenhum argumento é modificado e cada rodada conserva seus próprios snapshots.
 """
 
+from .versionamento import ENGINE_VERSION, inicializar_indicadores
+from .financeiros import reconciliar_financeiros
+from .indicadores import enps
 from copy import deepcopy
 from decimal import Decimal, ROUND_HALF_UP
 import math
@@ -129,6 +132,7 @@ def preparar(
     empresa, decisao, parametros = deepcopy(empresa), deepcopy(decisao), deepcopy(parametros)
     estado_inicial = _estado_normalizado(empresa.get("estado_simulacao"))
     estado = deepcopy(estado_inicial)
+    inicializar_indicadores(estado)
     simulacao = decisao.get("simulacao") or {}
     configuracao = {**_DEFAULTS, **(parametros.get("configuracao_simulacao") or {})}
     alertas = [
@@ -181,6 +185,7 @@ def preparar(
     )
 
     rh = _preparar_rh(empresa, decisao, parametros, estado)
+    kpis_rh = enps(estado, rh["funcionarios"], estado["rh"].get("salario", parametros.get("salario_base", 2000)), parametros.get("salario_base", 2000), (decisao.get("simulacao") or {}).get("beneficio", 0), (decisao.get("simulacao") or {}).get("horas_extras", 0))
     if rh["rotatividade"]:
         alertas.append(f"Moral baixa: {rh['rotatividade']} funcionário(s) saiu(ram) voluntariamente.")
     clientes_iniciais = max(0, int(estado["clientes"]))
@@ -224,6 +229,7 @@ def preparar(
         **{chave: rh[chave] for chave in ("folha", "beneficios", "treinamento", "rescisoes")},
     }
     return {
+        "kpis_rh": kpis_rh, "taxa_cheque_especial": parametros.get("taxa_cheque_especial", 0.08),
         "plano_comercial": deepcopy(decisao.get("plano_comercial")),
         "capacidade": capacidade, "atratividade": atratividade,
         "estado_inicial": deepcopy(estado_inicial), "estado": estado,
@@ -326,6 +332,7 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
     cac = _dinheiro(preparo["custos"]["marketing"] / adquiridos) if adquiridos else None
     ltv = _dinheiro(margem_cliente / preparo["churn"]) if margem_cliente is not None and preparo["churn"] > 0 else None
     operacao = {
+        **preparo["kpis_rh"], "oee": None, "otif": None,
         "produtos": linhas,
         "clientes_iniciais": preparo["clientes_iniciais"], "clientes_perdidos": preparo["clientes_perdidos"],
         "churn": preparo["churn"], "clientes_retidos": preparo["clientes_retidos"],
@@ -344,11 +351,13 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
             f"Nuvem insuficiente: {nao_atendidos} cliente(s) não foi(ram) atendido(s). "
             "A base foi preservada, mas a satisfação caiu e pode elevar o churn na próxima rodada.",
         )
+    balanco = _balanco(estado, caixa, preparo["divida"])
+    operacao.update(reconciliar_financeiros(balanco, estado, dre, preparo["rodada"], preparo["taxa_cheque_especial"], modo="STARTUP"))
     detalhes = {
-        "versao_motor": 1, "modo": "STARTUP", "perfil_tributario": "SERVICO_DIDATICO",
+        "versao_motor": 1, "engine_version": ENGINE_VERSION, "modo": "STARTUP", "perfil_tributario": "SERVICO_DIDATICO",
         "aliquota_servico": aliquota, "estado_inicial": deepcopy(preparo["estado_inicial"]),
         "estado_final": deepcopy(estado), "operacao": operacao, "dfc": dfc,
-        "balanco": _balanco(estado, caixa, preparo["divida"]),
+        "balanco": balanco,
         "balanco_inicial": deepcopy(preparo["balanco_inicial"]),
     }
     return {

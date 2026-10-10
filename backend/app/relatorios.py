@@ -4,6 +4,8 @@ Os indicadores usam os snapshots de cada rodada. Não recalculamos resultados
 antigos com parâmetros atuais nem fabricamos balanços para o motor legado.
 """
 
+from .motor.versionamento import versao_snapshot, snapshot_para_leitura
+
 from copy import deepcopy
 import csv
 import io
@@ -148,7 +150,7 @@ def indicadores_rodada(resultado, detalhes):
 
 
 def _rodada(empresa, resultado, decisao):
-    detalhes = deepcopy(getattr(resultado, "detalhes_simulacao", None))
+    detalhes = snapshot_para_leitura(getattr(resultado, "detalhes_simulacao", None))
     snapshot = _objeto(detalhes)
     basico = ser.resultado(resultado)
     dre = dict(basico["dre"])
@@ -156,6 +158,7 @@ def _rodada(empresa, resultado, decisao):
     return {
         "rodada": resultado.rodada,
         "modo": snapshot.get("modo", "LEGADO"),
+        "engine_version": versao_snapshot(snapshot),
         "preco": resultado.preco,
         "demanda": resultado.demanda,
         "unidades_vendidas": resultado.unidades_vendidas,
@@ -292,7 +295,7 @@ def relatorio_csv(relatorio: dict) -> str:
     escritor.writerow([
         "Empresa", "Rodada", "Modo", "Pontuação didática (não é nota)", "Receita", "Lucro líquido",
         "Margem líquida", "Endividamento", "ROE", "Capital de giro", "Satisfação", "CAC", "LTV", "Churn", "Runway",
-        "DRE", "DFC", "Balanço", "Operação", "Decisão", "Assinaturas", "Participação individual", "Alertas", "Rubrica", "Nota automática / 10", "Situação da nota",
+        "DRE", "DFC", "Balanço", "Operação", "Decisão", "Assinaturas", "Participação individual", "Alertas", "Rubrica", "Nota automática / 10", "Situação da nota", "Versão do motor",
     ])
     pontuacoes = {r["empresa_id"]: r["pontuacao_didatica"] for r in relatorio["ranking"]}
     codificar = lambda valor: json.dumps(valor, ensure_ascii=False, allow_nan=False) if valor is not None else ""
@@ -308,5 +311,6 @@ def relatorio_csv(relatorio: dict) -> str:
                 codificar(rodada["alertas"]), codificar(relatorio["rubrica"]),
                 _csv_numero(next((r.get("nota_semestre") for r in relatorio["ranking"] if r["empresa_id"] == empresa["id"]), None)),
                 "Provisória" if next((r.get("nota_provisoria", True) for r in relatorio["ranking"] if r["empresa_id"] == empresa["id"]), True) else "Final",
+                rodada.get("engine_version", "1.0.0-legacy"),
             ])
     return "\ufeff" + saida.getvalue()
