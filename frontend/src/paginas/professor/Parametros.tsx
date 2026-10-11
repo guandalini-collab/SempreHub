@@ -35,43 +35,29 @@ type Definicao = {
   tipo: "moeda" | "percentual" | "inteiro" | "decimal";
 };
 
-const GRUPOS: { titulo: string; campos: Definicao[] }[] = [
-  {
-    titulo: "Jogo",
-    campos: [
-      { campo: "total_rodadas", rotulo: "Total de rodadas (meses)", ajuda: "Cada rodada representa um mês.", tipo: "inteiro" },
-      { campo: "caixa_inicial", rotulo: "Caixa inicial", ajuda: "Capital com que cada empresa começa.", tipo: "moeda" },
-      { campo: "probabilidade_evento", rotulo: "Chance de evento ao sortear", ajuda: "Usada quando você escolhe “sortear”.", tipo: "percentual" },
-    ],
-  },
-  {
-    titulo: "Mercado",
-    campos: [
-      { campo: "preco_referencia", rotulo: "Preço de referência", ajuda: "Preço “justo” percebido pelos clientes.", tipo: "moeda" },
-      { campo: "custo_unitario", rotulo: "Custo da mercadoria (por unidade)", ajuda: "CMV por unidade vendida.", tipo: "moeda" },
-      { campo: "demanda_base_por_empresa", rotulo: "Demanda base por empresa (un./mês)", ajuda: "O mercado total cresce com o número de empresas.", tipo: "decimal" },
-      { campo: "crescimento_mercado_mensal", rotulo: "Crescimento do mercado (ao mês)", ajuda: "Crescimento vegetativo da demanda.", tipo: "percentual" },
-      { campo: "produtividade_por_pessoa", rotulo: "Produtividade (un./pessoa/mês)", ajuda: "O dono também produz.", tipo: "decimal" },
-    ],
-  },
-  {
-    titulo: "Custos e crédito",
-    campos: [
-      { campo: "custos_fixos_mensais", rotulo: "Custos fixos (por mês)", ajuda: "Aluguel, energia, contador etc.", tipo: "moeda" },
-      { campo: "salario_base", rotulo: "Salário-base", ajuda: "Sem encargos.", tipo: "moeda" },
-      { campo: "taxa_juros_mensal", rotulo: "Juros do empréstimo (ao mês)", ajuda: "Muda com eventos de Selic.", tipo: "percentual" },
-      { campo: "taxa_cheque_especial", rotulo: "Juros do cheque especial (ao mês)", ajuda: "Cobrados sobre caixa negativo.", tipo: "percentual" },
-      { campo: "limite_credito", rotulo: "Limite de crédito", ajuda: "Dívida máxima por empresa.", tipo: "moeda" },
-    ],
-  },
-  {
-    titulo: "Tributos",
-    campos: [
-      { campo: "teto_mei_anual", rotulo: "Teto anual do MEI", ajuda: "Confira o valor vigente na legislação.", tipo: "moeda" },
-      { campo: "das_mei_mensal", rotulo: "DAS do MEI (por mês)", ajuda: "Confira o valor vigente para comércio.", tipo: "moeda" },
-      { campo: "aliquota_icms", rotulo: "ICMS no Lucro Presumido", ajuda: "Aplicado sobre o valor agregado.", tipo: "percentual" },
-    ],
-  },
+const GRUPOS: { titulo: string; cor: string; campos: Definicao[] }[] = [
+  { titulo: "Cenário de Mercado", cor: "bg-royal", campos: [
+    { campo: "total_rodadas", rotulo: "Total de rodadas (meses)", ajuda: "Cada rodada representa um mês.", tipo: "inteiro" },
+    { campo: "probabilidade_evento", rotulo: "Chance de evento ao sortear", ajuda: "Usada quando você escolhe “sortear”.", tipo: "percentual" },
+    { campo: "preco_referencia", rotulo: "Preço de referência", ajuda: "Preço “justo” percebido pelos clientes.", tipo: "moeda" },
+    { campo: "demanda_base_por_empresa", rotulo: "Demanda base por empresa (un./mês)", ajuda: "O mercado total cresce com o número de empresas.", tipo: "decimal" },
+    { campo: "crescimento_mercado_mensal", rotulo: "Crescimento do mercado (ao mês)", ajuda: "Crescimento vegetativo da demanda.", tipo: "percentual" },
+  ] },
+  { titulo: "Custos e Limites da Empresa", cor: "bg-corporativo", campos: [
+    { campo: "caixa_inicial", rotulo: "Caixa inicial", ajuda: "Capital com que cada empresa começa.", tipo: "moeda" },
+    { campo: "custo_unitario", rotulo: "Custo da mercadoria (por unidade)", ajuda: "CMV por unidade vendida.", tipo: "moeda" },
+    { campo: "produtividade_por_pessoa", rotulo: "Produtividade (un./pessoa/mês)", ajuda: "O dono também produz.", tipo: "decimal" },
+    { campo: "custos_fixos_mensais", rotulo: "Custos fixos (por mês)", ajuda: "Aluguel, energia, contador etc.", tipo: "moeda" },
+    { campo: "salario_base", rotulo: "Salário-base", ajuda: "Sem encargos.", tipo: "moeda" },
+  ] },
+  { titulo: "Crédito e Tributação", cor: "bg-hub", campos: [
+    { campo: "taxa_juros_mensal", rotulo: "Juros do empréstimo (ao mês)", ajuda: "Muda com eventos de Selic.", tipo: "percentual" },
+    { campo: "taxa_cheque_especial", rotulo: "Juros do cheque especial (ao mês)", ajuda: "Cobrados sobre caixa negativo.", tipo: "percentual" },
+    { campo: "limite_credito", rotulo: "Limite de crédito", ajuda: "Dívida máxima por empresa.", tipo: "moeda" },
+    { campo: "teto_mei_anual", rotulo: "Teto anual do MEI", ajuda: "Confira o valor vigente na legislação.", tipo: "moeda" },
+    { campo: "das_mei_mensal", rotulo: "DAS do MEI (por mês)", ajuda: "Confira o valor vigente para comércio.", tipo: "moeda" },
+    { campo: "aliquota_icms", rotulo: "ICMS no Lucro Presumido", ajuda: "Aplicado sobre o valor agregado.", tipo: "percentual" },
+  ] },
 ];
 
 export function EditorParametros({
@@ -89,17 +75,21 @@ export function EditorParametros({
 }) {
   return (
     <div className="space-y-5">
+      {GRUPOS.map((grupo) => (
+        <fieldset key={grupo.titulo} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <legend className={`float-left w-full px-5 py-4 text-base font-bold ${grupo.cor} ${grupo.cor === "bg-hub" ? "text-sky-950" : "text-white"}`}>{grupo.titulo}</legend>
+          <div className="clear-both grid gap-5 p-5 sm:grid-cols-2 xl:grid-cols-3">
+            {grupo.titulo === "Cenário de Mercado" && <div className="sm:col-span-2 xl:col-span-3">
       {exibirModo && <ConfiguracaoSimulacao valores={valores} aoMudar={(jogo) => aoMudar({ ...valores, ...jogo })} bloqueado={modoBloqueado || somenteRodadas} />}
+            </div>}
+            {grupo.titulo === "Custos e Limites da Empresa" && <div className="sm:col-span-2 xl:col-span-3">
       {exibirModo && <Campo rotulo="Participação dos alunos" ajuda={modoBloqueado ? "Ao converter para equipes, empresas e resultados são preservados. Cada aluno atual inicia como CEO; complete a equipe e confirme novamente as decisões da rodada atual." : "Em equipes, 3 a 5 alunos dividem os cargos e todos confirmam cada decisão."}>
         <select className={estiloEntrada} value={valores.modo_equipe ? "EQUIPE" : "INDIVIDUAL"} onChange={(e) => aoMudar({ ...valores, modo_equipe: e.target.value === "EQUIPE" })}>
           <option value="EQUIPE">Equipes de 3 a 5 alunos</option>
           <option value="INDIVIDUAL" disabled={(modoBloqueado || somenteRodadas) && valores.modo_equipe}>Individual</option>
         </select>
       </Campo>}
-      {GRUPOS.map((grupo) => (
-        <fieldset key={grupo.titulo}>
-          <legend className="mb-3 border-b border-slate-200 pb-1 text-sm font-semibold text-marinho">{grupo.titulo}</legend>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            </div>}
             {grupo.campos.map((def) => {
               const bloqueado = somenteRodadas && def.campo !== "total_rodadas";
               const valor = valores[def.campo];

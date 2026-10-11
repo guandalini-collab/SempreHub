@@ -61,7 +61,7 @@ export function Cartao({
   return (
     <section className={`rounded-2xl bg-white p-5 shadow-[0_8px_30px_-18px_rgba(11,37,69,0.25)] ring-1 ring-slate-200 ${className}`}>
       {(titulo || acao) && (
-        <div className="-mx-5 -mt-5 mb-5 flex flex-wrap items-center justify-between gap-2 rounded-t-2xl bg-gradient-to-r from-marinho to-blue-700 px-5 py-4 text-white">
+        <div className="-mx-5 -mt-5 mb-5 flex flex-wrap items-center justify-between gap-2 rounded-t-2xl bg-gradient-to-r from-marinho to-royal px-5 py-4 text-white">
           {titulo && <h2 className="text-base font-semibold text-white">{titulo}</h2>}
           <div className="[&_.text-slate-500]:text-blue-100">{acao}</div>
         </div>
@@ -71,7 +71,7 @@ export function Cartao({
   );
 }
 
-type VarianteBotao = "primario" | "secundario" | "perigo";
+type VarianteBotao = "primario" | "secundario" | "perigo" | "final";
 
 export function Botao({
   variante = "primario",
@@ -81,7 +81,8 @@ export function Botao({
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variante?: VarianteBotao; carregando?: boolean }) {
   const estilos: Record<VarianteBotao, string> = {
-    primario: "bg-ouro text-marinho hover:bg-ouro/90",
+    primario: "bg-hub text-sky-950 hover:bg-hub/90",
+    final: "bg-ouro text-sky-950 hover:bg-ouro/90",
     secundario: "bg-marinho text-white hover:bg-marinho/90",
     perigo: "bg-red-600 text-white hover:bg-red-700",
   };

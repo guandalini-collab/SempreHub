@@ -20,9 +20,9 @@
 }
 
 @layer base {
-  body { background: #f3f5fa; }
+  body { background: #F8FAFC; }
   button, summary, input, select, textarea { touch-action: manipulation; }
-  button:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
+  button:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid #0762D9; outline-offset: 3px; }
   input[type="range"] { min-height: 36px; cursor: pointer; }
   [hidden] { display: none !important; }
 }
@@ -31,11 +31,18 @@
 }
 
 @layer base {
-  body { background: #eef3ff; }
-  input[type="range"] { accent-color: #2563eb; }
+  body { background: #F8FAFC; }
+  input[type="range"] { accent-color: #0762D9; }
 }
 @layer components {
-  #menu-painel button[aria-current="page"] { background: #2563eb; color: white; box-shadow: 0 4px 18px rgb(37 99 235 / 35%); }
-  #menu-painel button:hover { background: #234484; color: white; }
-  #menu-painel button[aria-current="page"]:hover { background: #1d4ed8; }
+  #menu-painel button[aria-current="page"] { background: #0AADBF; color: #082F49; box-shadow: 0 4px 18px rgb(10 173 191 / 20%); }
+  #menu-painel button:hover { background: #0762D9; color: white; }
+  #menu-painel button[aria-current="page"]:hover { background: #0AADBF; }
+}
+
+@layer components {
+  .quadros-analise > * { border-top: 4px solid #0762D9; min-height: 220px; }
+  .quadros-analise > :nth-child(2) { border-top-color: #0AADBF; }
+  .quadros-analise > :nth-child(3) { border-top-color: #034AA6; }
+  .quadros-analise > :nth-child(4) { border-top-color: #D9851E; }
 }

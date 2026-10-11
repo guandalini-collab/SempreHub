@@ -355,7 +355,7 @@ function Analises({ ferramenta }: { ferramenta?: number }) {
         </details>
         <details className="rounded-lg border border-slate-200 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-marinho">PESTEL · macroambiente</summary>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">{pestel.map(([titulo, texto]) => <ItemAnalise key={titulo} titulo={titulo} texto={texto} />)}</div>
+          <div className="quadros-analise mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{pestel.map(([titulo, texto]) => <ItemAnalise key={titulo} titulo={titulo} texto={texto} />)}</div>
         </details>
         <details className="rounded-lg border border-slate-200 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-marinho">Análise de mercado</summary>
@@ -367,10 +367,10 @@ function Analises({ ferramenta }: { ferramenta?: number }) {
         </details>
         <details className="rounded-lg border border-slate-200 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-marinho">SWOT (FOFA)</summary>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <div className="quadros-analise mt-3 grid gap-4 sm:grid-cols-2">
             <ItemAnalise titulo="Forças" texto="Vantagens internas que a empresa consegue sustentar." />
-            <ItemAnalise titulo="Fraquezas" texto="Limitações internas que precisam de melhoria." />
             <ItemAnalise titulo="Oportunidades" texto="Condições externas favoráveis ao crescimento." />
+            <ItemAnalise titulo="Fraquezas" texto="Limitações internas que precisam de melhoria." />
             <ItemAnalise titulo="Ameaças" texto="Riscos externos, crises e movimentos de rivais." />
           </div>
         </details>

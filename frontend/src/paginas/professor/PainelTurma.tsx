@@ -416,13 +416,13 @@ function FecharRodada({
             <Botao variante="secundario" onClick={() => setConfirmando(false)}>
               Voltar
             </Botao>
-            <Botao carregando={carregando}  onClick={fechar}>
+            <Botao variante="final" carregando={carregando}  onClick={fechar}>
               Confirmar
             </Botao>
           </div>
         ) : (
           <div className="flex justify-end">
-            <Botao disabled={empresas.length === 0} onClick={() => setConfirmando(true)}>
+            <Botao variante="final" disabled={empresas.length === 0} onClick={() => setConfirmando(true)}>
               Forçar Fechamento Imediato da Rodada
             </Botao>
           </div>
