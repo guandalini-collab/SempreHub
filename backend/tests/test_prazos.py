@@ -87,3 +87,32 @@ def test_limite_temporal_em_microssegundos():
     for instante in [limite,limite+timedelta(microseconds=1)]:
         with pytest.raises(HTTPException) as erro:validar_salvamento(turma,1,instante)
         assert erro.value.status_code==403
+
+
+@pytest.mark.parametrize("modo", ["TRADICIONAL", "STARTUP"])
+@pytest.mark.parametrize("automatico", [False, True])
+def test_prazo_no_snapshot_dos_motores_avancados(cliente, professor, monkeypatch, modo, automatico):
+    monkeypatch.setattr("app.routers.mercado.preparar_relatorios_automaticos", lambda *args: None)
+    equipe = _criar_equipe(cliente, professor)
+    _salvar(cliente, equipe)
+    with SessionLocal() as db:
+        turma = db.get(Turma, equipe["turma"]["id"])
+        turma.modo_jogo = modo
+        db.commit()
+    prazo = agora() + timedelta(days=-1 if automatico else 1)
+    with SessionLocal() as db:
+        turma = db.get(Turma, equipe["turma"]["id"])
+        turma.prazo_rodada = prazo
+        turma.prazo_numero_rodada = 1
+        db.commit()
+    if automatico:
+        fechar_vencidas()
+        fechar_vencidas()
+    else:
+        resposta = cliente.post(f"/api/professor/turmas/{equipe['turma']['id']}/fechar-rodada",
+                                headers=professor, json={"rodada": 1, "forcar": True, "evento": "NENHUM"})
+        assert resposta.status_code == 200
+    with SessionLocal() as db:
+        assert db.get(Turma, equipe["turma"]["id"]).rodada_atual == 2
+        resultado = db.query(Resultado).filter_by(empresa_id=equipe["id"], rodada=1).one()
+        assert resultado.detalhes_simulacao["parametros"]["prazo_rodada"] == prazo.isoformat()

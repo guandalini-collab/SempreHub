@@ -1,5 +1,6 @@
 """Integração dos motores didáticos v1 e snapshots históricos, sem mudar o legado."""
 from copy import deepcopy
+from datetime import date, datetime
 from enum import Enum
 import math
 
@@ -53,6 +54,10 @@ def colunas(objeto):
 def parametros(turma):
     dados = colunas(turma)
     dados.pop("criado_em", None)
+    # O prazo é preservado na fotografia histórica como ISO, nunca como objeto ORM.
+    for nome, valor in dados.items():
+        if isinstance(valor, (date, datetime)):
+            dados[nome] = valor.isoformat()
     dados["configuracao_simulacao"] = config(turma)
     return dados
 

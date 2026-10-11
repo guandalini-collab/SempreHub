@@ -39,3 +39,9 @@ Auditoria da versão publicada 91814a8 e validação das duas correções de int
 - Não houve teste de carga, recuperação de backup ou falha de infraestrutura. Os resultados não garantem disponibilidade futura de serviços externos.
 
 Credenciais de QA e arquivos temporários ficam em tmp/qa, ignorados pelo Git; não constam neste relatório. As evidências de interface e o roteiro automatizado estão nessa pasta e em tools/homologar_fluxo.mjs.
+
+## Correção após tentativa de fechamento antecipado com prazo configurado
+
+O PDF enviado pelo professor revelou HTTP 500 no fechamento da turma QA tradicional. Os logs do Railway confirmaram datetime não serializável em resultados.detalhes_simulacao: prazo_rodada foi copiado do ORM ao snapshot. Datas dos parâmetros agora são preservadas como texto ISO; o prazo no modelo permanece datetime e a validação temporal não mudou. A interface também trata respostas de erro não JSON sem mascarar o status HTTP com SyntaxError.
+
+Regressão específica: quatro cenários aprovados (Tradicional/Startup × manual antes do prazo/automático vencido), verificando persistência do prazo no snapshot, resultado único e avanço. Suíte completa: 262 testes aprovados; build frontend aprovado. Nenhum histórico foi recalculado e nenhuma migração foi necessária. O usuário confirmou o download do manual no Chrome, encerrando aquela limitação instrumental.

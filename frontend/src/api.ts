@@ -81,7 +81,16 @@ export async function requisitar<T>(caminho: string, opcoes: RequestInit = {}): 
     throw new ErroApi("Não foi possível falar com o servidor. Verifique se o backend está rodando.", 0);
   }
   const texto = await resposta.text();
-  const corpo = texto ? JSON.parse(texto) : null;
+  let corpo: unknown = null;
+  if (texto) {
+    try {
+      corpo = JSON.parse(texto);
+    } catch {
+      if (resposta.ok) {
+        throw new ErroApi("O servidor retornou uma resposta inválida. Tente novamente.", resposta.status);
+      }
+    }
+  }
   if (!resposta.ok) {
     if (resposta.status === 401 && token) {
       encerrarSessao();
