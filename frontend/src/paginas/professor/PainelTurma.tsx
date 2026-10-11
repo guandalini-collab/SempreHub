@@ -113,6 +113,13 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
 
   return (
     <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={(id) => { setSecao(id); setEditandoParametros(id === "parametros"); }} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ turma: turma.nome, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
+      {aberta && !turma.prazo_rodada && (
+        <div role="status" className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-950">
+          <p className="font-semibold">Configuração pendente: rodada {turma.rodada_atual} sem data limite.</p>
+          <p className="mt-1 text-sm">Antes de orientar os alunos a iniciar esta rodada, confira o prazo. Sem uma data salva, as decisões permanecem abertas e o encerramento será somente manual. O prazo da rodada anterior não é reutilizado.</p>
+          <button type="button" className="mt-3 rounded-lg border border-amber-400 px-3 py-2 text-sm font-semibold hover:bg-amber-100" onClick={() => setSecao("fechamento")}>Configurar prazo da rodada</button>
+        </div>
+      )}
       <SecaoPainel id="visao" ativa={secao}>
       <FormacaoTurma turma={turma} aoAtualizar={carregar}/>
       <div className="rounded-xl bg-marinho p-5 text-white shadow-lg">

@@ -57,6 +57,8 @@ Ao observar a rede, lembre-se de verificar as consequências de cada escolha nas
 
 No menu lateral, abra **Encerrar rodada**. Escolha a data em **Data limite da rodada** e clique em **Salvar prazo**. O bloqueio ocorre às **23:59:59 de Brasília**, exclusivamente na data configurada para aquele mês. Antes desse instante, rascunhos e envios finais continuam permitidos. Sem prazo, o encerramento é manual.
 
+Antes de orientar os alunos a iniciar cada rodada, confira o alerta de configuração no painel. Quando não houver data limite salva, aparecerá **Configuração pendente: rodada sem data limite**. Clique em **Configurar prazo da rodada** para abrir o campo correspondente. O aviso desaparece após salvar a data. O prazo anterior não é reutilizado; manter a rodada sem prazo é permitido, mas exige encerramento manual pelo professor.
+
 O sistema encerra o mês automaticamente quando o prazo vence, inclusive se ninguém estiver conectado. O professor também pode usar **Forçar Fechamento Imediato da Rodada**, com confirmação. Rascunhos existentes são preservados e processados como fechamento automático; sem decisão, o motor mantém as escolhas recorrentes anteriores e zera ações pontuais. Esses casos não equivalem a entrega final voluntária da equipe.
 
 O motor preserva os cálculos da simulação, atualiza caixa, estoque e participação e avança o mês uma única vez. No próximo mês, o líder volta a editar e o professor configura um novo prazo. O mecanismo de inteligência de mercado recebe os dados estruturados para preparar análises e relatórios; suas fontes e controles ficam no painel docente. Projeções são identificadas e dados ausentes não são apresentados como fatos confirmados.
