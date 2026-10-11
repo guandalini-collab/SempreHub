@@ -1,4 +1,5 @@
 import ManualMidias from "./ManualMidias";
+import LinkManual from "./LinkManual";
 import { MercadoPublicado } from "./MercadoReal";
 import React, { useEffect, useMemo, useState } from "react";
 
@@ -427,7 +428,7 @@ export function ManualRapido({ perfil }: { perfil: PerfilAprendizagem }) {
     ? ["Entre na turma e abra ou aceite uma empresa.", "Leia o evento e o SempreHub News.", "Preencha a decisão e use a prévia para conferir o impacto.", "O líder salva, envia a decisão final e acompanha o resultado da rodada."]
     : ["Crie a turma e escolha modo, cenário, parâmetros e número de rodadas.", "Acompanhe empresas, equipes e pendências antes do fechamento.", "Escolha o evento e feche uma rodada por vez.", "Use ranking, resultados e relatório para conduzir a devolutiva."];
   return (
-    <Cartao titulo={titulo} acao={<a className="text-xs font-semibold text-marinho underline" href={`/manuais/manual-${perfil === "ALUNO" ? "aluno" : "professor"}.pdf`} target="_blank" rel="noreferrer">Abrir / baixar PDF ilustrado</a>}>
+    <Cartao titulo={titulo} acao={<LinkManual className="text-xs font-semibold text-marinho underline" arquivo={`manual-${perfil === "ALUNO" ? "aluno" : "professor"}`}>Abrir / baixar PDF ilustrado</LinkManual>}>
       <ol className="grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
         {orientacoes.map((texto, indice) => <li key={texto} className="flex gap-2 rounded-lg bg-slate-50 p-3"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-marinho text-xs font-bold text-white">{indice + 1}</span><span className="leading-relaxed">{texto}</span></li>)}
       </ol>
