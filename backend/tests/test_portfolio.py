@@ -3,12 +3,12 @@ from copy import deepcopy
 import pytest
 from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
-from .test_mercado import edicao
+from .test_mercado import edicao, fontes_documentadas
 
 
 def preparar(cliente,professor,monkeypatch,modo='TRADICIONAL'):
     from app.routers import mercado
-    cat=edicao();p=deepcopy(cat['produtos'][0]);p.update(id='produto-2',nome='Produto dois',custo_unitario=80);cat['produtos'].append(p)
+    cat=edicao();p=deepcopy(cat['produtos'][0]);p.update(id='produto-2',nome='Produto dois',custo_unitario=80,evidencia_custo={'url':'https://example.com/produto','trecho':'Produto dois R$ 80,00 por unidade ou cliente/mês.'});cat['produtos'].append(p)
     if modo=='STARTUP':
         for p in cat['produtos']:p.update(natureza='SERVICO_DIGITAL',unidade='cliente/mês')
     monkeypatch.setattr(mercado,'gerar_json',lambda *a:(cat,{'https://example.com/produto'}))

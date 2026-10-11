@@ -7,7 +7,7 @@ from app.motor.estrategia import avaliar, quadrante
 from app.schemas import AnalisesEstrategicas
 from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
-from .test_mercado import edicao
+from .test_mercado import edicao, fontes_documentadas
 
 
 def test_quadrantes_bcg_e_limites():

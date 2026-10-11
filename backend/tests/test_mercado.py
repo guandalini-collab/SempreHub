@@ -1,3 +1,13 @@
+import pytest
+from app.evidencias_mercado import Documento
+
+
+@pytest.fixture(autouse=True)
+def fontes_documentadas(monkeypatch):
+    monkeypatch.setattr("app.evidencias_mercado.obter_documento", lambda url: Documento(
+        '<meta property="article:published_time" content="2026-10-06"><main>Produto de teste R$ 30,00 por unidade ou cliente/mês. Produto dois R$ 80,00 por unidade ou cliente/mês.</main>'))
+
+
 from .decisoes import completar_decisao
 from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
@@ -6,7 +16,7 @@ from .test_fluxo import _criar_turma, _entrar
 def edicao():
     fonte={"titulo":"Fonte de aquisição","url":"https://example.com/produto"}
     artigo={"titulo":"Mercado brasileiro","texto":"Dados de mercado consultados para esta edição.","data":"2026-10-06","fontes":[fonte]}
-    return {"setor":"Eletrônicos e Tecnologia","comercio":"B2C","noticias":[artigo],"analises":[artigo],"produtos":[{"natureza":"FISICO","id":"produto-1","nome":"Produto de teste","descricao":"Descrição de produto de teste","custo_unitario":30,"unidade":"unidade","base_custo":"Preço público de aquisição, não custo industrial.","data":"2026-10-06","fontes":[fonte]}]}
+    return {"setor":"Eletrônicos e Tecnologia","comercio":"B2C","noticias":[artigo],"analises":[artigo],"produtos":[{"natureza":"FISICO","id":"produto-1","nome":"Produto de teste","descricao":"Descrição de produto de teste","custo_unitario":30,"unidade":"unidade","base_custo":"Preço público de aquisição, não custo industrial.","data":"2026-10-06","fontes":[fonte],"evidencia_custo":{"url":"https://example.com/produto","trecho":"Produto de teste R$ 30,00 por unidade ou cliente/mês."}}]}
 
 
 def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch):

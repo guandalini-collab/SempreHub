@@ -1,3 +1,4 @@
+from .test_mercado import fontes_documentadas
 from .decisoes import completar_decisao
 from copy import deepcopy
 import pytest
