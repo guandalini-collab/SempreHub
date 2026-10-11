@@ -53,3 +53,9 @@ Implementados custo de aquisição comprovado, projeção de preço varejista co
 Regressões: três variantes do fluxo pesquisa → publicação → acesso aluno → envio final → fechamento → CMV, com normalização do custo pelo servidor. Testes de fonte inacessível, nome/trecho incompatível, desconto idempotente, notícias inválidas e fonte insegura. Suíte completa: 270 aprovados. Build frontend aprovado. Manuais do aluno e professor regenerados e páginas novas conferidas visualmente.
 
 Item 7: testes de leitura histórica, inicialização única e resultados legados aprovados. O catálogo ganha versao_custos_catalogo=1.0.0-three-paths; ENGINE_VERSION permanece 2.0.0-deterministic-indicators, evitando reinício de desgaste. Campos novos são opcionais no JSON para compatibilidade; não há migração de tabelas nem reprocessamento do passado. A validação em produção desta alteração será registrada após o deploy.
+
+### Confirmação em produção dos três caminhos
+
+Deploy 741c795 concluído com sucesso no Railway. Na turma QA tradicional, rodada 4, a pesquisa de um produto retornou uma edição nova com custo padrão de R$ 40 identificado como Estimativa do Modelo. A fonte não comprovou preço de aquisição, e o fallback permitiu revisão e publicação. O aluno recebeu o produto na tela com estado, fórmula e base do custo.
+
+Envio final da equipe fictícia aceito: tentativa de informar custo R$ 1 foi normalizada pelo backend para R$ 40 do catálogo. Campos obrigatórios de análise permaneceram exigidos (primeira tentativa incompleta recebeu HTTP 422); nenhuma trava foi removida. Após envio, Chrome exibiu modo de leitura e custo estimado de R$ 40. Comparação integral dos três resultados anteriores antes/depois: idênticos. A edição retorna versao_custos_catalogo=1.0.0-three-paths. O fechamento automático no horário real continua sem observação; rodada 4 da turma QA permanece sem prazo.
