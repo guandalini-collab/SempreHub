@@ -719,3 +719,12 @@ O ponto de equilíbrio tradicional é uma estimativa baseada na estrutura de des
 Margem de contribuição positiva permite dividir esses compromissos pela margem. Margem negativa mostra Não se aplica (Margem Negativa); margem nula mostra Não se aplica (Margem Zero). Sem receita ou sem despesas suficientemente discriminadas, aparece Dados indisponíveis. O resultado não é uma previsão garantida de vendas.
 
 LTV tradicional permanece Dados indisponíveis, pois não há retenção e frequência de compra registradas para sustentar seu cálculo. A estimativa de LTV do modelo Startup segue sua própria regra de assinaturas e cancelamentos.
+
+
+## Origem dos custos no catálogo de produtos
+
+O custo unitário pode aparecer como **Valor Calculado** quando sustentado pelo preço documentado de aquisição, ou como **Estimativa do Modelo**. Um preço de varejo comprovado gera uma projeção didática: **custo estimado = preço de varejo × 0,60** (desconto de 40%). Essa projeção não comprova o custo real de fabricação.
+
+Se a fonte estiver inacessível ou não confirmar o produto e o preço, o catálogo usa o custo unitário padrão configurado na turma, sempre identificado como **Estimativa do Modelo**. O professor recebe o motivo da falha na revisão da edição. Para esse recurso, o custo padrão deve ser maior que zero. Notícias e análises mantêm suas exigências de fontes e datas; links inseguros continuam bloqueados.
+
+A equipe deve interpretar a origem do custo ao definir preço, margem, produção e financiamento. Depois de publicado, o custo é aplicado pelo sistema às decisões e preservado com a edição; não é um campo livre para o aluno alterar. Edições e resultados históricos não são recalculados. A regra dos três caminhos possui identificação própria, separada da versão do motor de indicadores.

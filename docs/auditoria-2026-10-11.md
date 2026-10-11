@@ -45,3 +45,11 @@ Credenciais de QA e arquivos temporários ficam em tmp/qa, ignorados pelo Git; n
 O PDF enviado pelo professor revelou HTTP 500 no fechamento da turma QA tradicional. Os logs do Railway confirmaram datetime não serializável em resultados.detalhes_simulacao: prazo_rodada foi copiado do ORM ao snapshot. Datas dos parâmetros agora são preservadas como texto ISO; o prazo no modelo permanece datetime e a validação temporal não mudou. A interface também trata respostas de erro não JSON sem mascarar o status HTTP com SyntaxError.
 
 Regressão específica: quatro cenários aprovados (Tradicional/Startup × manual antes do prazo/automático vencido), verificando persistência do prazo no snapshot, resultado único e avanço. Suíte completa: 262 testes aprovados; build frontend aprovado. Nenhum histórico foi recalculado e nenhuma migração foi necessária. O usuário confirmou o download do manual no Chrome, encerrando aquela limitação instrumental.
+
+## Catálogo: três caminhos de custo e retorno ao Item 7
+
+Implementados custo de aquisição comprovado, projeção de preço varejista comprovado × 0,60 e custo padrão da turma por falha de evidência. A edição registra estado, fórmula, preço documentado quando comprovado e alerta de revisão ao professor. Na publicação os valores são novamente validados e persistidos, sem desconto duplicado. Notícias/análises permanecem estritas; fontes internas e HTTPS inválido não são liberados pelo fallback. Custo padrão zero exige configuração positiva antes de aceitar estimativas.
+
+Regressões: três variantes do fluxo pesquisa → publicação → acesso aluno → envio final → fechamento → CMV, com normalização do custo pelo servidor. Testes de fonte inacessível, nome/trecho incompatível, desconto idempotente, notícias inválidas e fonte insegura. Suíte completa: 270 aprovados. Build frontend aprovado. Manuais do aluno e professor regenerados e páginas novas conferidas visualmente.
+
+Item 7: testes de leitura histórica, inicialização única e resultados legados aprovados. O catálogo ganha versao_custos_catalogo=1.0.0-three-paths; ENGINE_VERSION permanece 2.0.0-deterministic-indicators, evitando reinício de desgaste. Campos novos são opcionais no JSON para compatibilidade; não há migração de tabelas nem reprocessamento do passado. A validação em produção desta alteração será registrada após o deploy.

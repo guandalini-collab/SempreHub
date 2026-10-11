@@ -19,9 +19,14 @@ def edicao():
     return {"setor":"Eletrônicos e Tecnologia","comercio":"B2C","noticias":[artigo],"analises":[artigo],"produtos":[{"natureza":"FISICO","id":"produto-1","nome":"Produto de teste","descricao":"Descrição de produto de teste","custo_unitario":30,"unidade":"unidade","base_custo":"Preço público de aquisição, não custo industrial.","data":"2026-10-06","fontes":[fonte],"evidencia_custo":{"url":"https://example.com/produto","trecho":"Produto de teste R$ 30,00 por unidade ou cliente/mês."}}]}
 
 
-def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch):
+@pytest.mark.parametrize("origem", ["documentado", "varejo", "fallback"])
+def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch,origem):
     from app.routers import mercado
-    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(edicao(),{"https://example.com/produto"}))
+    dados = edicao()
+    if origem == "varejo": dados["produtos"][0]["tipo_documento"] = "preco_varejo"
+    if origem == "fallback": dados["produtos"][0].pop("evidencia_custo")
+    custo = {"documentado": 30, "varejo": 18, "fallback": 40}[origem]
+    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(dados,{"https://example.com/produto"}))
     turma=_criar_turma(cliente,professor,total_rodadas=3)
     aluno=cadastrar(cliente,"Ana","ana@aluno.iffar.edu.br")
     outro=cadastrar(cliente,"Bia","bia@aluno.iffar.edu.br")
@@ -41,12 +46,12 @@ def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch):
     decisao={"preco":60,"marketing":557,"plano_comercial":plano}
     r=cliente.put(base+"/decisao",headers=aluno,json=completar_decisao(decisao))
     assert r.status_code==200,r.text
-    assert r.json()["plano_comercial"]["custo_unitario"]==30
+    assert r.json()["plano_comercial"]["custo_unitario"]==custo
     assert cliente.put(base+"/decisao",headers=aluno,json=completar_decisao({**decisao,"marketing":1})).status_code==422
     assert cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada",headers=professor,json={"evento":"NENHUM"}).status_code==200
     painel=cliente.get(base,headers=aluno).json()
     resultado=painel["resultados"][0]
-    assert abs(resultado["dre"]["cmv"]-resultado["unidades_vendidas"]*30)<.01
+    assert abs(resultado["dre"]["cmv"]-resultado["unidades_vendidas"]*custo)<.01
     assert cliente.get(base+"/mercado-real",headers=aluno).json()["edicoes"][0]["rodada"]==1
     # O catálogo anterior continua válido e seu custo não pode ser removido.
     assert cliente.put(base+"/decisao",headers=aluno,json=completar_decisao({"preco":60})).status_code==422

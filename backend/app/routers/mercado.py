@@ -52,10 +52,16 @@ class Produto(BaseModel):
     fontes: list[Fonte] = Field(min_length=1, max_length=10)
     # Opcional na leitura para preservar catálogos históricos; exigido em novas edições.
     evidencia_custo: EvidenciaCusto | None = None
+    tipo_documento: Literal["custo_aquisicao", "preco_varejo"] = "custo_aquisicao"
+    valor_documentado: float | None = Field(default=None, gt=0, le=1000000)
+    estado_indicador: Literal["Valor Calculado", "Estimativa do Modelo"] | None = None
+    formula_aplicada: str | None = Field(default=None, max_length=200)
+    alerta_professor: str | None = Field(default=None, max_length=2000)
 
 class Edicao(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
     modo_operacao: Literal["LEGADO", "TRADICIONAL", "STARTUP"] | None = None
+    versao_custos_catalogo: Literal["1.0.0-three-paths"] | None = None
     setor: str
     comercio: Literal["B2C", "B2B", "HIBRIDO"]
     noticias: list[Artigo] = Field(max_length=10)
@@ -107,10 +113,11 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     turma=_turma_do_professor(db,turma_id,usuario)
     rodada=turma.rodada_atual
     if turma.status != StatusTurma.ABERTA: raise HTTPException(409,"Turma encerrada.")
-    instrucoes='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,natureza,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. Cada produto deve incluir natureza FISICO ou SERVICO_DIGITAL conforme o modo de operação. O setor informado não determina o modelo da empresa. No modo tradicional descreva o custo por unidade de matéria-prima/kit de montagem documentado, identificando a base e sem atribuir custos industriais não documentados. Notícias e análises devem contextualizar o setor e o modo informado separadamente. id deve ser texto, custo_unitario deve ser número em BRL, sem símbolos ou separadores locais. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; nunca rotule preço de varejo como custo industrial. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores. Cada produto deve incluir evidencia_custo: {url,trecho}, com um trecho literal da página que contenha o nome exato do produto e seu preço em R$; use esse mesmo nome no campo nome. Não use estatísticas setoriais como fonte de preço. Não derive um preço de médias, faturamentos ou estimativas. A data dos artigos deve ser a data de publicação documentada (AAAA-MM-DD ou AAAA-MM), nunca a data atual da consulta. Para produtos sem data de publicação, indique explicitamente Consulta em AAAA-MM-DD com a data_consulta fornecida. Não atribua datas de atualização da página à publicação do artigo.'''
+    instrucoes='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,natureza,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. Cada produto deve incluir natureza FISICO ou SERVICO_DIGITAL conforme o modo de operação. O setor informado não determina o modelo da empresa. No modo tradicional descreva o custo por unidade de matéria-prima/kit de montagem documentado, identificando a base e sem atribuir custos industriais não documentados. Notícias e análises devem contextualizar o setor e o modo informado separadamente. id deve ser texto, custo_unitario deve ser número em BRL, sem símbolos ou separadores locais. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; identifique preços varejistas como preco_varejo para projeção didática, nunca como custo industrial documentado. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores. Cada produto deve incluir evidencia_custo: {url,trecho}, com um trecho literal da página que contenha o nome exato do produto e seu preço em R$; use esse mesmo nome no campo nome. Não use estatísticas setoriais como fonte de preço. Não derive o preço documentado de médias ou faturamentos; a projeção didática pertence ao backend. A data dos artigos deve ser a data de publicação documentada (AAAA-MM-DD ou AAAA-MM), nunca a data atual da consulta. Para produtos sem data de publicação, indique explicitamente Consulta em AAAA-MM-DD com a data_consulta fornecida. Não atribua datas de atualização da página à publicação do artigo.'''
+    instrucoes += " Para cada produto informe tipo_documento: custo_aquisicao ou preco_varejo. Se encontrar apenas preço varejista, informe esse preço original em custo_unitario e tipo_documento=preco_varejo; o backend projetará o custo com fator 0,60. Não calcule esse desconto na resposta. Se não houver evidência verificável, o backend aplicará custo padrão da turma, identificado como estimativa. Não afirme que estimativas são preços comprovados."
     schema = Edicao.model_json_schema()
     schema["$defs"]["Produto"]["properties"]["natureza"] = {"type": "string", "enum": ["FISICO", "SERVICO_DIGITAL"]}
-    schema["$defs"]["Produto"]["required"].append("natureza")
+    schema["$defs"]["Produto"]["required"].extend(["natureza", "tipo_documento"])
     bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True,schema)
     if isinstance(bruto, dict):
         nomes = {"noticias": "notícias", "analises": "análises", "produtos": "produtos com custo documentado"}
@@ -125,7 +132,7 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
         raise HTTPException(502,"A pesquisa não entregou as quantidades solicitadas.")
     validar_fontes(edicao,fontes)
     validar_coerencia(edicao,turma,dados,exigir_natureza=True)
-    validar_evidencias(edicao)
+    validar_evidencias(edicao, turma)
     edicao.modo_operacao=turma.modo_jogo
     db.refresh(turma)
     if turma.rodada_atual != rodada: raise HTTPException(409,"A rodada avançou durante a pesquisa. Repita para a rodada atual.")
@@ -138,7 +145,7 @@ def revisar(turma_id:int, edicao_id:int,dados:Edicao, db:Session=Depends(get_db)
     turma=_turma_do_professor(db,turma_id,usuario)
     validar_fontes(dados)
     validar_coerencia(dados,turma,exigir_natureza=True)
-    validar_evidencias(dados)
+    validar_evidencias(dados, turma)
     dados.modo_operacao=turma.modo_jogo
     n=db.execute(update(ConteudoMercado).where(ConteudoMercado.id==edicao_id,ConteudoMercado.turma_id==turma_id,ConteudoMercado.publicado.is_(False)).values(dados=dados.model_dump())).rowcount
     if not n: raise HTTPException(409,"Edição inexistente ou já publicada; o histórico é preservado.")
@@ -157,7 +164,8 @@ def publicar(turma_id:int,edicao_id:int, db:Session=Depends(get_db), usuario:Usu
     dados=Edicao.model_validate(e.dados)
     validar_fontes(dados)
     validar_coerencia(dados,turma,exigir_natureza=True)
-    validar_evidencias(dados)
+    validar_evidencias(dados, turma)
+    e.dados=dados.model_dump()
     e.publicado=True;db.commit();return serializar(e)
 
 @router.get("/api/aluno/empresas/{empresa_id}/mercado-real")

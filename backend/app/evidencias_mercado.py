@@ -64,15 +64,19 @@ class Documento(HTMLParser):
             self.partes.append(texto)
 
 
+class FonteInsegura(ValueError):
+    pass
+
+
 def obter_documento(url):
     """HTTPS público, IP fixado na conexão, redirects conferidos e resposta limitada."""
     for _ in range(4):
         u = urlsplit(url)
         if u.scheme != "https" or not u.hostname or u.username or u.password or u.port not in (None, 443):
-            raise ValueError("Fonte precisa usar HTTPS público.")
+            raise FonteInsegura("Fonte precisa usar HTTPS público.")
         ips = {r[4][0] for r in socket.getaddrinfo(u.hostname, 443, type=socket.SOCK_STREAM)}
         if not ips or any(not ipaddress.ip_address(ip).is_global for ip in ips):
-            raise ValueError("Fonte não pública.")
+            raise FonteInsegura("Fonte não pública.")
         # A conexão não resolve o hostname novamente, impedindo DNS rebinding.
         conexao = http.client.HTTPSConnection(u.hostname, timeout=10, context=ssl.create_default_context())
         conexao.sock = conexao._context.wrap_socket(
@@ -96,7 +100,7 @@ def obter_documento(url):
     raise ValueError("Excesso de redirecionamentos.")
 
 
-def validar_evidencias(edicao):
+def _validar_estritamente(edicao):
     documentos = {}
     # Falta de prova deve ser informada antes de qualquer consulta externa.
     for produto in edicao.produtos:
@@ -108,6 +112,8 @@ def validar_evidencias(edicao):
         if url not in documentos:
             try:
                 documentos[url] = obter_documento(url)
+            except FonteInsegura:
+                raise
             except (OSError, ValueError, http.client.HTTPException):
                 raise HTTPException(422, "Não foi possível conferir o conteúdo de uma fonte. A edição não pode ser salva ou publicada; use uma fonte acessível.") from None
         return documentos[url]
@@ -136,3 +142,53 @@ def validar_evidencias(edicao):
         if valores != {Decimal(str(produto.custo_unitario))}:
             raise HTTPException(422, "O custo informado não corresponde ao preço em reais no trecho citado. Não é permitido preencher custos estimados como preços documentados.")
         data_confere(produto, permitir_consulta=True)
+
+
+def validar_evidencias(edicao, turma=None):
+    """Notícias estritas; custos projetados somente com base numérica explícita."""
+    if turma is None:
+        return _validar_estritamente(edicao)
+    def custo_padrao():
+        if turma.custo_unitario <= 0:
+            raise HTTPException(422, "Configure um custo unitário padrão maior que zero na turma para permitir produtos estimados.")
+        return turma.custo_unitario
+
+    edicao.versao_custos_catalogo = "1.0.0-three-paths"
+    artigos = edicao.model_copy(update={"produtos": []})
+    try:
+        _validar_estritamente(artigos)
+    except FonteInsegura:
+        raise HTTPException(422, "Fonte bloqueada: use somente HTTPS público, sem endereços internos.") from None
+    for produto in edicao.produtos:
+        try:
+            # Valida o preço original, evitando aplicar 0,60 novamente na publicação.
+            if produto.tipo_documento == "preco_varejo" and produto.valor_documentado is not None:
+                produto.custo_unitario = produto.valor_documentado
+            _validar_estritamente(edicao.model_copy(update={"noticias": [], "analises": [], "produtos": [produto]}))
+        except FonteInsegura:
+            raise HTTPException(422, "Fonte bloqueada: use somente HTTPS público, sem endereços internos.") from None
+        except HTTPException as erro:
+            produto.custo_unitario = custo_padrao()
+            produto.valor_documentado = None
+            produto.estado_indicador = "Estimativa do Modelo"
+            produto.formula_aplicada = "Custo Padrão da Turma (Fallback por falha de leitura)"
+            produto.alerta_professor = str(erro.detail)
+            produto.base_custo = f"Estimativa do Modelo: custo padrão da turma de R$ {turma.custo_unitario:.2f}. Fonte não comprovada; não representa custo real documentado."
+            produto.data = "Consulta em " + datetime.now(timezone.utc).date().isoformat()
+        else:
+            valor = produto.custo_unitario
+            produto.valor_documentado = valor
+            produto.alerta_professor = None
+            if produto.tipo_documento == "preco_varejo":
+                produto.custo_unitario = float((Decimal(str(valor)) * Decimal("0.60")).quantize(Decimal("0.01")))
+                produto.estado_indicador = "Estimativa do Modelo"
+                produto.formula_aplicada = "Preço de Varejo * 0.60"
+                produto.base_custo = f"Estimativa do Modelo: preço de varejo documentado R$ {valor:.2f} × 0,60 (desconto didático de 40%). Não representa custo real de fabricação."
+            else:
+                produto.estado_indicador = "Valor Calculado"
+                produto.formula_aplicada = "Preço documentado de aquisição"
+            if produto.custo_unitario <= 0:
+                produto.custo_unitario = custo_padrao()
+                produto.estado_indicador = "Estimativa do Modelo"
+                produto.formula_aplicada = "Custo Padrão da Turma"
+                produto.alerta_professor = "Preço projetado abaixo de um centavo; aplicado custo padrão da turma."

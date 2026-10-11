@@ -31,7 +31,7 @@ def test_recusa_url_valida_sem_sustentacao_do_dado(fonte, alteracao):
     assert erro.value.status_code == 422
 
 
-def test_nao_salva_pesquisa_sem_prova_e_nao_publica_rascunho_antigo(cliente, professor, monkeypatch, fonte):
+def test_salva_e_publica_estimativa_sem_prova(cliente, professor, monkeypatch, fonte):
     from app.routers import mercado
     from app.models import ConteudoMercado
     from app.database import SessionLocal
@@ -40,13 +40,17 @@ def test_nao_salva_pesquisa_sem_prova_e_nao_publica_rascunho_antigo(cliente, pro
     turma = _criar_turma(cliente, professor)
     base = f"/api/professor/turmas/{turma['id']}/mercado"
     r = cliente.post(base + '/pesquisar', headers=professor, json={'setor':dados['setor'],'noticias':1,'analises':1,'produtos':1})
-    assert r.status_code == 422
-    assert cliente.get(base, headers=professor).json()['edicoes'] == []
+    assert r.status_code == 200
+    p = r.json()["dados"]["produtos"][0]
+    assert p["estado_indicador"] == "Estimativa do Modelo"
+    assert p["custo_unitario"] == turma["parametros"]["custo_unitario"]
+    assert p["alerta_professor"]
+    assert cliente.post(base + f'/{r.json()["id"]}/publicar', headers=professor, json={}).status_code == 200
     with SessionLocal() as db:
         e = ConteudoMercado(turma_id=turma['id'], rodada=1, dados=dados)
         db.add(e); db.commit(); eid = e.id
-    assert cliente.post(base + f'/{eid}/publicar', headers=professor, json={}).status_code == 422
-    assert cliente.get(base, headers=professor).json()['edicoes'][0]['publicado'] is False
+    assert cliente.post(base + f'/{eid}/publicar', headers=professor, json={}).status_code == 409
+    assert any(e['publicado'] for e in cliente.get(base, headers=professor).json()['edicoes'])
 
 
 def test_consulta_nao_e_data_de_publicacao(monkeypatch, fonte):
@@ -75,3 +79,48 @@ def test_fonte_inacessivel_nao_vira_evidencia(monkeypatch):
     monkeypatch.setattr(provas, 'obter_documento', falhar)
     with pytest.raises(HTTPException) as erro: provas.validar_evidencias(Edicao.model_validate(edicao()))
     assert erro.value.status_code == 422
+
+
+@pytest.mark.parametrize('tipo, custo, estado', [
+    ('custo_aquisicao', 30, 'Valor Calculado'),
+    ('preco_varejo', 18, 'Estimativa do Modelo'),
+])
+def test_tres_caminhos_sem_desconto_duplicado(fonte, tipo, custo, estado):
+    from types import SimpleNamespace
+    dados = Edicao.model_validate(edicao())
+    dados.produtos[0].tipo_documento = tipo
+    turma = SimpleNamespace(custo_unitario=40)
+    for _ in range(2):
+        provas.validar_evidencias(dados, turma)
+        assert dados.produtos[0].custo_unitario == custo
+        assert dados.produtos[0].estado_indicador == estado
+        assert dados.produtos[0].valor_documentado == 30
+
+
+@pytest.mark.parametrize('falha', ['nome', 'trecho', 'offline'])
+def test_fallback_numerico_alerta_e_nao_finge_prova(fonte, monkeypatch, falha):
+    from types import SimpleNamespace
+    dados = Edicao.model_validate(edicao())
+    dados.noticias = []; dados.analises = []
+    if falha == 'nome': dados.produtos[0].nome = 'Outro produto'
+    if falha == 'trecho': dados.produtos[0].evidencia_custo.trecho = 'Texto sem nenhum preço real'
+    if falha == 'offline':
+        def indisponivel(url): raise OSError('offline')
+        monkeypatch.setattr(provas, 'obter_documento', indisponivel)
+    provas.validar_evidencias(dados, SimpleNamespace(custo_unitario=40))
+    p = dados.produtos[0]
+    assert p.custo_unitario == 40
+    assert p.estado_indicador == 'Estimativa do Modelo'
+    assert p.valor_documentado is None and p.alerta_professor
+
+
+def test_fallback_nao_relaxa_artigos_ou_links(fonte, monkeypatch):
+    from types import SimpleNamespace
+    turma = SimpleNamespace(custo_unitario=40)
+    dados = Edicao.model_validate(edicao())
+    dados.noticias[0].data = '2020-01-01'
+    with pytest.raises(HTTPException): provas.validar_evidencias(dados, turma)
+    dados.noticias = []; dados.analises = []
+    def insegura(url): raise provas.FonteInsegura('Fonte não pública.')
+    monkeypatch.setattr(provas, 'obter_documento', insegura)
+    with pytest.raises(HTTPException): provas.validar_evidencias(dados, turma)
