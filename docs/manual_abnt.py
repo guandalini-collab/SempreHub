@@ -68,8 +68,9 @@ def build(stem):
   if block.startswith('##'):
    level=len(block)-len(block.lstrip('#'));text=block[level:].strip();plain=re.sub(r'^\d+\.\s*','',text)
    if level==2:
-    if plain=='Carta do Fundador':
-     p=Paragraph(plain,ParagraphStyle('LetterHeading',parent=STYLES['Chapter'],alignment=1));p.bookmark='carta';p.outline_level=0;p.toc_level=None;story.append(p)
+    if plain in ('Sobre o jogo','Carta de apresentação'):
+     if plain=='Carta de apresentação':story.append(PageBreak())
+     p=Paragraph(plain,ParagraphStyle('LetterHeading',parent=STYLES['Chapter'],alignment=1));p.bookmark='sobre-o-jogo' if plain=='Sobre o jogo' else 'carta';p.outline_level=0;p.toc_level=None;story.append(p)
     else:
      if not toc_added:
       if stem=='manual-aluno' or stem=='manual-professor':story.append(PageBreak())

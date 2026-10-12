@@ -1,22 +1,36 @@
 # SempreHub - Manual do professor
 
-## Carta do Fundador
+## Sobre o jogo
 
-Prezado(a) Futuro(a) Empreendedor(a) e Líder Educacional,
+O SempreHub é um simulador educacional de negócios para estudantes do Ensino Médio e Superior. Em equipe, vocês administram uma empresa, interpretam o mercado e acompanham as consequências de suas escolhas ao longo de rodadas que representam meses.
 
-Seja muito bem-vindo(a) ao SempreHub.
+O jogo reúne seis áreas: Produção, Logística, Marketing, Recursos Humanos, Pesquisa e Desenvolvimento (P&D) e Finanças. Escolher um preço, contratar pessoas, comprar máquinas, investir em divulgação ou solicitar crédito modifica recursos, custos e possibilidades da empresa.
 
-Quando idealizei e criei este simulador, o meu objetivo não era construir apenas mais uma plataforma digital de negócios ou um repositório de planilhas contábeis tradicionais. Eu queria criar uma ponte viva entre o conhecimento teórico e a realidade do mercado — um espaço onde você pudesse experimentar a adrenalina, os desafios e as conquistas de liderar uma organização de verdade.
+As equipes competem por clientes em um mercado compartilhado. O objetivo é aprender a analisar informações, discutir alternativas e justificar decisões. O resultado de uma rodada oferece elementos para rever a estratégia na seguinte.
 
-O nome SempreHub carrega a essência da metodologia que preparei para a sua jornada. O 'Sempre' representa a constância, a resiliência e o aprendizado contínuo (Lifelong Learning). O 'Hub' define esta plataforma como um centro conector. Olhando para a nossa logomarca, você verá uma rede de pontos interconectados: eles são os departamentos da sua empresa (Marketing, Produção, Logística, P&D, RH e Finanças). Nenhuma decisão sua será isolada; cada escolha impactará toda a organização.
+Este é um ambiente de aprendizagem: os valores e os resultados são produzidos pela simulação a partir das regras e decisões registradas. As situações representam desafios que empresas enfrentam no mercado todos os dias.
 
-Aqui, o erro não é um ponto final, mas sim uma variável de aprendizado. Se o seu caixa ficar no vermelho ou se uma estratégia de marketing não der o retorno esperado nesta rodada, não desanime. Analise os relatórios reais, observe o movimento dos seus concorrentes em sala de aula e reajuste a sua operação no mês seguinte.
+Criado por: Prof Guandalini.
 
-O mercado do SempreHub está aberto e o futuro do ecossistema está inteiramente em suas mãos.
+## Carta de apresentação
 
-**Prof. Guandalini**
+Olá, seja bem-vindo ao SempreHub.
 
-Criador e Fundador do SempreHub — Simulador de Empreendedorismo
+Criei este simulador para aproximar o que aprendemos em sala de aula das decisões que empresas precisam tomar todos os dias. A proposta é que você interprete informações, converse com sua equipe e acompanhe o efeito de cada escolha.
+
+O SempreHub funciona como um **ecossistema de negócios**. Ecossistema é um conjunto de participantes e atividades que se relacionam e dependem uns dos outros. No jogo, essa rede reúne estudantes, equipes, departamentos da empresa, clientes, fornecedores e concorrentes. Uma mudança em uma parte pode modificar as condições das demais.
+
+Por exemplo: aumentar a produção exige materiais, capacidade e pessoas; a logística precisa entregar os produtos; o marketing influencia a procura; e as finanças precisam sustentar os pagamentos. Seus concorrentes também fazem escolhas e disputam os mesmos clientes. Por isso, nenhuma decisão deve ser analisada isoladamente.
+
+As **decisões do simulador se baseiam em situações reais do mercado**. Definir preços, contratar funcionários, investir em tecnologia, planejar estoques e negociar crédito fazem parte da rotina de empresas de diferentes setores. Um preço pode atrair compradores e reduzir a margem; uma compra pode ampliar a capacidade e consumir caixa; um empréstimo pode financiar a operação e aumentar as despesas com juros. Esses desafios aparecem todos os dias no mercado.
+
+No SempreHub, vocês experimentam essas relações em um ambiente educacional. Os resultados são simulados, conforme as regras do jogo e as escolhas registradas, e servem para estudar as consequências que decisões semelhantes podem ter em uma empresa.
+
+Cada rodada representa um mês. Se uma escolha não produzir o resultado esperado, use os relatórios para identificar as causas, discutir o que poderia ter sido diferente e preparar a próxima decisão. Aprender também envolve reconhecer erros e ajustar a estratégia.
+
+Espero que esta experiência ajude você a transformar conhecimento em análise, decisão e aprendizagem.
+
+**Prof Guandalini**
 
 ## A história e o conceito da logomarca SempreHub
 

@@ -19,7 +19,7 @@ def capa(canvas,title,subtitle,audience,edition):
  if not art.exists():raise FileNotFoundError('Ilustração final da capa ainda não foi salva no projeto.')
  canvas.drawImage(str(art),left,218,width=usable,height=usable*2/3,preserveAspectRatio=True,anchor='c',mask='auto')
  canvas.setFillColor(BLUE);canvas.setFont('Helvetica-Bold',9);canvas.drawString(left,182,audience)
- canvas.setFont('Helvetica',10);canvas.drawString(left,156,'Autor e Fundador: Professor Guandalini')
+ canvas.setFont('Helvetica',10);canvas.drawString(left,156,'Criado por: Prof Guandalini.')
  canvas.setFillColor(GOLD);canvas.rect(left,121,usable,4,fill=1,stroke=0)
  canvas.setFillColor(BLUE);canvas.setFont('Helvetica',9);canvas.drawString(left,91,edition)
  canvas.setFont('Helvetica',8);canvas.drawString(left,72,'Conceito, marca e metodologia: Professor Guandalini')

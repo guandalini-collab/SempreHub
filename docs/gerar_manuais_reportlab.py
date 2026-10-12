@@ -79,7 +79,7 @@ def build(stem):
  audience={'manual-aluno':'ENSINO MÉDIO E SUPERIOR','manual-professor':'PROFESSORES, COORDENADORES E FACILITADORES','manual-midias':'PLANEJAMENTO DE MÍDIAS E CAMPANHAS'}[stem]
  story=[Spacer(1,5),PageBreak()]
 
- toc=TableOfContents();toc.levelStyles=[styles['Sumario'],styles['SumarioSub']];story += [Paragraph('Sumário',ParagraphStyle('TituloSumario',parent=styles['Capitulo'])),toc,PageBreak()]
+ toc=TableOfContents();toc.levelStyles=[styles['Sumario'],styles['SumarioSub']];toc_inserido=False
  markup=[];chapter=0;first=True;auditoria=False
  for block in re.split(r'\n\s*\n',(DOCS/f'{stem}.md').read_text()):
   block=block.strip()
@@ -97,6 +97,11 @@ def build(stem):
   elif block.startswith('##'):
    level=len(block)-len(block.lstrip('#'));text=block[level:].strip();auditoria='auditoria de escopo' in text.lower()
    if level==2:
+    if text in ('Sobre o jogo','Carta de apresentação'):
+     if text=='Carta de apresentação':story.append(PageBreak())
+     story.append(Paragraph(text,styles['Capitulo']));markup.append('<h2>'+inline(text)+'</h2>');continue
+    if not toc_inserido:
+     story += [PageBreak(),Paragraph('Sumário',ParagraphStyle('TituloSumario',parent=styles['Capitulo'])),toc,PageBreak()];toc_inserido=True
     if stem=='manual-midias' and text.startswith('Fontes de preço'):story.append(PageBreak())
     if stem != 'manual-midias' and chapter < 3:
      if not first:story.append(PageBreak())
