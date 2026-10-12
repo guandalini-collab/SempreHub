@@ -42,3 +42,8 @@ hr { border:0; border-top:1px solid var(--line); margin:13pt 0; }
 .media-card h3 { margin-top:0; }
 .media-card table strong { color:#047857; }
 .media-card blockquote { background:#ecfeff; border-left-color:#0891b2; color:#164e63; }
+
+/* Identidade editorial 2026: aplicada aos documentos, sem alterar a interface do jogo. */
+.destaque { border-left: 5px solid #D9851E; background: #FFF9F0; padding: 14px; margin: 16px 0; }
+table tr:first-child { background: #034AA6; color: white; }
+table tr:nth-child(2n+3) { background: #F2F2F2; }

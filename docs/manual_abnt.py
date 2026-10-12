@@ -1,6 +1,7 @@
 """Apresentação ABNT adaptada a manuais institucionais; sem alterações no simulador.
 A4, margens 3/2 cm, corpo 12, entrelinha 1,5, seções e sumário navegável.
 """
+from design_editorial import capa, destaque
 from pathlib import Path
 from io import BytesIO
 import html,re,shutil
@@ -59,7 +60,7 @@ def build(stem):
  source=(DOCS/f'{stem}.md').read_text()
  blocks=[b.strip() for b in re.split(r'\n\s*\n',source) if b.strip()]
  covertitle=ParagraphStyle('CoverTitle',parent=STYLES['Center'],fontName='Helvetica-Bold',textColor=BLUE)
- story=[Spacer(1,145),Paragraph('PROFESSOR GUANDALINI',STYLES['Center']),Spacer(1,40),Paragraph('SEMPREHUB',covertitle),Paragraph(title.upper(),covertitle),Paragraph(subtitle,STYLES['Center']),Spacer(1,36),Paragraph(audience,STYLES['Center']),Paragraph('Autor e Fundador: Professor Guandalini',STYLES['Center']),Spacer(1,30),Paragraph('Edição 3.5<br/>2026',STYLES['Center']),PageBreak()]
+ story=[Spacer(1,5),PageBreak()]
  toc=TableOfContents();toc.levelStyles=[STYLES['TOC'],STYLES['TOCSub']];toc.dotsMinLevel=0
  chapter=sub=figure=tablecount=0;toc_added=False;lastheading='';markup=[];placements={}
  for block in blocks:
@@ -94,10 +95,10 @@ def build(stem):
    rows=[]
    for line in block.splitlines():
     if re.match(r'^\|[\s:|-]+\|?$',line):continue
-    cells=[c.strip() for c in line.strip('|').split('|')];rows.append([Paragraph(inline(c),STYLES['Cell']) for c in cells])
+    cells=[c.strip() for c in line.strip('|').split('|')];rows.append([Paragraph(inline(c),ParagraphStyle('CellHeader',parent=STYLES['Cell'],fontName='Helvetica-Bold',textColor=colors.white) if not rows else STYLES['Cell']) for c in cells])
    count=max(map(len,rows));rows=[r+[Paragraph('',STYLES['Cell'])]*(count-len(r)) for r in rows];tablecount+=1
    table=Table(rows,colWidths=[WIDTH/count]*count,repeatRows=1,hAlign='LEFT')
-   table.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('LINEABOVE',(0,0),(-1,0),.7,BLACK),('LINEBELOW',(0,0),(-1,0),.6,BLACK),('LINEBELOW',(0,-1),(-1,-1),.7,BLACK),('LEFTPADDING',(0,0),(-1,-1),6),('RIGHTPADDING',(0,0),(-1,-1),6),('TOPPADDING',(0,0),(-1,-1),7),('BOTTOMPADDING',(0,0),(-1,-1),7)]))
+   table.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.HexColor('#034AA6')),('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.white,colors.HexColor('#F2F2F2')]),('VALIGN',(0,0),(-1,-1),'TOP'),('LINEABOVE',(0,0),(-1,0),.7,BLACK),('LINEBELOW',(0,0),(-1,0),.6,BLACK),('LINEBELOW',(0,-1),(-1,-1),.7,BLACK),('LEFTPADDING',(0,0),(-1,-1),6),('RIGHTPADDING',(0,0),(-1,-1),6),('TOPPADDING',(0,0),(-1,-1),7),('BOTTOMPADDING',(0,0),(-1,-1),7)]))
    story += [Paragraph(f'Tabela {tablecount} - {inline(lastheading)}',STYLES['Small']),table,Spacer(1,6),Paragraph('Fonte: SempreHub, acervo do Professor Guandalini (2026).',STYLES['Small'])];continue
   lines=block.splitlines()
   if all(re.match(r'^(\d+\. |\- )',line) for line in lines):
@@ -109,8 +110,7 @@ def build(stem):
  def page(canvas,doc):
   canvas.saveState();w,h=A4
   if doc.page==1:
-   canvas.setStrokeColor(CYAN);canvas.setLineWidth(2);canvas.line(LEFT,h-202,w-RIGHT,h-202)
-   canvas.setFillColor(GOLD);canvas.rect(LEFT,95,WIDTH,3,fill=1,stroke=0)
+   capa(canvas,title,subtitle,audience,'Edição 3.5 | Outubro de 2026')
   else:
    canvas.setFillColor(BLUE);canvas.setFont('Helvetica',8);canvas.drawRightString(w-RIGHT,h-68,title)
    canvas.setStrokeColor(CYAN);canvas.setLineWidth(.5);canvas.line(LEFT,h-73,w-RIGHT,h-73)
@@ -124,9 +124,9 @@ def build(stem):
  doc.multiBuild(story,onFirstPage=page,onLaterPages=page)
  reader=PdfReader(BytesIO(raw.getvalue()));logo=PdfReader(DOCS/'assets/semprehub-fundo-branco.pdf').pages[0];writer=PdfWriter();writer.clone_document_from_reader(reader)
  for index,p in enumerate(writer.pages):
-  width=WIDTH if index==0 else 75
+  width=230 if index==0 else 75
   scale=width/float(logo.mediabox.width);height=float(logo.mediabox.height)*scale
-  y=A4[1]-TOP-height if index==0 else A4[1]-69
+  y=A4[1]-130 if index==0 else A4[1]-69
   p.merge_transformed_page(logo,Transformation().scale(scale).translate(LEFT,y),over=True,expand=False)
  for path,(index,x,y,width) in placements.items():
   diagram=PdfReader(path).pages[0];scale=width/float(diagram.mediabox.width)

@@ -2,6 +2,8 @@
 """Gera três livros em PDF com marca, capa, sumário navegável e paginação.
 Requer ReportLab e Pillow. Uso: python3 docs/gerar_manuais_reportlab.py.
 """
+from design_editorial import capa, destaque
+from pypdf import PdfReader, PdfWriter, Transformation
 from pathlib import Path
 import html,re,shutil,base64
 from io import BytesIO
@@ -14,7 +16,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from PIL import Image as PILImage, ImageChops
 ROOT=Path(__file__).resolve().parents[1];DOCS=ROOT/'docs';OUT=DOCS/'gerados';PUBLIC=ROOT/'frontend/public/manuais'
-NAVY=colors.HexColor('#0B2545');GOLD=colors.HexColor('#D9851E');INK=colors.HexColor('#24364b')
+NAVY=colors.HexColor('#034AA6');GOLD=colors.HexColor('#D9851E');INK=colors.HexColor('#24364b')
 CYAN=colors.HexColor('#0AADBF');ROYAL=colors.HexColor('#034AA6')
 LOGO=DOCS/'assets/semprehub-oficial.svg'
 # Preserve the supplied SVG verbatim. Its artwork is an embedded PNG, so place
@@ -49,22 +51,24 @@ for name,options in {
  'Celula':dict(fontSize=8.5,leading=12,wordWrap='CJK',spaceAfter=0,textColor=INK),
  'Capa':dict(fontSize=36,leading=43,textColor=NAVY,spaceAfter=20),
  'CapaTexto':dict(fontSize=12,leading=19,textColor=INK,spaceAfter=14),
+ 'CelulaHeader':dict(fontSize=8.5,leading=12,spaceAfter=0,textColor=colors.white),
+ 'SumarioSub':dict(fontSize=9,leading=12,leftIndent=12,spaceBefore=2,textColor=INK),
  'Sumario':dict(fontSize=10.5,leading=14,leftIndent=0,firstLineIndent=0,spaceBefore=5,textColor=NAVY),
-}.items():styles.add(ParagraphStyle(name,fontName='Helvetica-Bold' if name in ('Capa','Capitulo','Subtitulo') else 'Helvetica',**options))
+}.items():styles.add(ParagraphStyle(name,fontName='Helvetica-Bold' if name in ('Capa','Capitulo','Subtitulo','CelulaHeader') else 'Helvetica',**options))
 
 def inline(text):
  text=html.escape(text.strip()).replace('—','-').replace('–','-')
- text=re.sub(r'\[([^]]+)\]\((https?://[^)]+)\)',lambda m:f'<link href="{html.escape(html.unescape(m[2]),quote=True)}" color="#0B2545">{m[1]}</link>',text)
+ text=re.sub(r'\[([^]]+)\]\((https?://[^)]+)\)',lambda m:f'<link href="{html.escape(html.unescape(m[2]),quote=True)}" color="#034AA6">{m[1]}</link>',text)
  text=re.sub(r'\*\*(.+?)\*\*',r'<b>\1</b>',text)
  text=re.sub(r'`(.+?)`',r'<font name="Courier">\1</font>',text)
  return text
 
 class Livro(SimpleDocTemplate):
  def afterFlowable(self,flowable):
-  if isinstance(flowable,Paragraph) and flowable.style.name=='Capitulo':
+  if isinstance(flowable,Paragraph) and hasattr(flowable,'_bookmark'):
    title=flowable.getPlainText();key=flowable._bookmark
-   self.canv.bookmarkPage(key);self.canv.addOutlineEntry(title,key,0,False)
-   self.notify('TOCEntry',(0,title,self.page-1,key))
+   self.canv.bookmarkPage(key);self.canv.addOutlineEntry(title,key,getattr(flowable,'_toc_level',0),False)
+   self.notify('TOCEntry',(getattr(flowable,'_toc_level',0),title,self.page-1,key))
 
 def build(stem):
  if stem != "manual-midias":
@@ -73,10 +77,10 @@ def build(stem):
  title={'manual-aluno':'Manual do aluno','manual-professor':'Manual do professor','manual-midias':'Manual de mídias e campanhas'}[stem]
  subtitle={'manual-aluno':'Aprenda a decidir, acompanhe sua empresa e transforme resultados em aprendizagem.','manual-professor':'Prepare a turma, conduza as rodadas e acompanhe a aprendizagem das equipes.','manual-midias':'Planeje público, mídia, produção e orçamento antes de contratar uma campanha.'}[stem]
  audience={'manual-aluno':'ENSINO MÉDIO E SUPERIOR','manual-professor':'PROFESSORES, COORDENADORES E FACILITADORES','manual-midias':'PLANEJAMENTO DE MÍDIAS E CAMPANHAS'}[stem]
- story=[Spacer(1,225),Paragraph(title,styles['Capa']),Paragraph(subtitle,styles['CapaTexto']),PageBreak()]
+ story=[Spacer(1,5),PageBreak()]
 
- toc=TableOfContents();toc.levelStyles=[styles['Sumario']]
- markup=[];chapter=0;first=True
+ toc=TableOfContents();toc.levelStyles=[styles['Sumario'],styles['SumarioSub']];story += [Paragraph('Sumário',ParagraphStyle('TituloSumario',parent=styles['Capitulo'])),toc,PageBreak()]
+ markup=[];chapter=0;first=True;auditoria=False
  for block in re.split(r'\n\s*\n',(DOCS/f'{stem}.md').read_text()):
   block=block.strip()
   if not block or block=='---' or block.startswith('<') or block.startswith('# '):continue
@@ -91,56 +95,45 @@ def build(stem):
    story.append(KeepTogether(figura+[Image(str(path),width=w*scale,height=h*scale),Spacer(1,7),Paragraph(inline(caption),styles['Legenda'])]))
    markup.append(f'<figure><img src="../{html.escape(relative)}" alt="{html.escape(caption)}"><figcaption>{inline(caption)}</figcaption></figure>')
   elif block.startswith('##'):
-   level=len(block)-len(block.lstrip('#'));text=block[level:].strip()
+   level=len(block)-len(block.lstrip('#'));text=block[level:].strip();auditoria='auditoria de escopo' in text.lower()
    if level==2:
     if stem=='manual-midias' and text.startswith('Fontes de preço'):story.append(PageBreak())
     if stem != 'manual-midias' and chapter < 3:
      if not first:story.append(PageBreak())
-    elif chapter == (3 if stem != 'manual-midias' else 1):
-     heading_toc=Paragraph('Sumário',ParagraphStyle('TituloSumario',parent=styles['Capitulo']))
-     story += [PageBreak(),heading_toc,toc,PageBreak()]
     elif not first:story += [CondPageBreak(190),Spacer(1,16)]
     first=False;chapter+=1;heading=Paragraph(inline(text),styles['Capitulo']);heading._bookmark=f'capitulo-{chapter}';story.append(heading)
-   else:story.append(Paragraph(inline(text),styles['Subtitulo']))
+   else:
+    heading=Paragraph(inline(text),styles['Subtitulo']);heading._bookmark=f'subtitulo-{len(markup)}';heading._toc_level=1;story.append(heading)
    markup.append(f'<h{level}>{inline(text)}</h{level}>')
   elif block.startswith('|'):
    rows=[]
    for line in block.splitlines():
     if re.match(r'^\|[\s:|-]+\|?$',line):continue
-    cells=[c.strip() for c in line.strip('|').split('|')];rows.append([Paragraph(inline(c),styles['Celula']) for c in cells])
+    cells=[c.strip() for c in line.strip('|').split('|')];rows.append([Paragraph(inline(c),styles['CelulaHeader'] if not rows else styles['Celula']) for c in cells])
    if rows:
     count=len(rows[0]);rows=[row+[Paragraph('',styles['Celula'])]*(count-len(row)) for row in rows]
     table=Table(rows,colWidths=[(A4[0]-100)/count]*count,repeatRows=1,hAlign='LEFT')
-    table.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.HexColor('#e8eef5')),('VALIGN',(0,0),(-1,-1),'TOP'),('GRID',(0,0),(-1,-1),.4,colors.HexColor('#dbe3ec')),('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),('TOPPADDING',(0,0),(-1,-1),7),('BOTTOMPADDING',(0,0),(-1,-1),7)]));story += [table,Spacer(1,10)]
+    table.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),ROYAL),('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.white,colors.HexColor('#F2F2F2')]),('VALIGN',(0,0),(-1,-1),'TOP'),('GRID',(0,0),(-1,-1),.4,colors.HexColor('#dbe3ec')),('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),('TOPPADDING',(0,0),(-1,-1),7),('BOTTOMPADDING',(0,0),(-1,-1),7)]));prefix=[]
+    if len(story)>=2 and isinstance(story[-2],Paragraph) and story[-2].style.name=='Subtitulo' and isinstance(story[-1],Paragraph):
+     prefix=story[-2:];del story[-2:]
+    story += [KeepTogether(prefix+[table]) if prefix else table,Spacer(1,10)]
     markup.append('<table>'+''.join('<tr>'+''.join('<td>'+inline(c)+'</td>' for c in line.strip('|').split('|'))+'</tr>' for line in block.splitlines() if not re.match(r'^\|[\s:|-]+\|?$',line))+'</table>')
+  elif block.startswith('> '):
+   text=' '.join(line.removeprefix('> ') for line in block.splitlines());story += [destaque(inline(text),A4[0]-100),Spacer(1,10)];markup.append('<aside class="destaque">'+inline(text)+'</aside>')
   else:
    lines=block.splitlines()
    if all(re.match(r'^(\d+\. |\- )',line) for line in lines):
-    for line in lines:story.append(Paragraph(inline(line),styles['Corpo']))
+    for line in lines:story.append(destaque(inline(line),A4[0]-100) if auditoria else Paragraph(inline(line),styles['Corpo']));story.append(Spacer(1,8)) if auditoria else None
     markup.append('<p>'+ '<br/>'.join(inline(line) for line in lines)+'</p>')
    else:
-    text=' '.join(lines);story.append(Paragraph(inline(text),styles['Corpo']));markup.append('<p>'+inline(text)+'</p>')
+    text=' '.join(lines);story.append(destaque(inline(text),A4[0]-100) if auditoria else Paragraph(inline(text),styles['Corpo']));story.append(Spacer(1,8)) if auditoria else None;markup.append('<p>'+inline(text)+'</p>')
  def page(canvas,doc):
   canvas.saveState()
   width,height=A4
   if doc.page==1:
-   canvas.setFillColor(colors.white);canvas.rect(0,0,width,height,fill=1,stroke=0)
-   draw_logo(canvas,50,height-181,365)
-   canvas.setStrokeColor(CYAN);canvas.setLineWidth(2);canvas.line(50,height-207,145,height-207)
-   canvas.setFillColor(ROYAL);canvas.setFont('Helvetica-Bold',9)
-   canvas.drawString(50,height-234,'SIMULADOR DE EMPREENDEDORISMO')
-   canvas.setFillColor(INK);canvas.setFont('Helvetica-Bold',8.5);canvas.drawString(50,294,audience)
-   canvas.setFillColor(colors.HexColor('#64748b'));canvas.setFont('Helvetica',8);canvas.drawString(50,268,'AUTOR E FUNDADOR')
-   canvas.setFillColor(NAVY);canvas.setFont('Helvetica-Bold',15);canvas.drawString(50,244,'Prof. Guandalini')
-   canvas.setFillColor(NAVY);canvas.rect(0,0,width,190,fill=1,stroke=0)
-   canvas.setFillColor(CYAN);canvas.rect(50,146,44,3,fill=1,stroke=0)
-   canvas.setFillColor(colors.white);canvas.setFont('Helvetica-Bold',19)
-   canvas.drawString(50,112,'Conhecimento que se transforma')
-   canvas.drawString(50,85,'em decisões e aprendizagem.')
-   canvas.setFillColor(colors.HexColor('#b8d9e5'));canvas.setFont('Helvetica',9)
-   canvas.drawString(50,38,'MANUAL INSTITUCIONAL  |  EDIÇÃO 3.1  |  OUTUBRO DE 2026')
+   capa(canvas,title,subtitle,audience,'Edição 3.1 | Outubro de 2026')
   else:
-   draw_logo(canvas,50,height-43,93)
+   # Logo oficial vetorial aplicada após a paginação.
    canvas.setFillColor(NAVY);canvas.setFont('Helvetica',9);canvas.drawRightString(width-50,height-31,title)
    canvas.setStrokeColor(colors.HexColor('#d5e3eb'));canvas.setLineWidth(.6);canvas.line(50,height-55,width-50,height-55)
    canvas.line(50,40,width-50,40)
@@ -152,6 +145,12 @@ def build(stem):
 
  pdf=OUT/f'{stem}.pdf';doc=Livro(str(pdf),pagesize=A4,rightMargin=50,leftMargin=50,topMargin=75,bottomMargin=58,title='SempreHub - '+title,author='Prof. Guandalini')
  doc.multiBuild(story,onFirstPage=page,onLaterPages=page)
+ reader=PdfReader(pdf);writer=PdfWriter();writer.clone_document_from_reader(reader);logo=PdfReader(DOCS/'assets/semprehub-fundo-branco.pdf').pages[0]
+ for index,p in enumerate(writer.pages):
+  width=230 if index==0 else 93;scale=width/float(logo.mediabox.width);height=float(logo.mediabox.height)*scale
+  x,y=(85,A4[1]-130) if index==0 else (50,A4[1]-43)
+  p.merge_transformed_page(logo,Transformation().scale(scale).translate(x,y),over=True,expand=False)
+ with pdf.open('wb') as output:writer.write(output)
  (OUT/f'{stem}.html').write_text('<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><title>'+title+'</title><link rel="stylesheet" href="../manual.css"></head><body><h1>'+title+'</h1>'+ '\n'.join(markup)+'</body></html>')
  shutil.copyfile(pdf,PUBLIC/pdf.name);print(f'Gerado {pdf.relative_to(ROOT)} ({pdf.stat().st_size:,} bytes)')
 

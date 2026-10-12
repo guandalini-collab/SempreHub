@@ -44,9 +44,16 @@ Escolher zero é uma decisão possível quando a equipe não deseja contratar um
 
 ## Glossário para quem está começando
 
-**Mídia:** meio ou espaço de divulgação. **Peça:** material produzido, como arte ou vídeo. **Inserção:** ocorrência de um anúncio. **Impressão:** exibição registrada. **Alcance:** pessoas distintas alcançadas quando essa medida estiver disponível. **Conversão:** ação desejada, que pode ser uma compra ou outra ação definida. **Orçamento:** valor previsto para contratar o escopo.
+| Termo | Leitura para a decisão |
+|---|---|
+| Mídia | Espaço ou meio de divulgação. **Não inclui automaticamente a produção da peça.** |
+| Peça | Arte, áudio ou vídeo produzido. **Não compra audiência por si só.** |
+| Inserção | Uma ocorrência contratada do anúncio. **Não representa uma pessoa distinta.** |
+| Impressão | Uma exibição registrada. **Não representa necessariamente uma pessoa nova.** |
+| Conversão | Ação definida para a campanha, como compra ou cadastro. **Não é sempre uma venda.** |
+| Orçamento | Valor previsto para o escopo contratado. **Não garante retorno financeiro.** |
 
-Compare o escopo, a unidade e o total, não apenas o número ao lado do preço. Uma peça produzida sem veiculação não compra audiência. Um pacote de veiculação pode não incluir produção. Uma referência publicada não garante o preço final de um fornecedor.
+Compare escopo, unidade e total. Uma referência pública não garante o preço final do fornecedor.
 
 ## Consulta por formato
 
@@ -59,23 +66,35 @@ O catálogo a seguir preserva os formatos, unidades, tarifas didáticas e refer�
 | Mídia / pacote | Quantidade × tarifa original do jogo. Tarifas preservadas; não são preços comerciais atuais de veiculação. |
 | Produção / serviço | Criação de arte, filme, áudio, gestão ou execução física. Referência pública com fonte e escopo; preços iniciais não são cotações personalizadas. |
 | Orçamento sob consulta | Serviços sem preço público exato validado exigem valor e link do fornecedor. A equipe informa a cotação; o sistema não a verifica automaticamente. |
-| Total | Mídia + serviços precificados + orçamento informado. Uma única despesa de marketing na DRE e no caixa. |
+| Total | Mídia + serviços precificados + orçamento informado. Uma única despesa de marketing na DRE e saída no caixa; não lançar o subtotal novamente como outra despesa. |
 
-Produção é cobrada por formato, produto e mês, sem repetir a taxa por inserção. Materiais físicos dependem da quantidade. Reutilização de peças entre meses, cachês especiais e direitos irrestritos não são presumidos. A mesma referência serve a professor e aluno.
+> **Sem duplicidade na DRE:** Produção é cobrada por formato, produto e mês, sem repetir a taxa por inserção. Materiais físicos dependem da quantidade. Reutilização de peças entre meses, cachês especiais e direitos irrestritos não são presumidos. A mesma referência serve a professor e aluno.
+
+### Estados dos preços e referências
+
+| Natureza | Identificação e uso |
+|---|---|
+| Tarifa original do jogo | Regra didática fixada pelo Professor Guandalini. Valor preservado, sem afirmar preço comercial atual. |
+| Preço público documentado | Evidência da oferta consultada, com data e escopo próprios. Não prova custo contábil interno. |
+| Adaptação de preço inicial a outro escopo | **Estimativa do Modelo.** A aplicação ao jogo é uma hipótese; o valor original e sua fonte permanecem registrados. |
+| Serviço sem preço exato para o escopo | Orçamento sob consulta. Não presumir gratuidade; informar o valor e a referência exigidos pelo programa. |
+
+> **Impressão e distribuição de panfletos:** Contrate ambas na mesma quantidade quando optar pela ação completa. Distribuição não inclui impressão. Não duplique o custo da criação por exemplar nem contabilize novamente o total já incluído em marketing.
 
 ## Métricas para analisar
 
-| Indicador | O que mede | O que não demonstra |
+| Indicador | O que mede | O que NÃO demonstra |
 |---|---|---|
-| CPM | Custo por mil impressões/exibições | Mil pessoas diferentes ou mil compradores. |
-| Alcance único | Pessoas distintas expostas | Impressões acumuladas; uma pessoa pode ver várias vezes. |
-| Frequência | Impressões / alcance, quando ambos são conhecidos | Conversão em venda. |
-| CPC | Custo por clique | Compra concluída. |
-| CPV | Custo por visualização conforme a regra da plataforma | Cliente adquirido. |
-| Conversão / CPA | Ação concluída / custo por aquisição | Retorno positivo sem comparar margem e gasto. |
+| CPM | Custo por mil impressões: gasto ÷ impressões × 1.000. | **NÃO demonstra mil pessoas distintas, clientes ou compradores.** |
+| CPC | Custo por clique: gasto ÷ cliques. | **NÃO demonstra compra concluída nem lucro.** |
+| CPA | Custo por ação definida: gasto ÷ ações concluídas. Quando a ação é aquisição de cliente, registre essa definição. | **NÃO demonstra lucro, margem positiva ou retorno sustentável.** |
+| Alcance único | Pessoas ou usuários distintos expostos, conforme a metodologia de identificação da plataforma. | **NÃO demonstra impressões acumuladas nem compradores.** |
+| Frequência | Impressões ÷ alcance único, na mesma campanha e período. | **NÃO demonstra conversão em venda.** |
+| CPV | Custo por visualização válida segundo a regra da plataforma. | **NÃO demonstra cliente adquirido.** |
 
-Quantidade 10 em uma linha de CPM significa 10 lotes de mil exibições, não 10 mil clientes. Não inferir alcance único a partir da verba. Target e praça são hipóteses a validar com o perfil da audiência; idade/renda não são propriedades universais de uma mídia.
+> **Leitura segura:** Quantidade 10 em CPM corresponde a 10 lotes de mil exibições, não 10 mil compradores. Não deduza alcance único da verba. Uma pessoa pode receber diversas impressões; identificações entre plataformas podem não ser deduplicadas.
 
+Sem denominador válido, não force divisão nem um zero artificial. Compare métricas na mesma campanha, período e definição de ação.
 
 ## Impressa
 
@@ -95,7 +114,7 @@ Anúncio que ocupa uma página inteira de jornal. Dá espaço para uma mensagem 
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
 
 
@@ -117,7 +136,7 @@ Anúncio em metade de uma página de jornal. Permite combinar informação e pre
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
 
 
@@ -139,7 +158,7 @@ Página completa em revista. Útil para públicos ligados ao tema da publicaçã
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
 
 
@@ -161,7 +180,7 @@ Anúncio nas duas páginas abertas do jornal. Prioriza impacto visual e visibili
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
 
 
@@ -183,7 +202,7 @@ Anúncio em duas páginas abertas de revista. Permite uma composição visual am
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
 
 
@@ -205,7 +224,7 @@ Espaço pequeno, como um quarto de página ou rodapé de jornal. Adequado a mens
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
 
 
@@ -227,7 +246,7 @@ Espaço pequeno em revista. Dá presença em um público temático sem comprar u
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
 
 
@@ -249,7 +268,7 @@ Metade de uma página de revista, em formato horizontal ou vertical. Equilibra e
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
+**Criação e fechamento da arte impressa:** Uma peça no formato contratado. Fração considera 1/4 de página. Tabela pública sem data de vigência informada; referência para o exercício. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Tabela de serviços Be It · documento público](https://pt.scribd.com/document/849457514/Tabela-de-Servic-os-Be-It) · consulta 07/10/2026.
 
 
 
@@ -336,7 +355,7 @@ Mensagem enviada a uma lista de contatos com permissão. Útil para relacionamen
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design do e-mail marketing:** Desenho de um e-mail, sem HTML. O pacote de envios do jogo fornece a ferramenta com editor visual; programação personalizada não está incluída. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: We Do Logos · layout de e-mail marketing](https://www.wedologos.com.br/comprar/layoutemailmkt.aspx) · consulta 07/10/2026.
+**Design do e-mail marketing:** Desenho de um e-mail, sem HTML. O pacote de envios do jogo fornece a ferramenta com editor visual; programação personalizada não está incluída. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: We Do Logos · layout de e-mail marketing](https://www.wedologos.com.br/comprar/layoutemailmkt.aspx) · consulta 07/10/2026.
 
 
 
@@ -415,7 +434,7 @@ Campanha de anúncios no Google, em pesquisa, display ou YouTube. Pesquisa atend
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Gestão de campanha Google Ads:** Referência de honorários mensais; verba paga ao Google é separada. No jogo, gestão por campanha de produto e mês. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: DivulgaAI · gestão Google Ads](https://divulgaai.com.br/) · consulta 07/10/2026.
+**Gestão de campanha Google Ads:** Referência de honorários mensais; verba paga ao Google é separada. No jogo, gestão por campanha de produto e mês. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: DivulgaAI · gestão Google Ads](https://divulgaai.com.br/) · consulta 07/10/2026.
 
 
 
@@ -458,7 +477,7 @@ Vídeo de até seis segundos no YouTube, não pulável. Exige uma mensagem curta
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -480,7 +499,7 @@ Vídeo in-stream pulável após os primeiros segundos. Apresente a proposta cedo
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -502,7 +521,7 @@ Vídeo ou imagem vertical para Stories, Reels ou TikTok. Formato móvel que exig
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -524,7 +543,7 @@ Imagem ou vídeo entre publicações de Instagram, Facebook ou LinkedIn. A mensa
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -546,7 +565,7 @@ Sequência de imagens ou vídeos deslizantes. Permite mostrar variantes, benefí
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design do carrossel:** Arte de carrossel; não inclui ensaio fotográfico ou filmagem. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design do carrossel:** Arte de carrossel; não inclui ensaio fotográfico ou filmagem. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
 
 
 
@@ -568,7 +587,7 @@ Anúncio com peça principal e catálogo de produtos. Facilita descoberta e nave
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -618,9 +637,9 @@ Painel fixo em via de circulação. Comunica rapidamente a quem passa; use pouco
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Impressão de lona · 9 × 3 m:** 27 m² × R$ 46/m². Somente impressão. Fixação, projeto de arte e licenças dependem de orçamento; não estão comprovados por esta referência. Preço publicado por m²; 9 × 3 m é uma premissa didática explícita. [Fonte: BannerJÁ · painel em lona](https://www.bannerja.com.br/categoria/painel-lona) · consulta 07/10/2026.
+**Impressão de lona · 9 × 3 m:** 27 m² × R$ 46/m². Somente impressão. Fixação, projeto de arte e licenças dependem de orçamento; não estão comprovados por esta referência. Preço publicado por m²; 9 × 3 m é uma premissa didática explícita. [Fonte: BannerJÁ · painel em lona](https://www.bannerja.com.br/categoria/painel-lona) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
-**Criação de arte para painel:** Uma arte para o painel de 9 × 3 m. Instalação é orçada separadamente. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Imprima Aqui · outdoor 9×3](https://imprimaaqui.com.br/produto/comprar/1/outdoor-9x3) · consulta 07/10/2026.
+**Criação de arte para painel:** Uma arte para o painel de 9 × 3 m. Instalação é orçada separadamente. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Imprima Aqui · outdoor 9×3](https://imprimaaqui.com.br/produto/comprar/1/outdoor-9x3) · consulta 07/10/2026.
 
 > **Orçamento obrigatório, fora do subtotal:** Fixação e instalação da lona de 9 × 3 m. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
@@ -645,9 +664,9 @@ Painel com iluminação frontal. Ajuda a manter a visibilidade noturna; localiza
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Impressão de lona · 9 × 3 m:** 27 m² × R$ 46/m², lona simples para iluminação frontal. Não é lona translúcida de backlight. Instalação e licenças exigem orçamento próprio. Referência de lona simples; dimensão assumida pelo exercício, não cotação de frontlight instalado. [Fonte: BannerJÁ · painel em lona](https://www.bannerja.com.br/categoria/painel-lona) · consulta 07/10/2026.
+**Impressão de lona · 9 × 3 m:** 27 m² × R$ 46/m², lona simples para iluminação frontal. Não é lona translúcida de backlight. Instalação e licenças exigem orçamento próprio. Referência de lona simples; dimensão assumida pelo exercício, não cotação de frontlight instalado. [Fonte: BannerJÁ · painel em lona](https://www.bannerja.com.br/categoria/painel-lona) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
-**Criação de arte para painel:** Uma arte para o painel de 9 × 3 m. Instalação é orçada separadamente. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: Imprima Aqui · outdoor 9×3](https://imprimaaqui.com.br/produto/comprar/1/outdoor-9x3) · consulta 07/10/2026.
+**Criação de arte para painel:** Uma arte para o painel de 9 × 3 m. Instalação é orçada separadamente. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: Imprima Aqui · outdoor 9×3](https://imprimaaqui.com.br/produto/comprar/1/outdoor-9x3) · consulta 07/10/2026.
 
 > **Orçamento obrigatório, fora do subtotal:** Fixação e instalação do painel de 9 × 3 m. Informe o custo total para a quantidade escolhida e a fonte. Não há tarifa pública exata validada para este escopo.
 
@@ -692,7 +711,7 @@ Painel de LED que exibe anúncios e permite alternar peças. Adequado a comunica
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -777,7 +796,7 @@ Circuito de telas em elevadores, táxis ou metrô. Exposição durante esperas e
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -807,7 +826,7 @@ Anúncio de áudio gravado com 30 segundos. Permite repetição e divulgação d
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026.
+**Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -848,7 +867,7 @@ Comercial de 15 segundos em televisão. Requer mensagem curta e execução visua
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
+**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -870,7 +889,7 @@ Comercial de 30 segundos em televisão. Oferece mais tempo para explicar a propo
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
+**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -892,7 +911,7 @@ Comercial de 30 segundos antes da sessão de cinema. Trabalha presença audiovis
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
+**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -914,7 +933,7 @@ Vídeo curto que cria expectativa sobre um lançamento. Precisa de continuidade 
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026.
+**Produção do filme publicitário:** Piso publicado para filme publicitário básico. Inclui produção audiovisual do projeto; não presume direitos irrestritos de imagem, música ou adaptações para cinema. Licenças e exigências de exibição dependem do orçamento real. A partir de R$ 3.000 por projeto; referência básica, não orçamento de produção cinematográfica premium. [Fonte: Toranja Films · publicidade e criativos](https://www.toranjafilms.com/servicos/publicidade-e-criativos/) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -957,7 +976,7 @@ Mensagem breve de patrocínio na abertura ou fechamento de um bloco. A tabela co
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026.
+**Criação de vídeo / motion:** Referência publicada para motion de 15–30s. No jogo, uma peça adaptada ao formato; bumper, vinheta e telas exigem versão curta. Não equivale a filmagem com atores. A partir de R$ 990; adaptação didática da referência de motion 15–30s. [Fonte: Two Pixels · produção de vídeo](https://www.twopixels.com.br/producao-de-video-com-ia/) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -1040,7 +1059,7 @@ Anúncio de áudio em plataformas digitais de rádio ou streaming. A tabela comp
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026.
+**Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -1062,7 +1081,7 @@ Publicação nos perfis sociais da emissora. É uma ação digital distinta das 
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -1092,7 +1111,7 @@ Divulgação por veículo com alto-falante em uma região. É uma ação local; 
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026.
+**Produção de áudio · locução e trilha:** Spot simples. Cachês especiais, trilhas exclusivas e efeitos complexos não fazem parte deste piso. Preço publicado a partir de R$ 199; peça simples de áudio. [Fonte: GT Studio · spot comercial](https://www.gtstudio.com.br/spot-para-radio-gravacao-de-spots-comerciais.html) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -1114,7 +1133,7 @@ Produção física de panfletos. Imprimir não significa distribuir; a distribui
 
 **Escopo:** Tarifa original por unidade de impressão. Arte e distribuição são separadas.
 
-**Design do panfleto até A4:** Criação da arte; impressão e distribuição são contratadas nas linhas próprias. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. [Fonte: ADM Agência · design gráfico](https://admagenciadigital.com.br/tabela-de-precos-de-design-grafico/) · consulta 07/10/2026.
+**Design do panfleto até A4:** Criação da arte; impressão e distribuição são contratadas nas linhas próprias. Preço publicado de referência; contratação real sujeita ao escopo e orçamento. **Aplicação ao escopo do jogo: Estimativa do Modelo.** [Fonte: ADM Agência · design gráfico](https://admagenciadigital.com.br/tabela-de-precos-de-design-grafico/) · consulta 07/10/2026.
 
 > **Dependência obrigatória:** Contratar impressão e distribuição na mesma quantidade. O design é cobrado uma vez por produto e mês.
 
@@ -1328,7 +1347,7 @@ Banner horizontal de 728×90 pixels, normalmente no topo de uma página web. A c
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -1350,7 +1369,7 @@ Banner retangular de 300×250 pixels, integrado ao conteúdo ou à lateral de um
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -1372,7 +1391,7 @@ Banner vertical de 300×600 pixels. Oferece grande área visual na lateral da p�
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -1394,7 +1413,7 @@ Banner vertical estreito de 160×600 pixels. Ocupa uma faixa lateral da página.
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -1416,7 +1435,7 @@ Banner grande de 970×250 pixels, normalmente no topo. Busca destaque em telas m
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -1438,7 +1457,7 @@ Anúncio que ocupa a tela entre etapas de navegação. Tem grande visibilidade, 
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
@@ -1460,7 +1479,7 @@ Anúncio que acompanha o formato visual do conteúdo de um site. Deve permanecer
 
 **Escopo:** A tarifa original do jogo remunera o espaço/pacote descrito, não uma cotação universal de campanha completa.
 
-**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026.
+**Design da peça digital:** Referência de uma arte estática para rede social. No jogo, adaptação ao formato contratado; não inclui fotografia profissional, programação ou produção de vídeo. Arte unitária publicada a R$ 80; adaptação didática para formatos digitais estáticos. [Fonte: Estúdio Belize · redes sociais](https://www.estudiobelize.com.br/redes-sociais) · consulta 07/10/2026. **Aplicação ao escopo contratado no simulador: Estimativa do Modelo; a referência publicada não comprova o custo contábil interno da empresa.**
 
 
 
