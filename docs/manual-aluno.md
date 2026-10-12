@@ -16,7 +16,7 @@ Criado por: Prof Guandalini.
 
 Olá, seja bem-vindo ao SempreHub.
 
-Criei este simulador para aproximar o que aprendemos em sala de aula das decisões que empresas precisam tomar todos os dias. A proposta é que você interprete informações, converse com sua equipe e acompanhe o efeito de cada escolha.
+O SempreHub foi criado para integrar conhecimentos de diversas áreas e aplicá-los à gestão de organizações que ingressam e atuam no mercado. A disciplina terá uma abordagem essencialmente prática: conceitos estudados em outras disciplinas serão utilizados na análise de cenários, na tomada de decisões e na avaliação dos resultados da empresa simulada.
 
 O SempreHub funciona como um **ecossistema de negócios**. Ecossistema é um conjunto de participantes e atividades que se relacionam e dependem uns dos outros. No jogo, essa rede reúne estudantes, equipes, departamentos da empresa, clientes, fornecedores e concorrentes. Uma mudança em uma parte pode modificar as condições das demais.
 

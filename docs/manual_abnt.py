@@ -104,7 +104,9 @@ def build(stem):
   lines=block.splitlines()
   if all(re.match(r'^(\d+\. |\- )',line) for line in lines):
    story += [Paragraph(inline(line),STYLES['List']) for line in lines]
-  else:story.append(Paragraph(inline(' '.join(lines)),STYLES['Body']))
+  else:
+   estilo=ParagraphStyle('LetterBody',parent=STYLES['Body'],spaceAfter=4,keepWithNext=' '.join(lines).startswith('Espero que')) if lastheading=='Carta de apresentação' else STYLES['Body']
+   story.append(Paragraph(inline(' '.join(lines)),estilo))
   markup.append('<p>'+inline(' '.join(lines))+'</p>')
  # The source logo is merged as vector PDF after ReportLab pagination; this
  # preserves CorelDRAW paths, the white background, and gradient fills.
