@@ -634,3 +634,17 @@ O custo unitário pode aparecer como **Valor Calculado** quando sustentado pelo 
 Se a fonte estiver inacessível ou não confirmar o produto e o preço, o catálogo usa o custo unitário padrão configurado na turma, sempre identificado como **Estimativa do Modelo**. O professor recebe o motivo da falha na revisão da edição. Para esse recurso, o custo padrão deve ser maior que zero. Notícias e análises mantêm suas exigências de fontes e datas; links inseguros continuam bloqueados.
 
 A equipe deve interpretar a origem do custo ao definir preço, margem, produção e financiamento. Depois de publicado, o custo é aplicado pelo sistema às decisões e preservado com a edição; não é um campo livre para o aluno alterar. Edições e resultados históricos não são recalculados. A regra dos três caminhos possui identificação própria, separada da versão do motor de indicadores.
+
+## Painel de comando executivo
+
+O menu lateral abre uma área de trabalho por vez. Os cartões brancos sobre fundo claro separam decisões, consultas e resultados. Os cabeçalhos azuis e ícones identificam as missões de cada departamento. O foco em ciano destaca o campo em edição; o botão laranja de envio final mantém a confirmação e a trava de leitura já previstas nas regras.
+
+SWOT apresenta Forças e Oportunidades na linha superior, Fraquezas e Ameaças na inferior. PESTEL e Porter usam blocos responsivos. No celular, os blocos se reorganizam em uma coluna, sem mudar os dados.
+
+Os selos de ouro, prata e bronze identificam as três primeiras posições do ranking de patrimônio líquido registrado. Não alteram a nota, não concedem vantagens e não garantem lucro. No relatório do professor, a ordem da nota automática e o pódio patrimonial têm critérios distintos. O modo sobrevivência representa a fase SOBREVIVENCIA; Empresa Estabilizada representa OPERACAO_ESTAVEL. As fases são calculadas pelo motor, não pelos selos.
+
+A barra de prazo no painel docente representa somente as últimas 24 horas da data limite salva. Antes dessa janela, permanece cheia. Ao chegar a zero, aguarde a atualização do servidor. Ela não encerra rodadas, não salva rascunhos e não substitui a trava das 23:59:59 de Brasília. Sem data limite salva, não há contagem regressiva.
+
+### Critérios de coerência estratégica
+
+As incompatibilidades estruturadas podem reduzir a demanda comercial: SWOT e posicionamento, 4%; BCG e quadrante, 3%; público e preço, 5%; cobertura, 3%; canais, 4%; mídias, 4%. A redução total é limitada a 20%. Diagnósticos de consulta e textos livres não recebem penalidades automáticas. Demanda, capacidade, custos e concorrência continuam influenciando os resultados; nenhuma escolha garante lucro.

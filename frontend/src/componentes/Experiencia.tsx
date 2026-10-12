@@ -1,3 +1,4 @@
+import { ValorMonetario } from "./ui";
 import React, { useEffect, useState } from "react";
 import { reais, percentual } from "../formatos";
 import type { PainelAluno } from "../tipos";
@@ -168,7 +169,7 @@ export function FeedResultados({
             <h3 className="mt-2 text-lg font-bold">{f.titulo}</h3>
             <p className="my-2 text-sm text-slate-600">{f.texto}</p>
             <p className="mb-3 text-sm">
-              Resultado: <strong>{reais(f.lucro)}</strong> · Mercado:{" "}
+              Resultado: <strong><ValorMonetario valor={f.lucro}/></strong> · Mercado:{" "}
               <strong>{percentual(f.participacao)}</strong>
             </p>
             <Botao variante="secundario" onClick={aoResultados}>

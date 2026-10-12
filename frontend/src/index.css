@@ -46,3 +46,47 @@
   .quadros-analise > :nth-child(3) { border-top-color: #034AA6; }
   .quadros-analise > :nth-child(4) { border-top-color: #D9851E; }
 }
+
+/* Aplicação exclusiva após autenticação: a página de acesso mantém suas cores. */
+@layer components {
+  .painel-executivo { background: #F8FAFC; }
+  .painel-executivo > header { background: linear-gradient(115deg, #034AA6, #0762D9); border-bottom: 3px solid #0AADBF; }
+  .painel-executivo .cartao-executivo { min-width: 0; border: 1px solid rgb(3 74 166 / 8%); box-shadow: 0 12px 32px -24px rgb(3 74 166 / 45%); }
+  .painel-executivo h1, .painel-executivo h2, .painel-executivo h3 { letter-spacing: -0.02em; }
+  .painel-executivo input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):focus,
+  .painel-executivo textarea:focus, .painel-executivo select:focus {
+    border-color: #0AADBF; outline: none; box-shadow: 0 0 0 3px rgb(10 173 191 / 15%), 0 0 18px rgb(10 173 191 / 10%);
+  }
+  .painel-executivo input, .painel-executivo textarea, .painel-executivo select { transition: border-color 160ms, box-shadow 160ms; }
+  .painel-executivo input[type="range"], .painel-executivo input[type="checkbox"], .painel-executivo progress { accent-color: #0AADBF; }
+  .painel-executivo .acao-final { padding: 0.9rem 1.5rem; border-radius: 0.85rem; box-shadow: 0 5px 16px rgb(217 133 30 / 25%); transition: transform 180ms, background-color 180ms, box-shadow 180ms; }
+  .painel-executivo .acao-final:hover:not(:disabled) { background: #E59A3A; transform: scale(1.05); box-shadow: 0 7px 22px rgb(217 133 30 / 35%); }
+  .painel-executivo .acao-final:active:not(:disabled) { transform: scale(0.99); }
+  .painel-executivo .missao-decisao { min-width: 0; border: 1px solid rgb(7 98 217 / 15%); border-radius: 1rem; background: white; padding: 1.25rem; box-shadow: 0 6px 20px -15px rgb(3 74 166 / 30%); }
+  .painel-executivo .cabecalho-missao { display: flex; align-items: center; gap: 0.75rem; max-width: 100%; padding: 0.6rem 1rem; border-radius: 0.75rem; background: #0762D9; color: white; font-size: 0.9rem; font-weight: 700; }
+  .icone-missao { display: inline-flex; flex-shrink: 0; width: 2rem; height: 2rem; align-items: center; justify-content: center; border-radius: 0.6rem; background: rgb(255 255 255 / 12%); color: #A5F3FC; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 15%); }
+  .icone-missao svg { width: 1.15rem; height: 1.15rem; }
+  .painel-executivo .quadros-analise > * { background: linear-gradient(135deg, rgb(10 173 191 / 8%), white 70%); border-radius: 1rem; padding: 1.25rem; box-shadow: 0 8px 22px -18px rgb(3 74 166 / 35%); }
+  .painel-executivo .quadros-analise > :nth-child(2) { background: linear-gradient(135deg, rgb(7 98 217 / 7%), white 70%); }
+  .painel-executivo .quadros-analise > :nth-child(3) { background: linear-gradient(135deg, rgb(3 74 166 / 6%), white 70%); }
+  .painel-executivo .quadros-analise > :nth-child(4) { background: linear-gradient(135deg, rgb(217 133 30 / 7%), white 70%); }
+  .painel-executivo table { border-collapse: separate; border-spacing: 0; }
+  .painel-executivo table th { background: #F0F7FF; color: #034AA6; padding: 0.9rem 0.75rem; font-weight: 700; }
+  .painel-executivo table td { padding: 0.9rem 0.75rem; vertical-align: middle; }
+  .painel-executivo table tbody tr:hover { background: rgb(10 173 191 / 5%); }
+  .painel-executivo table td.text-right, .painel-executivo dd { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+  .painel-executivo .text-red-700, .painel-executivo .text-red-600, .painel-executivo .valor-negativo { color: #EF4444; }
+  .painel-executivo .alerta-controle { border-left: 4px solid #D9851E; box-shadow: 0 5px 20px -15px rgb(217 133 30 / 35%); }
+  .painel-executivo #menu-painel button[aria-current="page"] { color: #082F49; border-left: 3px solid #A5F3FC; }
+  .painel-executivo #menu-painel button[aria-expanded="true"] { color: white; }
+  .painel-executivo [role="status"] { border-radius: 0.75rem; }
+  .painel-executivo details > summary { padding-block: 0.3rem; color: #034AA6; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .painel-executivo .acao-final:hover:not(:disabled), .painel-executivo .acao-final:active:not(:disabled) { transform: none; }
+}
+
+@layer components {
+  .painel-executivo .valor-monetario { color: #034AA6; }
+  .painel-executivo .bg-marinho .valor-monetario, .painel-executivo .text-white .valor-monetario { color: inherit; }
+}

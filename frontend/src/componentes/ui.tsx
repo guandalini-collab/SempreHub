@@ -1,5 +1,6 @@
 import React from "react";
 
+import { IconeMissao } from "./IdentidadeExecutiva";
 import logoSempreHub from "../assets/logo-semprehub.svg";
 import { NOME_FASE, corFase, reais } from "../formatos";
 import type { Dre, FaseAtual, Usuario } from "../tipos";
@@ -59,10 +60,10 @@ export function Cartao({
   className?: string;
 }) {
   return (
-    <section className={`rounded-2xl bg-white p-5 shadow-[0_8px_30px_-18px_rgba(11,37,69,0.25)] ring-1 ring-slate-200 ${className}`}>
+    <section className={`cartao-executivo rounded-2xl bg-white p-5 shadow-[0_8px_30px_-18px_rgba(11,37,69,0.25)] ring-1 ring-slate-200 ${className}`}>
       {(titulo || acao) && (
         <div className="-mx-5 -mt-5 mb-5 flex flex-wrap items-center justify-between gap-2 rounded-t-2xl bg-gradient-to-r from-marinho to-royal px-5 py-4 text-white">
-          {titulo && <h2 className="text-base font-semibold text-white">{titulo}</h2>}
+          {titulo && <h2 className="flex items-center gap-3 text-base font-semibold text-white">{typeof titulo === "string" && <IconeMissao titulo={titulo} />}{titulo}</h2>}
           <div className="[&_.text-slate-500]:text-blue-100">{acao}</div>
         </div>
       )}
@@ -90,7 +91,7 @@ export function Botao({
     <button
       {...props}
       disabled={props.disabled || carregando}
-      className={`rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60 ${estilos[variante]} ${className}`}
+      className={`rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60 ${variante === "final" ? "acao-final" : ""} ${estilos[variante]} ${className}`}
     >
       {carregando ? "Processando..." : children}
     </button>
@@ -306,8 +307,8 @@ export function BarraProgresso({ rotulo, valor, escuro = false }: { rotulo: stri
 
 export function SeloFase({ fase }: { fase: FaseAtual }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${corFase(fase)}`}>
-      {NOME_FASE[fase]}
+    <span className={`selo-fase inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${fase === "SOBREVIVENCIA" ? "bg-ouro/15 text-amber-900 ring-ouro/30" : corFase(fase)}`}>
+      <span aria-hidden="true">{fase === "SOBREVIVENCIA" ? "⛨" : fase === "OPERACAO_ESTAVEL" ? "✓" : "◇"}</span>{fase === "SOBREVIVENCIA" ? "Modo sobrevivência" : fase === "OPERACAO_ESTAVEL" ? "Empresa Estabilizada" : NOME_FASE[fase]}
     </span>
   );
 }
@@ -386,13 +387,13 @@ export function TabelaDre({ dre }: { dre: Dre }) {
       <tbody>
         <tr className="border-b border-slate-200">
           <td className="py-1.5 font-semibold text-marinho">Receita bruta</td>
-          <td className="py-1.5 text-right font-semibold text-marinho">{reais(dre.receita)}</td>
+          <td className="py-1.5 text-right font-semibold text-marinho"><ValorMonetario valor={dre.receita}/></td>
         </tr>
         {LINHAS_DRE.filter(({ chave }) => dre[chave] != null && (dre[chave] !== 0 || ["impostos", "cmv", "custos_fixos"].includes(chave))).map(
           ({ chave, rotulo }) => (
             <tr key={chave} className="border-b border-slate-100">
               <td className="py-1.5 text-slate-600">{rotulo}</td>
-              <td className="py-1.5 text-right text-red-700">{reais(-(dre[chave] ?? 0))}</td>
+              <td className="py-1.5 text-right text-red-700"><ValorMonetario valor={-(dre[chave] ?? 0)}/></td>
             </tr>
           )
         )}
@@ -401,7 +402,7 @@ export function TabelaDre({ dre }: { dre: Dre }) {
         <tr className="border-t-2 border-marinho">
           <td className="py-2 font-bold text-marinho">Lucro (prejuízo) do mês</td>
           <td className={`py-2 text-right font-bold ${dre.lucro_liquido >= 0 ? "text-emerald-700" : "text-red-700"}`}>
-            {reais(dre.lucro_liquido)}
+            <ValorMonetario valor={dre.lucro_liquido}/>
           </td>
         </tr>
       </tfoot>
@@ -450,7 +451,7 @@ export function GraficoLinhas({
       <svg viewBox={`0 0 ${largura} ${altura}`} className="w-full" role="img" aria-label={series.map((s) => s.nome).join(", ")}>
         {marcas.map((m) => (
           <g key={m}>
-            <line x1={margem.esquerda} x2={largura - margem.direita} y1={y(m)} y2={y(m)} stroke="#102A68" strokeOpacity={0.08} />
+            <line x1={margem.esquerda} x2={largura - margem.direita} y1={y(m)} y2={y(m)} stroke="#034AA6" strokeOpacity={0.08} />
             <text x={margem.esquerda - 6} y={y(m) + 3} textAnchor="end" fontSize="10" fill="#64748b">
               {formatar(m)}
             </text>
@@ -495,4 +496,9 @@ export function GraficoLinhas({
   );
 }
 
-export const CORES_SERIES = ["#102A68", "#FFC233", "#2A6F97", "#B5523B", "#5C8A4E", "#7D5BA6", "#8C8C8C", "#1F8A8A"];
+export const CORES_SERIES = ["#034AA6", "#D9851E", "#2A6F97", "#B5523B", "#5C8A4E", "#7D5BA6", "#8C8C8C", "#1F8A8A"];
+
+/** Apresentação monetária: preserva o valor calculado e sinaliza déficits. */
+export function ValorMonetario({ valor }: { valor: number }) {
+  return <span className={`font-bold tabular-nums whitespace-nowrap ${valor < 0 ? "valor-negativo" : "valor-monetario"}`}>{reais(valor)}</span>;
+}

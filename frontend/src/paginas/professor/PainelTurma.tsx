@@ -1,3 +1,5 @@
+import { ValorMonetario } from "../../componentes/ui";
+import { ProgressoPrazo, SeloPodio } from "../../componentes/IdentidadeExecutiva";
 import CentralManuais from "../../componentes/CentralManuais";
 import { CONFIGURACAO_MOTOR_PADRAO } from "../../tiposSimulacao";
 import FormacaoTurma from "../../componentes/FormacaoTurma";
@@ -114,7 +116,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   return (
     <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={(id) => { setSecao(id); setEditandoParametros(id === "parametros"); }} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ turma: turma.nome, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
       {aberta && !turma.prazo_rodada && (
-        <div role="status" className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-950">
+        <div role="status" className="alerta-controle mb-4 rounded-xl border border-ouro/25 bg-white p-4 text-amber-950">
           <p className="font-semibold">Configuração pendente: rodada {turma.rodada_atual} sem data limite.</p>
           <p className="mt-1 text-sm">Antes de orientar os alunos a iniciar esta rodada, confira o prazo. Sem uma data salva, as decisões permanecem abertas e o encerramento será somente manual. O prazo da rodada anterior não é reutilizado.</p>
           <button type="button" className="mt-3 rounded-lg border border-amber-400 px-3 py-2 text-sm font-semibold hover:bg-amber-100" onClick={() => setSecao("fechamento")}>Configurar prazo da rodada</button>
@@ -169,7 +171,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-lg bg-slate-50 p-4"><p className="text-sm text-slate-600">Empresas</p><p className="text-2xl font-bold">{empresas.length}</p></div>
           <div className="rounded-lg bg-emerald-50 p-4"><p className="text-sm text-emerald-800">Decisões prontas</p><p className="text-2xl font-bold">{aberta ? enviadas : "—"}</p></div>
-          <div className="rounded-lg bg-amber-50 p-4"><p className="text-sm text-amber-900">Envios pendentes</p><p className="text-2xl font-bold">{aberta ? empresas.length - enviadas : "—"}</p></div>
+          <div className="alerta-controle rounded-lg bg-white p-4"><p className="text-sm text-amber-900">Envios pendentes</p><p className="text-2xl font-bold">{aberta ? empresas.length - enviadas : "—"}</p></div>
         </div>
         <div className="mt-5 border-t border-slate-200 pt-4">
           <h3 className="font-semibold">O que fazer agora</h3>
@@ -206,12 +208,12 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
             }
           >
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              <Dado rotulo="Caixa inicial" valor={reais(turma.parametros!.caixa_inicial)} />
-              <Dado rotulo="Preço de referência" valor={reais(turma.parametros!.preco_referencia)} />
-              <Dado rotulo="Custo unitário" valor={reais(turma.parametros!.custo_unitario)} />
+              <Dado rotulo="Caixa inicial" valor={<ValorMonetario valor={turma.parametros!.caixa_inicial}/>} />
+              <Dado rotulo="Preço de referência" valor={<ValorMonetario valor={turma.parametros!.preco_referencia}/>} />
+              <Dado rotulo="Custo unitário" valor={<ValorMonetario valor={turma.parametros!.custo_unitario}/>} />
               <Dado rotulo="Demanda base/empresa" valor={`${inteiro(turma.parametros!.demanda_base_por_empresa)} un.`} />
-              <Dado rotulo="Salário-base" valor={reais(turma.parametros!.salario_base)} />
-              <Dado rotulo="Custos fixos" valor={reais(turma.parametros!.custos_fixos_mensais)} />
+              <Dado rotulo="Salário-base" valor={<ValorMonetario valor={turma.parametros!.salario_base}/>} />
+              <Dado rotulo="Custos fixos" valor={<ValorMonetario valor={turma.parametros!.custos_fixos_mensais}/>} />
             </dl>
             <p className="mt-3 text-xs text-slate-500">O CSV traz todas as rodadas de todas as empresas, pronto para Excel ou análise estatística.</p>
           </Cartao>
@@ -245,15 +247,15 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
                         onClick={() => setEmpresaAberta(linha.empresa_id)}
                         className="cursor-pointer border-t border-slate-100 hover:bg-slate-50"
                       >
-                        <td className="py-2 font-semibold text-ouro">{linha.posicao}º</td>
+                        <td className="py-2 font-semibold text-ouro"><SeloPodio posicao={linha.posicao}/></td>
                         <td className="py-2">
                           <button type="button" className="font-medium text-marinho underline decoration-ouro underline-offset-4" onClick={(e) => { e.stopPropagation(); setEmpresaAberta(linha.empresa_id); }}>{linha.empresa}</button>
                           <p className="text-xs text-slate-500">{turma.modo_equipe ? empresa.equipe_membros?.map((m) => m.nome).join(", ") || linha.aluno : linha.aluno}</p>
                         </td>
                         <td className={`py-2 text-right font-semibold ${linha.patrimonio < 0 ? "text-red-700" : "text-marinho"}`}>
-                          {reais(linha.patrimonio)}
+                          <ValorMonetario valor={linha.patrimonio}/>
                         </td>
-                        <td className="py-2 text-right">{reais(linha.lucro_acumulado)}</td>
+                        <td className={`py-2 text-right font-bold ${linha.lucro_acumulado < 0 ? "valor-negativo" : "text-corporativo"}`}><ValorMonetario valor={linha.lucro_acumulado}/></td>
                         <td className="py-2 text-right">{percentual(linha.participacao_mercado)}</td>
                         <td className="py-2">
                           <SeloFase fase={linha.fase} />
@@ -280,7 +282,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       <SecaoPainel id="resultados" ativa={secao}>
       <RelatoriosEmpresariaisProfessor turmaId={turmaId} ultimaRodada={rodadasJogadas} empresas={empresas} />
       {rodadasJogadas === 0 && <Cartao titulo="Resultados ainda indisponíveis"><p>Os gráficos e indicadores serão disponibilizados após o encerramento da primeira rodada. As empresas podem ser acompanhadas em Alunos e empresas.</p></Cartao>}
-      {turma.modo_jogo !== "LEGADO" && <RelatorioPedagogico turmaId={turma.id} rodada={turma.rodada_atual} temResultados={rodadasJogadas > 0} abrirEmpresa={setEmpresaAberta} />}
+      {turma.modo_jogo !== "LEGADO" && <RelatorioPedagogico turmaId={turma.id} rodada={turma.rodada_atual} temResultados={rodadasJogadas > 0} abrirEmpresa={setEmpresaAberta} rankingPatrimonial={ranking} />}
 
       {rodadasJogadas > 0 && (
         <div className="grid gap-6 lg:grid-cols-2">
@@ -300,8 +302,8 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
             <GraficoLinhas
               rotulosX={mercado.map((m) => `M${m.rodada}`)}
               series={[
-                { nome: "Receita total", cor: "#102A68", valores: mercado.map((m) => m.receita) },
-                { nome: "Lucro total", cor: "#FFC233", valores: mercado.map((m) => m.lucro) },
+                { nome: "Receita total", cor: "#034AA6", valores: mercado.map((m) => m.receita) },
+                { nome: "Lucro total", cor: "#D9851E", valores: mercado.map((m) => m.lucro) },
               ]}
             />
             <p className="mt-2 text-xs text-slate-500">
@@ -349,7 +351,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   );
 }
 
-function Dado({ rotulo, valor }: { rotulo: string; valor: string }) {
+function Dado({ rotulo, valor }: { rotulo: string; valor: React.ReactNode }) {
   return (
     <div>
       <dt className="text-xs text-slate-500">{rotulo}</dt>
@@ -469,8 +471,8 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
             <Dado rotulo="Tipo" valor={NOME_DORNELAS[dados.empresa.classe_dornelas]} />
             <Dado rotulo="Regime" valor={NOME_REGIME[dados.empresa.regime_tributario]} />
             <Dado rotulo="Funcionários" valor={String(dados.empresa.funcionarios)} />
-            <Dado rotulo="Caixa" valor={reais(dados.empresa.caixa)} />
-            <Dado rotulo="Dívida" valor={reais(dados.empresa.divida)} />
+            <Dado rotulo="Caixa" valor={<ValorMonetario valor={dados.empresa.caixa}/>} />
+            <Dado rotulo="Dívida" valor={<ValorMonetario valor={dados.empresa.divida}/>} />
             <Dado rotulo="Autoeficácia" valor={dados.empresa.autoeficacia.toFixed(0)} />
             <Dado rotulo="Networking" valor={dados.empresa.networking.toFixed(0)} />
           </div>
@@ -500,12 +502,12 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
                     <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Decisões</p>
                     {decisao ? (
                       <dl className="grid grid-cols-2 gap-2 text-sm">
-                        <Dado rotulo="Preço" valor={reais(decisao.preco)} />
-                        <Dado rotulo="Marketing" valor={reais(decisao.marketing)} />
-                        <Dado rotulo="P&D" valor={reais(decisao.pd)} />
-                        <Dado rotulo="Networking" valor={reais(decisao.networking)} />
+                        <Dado rotulo="Preço" valor={<ValorMonetario valor={decisao.preco}/>} />
+                        <Dado rotulo="Marketing" valor={<ValorMonetario valor={decisao.marketing}/>} />
+                        <Dado rotulo="P&D" valor={<ValorMonetario valor={decisao.pd}/>} />
+                        <Dado rotulo="Networking" valor={<ValorMonetario valor={decisao.networking}/>} />
                         <Dado rotulo="Contratou / demitiu" valor={`${decisao.contratar} / ${decisao.demitir}`} />
-                        <Dado rotulo="Empréstimo / amortização" valor={`${reais(decisao.emprestimo)} / ${reais(decisao.amortizacao)}`} />
+                        <Dado rotulo="Empréstimo / amortização" valor={`$<ValorMonetario valor={decisao.emprestimo}/> / $<ValorMonetario valor={decisao.amortizacao}/>`} />
                       </dl>
                     ) : (
                       <p className="text-sm text-slate-500">—</p>
@@ -613,5 +615,5 @@ function PrazoRodada({turmaId, rodada, prazo, aoSalvar}: {turmaId: number; rodad
     catch(e) { setMensagem(e instanceof Error ? e.message : "Erro ao salvar prazo."); }
     finally { setSalvando(false); }
   }
-  return <Cartao titulo="Data limite da rodada"><p className="mb-4 text-sm">O sistema bloqueia os envios e encerra automaticamente este mês às 23:59:59 de Brasília da data escolhida. Sem data, o encerramento é manual. Configure um novo prazo para cada mês.</p><Campo rotulo="Data limite"><input type="date" className={estiloEntrada} value={data} onChange={e=>setData(e.target.value)} /></Campo><div className="mt-4 flex justify-end"><Botao carregando={salvando} onClick={salvar}>Salvar prazo</Botao></div>{mensagem && <p role="status" className="mt-3 text-sm">{mensagem}</p>}</Cartao>;
+  return <Cartao titulo="Data limite da rodada"><ProgressoPrazo prazo={prazo}/><p className="mb-4 text-sm">O sistema bloqueia os envios e encerra automaticamente este mês às 23:59:59 de Brasília da data escolhida. Sem data, o encerramento é manual. Configure um novo prazo para cada mês.</p><Campo rotulo="Data limite"><input type="date" className={estiloEntrada} value={data} onChange={e=>setData(e.target.value)} /></Campo><div className="mt-4 flex justify-end"><Botao carregando={salvando} onClick={salvar}>Salvar prazo</Botao></div>{mensagem && <p role="status" className="mt-3 text-sm">{mensagem}</p>}</Cartao>;
 }

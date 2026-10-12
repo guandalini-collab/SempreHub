@@ -351,7 +351,7 @@ function Analises({ ferramenta }: { ferramenta?: number }) {
         {painel(<>
         <details open className="rounded-lg border border-slate-200 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-marinho">5 Forças de Porter · concorrência</summary>
-          <div className="mt-3 space-y-2">{porter.map(([titulo, texto]) => <ItemAnalise key={titulo} titulo={titulo} texto={texto} />)}</div>
+          <div className="quadros-analise mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{porter.map(([titulo, texto]) => <ItemAnalise key={titulo} titulo={titulo} texto={texto} />)}</div>
         </details>
         <details className="rounded-lg border border-slate-200 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-marinho">PESTEL · macroambiente</summary>

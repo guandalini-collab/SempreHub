@@ -1,3 +1,5 @@
+import { ValorMonetario } from "../../componentes/ui";
+import { IconeMissao } from "../../componentes/IdentidadeExecutiva";
 import IndicadoresDepartamentais, { AREAS_INDICADORES } from "../../componentes/IndicadoresDepartamentais";
 import CentralManuais from "../../componentes/CentralManuais";
 import ResultadoProdutos from "../../componentes/ResultadoProdutos";
@@ -241,9 +243,9 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
 
         <details className="mt-4 border-t border-white/15 pt-3"><summary className="cursor-pointer text-sm text-white/80">Perfil, estrutura e desenvolvimento da empresa</summary>
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          <Indicador rotulo="Caixa" valor={reais(empresa.caixa)} destaque />
-          <Indicador rotulo="Dívida" valor={reais(empresa.divida)} />
-          <Indicador rotulo="Patrimônio" valor={reais(empresa.patrimonio)} />
+          <Indicador rotulo="Caixa" valor={<ValorMonetario valor={empresa.caixa}/>} destaque />
+          <Indicador rotulo="Dívida" valor={<ValorMonetario valor={empresa.divida}/>} />
+          <Indicador rotulo="Patrimônio" valor={<ValorMonetario valor={empresa.patrimonio}/>} />
           <Indicador rotulo="Regime" valor={NOME_REGIME[empresa.regime_tributario]} />
           <Indicador rotulo="Funcionários" valor={empresa.funcionarios} />
           <Indicador
@@ -300,7 +302,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
                 <strong>
                   {painel.posicao_ranking}º lugar de {painel.total_empresas}
                 </strong>{" "}
-                no ranking de patrimônio, com {reais(empresa.patrimonio)}.
+                no ranking de patrimônio, com <ValorMonetario valor={empresa.patrimonio}/>.
               </p>
             </Cartao>
           ) : (
@@ -308,7 +310,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
           )}
         </div>
       </SecaoPainel>
-      <SecaoPainel id="resultados" ativa={secao}><Cartao titulo="Resultados da empresa"><p>Selecione uma área no submenu lateral. Compare os valores e consulte o manual do aluno para interpretar os indicadores antes de decidir a próxima rodada.</p>{ultimo&&<p className="mt-4 font-semibold">Última rodada concluída: {ultimo.rodada} · Caixa: {reais(ultimo.caixa_final)} · Lucro líquido: {reais(ultimo.dre.lucro_liquido)}</p>}</Cartao></SecaoPainel>
+      <SecaoPainel id="resultados" ativa={secao}><Cartao titulo="Resultados da empresa"><p>Selecione uma área no submenu lateral. Compare os valores e consulte o manual do aluno para interpretar os indicadores antes de decidir a próxima rodada.</p>{ultimo&&<p className="mt-4 font-semibold">Última rodada concluída: {ultimo.rodada} · Caixa: <ValorMonetario valor={ultimo.caixa_final}/> · Lucro líquido: <ValorMonetario valor={ultimo.dre.lucro_liquido}/></p>}</Cartao></SecaoPainel>
       {AREAS_INDICADORES.map(a=><SecaoPainel key={a.id} id={`resultado-${a.id}`} ativa={secao}><IndicadoresDepartamentais area={a.id} resultado={ultimo}/></SecaoPainel>)}
       <SecaoPainel id="demonstrativos" ativa={secao}>
       {ultimo && <IndicadoresFinanceiros resultado={ultimo} />}
@@ -364,7 +366,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
                   {painel.mercado.map((linha) => (
                     <tr key={linha.empresa} className={`border-t border-slate-100 ${linha.propria ? "font-semibold text-marinho" : "text-slate-600"}`}>
                       <td className="py-1.5">{linha.empresa}{linha.propria && " (você)"}</td>
-                      <td className="py-1.5 text-right">{reais(linha.preco)}</td>
+                      <td className="py-1.5 text-right"><ValorMonetario valor={linha.preco}/></td>
                       <td className="py-1.5 text-right">{percentual(linha.participacao_mercado)}</td>
                     </tr>
                   ))}
@@ -384,15 +386,15 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
             <GraficoLinhas
               rotulosX={resultados.map((r) => `M${r.rodada}`)}
               series={[
-                { nome: "Caixa", cor: "#102A68", valores: resultados.map((r) => r.caixa_final) },
-                { nome: "Lucro do mês", cor: "#FFC233", valores: resultados.map((r) => r.dre.lucro_liquido) },
+                { nome: "Caixa", cor: "#034AA6", valores: resultados.map((r) => r.caixa_final) },
+                { nome: "Lucro do mês", cor: "#D9851E", valores: resultados.map((r) => r.dre.lucro_liquido) },
               ]}
             />
           </Cartao>
           <Cartao titulo="Participação de mercado">
             <GraficoLinhas
               rotulosX={resultados.map((r) => `M${r.rodada}`)}
-              series={[{ nome: "Participação", cor: "#FFC233", valores: resultados.map((r) => r.participacao_mercado) }]}
+              series={[{ nome: "Participação", cor: "#D9851E", valores: resultados.map((r) => r.participacao_mercado) }]}
               formatar={(v) => percentual(v, 0)}
             />
           </Cartao>
@@ -418,7 +420,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
           <p className="text-sm leading-relaxed text-slate-700">{eventoAberto.narrativa}</p>
           {ultimo && ultimo.rodada === eventoAberto.rodada && (
             <p className="mt-3 text-sm text-slate-600">
-              Resultado da sua empresa no mês: <strong>{reais(ultimo.dre.lucro_liquido)}</strong>.
+              Resultado da sua empresa no mês: <strong><ValorMonetario valor={ultimo.dre.lucro_liquido}/></strong>.
             </p>
           )}
         </Modal>
@@ -605,12 +607,12 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
           <div hidden={area !== "decisoes"}><Secao titulo="Mercado e posicionamento">
           <div hidden={!!d.plano_comercial?.produtos?.length}><Campo
             rotulo="Preço de venda (por unidade)"
-            ajuda={`Preço de referência do mercado: ${reais(p.preco_referencia)}. Custo da mercadoria: ${reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)}.`}
+            ajuda={`Preço de referência do mercado: $<ValorMonetario valor={p.preco_referencia}/>. Custo da mercadoria: $<ValorMonetario valor={d.plano_comercial?.custo_unitario ?? p.custo_unitario}/>.`}
           >
             <ControleVisual rotulo="Preço de venda" valor={d.preco} aoMudar={(v) => atualizar("preco", v)} minimo={0.01} limite={p.preco_referencia * 3} />
           </Campo>
           </div><Campo rotulo="Marketing (no mês)" ajuda={d.plano_comercial ? "Inclui mídia, produção e serviços; somente produzir uma peça não compra audiência." : `Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
-            {d.plano_comercial ? <p className="font-semibold">{reais(d.marketing)} · mídia + produção e serviços</p> : <ControleVisual rotulo="Investimento em marketing" valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} limite={Math.max(1000, empresa.caixa)} />}
+            {d.plano_comercial ? <p className="font-semibold"><ValorMonetario valor={d.marketing}/> · mídia + produção e serviços</p> : <ControleVisual rotulo="Investimento em marketing" valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} limite={Math.max(1000, empresa.caixa)} />}
           </Campo>
           </Secao></div><div hidden={area !== "pd"}><Secao titulo="Pesquisa e desenvolvimento"><Campo rotulo="Pesquisa e desenvolvimento (no mês)" ajuda={`Melhora a qualidade percebida. Índice atual: ${umDecimal(empresa.qualidade)}.`}>
             <ControleVisual rotulo="Tecnologia e melhoria do produto (P&D)" valor={d.pd} aoMudar={(v) => atualizar("pd", v)} limite={Math.max(1000, empresa.caixa)} />
@@ -623,7 +625,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         </div>
         <div hidden={area !== "rh"}>
         <Secao titulo="Funcionários e capacidade de atendimento">
-          <Campo rotulo="Contratar" ajuda={`Salário-base ${reais(p.salario_base)}. A prévia aplica os encargos do regime efetivo.`}>
+          <Campo rotulo="Contratar" ajuda={`Salário-base $<ValorMonetario valor={p.salario_base}/>. A prévia aplica os encargos do regime efetivo.`}>
             <ControleVisual rotulo="Contratar funcionários" moeda={false} inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} limite={20} />
           </Campo>
           <Campo rotulo="Demitir" ajuda={`Hoje: ${empresa.funcionarios} funcionário(s). Rescisão custa um salário.`}>
@@ -634,16 +636,16 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         </div>
         <div hidden={area !== "financas"}>
         <Campo pendente={!d.analise_financeira.trim()} rotulo="Análise financeira da equipe" ajuda="Explique margem, custos, fluxo de caixa, capital de giro e riscos das escolhas. Esta análise é responsabilidade da equipe."><textarea aria-label="Análise financeira da equipe" className={`${estiloEntrada} min-h-32`} maxLength={6000} value={d.analise_financeira} onChange={e=>atualizar("analise_financeira",e.target.value)} /></Campo>
-        <div className="mb-4 rounded-xl border-l-4 border-blue-600 bg-blue-50 p-4 text-sm"><h3 className="font-bold text-blue-900">Planeje antes de enviar</h3><p className="mt-2">Use preço de venda, custo unitário e despesas para analisar a margem e o ponto de equilíbrio. A prévia abaixo reúne os valores calculados para você conferir seu planejamento.</p><p className="mt-2 font-semibold">Preço escolhido: {reais(d.preco)} · Custo unitário: {reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)} · Caixa atual: {reais(empresa.caixa)}</p></div>
-        {d.emprestimo > 0 && <Aviso tipo="info">Atenção: dinheiro do banco tem custo alto e pode comprometer a empresa. Juros estimados deste pedido: até {reais(Math.min(d.emprestimo, Math.max(0, p.limite_credito - empresa.divida)) * p.taxa_juros_mensal)} por mês, além da dívida atual, à taxa de {percentual(p.taxa_juros_mensal, 2)}. Os juros reduzem lucro e capital de giro, podem subir com a Selic e continuam enquanto houver saldo devedor. O principal precisa ser devolvido; crédito depende do caixa e do limite disponível.</Aviso>}
+        <div className="mb-4 rounded-xl border-l-4 border-blue-600 bg-blue-50 p-4 text-sm"><h3 className="font-bold text-blue-900">Planeje antes de enviar</h3><p className="mt-2">Use preço de venda, custo unitário e despesas para analisar a margem e o ponto de equilíbrio. A prévia abaixo reúne os valores calculados para você conferir seu planejamento.</p><p className="mt-2 font-semibold">Preço escolhido: <ValorMonetario valor={d.preco}/> · Custo unitário: <ValorMonetario valor={d.plano_comercial?.custo_unitario ?? p.custo_unitario}/> · Caixa atual: <ValorMonetario valor={empresa.caixa}/></p></div>
+        {d.emprestimo > 0 && <Aviso tipo="info">Atenção: dinheiro do banco tem custo alto e pode comprometer a empresa. Juros estimados deste pedido: até <ValorMonetario valor={Math.min(d.emprestimo, Math.max(0, p.limite_credito - empresa.divida)) * p.taxa_juros_mensal}/> por mês, além da dívida atual, à taxa de {percentual(p.taxa_juros_mensal, 2)}. Os juros reduzem lucro e capital de giro, podem subir com a Selic e continuam enquanto houver saldo devedor. O principal precisa ser devolvido; crédito depende do caixa e do limite disponível.</Aviso>}
         <Secao titulo="Finanças e tributos">
           <Campo
             rotulo="Novo empréstimo"
-            ajuda={`Juros de ${percentual(p.taxa_juros_mensal, 2)} ao mês. Limite disponível: ${reais(Math.max(0, p.limite_credito - empresa.divida))}.`}
+            ajuda={`Juros de ${percentual(p.taxa_juros_mensal, 2)} ao mês. Limite disponível: $<ValorMonetario valor={Math.max(0, p.limite_credito - empresa.divida)}/>.`}
           >
             <ControleVisual rotulo="Novo empréstimo" valor={d.emprestimo} aoMudar={(v) => atualizar("emprestimo", v)} limite={Math.max(0, p.limite_credito - empresa.divida)} />
           </Campo>
-          <Campo rotulo="Amortizar dívida" ajuda={`Dívida atual: ${reais(empresa.divida)}.`}>
+          <Campo rotulo="Amortizar dívida" ajuda={`Dívida atual: $<ValorMonetario valor={empresa.divida}/>.`}>
             <ControleVisual rotulo="Amortizar dívida" valor={d.amortizacao} aoMudar={(v) => atualizar("amortizacao", v)} limite={empresa.divida} />
           </Campo>
           <Campo
@@ -652,7 +654,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
               empresa.regime_pretendido
                 ? `Migração obrigatória: a empresa passa ao ${NOME_REGIME[empresa.regime_pretendido]} neste mês.`
                 : empresa.regime_tributario === "MEI"
-                ? `Faturamento no ano: ${reais(empresa.faturamento_ano)} de ${reais(p.teto_mei_anual)} do teto do MEI.`
+                ? `Faturamento no ano: $<ValorMonetario valor={empresa.faturamento_ano}/> de $<ValorMonetario valor={p.teto_mei_anual}/> do teto do MEI.`
                 : "A mudança vale a partir deste mês."
             }
           >
@@ -692,16 +694,16 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
             <>
               <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 sm:grid-cols-3">
                 <Previa rotulo="Capacidade de produção" valor={`${inteiro(previsao.capacidade)} un.`} />
-                <Previa rotulo="Folha com encargos" valor={reais(previsao.folha)} />
-                <Previa rotulo="Gastos previstos do mês" valor={reais(previsao.gastos_previstos)} />
-                <Previa rotulo="Margem por unidade" valor={reais(previsao.margem_unitaria)} />
+                <Previa rotulo="Folha com encargos" valor={<ValorMonetario valor={previsao.folha}/>} />
+                <Previa rotulo="Gastos previstos do mês" valor={<ValorMonetario valor={previsao.gastos_previstos}/>} />
+                <Previa rotulo="Margem por unidade" valor={<ValorMonetario valor={previsao.margem_unitaria}/>} />
                 <Previa
                   rotulo="Ponto de equilíbrio"
                   valor={previsao.ponto_equilibrio !== null ? `${inteiro(Math.ceil(previsao.ponto_equilibrio))} un.` : "sem margem"}
                 />
-                <Previa rotulo="Caixa após financiamento" valor={reais(previsao.caixa_disponivel)} />
-                <Previa rotulo="Empréstimo aprovado na prévia" valor={reais(previsao.emprestimo_aprovado)} />
-                <Previa rotulo="Amortização aplicada" valor={reais(previsao.amortizacao_aplicada)} />
+                <Previa rotulo="Caixa após financiamento" valor={<ValorMonetario valor={previsao.caixa_disponivel}/>} />
+                <Previa rotulo="Empréstimo aprovado na prévia" valor={<ValorMonetario valor={previsao.emprestimo_aprovado}/>} />
+                <Previa rotulo="Amortização aplicada" valor={<ValorMonetario valor={previsao.amortizacao_aplicada}/>} />
                 <Previa rotulo="Regime considerado" valor={NOME_REGIME[previsao.regime]} />
               </div>
               <p className="mt-2 text-xs text-slate-500">
@@ -732,14 +734,14 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
 
 function Secao({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <fieldset>
-      <legend className="mb-3 border-b border-slate-200 pb-1 text-sm font-semibold text-marinho">{titulo}</legend>
+    <fieldset className="missao-decisao">
+      <legend className="cabecalho-missao"><IconeMissao titulo={titulo}/>{titulo}</legend>
       <div className="grid gap-4 sm:grid-cols-2">{children}</div>
     </fieldset>
   );
 }
 
-function Previa({ rotulo, valor }: { rotulo: string; valor: string }) {
+function Previa({ rotulo, valor }: { rotulo: string; valor: React.ReactNode }) {
   return (
     <div>
       <p className="text-xs text-slate-500">{rotulo}</p>
@@ -774,13 +776,13 @@ function Historico({ painel }: { painel: PainelAluno }) {
             {[...painel.resultados].reverse().map((r) => (
               <tr key={r.rodada} className="border-t border-slate-100">
                 <td className="py-1.5">{r.rodada}</td>
-                <td className="py-1.5 text-right">{reais(r.preco)}</td>
+                <td className="py-1.5 text-right"><ValorMonetario valor={r.preco}/></td>
                 <td className="py-1.5 text-right">{inteiro(r.unidades_vendidas)}</td>
-                <td className="py-1.5 text-right">{reais(r.dre.receita)}</td>
+                <td className="py-1.5 text-right"><ValorMonetario valor={r.dre.receita}/></td>
                 <td className={`py-1.5 text-right ${r.dre.lucro_liquido < 0 ? "text-red-700" : "text-emerald-700"}`}>
-                  {reais(r.dre.lucro_liquido)}
+                  <ValorMonetario valor={r.dre.lucro_liquido}/>
                 </td>
-                <td className="py-1.5 text-right">{reais(r.caixa_final)}</td>
+                <td className="py-1.5 text-right"><ValorMonetario valor={r.caixa_final}/></td>
                 <td className="py-1.5">{NOME_REGIME[r.regime]}</td>
                 <td className="py-1.5 text-slate-500">{eventos.get(r.rodada) ?? "—"}</td>
                 {temDetalhes && <td className="py-1.5">{r.detalhes_simulacao && <button className={`rounded-md px-2 py-1 text-xs font-semibold ${rodadaSelecionada === r.rodada ? "bg-marinho text-white" : "bg-slate-100 text-marinho"}`} aria-pressed={rodadaSelecionada === r.rodada} onClick={() => setRodadaSelecionada(r.rodada)}>Ver mês {r.rodada}</button>}</td>}
@@ -802,13 +804,13 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
   const passivos = b ? (b.passivo_total ?? b.pagar + b.divida + Math.max(0,-b.caixa)) : null;
   return <Cartao titulo={`KPIs e indicadores financeiros · rodada ${resultado.rodada}`}>
     <dl className="grid gap-4 sm:grid-cols-3">
-      <div><dt className="text-sm text-slate-500">Margem líquida</dt><dd className="font-bold text-marinho">{margem === null ? "—" : percentual(margem)}</dd><p className="text-xs text-slate-500">Lucro líquido dividido pela receita.</p></div>
+      <div><dt className="text-sm text-slate-500">Margem líquida</dt><dd className="font-bold text-marinho">{margem === null ? "—" : percentual(margem)}</dd></div>
       <div><dt className="text-sm text-slate-500">Participação no mercado</dt><dd className="font-bold text-marinho">{percentual(resultado.participacao_mercado)}</dd><p className="text-xs text-slate-500">Parcela do mercado conquistada nesta rodada.</p></div>
-      <div><dt className="text-sm text-slate-500">Atendimento da demanda</dt><dd className="font-bold text-marinho">{resultado.demanda > 0 ? percentual(resultado.unidades_vendidas / resultado.demanda) : "—"}</dd><p className="text-xs text-slate-500">Unidades vendidas divididas pela demanda da empresa.</p></div>
+      <div><dt className="text-sm text-slate-500">Atendimento da demanda</dt><dd className="font-bold text-marinho">{resultado.demanda > 0 ? percentual(resultado.unidades_vendidas / resultado.demanda) : "—"}</dd></div>
       {b && <>
-        <div><dt className="text-sm text-slate-500">Endividamento sobre ativos</dt><dd className="font-bold text-marinho">{ativos !== null && ativos > 0 && passivos !== null ? percentual(passivos / ativos) : "—"}</dd><p className="text-xs text-slate-500">Contas a pagar e dívida divididas pelo total de ativos.</p></div>
-        <div><dt className="text-sm text-slate-500">Retorno sobre o patrimônio · rodada</dt><dd className="font-bold text-marinho">{b.patrimonio > 0 ? percentual(dre.lucro_liquido / b.patrimonio) : "—"}</dd><p className="text-xs text-slate-500">Lucro da rodada dividido pelo patrimônio final; não é uma taxa anual.</p></div>
-        <div><dt className="text-sm text-slate-500">Caixa operacional</dt><dd className="font-bold text-marinho">{reais(detalhes!.dfc.operacional)}</dd><p className="text-xs text-slate-500">Recebimentos menos pagamentos operacionais.</p></div>
+        <div><dt className="text-sm text-slate-500">Endividamento sobre ativos</dt><dd className="font-bold text-marinho">{ativos !== null && ativos > 0 && passivos !== null ? percentual(passivos / ativos) : "—"}</dd></div>
+        <div><dt className="text-sm text-slate-500">Retorno sobre o patrimônio · rodada</dt><dd className="font-bold text-marinho">{b.patrimonio > 0 ? percentual(dre.lucro_liquido / b.patrimonio) : "—"}</dd></div>
+        <div><dt className="text-sm text-slate-500">Caixa operacional</dt><dd className="font-bold text-marinho"><ValorMonetario valor={detalhes!.dfc.operacional}/></dd></div>
       </>}
     </dl>
     <p className="mt-3 text-xs text-slate-500">“—” indica ausência de uma base válida para cálculo. Compare com as rodadas anteriores e com os demonstrativos.</p>
@@ -820,7 +822,7 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
       ["Ativo total",resultado.balanco_basico.ativo_total],
       ["Passivo total",resultado.balanco_basico.passivo_total],
       ["Patrimônio líquido",resultado.balanco_basico.patrimonio_liquido]
-    ] as const).map(([nome,valor])=><div key={nome}><dt className="text-sm text-slate-500">{nome}</dt><dd className="font-bold">{reais(valor)}</dd></div>)}</dl></div>}
+    ] as const).map(([nome,valor])=><div key={nome}><dt className="text-sm text-slate-500">{nome}</dt><dd className="font-bold"><ValorMonetario valor={valor}/></dd></div>)}</dl></div>}
     {!detalhes && <ResultadoProdutos produtos={resultado.produtos_resultado??[]}/>}
     {detalhes && <div className="mt-5"><RelatorioFinanceiro detalhes={detalhes} /></div>}
     </details>
