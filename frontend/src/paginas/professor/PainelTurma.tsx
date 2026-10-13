@@ -507,7 +507,7 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
                         <Dado rotulo="P&D" valor={<ValorMonetario valor={decisao.pd}/>} />
                         <Dado rotulo="Networking" valor={<ValorMonetario valor={decisao.networking}/>} />
                         <Dado rotulo="Contratou / demitiu" valor={`${decisao.contratar} / ${decisao.demitir}`} />
-                        <Dado rotulo="Empréstimo / amortização" valor={`$<ValorMonetario valor={decisao.emprestimo}/> / $<ValorMonetario valor={decisao.amortizacao}/>`} />
+                        <Dado rotulo="Empréstimo / amortização" valor={<><ValorMonetario valor={decisao.emprestimo}/> / <ValorMonetario valor={decisao.amortizacao}/></>} />
                       </dl>
                     ) : (
                       <p className="text-sm text-slate-500">—</p>

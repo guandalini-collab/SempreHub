@@ -607,7 +607,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
           <div hidden={area !== "decisoes"}><Secao titulo="Mercado e posicionamento">
           <div hidden={!!d.plano_comercial?.produtos?.length}><Campo
             rotulo="Preço de venda (por unidade)"
-            ajuda={`Preço de referência do mercado: $<ValorMonetario valor={p.preco_referencia}/>. Custo da mercadoria: $<ValorMonetario valor={d.plano_comercial?.custo_unitario ?? p.custo_unitario}/>.`}
+            ajuda={`Preço de referência do mercado: ${reais(p.preco_referencia)}. Custo da mercadoria: ${reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)}.`}
           >
             <ControleVisual rotulo="Preço de venda" valor={d.preco} aoMudar={(v) => atualizar("preco", v)} minimo={0.01} limite={p.preco_referencia * 3} />
           </Campo>
@@ -625,7 +625,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         </div>
         <div hidden={area !== "rh"}>
         <Secao titulo="Funcionários e capacidade de atendimento">
-          <Campo rotulo="Contratar" ajuda={`Salário-base $<ValorMonetario valor={p.salario_base}/>. A prévia aplica os encargos do regime efetivo.`}>
+          <Campo rotulo="Contratar" ajuda={`Salário-base ${reais(p.salario_base)}. A prévia aplica os encargos do regime efetivo.`}>
             <ControleVisual rotulo="Contratar funcionários" moeda={false} inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} limite={20} />
           </Campo>
           <Campo rotulo="Demitir" ajuda={`Hoje: ${empresa.funcionarios} funcionário(s). Rescisão custa um salário.`}>
@@ -641,11 +641,11 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         <Secao titulo="Finanças e tributos">
           <Campo
             rotulo="Novo empréstimo"
-            ajuda={`Juros de ${percentual(p.taxa_juros_mensal, 2)} ao mês. Limite disponível: $<ValorMonetario valor={Math.max(0, p.limite_credito - empresa.divida)}/>.`}
+            ajuda={`Juros de ${percentual(p.taxa_juros_mensal, 2)} ao mês. Limite disponível: ${reais(Math.max(0, p.limite_credito - empresa.divida))}.`}
           >
             <ControleVisual rotulo="Novo empréstimo" valor={d.emprestimo} aoMudar={(v) => atualizar("emprestimo", v)} limite={Math.max(0, p.limite_credito - empresa.divida)} />
           </Campo>
-          <Campo rotulo="Amortizar dívida" ajuda={`Dívida atual: $<ValorMonetario valor={empresa.divida}/>.`}>
+          <Campo rotulo="Amortizar dívida" ajuda={`Dívida atual: ${reais(empresa.divida)}.`}>
             <ControleVisual rotulo="Amortizar dívida" valor={d.amortizacao} aoMudar={(v) => atualizar("amortizacao", v)} limite={empresa.divida} />
           </Campo>
           <Campo
@@ -654,7 +654,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
               empresa.regime_pretendido
                 ? `Migração obrigatória: a empresa passa ao ${NOME_REGIME[empresa.regime_pretendido]} neste mês.`
                 : empresa.regime_tributario === "MEI"
-                ? `Faturamento no ano: $<ValorMonetario valor={empresa.faturamento_ano}/> de $<ValorMonetario valor={p.teto_mei_anual}/> do teto do MEI.`
+                ? `Faturamento no ano: ${reais(empresa.faturamento_ano)} de ${reais(p.teto_mei_anual)} do teto do MEI.`
                 : "A mudança vale a partir deste mês."
             }
           >
