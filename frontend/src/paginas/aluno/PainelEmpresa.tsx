@@ -38,7 +38,9 @@ import type { DecisaoSimulacao } from "../../tiposSimulacao";
 
 const FERRAMENTAS = ["SWOT", "PORTER", "BCG", "PESTEL", "SEGMENTACAO"];
 const ANALISES_APRENDIZAGEM = ["5 Forças de Porter", "PESTEL", "Análise de mercado", "SWOT (FOFA)", "Análise financeira", "Segmentação de mercado"];
+const DEPARTAMENTOS = [{id:"decisoes",titulo:"Produtos e marketing"},{id:"pd",titulo:"P&D"},{id:"rh",titulo:"RH"},{id:"estrategia",titulo:"Estratégia"},{id:"financas",titulo:"Finanças"},{id:"producao",titulo:"Produção"},{id:"logistica",titulo:"Logística"}];
 const ITENS_PAINEL = [
+  {id:"departamentos",titulo:"Departamentos",descricao:"Planeje as decisões de cada departamento.",simbolo:"",grupo:"Decisões da rodada"},
   {id: "manuais", titulo: "Manuais", descricao: "Consulte ou baixe os manuais em PDF.", simbolo: "", grupo: "Manuais"},
   {
     "id": "visao",
@@ -208,7 +210,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   }
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL.map(i => ({...i, ...(["mercado", "decisoes", "financas", "producao", "logistica", "equipe"].includes(i.id) ? {grupo: "Rodada atual", pai: "rodada"} : {}), estado: i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL" ? "Sem decisão neste modelo" : (AREAS_DECISAO.includes(i.id) || ["pd", "rh"].includes(i.id)) ? painel.decisao_atual?.enviada_em ? "Enviada" : painel.decisao_atual?.revisao_areas?.[(AREA_REVISAO[i.id] || i.id) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>] ? "Rascunho salvo · conferido" : "Decisão pendente" : undefined}))} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · acompanhe a rodada" : "Decisão pendente · prepare e envie" }}>
+    <LayoutPainel itens={ITENS_PAINEL.map(i => ({...i, ...(DEPARTAMENTOS.some(d => d.id === i.id) ? {grupo:"Decisões da rodada",pai:"departamentos"} : ["mercado", "equipe"].includes(i.id) ? {grupo: "Rodada atual", pai: "rodada"} : {}), estado: i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL" ? "Sem decisão neste modelo" : (AREAS_DECISAO.includes(i.id) || ["pd", "rh"].includes(i.id)) ? painel.decisao_atual?.enviada_em ? "Enviada" : painel.decisao_atual?.revisao_areas?.[(AREA_REVISAO[i.id] || i.id) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>] ? "Rascunho salvo · conferido" : "Decisão pendente" : undefined}))} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · acompanhe a rodada" : "Decisão pendente · prepare e envie" }}>
       <SecaoPainel id="rodada" ativa={secao}>
         <Cartao titulo={encerrada ? "Simulação concluída" : `O que fazer na rodada ${turma.rodada_atual}`}>
           <p className="mb-5 text-sm text-slate-600">{encerrada ? "Consulte os resultados e os relatórios da sua empresa." : painel.decisao_atual?.enviada_em ? "O líder enviou a decisão. Acompanhe os resultados quando a rodada encerrar." : "Siga os passos no menu lateral. Produtos, finanças, produção e logística fazem parte de uma única decisão da rodada."}</p>
@@ -293,8 +295,11 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <RelatorioPrimeiraRodada empresaId={empresa.id} disponivel={resultados.some(r => r.rodada === 1)} />
 
       </SecaoPainel>
+      <SecaoPainel id="departamentos" ativa={secao}><Cartao titulo="Departamentos"><p>Escolha uma área para planejar, conferir e salvar as decisões da rodada.</p><nav aria-label="Departamentos" className="mt-4 flex flex-wrap gap-2">{DEPARTAMENTOS.map(d=><Botao key={d.id} onClick={()=>setSecao(d.id)}>{d.titulo}</Botao>)}</nav></Cartao></SecaoPainel>
       <SecaoPainel id={(AREAS_DECISAO.includes(secao) || ["pd", "rh"].includes(secao) || secao === "estrategia" || secao.startsWith("ferramenta-")) ? secao : "decisoes"} ativa={secao}>
         <div>
+          <nav aria-label="Subabas dos departamentos" className="mb-4 flex flex-wrap gap-2">{DEPARTAMENTOS.map(d=><Botao key={d.id} variante={secao===d.id || (d.id==="estrategia" && secao.startsWith("ferramenta-")) ? "primario" : "secundario"} onClick={()=>setSecao(d.id)}>{d.titulo}</Botao>)}</nav>
+          {(secao==="estrategia" || secao.startsWith("ferramenta-")) && <nav aria-label="Ferramentas de estratégia" className="mb-4 flex flex-wrap gap-2">{FERRAMENTAS.map(f=><Botao key={f} variante={secao===`ferramenta-${f}` ? "primario" : "secundario"} onClick={()=>setSecao(`ferramenta-${f}`)}>{f==="SEGMENTACAO" ? "Segmentação" : f}</Botao>)}</nav>}
           {encerrada ? (
             <Cartao titulo="Simulação encerrada">
               <p className="text-sm text-slate-600">
@@ -380,6 +385,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
 
       </SecaoPainel>
       <SecaoPainel id="evolucao" ativa={secao}>
+      {!resultados.length && <Cartao titulo="Evolução por rodada"><p>Os gráficos estarão disponíveis após o fechamento da primeira rodada.</p></Cartao>}
       {resultados.length > 0 && (
         <div className="grid gap-6 lg:grid-cols-2">
           <Cartao titulo="Caixa e lucro mensal">
@@ -391,6 +397,9 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
               ]}
             />
           </Cartao>
+          <Cartao titulo="Receita e custos do mês"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} series={[{nome:"Receita",cor:"#034AA6",valores:resultados.map(r=>r.dre.receita)},{nome:"Custos e despesas",cor:"#666666",valores:resultados.map(r=>r.dre.receita-r.dre.lucro_liquido)}]}/></Cartao>
+          <Cartao titulo="Demanda, capacidade e vendas"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} formatar={v=>inteiro(v)} series={[{nome:"Demanda",cor:"#666666",valores:resultados.map(r=>r.demanda)},{nome:"Capacidade",cor:"#034AA6",valores:resultados.map(r=>r.capacidade)},{nome:"Vendas",cor:"#9B6518",valores:resultados.map(r=>r.unidades_vendidas)}]}/></Cartao>
+          <Cartao titulo="Dívida ao final da rodada"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} series={[{nome:"Dívida",cor:"#666666",valores:resultados.map(r=>r.divida_final)}]}/></Cartao>
           <Cartao titulo="Participação de mercado">
             <GraficoLinhas
               rotulosX={resultados.map((r) => `M${r.rodada}`)}
@@ -635,7 +644,6 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
 
         </div>
         <div hidden={area !== "financas"}>
-        <Campo pendente={!d.analise_financeira.trim()} rotulo="Análise financeira da equipe" ajuda="Explique margem, custos, fluxo de caixa, capital de giro e riscos das escolhas. Esta análise é responsabilidade da equipe."><textarea aria-label="Análise financeira da equipe" className={`${estiloEntrada} min-h-32`} maxLength={6000} value={d.analise_financeira} onChange={e=>atualizar("analise_financeira",e.target.value)} /></Campo>
         <div className="mb-4 rounded-xl border-l-4 border-blue-600 bg-blue-50 p-4 text-sm"><h3 className="font-bold text-blue-900">Planeje antes de enviar</h3><p className="mt-2">Use preço de venda, custo unitário e despesas para analisar a margem e o ponto de equilíbrio. A prévia abaixo reúne os valores calculados para você conferir seu planejamento.</p><p className="mt-2 font-semibold">Preço escolhido: <ValorMonetario valor={d.preco}/> · Custo unitário: <ValorMonetario valor={d.plano_comercial?.custo_unitario ?? p.custo_unitario}/> · Caixa atual: <ValorMonetario valor={empresa.caixa}/></p></div>
         {d.emprestimo > 0 && <Aviso tipo="info">Atenção: dinheiro do banco tem custo alto e pode comprometer a empresa. Juros estimados deste pedido: até <ValorMonetario valor={Math.min(d.emprestimo, Math.max(0, p.limite_credito - empresa.divida)) * p.taxa_juros_mensal}/> por mês, além da dívida atual, à taxa de {percentual(p.taxa_juros_mensal, 2)}. Os juros reduzem lucro e capital de giro, podem subir com a Selic e continuam enquanto houver saldo devedor. O principal precisa ser devolvido; crédito depende do caixa e do limite disponível.</Aviso>}
         <Secao titulo="Finanças e tributos">

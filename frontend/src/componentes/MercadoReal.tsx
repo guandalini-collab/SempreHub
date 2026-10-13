@@ -205,5 +205,5 @@ export function RelatoriosEmpresariaisProfessor({ turmaId, ultimaRodada, empresa
 
 function FaixaDecisao({tipo, ...props}: React.InputHTMLAttributes<HTMLInputElement> & {tipo?: "moeda"}) {
  const exibir=(valor: unknown)=>tipo === "moeda" ? reais(Number(valor)) : Number(valor).toLocaleString("pt-BR");
- return <span className="mt-2 block rounded-xl border border-cyan-200 bg-cyan-50 p-3"><span className="mb-2 block text-lg font-bold tabular-nums">{exibir(props.value)}</span><input {...props} type="range" className="w-full accent-cyan-600" /><span className="mt-2 flex justify-between text-xs text-slate-600"><span>Mínimo: {exibir(props.min)}</span><span>Máximo: {exibir(props.max)}</span></span></span>;
+ return <span className="mt-2 block rounded-xl border border-cyan-200 bg-cyan-50 p-3"><span className="mb-2 block text-lg font-bold tabular-nums">{exibir(props.value)}</span><input {...props} type="number" className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-marinho" /><span className="mt-2 flex justify-between text-xs text-slate-600"><span>Mínimo: {exibir(props.min)}</span><span>Máximo: {exibir(props.max)}</span></span></span>;
 }

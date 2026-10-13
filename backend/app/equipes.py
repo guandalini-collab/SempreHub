@@ -207,8 +207,6 @@ def pendencias_envio(empresa, dados):
     for chave, titulo in areas.items():
         if not (dados.revisao_areas or {}).get(chave):
             motivos.append("Revise e confirme a área: " + titulo + ".")
-    if not (dados.analise_financeira or "").strip():
-        motivos.append("Preencha a análise financeira da equipe.")
     plano = dados.plano_comercial
     if plano:
         a = plano.analises

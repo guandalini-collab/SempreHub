@@ -154,7 +154,7 @@ SWOT, Porter, PESTEL e concorrência usam pesquisa atual e informações registr
 
 A análise de concorrência cobre perfil, localização e alcance, porte e participação, portfólio, qualidade e diferenciais, preços, pagamento, promoções, canais, presença digital, atendimento e reputação. Quando não existe base suficiente para um concorrente real, o sistema pode usar um concorrente de referência explicitamente projetado.
 
-O aluno não recebe decisões prontas. **BCG, segmentação e análise financeira são responsabilidade da equipe.** Os relatórios narrativos do painel docente não substituem a análise escrita dos alunos; na visão deles, o histórico financeiro reúne suas próprias análises e os demonstrativos calculados.
+O aluno não recebe decisões prontas. **BCG, segmentação e interpretação financeira são responsabilidade da equipe.** Os alunos consultam os indicadores e demonstrativos calculados para tomar decisões. Não há campo de análise financeira escrita obrigatório; textos registrados anteriormente permanecem no histórico.
 
 ## 5. Envio final e fechamento da rodada
 
@@ -164,7 +164,7 @@ O aluno percorre produtos e marketing, ferramentas e segmentação, finanças, p
 
 ![Exemplo da trava de envio](diagramas/envio-bloqueado.png)
 
-O programa exige revisão das áreas aplicáveis, mixes completos, diretriz estratégica, segmentação, BCG de todos os produtos e análise financeira. Orçamentos de campanha são exigidos quando o serviço não possui custo público validado. Ações opcionais podem permanecer em zero.
+O programa exige revisão das áreas aplicáveis, mixes completos, diretriz estratégica, segmentação, BCG de todos os produtos. Orçamentos de campanha são exigidos quando o serviço não possui custo público validado. Ações opcionais podem permanecer em zero.
 
 1. Acompanhe **Envios** e as pendências de cada equipe.
 2. Confira se todas as equipes têm entre três e cinco integrantes e líder definido.
@@ -190,7 +190,7 @@ A vida útil contábil padrão de máquinas é **24 meses**, configurável antes
 
 Novas compras são opcionais a partir do mês 3, com pagamento no mês da compra e ativação na rodada seguinte. Funcionários, horas extras, insumos e máquinas impõem limites conjuntos à capacidade. Horas extras usam a premissa didática de até 40 horas por funcionário, adicional de 50%, salário/220 e encargos.
 
-A DRE mostra resultado, a DFC mostra dinheiro, e o balanço mostra ativos e obrigações. A análise escrita deve discutir margem, caixa, recebimentos, pagamentos, estoques e capital de giro. Solicitar crédito exibe aviso de custo alto e risco ao lucro e caixa. Em Startup, aporte de investidores não entra como receita comercial e pode diluir os fundadores.
+A DRE mostra resultado, a DFC mostra dinheiro, e o balanço mostra ativos e obrigações. A discussão da equipe deve considerar margem, caixa, recebimentos, pagamentos, estoques e capital de giro. Solicitar crédito exibe aviso de custo alto e risco ao lucro e caixa. Em Startup, aporte de investidores não entra como receita comercial e pode diluir os fundadores.
 
 ## 8. Avaliação automática e auditoria
 
@@ -225,7 +225,7 @@ Um início possível é perguntar: quem é o público; o que será oferecido; po
 - As equipes possuem composição válida e líder definido.
 - Os alunos que ficaram sem equipe foram atendidos sem ultrapassar cinco integrantes.
 - As decisões estão enviadas, não apenas salvas como rascunho.
-- As etapas aplicáveis, mixes, BCG, segmentação e análise financeira foram registradas.
+- As etapas aplicáveis, mixes, BCG e segmentação foram registrados.
 - A turma conhece as consequências de crédito, produção, pessoas e campanhas.
 - Transferências de liderança têm vigência clara na próxima rodada.
 
@@ -239,7 +239,7 @@ A nota automática de zero a dez resume critérios de desempenho definidos pelo 
 
 **Exemplo de devolutiva:** peça à equipe que explique por que tomou crédito e por que aumentou a produção. Compare justificativa, custo de juros, capacidade e vendas realizadas. Discuta uma alternativa para a rodada seguinte sem preencher a decisão por eles.
 
-Use pesquisa atual, fontes e premissas para revisar os diagnósticos. Um dado confirmado, uma interpretação e uma projeção têm naturezas diferentes. A ausência de fonte não autoriza tratar uma estimativa como fato. A análise financeira e a segmentação continuam responsabilidade dos alunos.
+Use pesquisa atual, fontes e premissas para revisar os diagnósticos. Um dado confirmado, uma interpretação e uma projeção têm naturezas diferentes. A ausência de fonte não autoriza tratar uma estimativa como fato. A interpretação financeira e a segmentação continuam responsabilidade dos alunos, sem exigência de texto financeiro para envio.
 
 ## 13. Problemas frequentes e respostas de orientação
 

@@ -137,10 +137,11 @@ def test_rascunho_incompleto_e_envio_com_pendencias(cliente, professor, equipe):
     assert r.status_code == 200 and r.json()["enviada_em"] is None
     final = cliente.post(base+"/aprovar",headers=lider["headers"],json={"versao":1,"rodada":1})
     assert final.status_code == 422
-    assert "Finanças" in final.json()["detail"] and "análise financeira" in final.json()["detail"]
+    assert "Finanças" in final.json()["detail"]
+    assert "análise financeira" not in final.json()["detail"]
     assert _painel(cliente,equipe["id"],lider)["decisao_atual"]["enviada_em"] is None
     assert _fechar(cliente,equipe,professor).status_code == 422
-    enviada = _salvar(cliente,equipe,rascunho=False)
+    enviada = _salvar(cliente,equipe,rascunho=False,analise_financeira="")
     assert enviada["enviada_em"]
     assert _fechar(cliente,equipe,professor).status_code == 200
 

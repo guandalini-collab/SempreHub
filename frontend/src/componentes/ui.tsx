@@ -421,7 +421,7 @@ export function GraficoLinhas({
   rotulosX,
   series,
   formatar = reais,
-  altura = 180,
+  altura = 300,
 }: {
   rotulosX: string[];
   series: SerieGrafico[];
@@ -429,7 +429,7 @@ export function GraficoLinhas({
   altura?: number;
 }) {
   const largura = 600;
-  const margem = { topo: 10, direita: 10, base: 24, esquerda: 70 };
+  const margem = { topo: 16, direita: 120, base: 24, esquerda: 90 };
   const todos = series.flatMap((s) => s.valores);
   if (rotulosX.length === 0 || todos.length === 0) {
     return <p className="text-sm text-slate-500">Os gráficos aparecem depois da primeira rodada.</p>;
@@ -448,7 +448,7 @@ export function GraficoLinhas({
 
   return (
     <div>
-      <svg viewBox={`0 0 ${largura} ${altura}`} className="w-full" role="img" aria-label={series.map((s) => s.nome).join(", ")}>
+      <svg style={{background:"#fffff8",fontFamily:"Georgia,serif"}} viewBox={`0 0 ${largura} ${altura}`} className="w-full" role="img" aria-label={series.map((s) => s.nome).join(", ")}>
         {marcas.map((m) => (
           <g key={m}>
             <line x1={margem.esquerda} x2={largura - margem.direita} y1={y(m)} y2={y(m)} stroke="#034AA6" strokeOpacity={0.08} />
@@ -467,6 +467,7 @@ export function GraficoLinhas({
         ))}
         {series.map((s) => (
           <g key={s.nome}>
+            <text x={largura - margem.direita + 8} y={margem.topo + 16 + series.indexOf(s)*32} fontSize="12" fill={s.cor}>{s.nome}</text>
             <polyline
               points={s.valores.map((v, i) => `${x(i)},${y(v)}`).join(" ")}
               fill="none"
@@ -482,16 +483,7 @@ export function GraficoLinhas({
           </g>
         ))}
       </svg>
-      {series.length > 1 && (
-        <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-600">
-          {series.map((s) => (
-            <span key={s.nome} className="flex items-center gap-1.5">
-              <span className="inline-block h-2 w-4 rounded" style={{ background: s.cor }} />
-              {s.nome}
-            </span>
-          ))}
-        </div>
-      )}
+      <details className="mt-3 text-sm"><summary className="cursor-pointer">Consultar valores do gráfico</summary><div className="overflow-x-auto"><table className="mt-2 w-full"><thead><tr><th className="text-left">Rodada</th>{series.map(s=><th key={s.nome} className="p-2 text-right">{s.nome}</th>)}</tr></thead><tbody>{rotulosX.map((r,i)=><tr key={r} className="border-t"><th className="text-left">{r}</th>{series.map(s=><td key={s.nome} className="p-2 text-right">{formatar(s.valores[i])}</td>)}</tr>)}</tbody></table></div></details>
     </div>
   );
 }

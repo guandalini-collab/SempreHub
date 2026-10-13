@@ -76,9 +76,9 @@ Comece na **Visão Geral / Mesa do CEO**: confira nome da empresa, mês, caixa e
 3. **Logística:** escolha a modalidade de entrega nos modelos aplicáveis.
 4. **Marketing:** planeje produtos, preços, campanhas e canais.
 5. **RH:** decida contratações, demissões, horas extras e remuneração.
-6. **Finanças:** avalie crédito, pagamentos e escreva a análise financeira da equipe.
+6. **Finanças:** avalie crédito, pagamentos, caixa e capital de giro.
 
-Sliders mostram valores mínimos e máximos. Ações opcionais podem permanecer em zero. Confira o checklist; salve rascunhos enquanto estiver discutindo. Ao enviar, confirme no modal: depois do envio final, os valores ficam visíveis em **modo de leitura**, sem alterações até o próximo mês.
+Os campos numéricos permitem digitar valores e mostram os limites disponíveis. As decisões ficam reunidas em Departamentos, com subabas para cada área. Ações opcionais podem permanecer em zero. Confira o checklist; salve rascunhos enquanto estiver discutindo. Ao enviar, confirme no modal: depois do envio final, os valores ficam visíveis em **modo de leitura**, sem alterações até o próximo mês.
 
 ## Navegação: escolha à esquerda, trabalhe à direita
 
@@ -153,7 +153,7 @@ Leia **Notícias e mercado** e discuta o cenário. Depois, percorra as áreas:
 
 1. **Produtos e marketing:** preços, canais, campanhas, posicionamento e mix de cada produto.
 2. **Ferramentas e segmentação:** SWOT, Porter, PESTEL, concorrência, diretriz, BCG e público-alvo.
-3. **Finanças:** análise escrita da equipe, margens, custos, crédito, caixa e capital de giro.
+3. **Finanças:** interpretação de margens, custos, crédito, caixa e capital de giro.
 4. **Produção:** produção, insumos, máquinas e capacidade.
 5. **P&D e RH:** tecnologia, contratação, demissão, remuneração e capacitação.
 6. **Logística:** frete e localização, quando disponíveis no modo Empresa tradicional.
@@ -168,7 +168,7 @@ Clique em **Enviar decisão final** quando terminar. O programa confere as infor
 
 ![Exemplo de envio bloqueado por informações pendentes](diagramas/envio-bloqueado.png)
 
-Confira todas as áreas aplicáveis, os mixes dos produtos, a diretriz estratégica, a segmentação, a BCG e a análise financeira. Orçamentos de serviços de campanha também precisam estar completos quando exigidos. Se a turma avançar ou a versão mudar, atualize o painel antes de tentar salvar novamente.
+Confira todas as áreas aplicáveis, os mixes dos produtos, a diretriz estratégica, a segmentação e a BCG. Orçamentos de serviços de campanha também precisam estar completos quando exigidos. Se a turma avançar ou a versão mudar, atualize o painel antes de tentar salvar novamente.
 
 **Comprar máquinas, contratar funcionários, pagar horas extras, solicitar empréstimos e investir em tecnologia são escolhas opcionais.** Zero é válido para essas ações e não impede o envio. A revisão obrigatória serve para confirmar que a equipe considerou a escolha.
 
@@ -195,7 +195,7 @@ As consequências aparecem **por meio das escolhas da equipe**. Ignorar uma qued
 
 O programa confronta escolhas estruturadas de SWOT, BCG e segmentação com o mix. Incompatibilidades podem reduzir a conversão comercial, conforme os critérios mostrados na interface e nos resultados. Não existe garantia de lucro: concorrência, custos, capacidade e eventos também influenciam o desempenho. Textos livres não recebem descontos arbitrários.
 
-**A segmentação e a análise financeira são responsabilidade dos alunos.** Definam o público, os canais, a localização, a cobertura e o preço máximo aceito. Em Finanças, escrevam a interpretação de margem, despesas, fluxo de caixa, capital de giro e riscos. Os demonstrativos calculados ajudam a analisar; não substituem o raciocínio da equipe.
+**A segmentação e a interpretação dos resultados financeiros são responsabilidade dos alunos.** Definam o público, os canais, a localização, a cobertura e o preço máximo aceito. Em Finanças, avaliem margem, despesas, fluxo de caixa, capital de giro e riscos. Os demonstrativos calculados ajudam a analisar; não substituem o raciocínio da equipe.
 
 ## 6. Use a matriz BCG no formato tradicional
 
@@ -242,7 +242,7 @@ Vender a prazo pode registrar receita antes do recebimento; comprar a prazo pode
 
 **Crédito bancário tem custo alto e pode impactar a empresa.** Juros reduzem lucro e caixa; o principal precisa ser devolvido. A taxa da rodada e o cheque especial podem agravar o risco. Um aporte de investidores, quando disponível na Startup, não é receita de vendas e pode reduzir a participação dos fundadores.
 
-A prévia ajuda a conferir gastos e capacidade. Ela não garante vendas ou lucro e pode ser provisória enquanto o planejamento estiver incompleto. Depois do fechamento, compare as premissas com o resultado e atualize a análise financeira para a próxima rodada.
+A prévia ajuda a conferir gastos e capacidade. Ela não garante vendas ou lucro e pode ser provisória enquanto o planejamento estiver incompleto. Depois do fechamento, compare as premissas com o resultado e ajuste o planejamento financeiro da próxima rodada.
 
 ## 9. Histórico, avaliação e problemas de acesso
 
@@ -267,7 +267,7 @@ Antes de começar, confirme o nome da turma com o professor, entre nela, forme s
 3. Em **Segmentação do mercado**, descreva localização e público, escolha cobertura e canais e informe o preço máximo que esse público aceitaria. Consulte a seção Dicionário das decisões comerciais e estratégicas para entender cada campo.
 4. Em **BCG**, registre todos os produtos do mix. Confira crescimento, participação relativa, classificação e se são dados ou projeções. Projeções precisam de premissas escritas.
 5. Em **Produtos e marketing**, complete cada produto: quantidade ou peso de atendimento, preço, posicionamento, canais, cobertura, mídias e serviços. Confira os custos e marque o mix como revisado.
-6. Em **Finanças**, escolha crédito, amortização, prazos e regime quando aplicáveis. Escreva a análise financeira com base nos números da equipe; o sistema não escreve essa decisão por você.
+6. Em **Finanças**, escolha crédito, amortização, prazos e regime quando aplicáveis. Analise os números da equipe para definir as decisões; não há texto de análise financeira obrigatório para enviar a rodada.
 7. Em **Produção**, compare capacidade, demanda esperada, pessoas, estoques e investimento. Escolha contratações, demissões, horas extras e compras quando disponíveis no seu modelo.
 8. Em **Logística**, quando disponível, selecione a entrega. No modelo em que essa decisão não se aplica, o submenu não é apresentado como uma obrigação.
 9. Confirme a revisão de cada área depois de conferir seus campos. Clique em **Salvar rascunho** para guardar sem entregar, ou **Salvar e ir para a próxima etapa** para continuar.
@@ -313,7 +313,7 @@ Máquinas são investimentos: o pagamento afeta caixa no mês da compra, a ativa
 
 P&D é investimento na melhoria do produto e da tecnologia. Ele reduz recursos disponíveis no presente e pode influenciar qualidade e atratividade. No modelo Startup, compare também capacidade da nuvem, equipe, produto e atendimento. As escolhas de um modelo não são automaticamente oferecidas em outro.
 
-## 13. Dicionário financeiro e análise escrita
+## 13. Dicionário financeiro e interpretação dos resultados
 
 **Receita:** valor das vendas. **Custo:** gasto relacionado à produção ou mercadoria. **Despesa:** gasto de operação e administração. **Lucro:** resultado depois dos custos, despesas e demais efeitos. **Caixa:** dinheiro disponível. **Dívida:** obrigação ainda não paga. Uma empresa pode apresentar lucro e, ao mesmo tempo, dificuldade de caixa.
 
@@ -323,7 +323,7 @@ Empréstimo não é receita de venda: entra dinheiro e surge obrigação de devo
 
 **Exemplo didático:** se a equipe tomar R$ 10.000 a uma taxa de 2,5% no mês, o custo de juros dessa parcela será R$ 250, antes de outros efeitos. A taxa real do jogo é a indicada na turma e pode mudar. R$ 10.000 recebidos não representam R$ 10.000 de lucro.
 
-Na análise financeira, registre: expectativa de receita; custos e despesas relevantes; dinheiro disponível; diferença entre lucro e caixa; efeito de estoques e prazos; necessidade de giro; risco de crédito; e justificativa das escolhas. Use números da equipe, premissas e limites. Um texto preenchido permite validar a presença da análise, mas não demonstra sozinho sua qualidade.
+Antes de decidir, compare a expectativa de receita, os custos, as despesas, o dinheiro disponível, os estoques, os prazos e os riscos de crédito. Use os indicadores e demonstrativos para discutir as escolhas da equipe. O envio não exige uma análise financeira escrita.
 
 ## 14. Salvar, corrigir e enviar sem se perder
 
