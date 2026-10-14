@@ -44,6 +44,7 @@ export function ControleVisual({
       <div className="mb-3 text-2xl font-bold tabular-nums">
         {moeda ? reais(valor) : valor}
       </div>
+      {moeda ? <EntradaNumero aria-label={rotulo} moeda minimo={minimo} max={teto} valor={valor} aoMudar={aoMudar}/> : (
       <input
         aria-label={rotulo}
         type="number"
@@ -54,6 +55,7 @@ export function ControleVisual({
         onChange={(e) => aoMudar(Number(e.target.value))}
         className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-marinho"
       />
+      )}
       <div className="mt-2 flex justify-between text-xs font-semibold text-slate-600"><span>Mínimo: {moeda ? reais(minimo) : minimo}</span><span>Máximo: {moeda ? reais(teto) : teto}</span></div>
     </div>
   );

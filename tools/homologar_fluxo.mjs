@@ -26,10 +26,10 @@ const anon=await browser.newPage();await anon.goto(base);assert.equal(await anon
 for(const modo of ['TRADICIONAL','STARTUP']){
  console.log('Homologando '+modo);const e=await equipe(modo);const lider=await abrir(e.alunos[0],`/#/empresa/${e.id}`);const membro=await abrir(e.alunos[1],`/#/empresa/${e.id}`);
  await lider.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await membro.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();
- const preco=lider.getByRole('spinbutton',{name:'Preço de venda',exact:true});await preco.waitFor();assert(!(await preco.isDisabled()));assert(await membro.getByRole('spinbutton',{name:'Preço de venda',exact:true}).isDisabled());
+ const preco=lider.getByLabel('Preço de venda',{exact:true});await preco.waitFor();assert(!(await preco.isDisabled()));assert(await membro.getByLabel('Preço de venda',{exact:true}).isDisabled());
  await preco.fill('123');const salvo=lider.waitForResponse(r=>r.url().endsWith(`/api/aluno/empresas/${e.id}/decisao`) && r.request().method()==='PUT');await lider.getByRole('button',{name:'Salvar rascunho',exact:true}).click();assert((await salvo).ok());
- await lider.reload();await fecharAvisos(lider);await lider.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();assert.equal(await lider.getByRole('spinbutton',{name:'Preço de venda',exact:true}).inputValue(),'123');
- await membro.reload();await fecharAvisos(membro);await membro.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();assert.equal(await membro.getByRole('spinbutton',{name:'Preço de venda',exact:true}).inputValue(),'123');
+ await lider.reload();await fecharAvisos(lider);await lider.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();assert.equal(await lider.getByLabel('Preço de venda',{exact:true}).inputValue(),'123,00');
+ await membro.reload();await fecharAvisos(membro);await membro.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();assert.equal(await membro.getByLabel('Preço de venda',{exact:true}).inputValue(),'123,00');
  await lider.getByRole('button',{name:'Enviar decisão final',exact:true}).click();await lider.getByRole('button',{name:'Confirmar envio final',exact:true}).click();await lider.getByText(/Você não pode enviar/).first().waitFor();
  const painel=await req(`/api/aluno/empresas/${e.id}`,e.alunos[0]);
  const completa={rodada:1,versao:painel.equipe.versao_decisao,rascunho:false,preco:123,marketing:0,pd:0,networking:0,contratar:3,demitir:0,emprestimo:0,amortizacao:0,revisao_areas:{decisoes:true,financas:true,producao:true,logistica:true},simulacao:{producao:100,comprar_mp:100,manutencao:1000,treinamento:300,salario:2100,beneficio:150,horas_extras:0,modal:'PADRAO',capacidade_nuvem:100}};
@@ -38,14 +38,14 @@ for(const modo of ['TRADICIONAL','STARTUP']){
  await departamento('RH');
  await lider.getByRole('spinbutton',{name:'Contratar funcionários',exact:true}).fill('3');
  await lider.locator('select').filter({has:lider.getByRole('option',{name:'Definir salário da empresa',exact:true})}).selectOption('PROPRIO');
- await lider.getByRole('spinbutton',{name:'salario',exact:true}).fill('2100');
- await lider.getByRole('spinbutton',{name:'beneficio',exact:true}).fill('150');
- await lider.getByRole('spinbutton',{name:'treinamento',exact:true}).fill('300');
+ await lider.getByLabel('salario',{exact:true}).fill('2100');
+ await lider.getByLabel('beneficio',{exact:true}).fill('150');
+ await lider.getByLabel('treinamento',{exact:true}).fill('300');
  await departamento('Produção');
  if(modo==='TRADICIONAL'){
    await lider.getByRole('spinbutton',{name:'producao',exact:true}).fill('100');
    await lider.getByRole('spinbutton',{name:'comprar mp',exact:true}).fill('100');
-   await lider.getByRole('spinbutton',{name:'manutencao',exact:true}).fill('1000');
+   await lider.getByLabel('manutencao',{exact:true}).fill('1000');
  }else await lider.getByRole('spinbutton',{name:'capacidade nuvem',exact:true}).fill('100');
  for(const nome of ['Produtos e marketing','Finanças','Produção',...(modo==='TRADICIONAL'?['Logística']:[])]){
    await departamento(nome);await lider.getByRole('checkbox',{name:'Conferi os valores desta área',exact:true}).check();
@@ -53,7 +53,7 @@ for(const modo of ['TRADICIONAL','STARTUP']){
  await lider.getByRole('button',{name:'Salvar rascunho',exact:true}).click();
  await lider.getByText(/Rascunho da versão .* salvo/).filter({visible:true}).first().waitFor();
  await lider.reload();await fecharAvisos(lider);await lider.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await lider.getByRole('button',{name:'Enviar decisão final',exact:true}).click();const enviado=lider.waitForResponse(r=>r.url().endsWith(`/api/aluno/empresas/${e.id}/decisao`) && r.request().method()==='PUT');await lider.getByRole('button',{name:'Confirmar envio final',exact:true}).click();assert((await enviado).ok());
- for(const p of [lider,membro]){await p.reload();await fecharAvisos(p);await p.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await p.getByText(/Decisões salvas! Modo de leitura ativado/).waitFor();assert(await p.getByRole('spinbutton',{name:'Preço de venda',exact:true}).isDisabled());}
+ for(const p of [lider,membro]){await p.reload();await fecharAvisos(p);await p.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await p.getByText(/Decisões salvas! Modo de leitura ativado/).waitFor();assert(await p.getByLabel('Preço de venda',{exact:true}).isDisabled());}
  const resposta=await req(`/api/professor/turmas/${e.turma.id}/fechar-rodada`,prof,'POST',{rodada:1,forcar:true,evento:'NENHUM'});assert.equal(resposta.turma.rodada_atual,2);
  const resultado=(await req(`/api/aluno/empresas/${e.id}`,e.alunos[0])).resultados[0];assert.equal(resultado.engine_version,'2.0.0-deterministic-indicators');assert(resultado.detalhes_simulacao.operacao.enps>0);
  await lider.reload();await menus(lider);await lider.getByRole('button',{name:/Manuais · baixar PDF/}).click();assert.equal(await lider.getByRole('link',{name:/Baixar PDF:/}).count(),2);

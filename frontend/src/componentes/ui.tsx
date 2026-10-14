@@ -174,6 +174,7 @@ export function EntradaNumero({
   sufixo,
   casas,
   disabled,
+  aoLimpar,
   ...props
 }: {
   valor: number;
@@ -183,6 +184,7 @@ export function EntradaNumero({
   inteiro?: boolean;
   sufixo?: string;
   casas?: number;
+  aoLimpar?: () => void;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type">) {
   const casasDecimais = inteiro ? 0 : casas ?? (moeda ? 2 : 4);
   const formatar = (v: number) => (Number.isFinite(v) ? formatarNumeroBr(v, casasDecimais, moeda) : "");
@@ -200,7 +202,7 @@ export function EntradaNumero({
     setTexto(bruto);
     const numero = lerNumeroBr(bruto);
     if (numero === null) {
-      aoMudar(0);
+      if (aoLimpar) aoLimpar(); else aoMudar(0);
       return;
     }
     aoMudar(inteiro ? Math.round(numero) : numero);
@@ -209,6 +211,7 @@ export function EntradaNumero({
   function aoSair() {
     setEditando(false);
     const numero = lerNumeroBr(texto);
+    if (numero === null && aoLimpar) { aoLimpar(); setTexto(""); return; }
     const final = Math.max(minimo, numero === null ? 0 : inteiro ? Math.round(numero) : numero);
     aoMudar(final);
     setTexto(formatar(final));
