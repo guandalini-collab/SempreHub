@@ -56,8 +56,15 @@ def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch,orig
     # O catálogo anterior continua válido e seu custo não pode ser removido.
     assert cliente.put(base+"/decisao",headers=aluno,json=completar_decisao({"preco":60})).status_code==422
     assert cliente.put(base+"/decisao",headers=aluno,json=completar_decisao(decisao)).status_code==200
-    monkeypatch.setattr(mercado,"gerar_json",lambda *a:({"texto":"Relatório empresarial: a rodada registrou vendas e custos conforme os demonstrativos."},set()))
     caminho=f"/api/professor/turmas/{turma['id']}/empresas/{empresa}/relatorio-empresarial/1"
+    monkeypatch.setattr(mercado,"gerar_json",lambda *a:({"resposta":"Formato incorreto"},set()))
+    assert cliente.post(caminho,headers=professor,json={}).status_code==502
+    def gerar_texto(*args):
+        assert args[2] is False  # O relatório usa registros encerrados, sem pesquisa de catálogo.
+        assert args[3]["properties"]["texto"]["type"] == "string"
+        assert args[3]["additionalProperties"] is False
+        return {"texto":"Relatório empresarial: a rodada registrou vendas e custos conforme os demonstrativos."},set()
+    monkeypatch.setattr(mercado,"gerar_json",gerar_texto)
     assert cliente.post(caminho,headers=professor,json={}).status_code==200
     monkeypatch.setattr(mercado,"gerar_json",lambda *a:(_ for _ in ()).throw(AssertionError("Não deve gerar novamente")))
     assert cliente.post(caminho,headers=professor,json={}).status_code==200

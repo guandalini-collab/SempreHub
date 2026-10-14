@@ -174,6 +174,11 @@ def mercado_aluno(empresa_id:int,db:Session=Depends(get_db),usuario:Usuario=Depe
     edicoes=db.query(ConteudoMercado).filter(ConteudoMercado.turma_id==empresa.turma_id,ConteudoMercado.publicado.is_(True),ConteudoMercado.rodada<=empresa.turma.rodada_atual).order_by(ConteudoMercado.rodada.desc()).all()
     return {"edicoes":[serializar(e) for e in edicoes]}
 
+class TextoRelatorioEmpresarial(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    texto: str = Field(min_length=30, max_length=24000)
+
+
 @router.post("/api/professor/turmas/{turma_id}/empresas/{empresa_id}/relatorio-empresarial/{rodada}")
 def gerar_relatorio(turma_id:int,empresa_id:int,rodada:int,db:Session=Depends(get_db),usuario:Usuario=Depends(exigir_professor)):
     turma=_turma_do_professor(db,turma_id,usuario)
@@ -202,7 +207,7 @@ def gerar_relatorio(turma_id:int,empresa_id:int,rodada:int,db:Session=Depends(ge
         for d in [next((x for x in e.decisoes if x.rodada == rodada), None)]
     ]}
     dados["historico"]=[{"rodada":r.rodada,"receita":r.receita,"lucro":r.lucro_liquido,"caixa":r.caixa_final} for r in empresa.resultados if r.rodada<rodada]
-    bruto,_=gerar_json('''Redija um relatório empresarial em português com tom frio, objetivo e profissional. JSON {texto:string}. Use apenas os dados fornecidos, não invente indicadores nem atribua causalidade não comprovada. Inclua resultado comercial, DRE, fluxo de caixa, balanço quando disponível, riscos e comparação histórica. Explique os efeitos de alinhamento estratégico registrados nos alertas e na avaliação da rodada, separando o fator comercial de custos, capacidade e eventos. Não atribua julgamento de qualidade aos textos livres. Discuta decisões sem escolher a próxima decisão pela equipe. Não mencione IA, ferramentas, professor ou avaliações pedagógicas. Não trate plano comercial como executado se os dados não comprovam sua execução. Não exponha dados pessoais. Até 8000 caracteres.''',dados)
+    bruto,_=gerar_json('''Redija um relatório empresarial em português com tom frio, objetivo e profissional. JSON {texto:string}. Use apenas os dados fornecidos, não invente indicadores nem atribua causalidade não comprovada. Inclua resultado comercial, DRE, fluxo de caixa, balanço quando disponível, riscos e comparação histórica. Explique os efeitos de alinhamento estratégico registrados nos alertas e na avaliação da rodada, separando o fator comercial de custos, capacidade e eventos. Não atribua julgamento de qualidade aos textos livres. Discuta decisões sem escolher a próxima decisão pela equipe. Não mencione IA, ferramentas, professor ou avaliações pedagógicas. Não trate plano comercial como executado se os dados não comprovam sua execução. Não exponha dados pessoais. Até 8000 caracteres.''',dados,False,TextoRelatorioEmpresarial.model_json_schema())
     texto=bruto.get("texto") if isinstance(bruto,dict) else None
     if not isinstance(texto,str) or not 30<=len(texto)<=24000: raise HTTPException(502,"Relatório inválido.")
     from sqlalchemy.exc import IntegrityError
