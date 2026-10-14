@@ -34,7 +34,7 @@ for(const modo of ['TRADICIONAL','STARTUP']){
  const painel=await req(`/api/aluno/empresas/${e.id}`,e.alunos[0]);
  const completa={rodada:1,versao:painel.equipe.versao_decisao,rascunho:false,preco:123,marketing:0,pd:0,networking:0,contratar:3,demitir:0,emprestimo:0,amortizacao:0,revisao_areas:{decisoes:true,financas:true,producao:true,logistica:true},simulacao:{producao:100,comprar_mp:100,manutencao:1000,treinamento:300,salario:2100,beneficio:150,horas_extras:0,modal:'PADRAO',capacidade_nuvem:100}};
  // Percorre a interface como aluno: decisões reais digitadas em cada departamento.
- const departamento=async nome=>{await lider.getByRole('navigation',{name:'Subabas dos departamentos'}).getByRole('button',{name:nome,exact:true}).click();};
+ const departamento=async nome=>{await lider.locator('button[aria-expanded="false"]').evaluateAll(xs=>xs.forEach(x=>x.click()));await lider.getByRole('navigation',{name:'Navegação do Aluno'}).getByRole('button',{name:nome,exact:true}).first().click();};
  await departamento('RH');
  await lider.getByRole('spinbutton',{name:'Contratar funcionários',exact:true}).fill('3');
  await lider.locator('select').filter({has:lider.getByRole('option',{name:'Definir salário da empresa',exact:true})}).selectOption('PROPRIO');

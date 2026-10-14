@@ -151,7 +151,7 @@ Se o líder precisar trocar de turma, deve transferir a liderança e aguardar su
 
 Leia **Notícias e mercado** e discuta o cenário. Ao selecionar um submenu, o painel leva ao início do conteúdo escolhido. Os grupos do menu podem ser abertos ou recolhidos. Em **Departamentos**, use as subabas para percorrer as áreas; em Estratégia, a comparação de concorrentes tem sua própria subaba **Concorrentes**.
 
-O bloco **Conferir revisão dos departamentos** reúne a visão geral das revisões. A confirmação da área atual permanece visível. Abra **Consultar prévia financeira e operacional** quando quiser conferir as estimativas; recolher esses blocos não apaga as decisões. Depois, percorra as áreas:
+Na faixa inferior, **Revisão** abre a visão geral dos departamentos e **Prévia** abre as estimativas em uma janela. A confirmação da área atual permanece na faixa inferior. Fechar essas janelas não apaga as decisões. Depois, percorra as áreas:
 
 1. **Produtos e marketing:** preços, canais, campanhas, posicionamento e mix de cada produto.
 2. **Ferramentas e segmentação:** SWOT, Porter, PESTEL, concorrência, diretriz, BCG e público-alvo.
@@ -763,3 +763,8 @@ As incompatibilidades estruturadas podem reduzir a demanda comercial: SWOT e pos
 ### Área de trabalho do aluno
 
 No computador, o menu lateral, o resumo da empresa e as ações da decisão permanecem visíveis. Somente o conteúdo da etapa atual rola, quando necessário. A faixa inferior reúne Salvar rascunho, Salvar e ir para a próxima etapa e Enviar decisão final. Em Finanças, selecione Crédito e tributos, Compras a prazo ou Vendas a prazo para preencher uma etapa por vez. A troca de submenu volta ao início do conteúdo e mantém as escolhas ainda em edição. No celular, toque em Menu para escolher uma área; o menu se recolhe após a seleção. O grupo ativo fica aberto e os demais podem ser expandidos conforme a necessidade.
+
+
+### Etapas curtas de Produtos e Marketing
+
+Selecione um produto por vez. Use as etapas Produto e preço, Posicionamento e canais, Mídias e Conferir produto. Na etapa Mídias, selecione o canal que deseja configurar; escolher qual mídia visualizar não contrata o serviço. A contratação é marcada na caixa de seleção da mídia. Detalhes e serviços abrem as informações de apoio; Preencher orçamento abre os campos de cotação quando exigidos. Na última etapa, confira os custos e marque a revisão do produto. Os demais produtos e as escolhas já preenchidas permanecem preservados ao mudar de etapa.

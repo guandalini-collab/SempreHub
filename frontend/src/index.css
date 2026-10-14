@@ -156,3 +156,34 @@
 .estacao-aluno .formulario-estacao > div:has(> details) > p { display: none; }
 .estacao-aluno .missao-decisao { margin-top: .5rem; }
 .estacao-aluno .cabecalho-missao { padding: .4rem .7rem; font-size: .85rem; }
+
+/* Cada decisão começa pelos campos, sem banners ou títulos repetidos. */
+.estacao-aluno .cartao-decisao > div:first-child:has(> h2) { display: none; }
+.estacao-aluno .cartao-decisao { padding: .75rem; border: none; }
+.estacao-aluno .formulario-estacao > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
+.estacao-aluno .formulario-estacao > fieldset > :not([hidden]) ~ :not([hidden]) { margin-top: .5rem; }
+.estacao-aluno .acoes-estacao-aluno label { margin: 0 auto 0 0; font-size: .75rem; }
+.estacao-aluno .acoes-estacao-aluno > div { gap: .65rem; }
+.estacao-aluno .mix-paginado > p { margin-bottom: .5rem; }
+.estacao-aluno .produto-etapa { padding: .25rem; }
+.estacao-aluno .produto-etapa h3 { font-size: .9rem; }
+.estacao-aluno .produto-etapa article > p { font-size: .75rem; }
+.estacao-aluno .resumo-inicial { margin-top: 0; }
+.estacao-aluno #secao-visao { gap: .75rem; }
+.estacao-aluno .area-trabalho-conteudo:has(.formulario-estacao) { padding-top: 0; }
+
+.estacao-aluno .entrada-mix { padding: 0; border: none; background: transparent; }
+.estacao-aluno .entrada-mix > span:first-child { display: none; }
+.estacao-aluno .entrada-mix > span:last-child { margin-top: .25rem; }
+.estacao-aluno .produto-etapa label { font-size: .8rem; }
+.estacao-aluno .mix-paginado { padding: 0; }
+.estacao-aluno fieldset:has(> .mix-paginado) { padding: .5rem; border: none; }
+.estacao-aluno fieldset:has(> .mix-paginado) > legend { display: none; }
+.estacao-aluno .produto-etapa > div > h4 { margin-top: .5rem; margin-bottom: .5rem; }
+
+@media(min-width:768px) { .estacao-aluno .subabas-estacao { display: none; } }
+.estacao-aluno .formulario-estacao fieldset.mb-6 { margin-bottom: 0; }
+.estacao-aluno .produto-etapa > div > .my-4 { margin-top: .75rem; margin-bottom: .5rem; }
+.estacao-aluno .produto-etapa .p-4 { padding: .75rem; }
+.estacao-aluno .produto-etapa label.rounded-xl { padding: .5rem .75rem; }
+.estacao-aluno .produto-etapa label.rounded-xl { padding-top: .35rem; padding-bottom: .35rem; }

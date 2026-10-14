@@ -220,57 +220,14 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
         </Cartao>
       </SecaoPainel>
       <SecaoPainel id="visao" ativa={secao}>
-      <div className="rounded-xl bg-marinho p-5 text-white shadow-lg">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-ouro">{turma.nome}</p>
-            <h1 className="text-2xl font-bold">{empresa.nome}</h1>
-            <p className="mt-1 text-xs text-white/60">
-              {NOME_GEM[empresa.tipo_entrada_gem]} · {NOME_DORNELAS[empresa.classe_dornelas]}
-            </p>
-            {turma.modo_jogo !== "LEGADO" && <p className="mt-1 text-xs text-white/60">{turma.modo_jogo === "STARTUP" ? "Startup digital" : "Empresa tradicional"} · {turma.cenario === "CRISE" ? "Recuperação de empresa em crise" : "Começar do zero"}</p>}
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <SeloFase fase={empresa.fase_atual} />
-            <p className="text-sm text-white/80">
-              {encerrada ? "Simulação encerrada" : `Mês ${turma.rodada_atual} de ${turma.total_rodadas}`}
-            </p>
-          </div>
-        </div>
-
-        {empresa.fase_atual === "SOBREVIVENCIA" && (
-          <div className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-bold uppercase tracking-wide">
-            Alerta: estado de sobrevivência — o caixa não cobre um mês de custos fixos
-          </div>
-        )}
-
-        <details className="mt-4 border-t border-white/15 pt-3"><summary className="cursor-pointer text-sm text-white/80">Perfil, estrutura e desenvolvimento da empresa</summary>
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          <Indicador rotulo="Caixa" valor={<ValorMonetario valor={empresa.caixa}/>} destaque />
-          <Indicador rotulo="Dívida" valor={<ValorMonetario valor={empresa.divida}/>} />
-          <Indicador rotulo="Patrimônio" valor={<ValorMonetario valor={empresa.patrimonio}/>} />
-          <Indicador rotulo="Regime" valor={NOME_REGIME[empresa.regime_tributario]} />
-          <Indicador rotulo="Funcionários" valor={empresa.funcionarios} />
-          <Indicador
-            rotulo="Ranking"
-            valor={painel.posicao_ranking && resultados.length ? `${painel.posicao_ranking}º de ${painel.total_empresas}` : "—"}
-          />
-        </div>
-        <div className="mt-5 grid gap-4 sm:grid-cols-3">
-          <BarraProgresso escuro rotulo="Autoeficácia" valor={empresa.autoeficacia} />
-          <BarraProgresso escuro rotulo="Necessidade de realização" valor={empresa.necessidade_realizacao} />
-          <BarraProgresso escuro rotulo="Networking" valor={empresa.networking} />
-        </div>
-        </details>
+      <div className="resumo-inicial grid gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border bg-white p-4"><p className="text-xs text-slate-500">Caixa</p><p className="mt-2 text-xl font-bold"><ValorMonetario valor={empresa.caixa}/></p></div>
+        <div className="rounded-xl border bg-white p-4"><p className="text-xs text-slate-500">Patrimônio</p><p className="mt-2 text-xl font-bold"><ValorMonetario valor={empresa.patrimonio}/></p></div>
+        <div className="rounded-xl border bg-white p-4"><p className="text-xs text-slate-500">Equipe de funcionários</p><p className="mt-2 text-xl font-bold">{empresa.funcionarios}</p></div>
       </div>
-
-      <section className="rounded-xl border-2 border-ouro bg-amber-50 p-5" aria-label="Ambiente de competição">
-        <h2 className="text-lg font-bold text-marinho">Você está em um mercado competitivo</h2>
-        <p className="mt-2 text-sm text-slate-700">Sua empresa disputa clientes com {Math.max(0, painel.total_empresas - 1)} outra(s) empresa(s) da turma e {(turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO).concorrentes_virtuais} concorrente(s) externo(s) simulados, conforme a configuração do sistema. Preços, produtos, comunicação e capacidade de atendimento influenciam os resultados de cada rodada.</p>
-        <p className="mt-2 text-sm font-semibold text-marinho">As decisões das outras empresas também afetam sua participação no mercado.</p>
-      </section>
-      <ResumoNegocio painel={painel} aoResultados={() => setSecao("resultados")} />
-      <Cartao titulo="Sua missão nesta rodada"><ol className="space-y-3 text-sm"><li>1. Consulte as notícias e análises do mercado.</li><li>2. Defina a estratégia e as decisões da sua empresa.</li><li>3. Envie a decisão e acompanhe os resultados.</li></ol><p className="my-4 font-semibold">{encerrada ? "Jornada concluída: confira seu desempenho." : painel.decisao_atual?.enviada_em ? "Decisão registrada. Acompanhe os resultados e o fechamento da rodada." : "Próximo objetivo: preparar e enviar sua decisão."}</p><Botao onClick={() => setSecao(encerrada ? "resultados" : "decisoes")}>{encerrada ? "Analisar resultados" : "Ir para decisões"}</Botao></Cartao>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-white p-4"><div><h3 className="font-bold">{empresa.nome}</h3><p className="text-sm text-slate-600">{Math.max(0,painel.total_empresas-1)} equipes concorrentes · {(turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO).concorrentes_virtuais} concorrentes externos simulados</p></div><SeloFase fase={empresa.fase_atual}/></div>
+      {empresa.caixa < 0 && <p className="mt-3 rounded-lg bg-amber-50 px-4 py-2 text-sm text-amber-900">Caixa em déficit. Confira crédito, gastos e capacidade antes de enviar.</p>}
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">{[["mercado","1. Consultar mercado"],["decisoes","2. Tomar decisões"],["resultados","3. Ver resultados"]].map(([id,nome])=><button key={id} type="button" onClick={()=>setSecao(id)} className="rounded-xl border border-blue-200 bg-white p-5 text-left font-bold text-corporativo hover:bg-blue-50">{nome} →</button>)}</div>
       </SecaoPainel>
       {erro && <Aviso>{erro}</Aviso>}
       <SecaoPainel id="equipe" ativa={secao}>
@@ -589,12 +546,13 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
     }
   }
 
+  const [painelAuxiliar, setPainelAuxiliar] = useState<"revisao" | "previa" | null>(null);
   const [etapaFinanceira, setEtapaFinanceira] = useState("credito");
   const [destinoAcoes, setDestinoAcoes] = useState<HTMLElement | null>(null);
   useEffect(() => { setDestinoAcoes(document.getElementById("acoes-estacao-aluno")); }, []);
 
   return (
-    <Cartao
+    <Cartao className="cartao-decisao"
       titulo={`${area === "estrategia" ? "Ferramentas estratégicas e segmentação" : area === "pd" ? "P&D - tecnologia e inovação" : area === "rh" ? "Recursos humanos" : area === "financas" ? "Planejamento financeiro" : area === "producao" ? "Produção e operação" : area === "logistica" ? "Logística" : "Decisões comerciais"} · mês ${turma.rodada_atual}`}
       acao={
         painel.decisao_atual ? (
@@ -608,17 +566,17 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         {painel.decisao_atual?.enviada_em && <div role="status" className="sticky top-0 z-20 rounded-xl border border-emerald-300 bg-emerald-50 p-4 font-semibold text-emerald-900">🔒 Decisões salvas! Modo de leitura ativado. Aguardando o encerramento do prazo pelo professor.</div>}
         {somenteLeitura && !painel.decisao_atual?.enviada_em && <Aviso tipo="info">Você está em modo de visualização. Discuta as decisões com o líder, que registra e envia pela equipe.</Aviso>}
         <p className="text-sm text-slate-600">Decisões da equipe · salve ao concluir esta etapa. Envie a rodada após revisar todos os departamentos.</p>
-        <div className="rounded-xl border border-blue-200 p-3"><details><summary className="cursor-pointer text-sm font-bold">Conferir revisão dos departamentos</summary><p className="mt-1 text-sm text-slate-600">Confira cada área e marque a revisão. Alterar escolhas pede nova revisão das áreas afetadas. Valores zero são escolhas válidas para ações opcionais. Todas as áreas aplicáveis precisam estar revisadas para o envio final.</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{AREAS_DECISAO.map(id => {
+        {painelAuxiliar === "revisao" && <Modal titulo="Revisão dos departamentos" aoFechar={()=>setPainelAuxiliar(null)}><p className="mt-1 text-sm text-slate-600">Confira cada área e marque a revisão. Alterar escolhas pede nova revisão das áreas afetadas. Valores zero são escolhas válidas para ações opcionais. Todas as áreas aplicáveis precisam estar revisadas para o envio final.</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{AREAS_DECISAO.map(id => {
           const aplicavel = id !== "logistica" || turma.modo_jogo === "TRADICIONAL";
           const revisada = !!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>];
           return <button type="button" key={id} onClick={() => aoNavegar(id)} className={`rounded-lg border p-3 text-left text-sm ${aplicavel && revisada ? "border-emerald-300 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>{id === "decisoes" ? "Produtos e marketing" : id === "financas" ? "Finanças" : id === "producao" ? "Produção" : "Logística"} · {aplicavel ? revisada ? "Revisado ✓" : "Revisar →" : "Sem decisão neste modelo"}</button>;
-        })}</div></details><label className="mt-3 flex items-center gap-3 text-sm font-semibold"><input type="checkbox" disabled={somenteLeitura || (area === "logistica" && turma.modo_jogo !== "TRADICIONAL")} checked={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e => setD(atual => ({ ...atual, revisao_areas: { ...atual.revisao_areas, [area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)]: e.target.checked } }))} />Conferi os valores desta área</label><p className="mt-2 text-xs text-slate-500">As revisões ficam registradas ao salvar ou enviar esta versão da decisão.</p></div>
+        })}</div></Modal>}
         {turma.modo_equipe && <p className="text-sm text-slate-600">Somente o líder altera e envia. Todos podem consultar o planejamento e contribuir na discussão. O envio final será bloqueado se houver etapas obrigatórias pendentes.</p>}
         {conflito && <div className="space-y-2"><Aviso tipo="info">Outra atualização chegou enquanto você editava. Seus campos foram mantidos. Carregue a decisão salva da empresa antes de continuar; essa ação substitui os valores do formulário.</Aviso><Botao type="button" variante="secundario" disabled={carregando} onClick={carregarDecisaoSalva}>Carregar decisão salva</Botao></div>}
         <RevisaoCampos.Provider value={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]}><fieldset disabled={carregando || somenteLeitura} className={`space-y-6 ${somenteLeitura ? "opacity-50 pointer-events-none" : ""}`}>
         <div hidden={area !== "decisoes" && area !== "estrategia" && area !== "pd"}>
         <div hidden={area === "pd"}><EditorMix ferramenta={ferramenta || "SWOT"} precoAtual={d.preco} visao={area === "estrategia" ? "estrategia" : "mix"} aoNavegar={aoNavegar} empresaId={empresa.id} rodada={turma.rodada_atual} plano={d.plano_comercial} aoMudar={(plano,total,preco)=>!somenteLeitura && setD(atual=>manterRevisoes(atual,{...atual,plano_comercial:plano,marketing:total,preco:preco??atual.preco,simulacao:atual.simulacao?{...atual.simulacao,marketing_digital:0}:null}))} /></div>
-          <div hidden={area !== "decisoes"}><Secao titulo="Mercado e posicionamento">
+          <div hidden={area !== "decisoes" || !!d.plano_comercial?.produtos?.length}><Secao titulo="Mercado e posicionamento">
           <div hidden={!!d.plano_comercial?.produtos?.length}><Campo
             rotulo="Preço de venda (por unidade)"
             ajuda={`Preço de referência do mercado: ${reais(p.preco_referencia)}. Custo da mercadoria: ${reais(d.plano_comercial?.custo_unitario ?? p.custo_unitario)}.`}
@@ -693,8 +651,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         {turma.modo_jogo === "LEGADO" && ["producao", "logistica"].includes(area) && <div className="rounded-xl border-l-4 border-blue-600 bg-blue-50 p-5"><h3 className="font-bold">{area === "producao" ? "Capacidade no modelo básico" : "Logística no modelo básico"}</h3><p className="mt-2 text-sm">{area === "producao" ? "Neste modelo, a capacidade depende da equipe de funcionários. Estoques, máquinas e planejamento de produção são controles do modelo Empresa tradicional." : "Este modelo não possui escolha de frete ou entregas. Esses controles estão disponíveis no modelo Empresa tradicional; no modelo Startup, a operação é digital."}</p><p className="mt-2 text-sm">Confira a capacidade e os gastos previstos na prévia abaixo.</p></div>}
         {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao etapaFinanceira={etapaFinanceira} rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
 
-        <details className="rounded-lg bg-slate-50 p-4 text-sm">
-          <summary className="cursor-pointer font-semibold text-corporativo">Consultar prévia financeira e operacional</summary><div className="mt-4">
+        {painelAuxiliar === "previa" && <Modal titulo="Prévia financeira e operacional" aoFechar={()=>setPainelAuxiliar(null)}><div className="text-sm">
           {!previsao && !erroPrevisao && <p role="status">Calculando prévia…</p>}
           {erroPrevisao && (
             <div className="space-y-2">
@@ -734,13 +691,13 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
             </>
           )}
         </div>
-        </details>
+        </Modal>}
         </fieldset></RevisaoCampos.Provider>
 
         {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}
         {!somenteLeitura && <><p className="text-xs text-slate-600">O rascunho pode ficar incompleto. No envio final, o programa informa as pendências e impede o envio até que sejam resolvidas.</p>
-        {!!painel.pendencias_envio?.length && <Aviso tipo="info"><p className="font-bold">Pendências da versão salva:</p><ul className="list-disc pl-5">{painel.pendencias_envio.map(p=><li key={p}>{p}</li>)}</ul></Aviso>}
-        {destinoAcoes && createPortal(<div className="flex flex-wrap items-center justify-end gap-2" aria-label="Ações da decisão">{mensagem && <span role="status" className={`mr-auto text-sm ${mensagem.tipo === "erro" ? "text-red-700" : "text-corporativo"}`}>{mensagem.texto}</span>}<Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho</Botao>{proxima&&<Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para a próxima etapa →</Botao>}<Botao variante="final" type="submit" form={`form-decisao-${empresa.id}`} carregando={carregando} disabled={conflito}>Enviar decisão final</Botao></div>, destinoAcoes)}</>}
+
+        {destinoAcoes && createPortal(<div className="flex flex-wrap items-center justify-end gap-2" aria-label="Ações da decisão"><label className="mt-3 flex items-center gap-3 text-sm font-semibold"><input type="checkbox" disabled={somenteLeitura || (area === "logistica" && turma.modo_jogo !== "TRADICIONAL")} checked={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e => setD(atual => ({ ...atual, revisao_areas: { ...atual.revisao_areas, [area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)]: e.target.checked } }))} />Conferi os valores desta área</label><button type="button" className="text-xs font-semibold text-corporativo" onClick={()=>setPainelAuxiliar("previa")}>Prévia</button><button type="button" className="text-xs font-semibold text-corporativo" onClick={()=>setPainelAuxiliar("revisao")}>Revisão</button>{mensagem && <span role="status" className={`mr-auto text-sm ${mensagem.tipo === "erro" ? "text-red-700" : "text-corporativo"}`}>{mensagem.texto}</span>}<Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho</Botao>{proxima&&<Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para a próxima etapa →</Botao>}<Botao variante="final" type="submit" form={`form-decisao-${empresa.id}`} carregando={carregando} disabled={conflito}>Enviar decisão final</Botao></div>, destinoAcoes)}</>}
       </form>
       {confirmandoEnvio && <Modal titulo="Confirmar decisão final" aoFechar={()=>setConfirmandoEnvio(false)}><p className="text-sm">Esta é a decisão final da equipe para este mês? Após enviar, todas as escolhas ficam visíveis em modo de leitura até a próxima rodada. Use o rascunho se ainda precisar alterar algo.</p><div className="mt-6 flex justify-end gap-3"><Botao variante="secundario" onClick={()=>setConfirmandoEnvio(false)}>Voltar e revisar</Botao><Botao variante="final" carregando={carregando} onClick={()=>{setConfirmandoEnvio(false);salvar(false);}}>Confirmar envio final</Botao></div></Modal>}
     </Cartao>
