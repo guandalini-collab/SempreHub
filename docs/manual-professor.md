@@ -667,3 +667,8 @@ As incompatibilidades estruturadas podem reduzir a demanda comercial: SWOT e pos
 ### Navegação focada dos alunos
 
 As subabas de Departamentos exibem uma área por vez. Ao trocar de submenu, o conteúdo selecionado aparece no topo. A comparação de concorrentes fica na subaba Concorrentes de Estratégia. O checklist completo de revisões e a prévia financeira podem ser expandidos quando necessários; a confirmação da área permanece visível. Esses controles de apresentação não alteram as regras de envio ou os dados salvos.
+
+
+### Área de trabalho do aluno
+
+No computador, o menu lateral, o resumo da empresa e as ações da decisão permanecem visíveis. Somente o conteúdo da etapa atual rola, quando necessário. A faixa inferior reúne Salvar rascunho, Salvar e ir para a próxima etapa e Enviar decisão final. Em Finanças, selecione Crédito e tributos, Compras a prazo ou Vendas a prazo para preencher uma etapa por vez. A troca de submenu volta ao início do conteúdo e mantém as escolhas ainda em edição. No celular, toque em Menu para escolher uma área; o menu se recolhe após a seleção. O grupo ativo fica aberto e os demais podem ser expandidos conforme a necessidade.

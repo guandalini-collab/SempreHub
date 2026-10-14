@@ -758,3 +758,8 @@ A barra de prazo no painel docente representa somente as últimas 24 horas da da
 ### Critérios de coerência estratégica
 
 As incompatibilidades estruturadas podem reduzir a demanda comercial: SWOT e posicionamento, 4%; BCG e quadrante, 3%; público e preço, 5%; cobertura, 3%; canais, 4%; mídias, 4%. A redução total é limitada a 20%. Diagnósticos de consulta e textos livres não recebem penalidades automáticas. Demanda, capacidade, custos e concorrência continuam influenciando os resultados; nenhuma escolha garante lucro.
+
+
+### Área de trabalho do aluno
+
+No computador, o menu lateral, o resumo da empresa e as ações da decisão permanecem visíveis. Somente o conteúdo da etapa atual rola, quando necessário. A faixa inferior reúne Salvar rascunho, Salvar e ir para a próxima etapa e Enviar decisão final. Em Finanças, selecione Crédito e tributos, Compras a prazo ou Vendas a prazo para preencher uma etapa por vez. A troca de submenu volta ao início do conteúdo e mantém as escolhas ainda em edição. No celular, toque em Menu para escolher uma área; o menu se recolhe após a seleção. O grupo ativo fica aberto e os demais podem ser expandidos conforme a necessidade.

@@ -40,7 +40,7 @@ export function ControleVisual({
 }) {
   const teto = Math.max(limite, valor, minimo + 1);
   return (
-    <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+    <div className="controle-valor rounded-xl border border-blue-200 bg-blue-50 p-4">
       <div className="mb-3 text-2xl font-bold tabular-nums">
         {moeda ? reais(valor) : valor}
       </div>

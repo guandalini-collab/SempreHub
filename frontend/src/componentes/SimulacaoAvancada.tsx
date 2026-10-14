@@ -9,7 +9,7 @@ import { inteiro, percentual, reais, umDecimal } from "../formatos";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, PreviaSimulacao } from "../tiposSimulacao";
 import { Campo, Cartao, EntradaNumero, estiloEntrada } from "./ui";
 
-export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, area = "decisoes", rodada }: {
+export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, area = "decisoes", rodada, etapaFinanceira }: {
   modo: ModoJogo;
   valores: DecisaoSimulacao;
   aoMudar: (valores: DecisaoSimulacao) => void;
@@ -18,6 +18,7 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
   marketing: number;
   mixSelecionado?: boolean;
   area?: string;
+  etapaFinanceira?: string;
   rodada: number;
 }) {
   const estudo = valores.centro_gravidade;
@@ -50,7 +51,7 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
         </Campo>
       </Secao>
       {area === "logistica" && <div className="rounded-lg bg-blue-50 p-4 text-sm"><h3 className="font-bold">Frete e localização</h3><p className="mt-2">Modalidade: <ValorMonetario valor={baseFrete}/>/unidade · taxa didática: <ValorMonetario valor={taxaKm}/>/unidade/km.</p><p className="mt-2">Distância média ponderada: {distancia.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} km · adicional: <ValorMonetario valor={adicionalFrete}/>/unidade.</p><p className="mt-2 font-bold">Frete estimado: <ValorMonetario valor={baseFrete + adicionalFrete}/> por unidade vendida.</p><p className="mt-2">{temLocalizacao ? "A localização escolhida em Produção afeta o frete registrado na DRE e no caixa." : "Sem localização definida e volumes positivos, aplica-se apenas o custo da modalidade. Complete o estudo em Produção para incluir as distâncias."}</p></div>}
-      <Secao titulo="Compras a prazo" oculto={area !== "financas"}>
+      <Secao titulo="Compras a prazo" oculto={area !== "financas" || (!!etapaFinanceira && etapaFinanceira !== "compras")}>
         <Campo rotulo="Parcela das compras a prazo" ajuda="A compra entra no estoque agora; o pagamento ocorre no vencimento. O restante é pago à vista."><ControleVisual rotulo="Compras a prazo (%)" moeda={false} valor={valores.compras_prazo * 100} limite={100} aoMudar={(v) => mudar("compras_prazo", v / 100)} /></Campo>
         <Campo rotulo="Prazo de pagamento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_pagamento} onChange={(e) => mudar("prazo_pagamento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} mês(es)</option>)}</select></Campo>
       </Secao>
@@ -59,7 +60,7 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
       <Secao titulo="Capacidade do serviço digital" oculto={area !== "producao"}>
       <Campo rotulo="Capacidade da nuvem" ajuda="Número de clientes que a operação consegue atender neste mês. Os clientes sem atendimento continuam na base, com impacto na satisfação."><ControleVisual rotulo="capacidade nuvem" moeda={false} inteiro valor={valores.capacidade_nuvem} aoMudar={(v) => mudar("capacidade_nuvem", v)} limite={10000} /></Campo>
       </Secao>
-      <Secao titulo="Investidores e financiamento" oculto={area !== "financas"}>
+      <Secao titulo="Investidores e financiamento" oculto={area !== "financas" || (!!etapaFinanceira && etapaFinanceira !== "credito")}>
       <Campo rotulo="Aporte de investidores" ajuda="Entrada de capital no caixa em troca de participação. Não é receita nem lucro e pode reduzir a participação dos fundadores."><ControleVisual rotulo="aporte"  valor={valores.aporte} aoMudar={(v) => mudar("aporte", v)} limite={100000} /></Campo>
       <Campo rotulo="Valuation antes do aporte" ajuda="Valor da empresa usado para definir a participação do investidor."><ControleVisual rotulo="valuation"  minimo={0.01} valor={valores.valuation} aoMudar={(v) => mudar("valuation", v)} limite={100000} /></Campo>
     </Secao>
@@ -79,7 +80,7 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
       <Campo rotulo="Marketing direcionado ao digital" ajuda={`Parcela do orçamento de marketing que vai ao digital. Limite atual: ${reais(marketing)}; este valor já está incluído no marketing total.`}><ControleVisual rotulo="Marketing digital" valor={valores.marketing_digital} limite={marketing} aoMudar={(v) => mudar("marketing_digital", v)} /></Campo>
     </Secao>
     }
-    <Secao titulo="Vendas a prazo" oculto={area !== "financas"}>
+    <Secao titulo="Vendas a prazo" oculto={area !== "financas" || (!!etapaFinanceira && etapaFinanceira !== "vendas")}>
       <Campo rotulo="Parcela das vendas a prazo" ajuda="A venda gera receita e lucro nesta rodada, mas o dinheiro só chega ao caixa no vencimento."><ControleVisual rotulo="Vendas a prazo (%)" moeda={false} valor={valores.vendas_prazo * 100} limite={100} aoMudar={(v) => mudar("vendas_prazo", v / 100)} /></Campo>
       <Campo rotulo="Prazo de recebimento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_recebimento} onChange={(e) => mudar("prazo_recebimento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} mês(es)</option>)}</select></Campo>
     </Secao>

@@ -90,3 +90,69 @@
   .painel-executivo .valor-monetario { color: #034AA6; }
   .painel-executivo .bg-marinho .valor-monetario, .painel-executivo .text-white .valor-monetario { color: inherit; }
 }
+
+/* Área de trabalho do aluno: controles permanentes e um conteúdo por vez. */
+.painel-executivo:has(.estacao-aluno) { height: 100dvh; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.painel-executivo:has(.estacao-aluno) > header { flex: none; }
+.painel-executivo:has(.estacao-aluno) > header > div:first-child { padding-top: .5rem; padding-bottom: .5rem; }
+.painel-executivo:has(.estacao-aluno) > main { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; padding-top: .5rem; padding-bottom: .5rem; }
+.painel-executivo:has(.estacao-aluno) > main > button { align-self: flex-start; margin-bottom: .5rem; font-size: .75rem; }
+.painel-executivo .estacao-aluno { flex: 1; min-height: 0; height: 100%; grid-template-columns: 230px minmax(0,1fr); gap: 1rem; }
+.estacao-aluno > aside { position: static; height: 100%; min-height: 0; max-height: none; border-radius: .75rem; padding: .75rem; overscroll-behavior: contain; }
+.estacao-aluno > aside nav { margin-top: .5rem; }
+.estacao-aluno > aside nav button { padding-top: .5rem; padding-bottom: .5rem; }
+.estacao-aluno > aside > div.mt-5 { display: none; }
+.estacao-aluno .area-trabalho { height: 100%; min-height: 0; display: flex; flex-direction: column; gap: .5rem; }
+.estacao-aluno .area-trabalho > * { margin-top: 0; }
+.estacao-aluno [aria-label="Turma e rodada atual"] { position: static; padding: .6rem .9rem; flex: none; box-shadow: none; border-radius: .75rem; }
+.estacao-aluno [aria-label="Turma e rodada atual"] > div { gap: .5rem; }
+.estacao-aluno [aria-label="Turma e rodada atual"] p { font-size: .75rem; line-height: 1.25; }
+.estacao-aluno [aria-label="Turma e rodada atual"] p.text-lg,
+.estacao-aluno [aria-label="Turma e rodada atual"] p.text-xl { font-size: 1rem; }
+.estacao-aluno [aria-label="Turma e rodada atual"] > div > div:first-child > p:first-child,
+.estacao-aluno [aria-label="Turma e rodada atual"] button,
+.estacao-aluno [aria-label="Turma e rodada atual"] .text-amber-800 { display: none; }
+.estacao-aluno [aria-label="Turma e rodada atual"] a { padding: .4rem .6rem; font-size: .75rem; }
+.estacao-aluno .titulo-area-trabalho { flex: none; padding: .25rem .5rem; }
+.estacao-aluno .titulo-area-trabalho h2 { font-size: 1.15rem; line-height: 1.4; }
+.estacao-aluno .titulo-area-trabalho > p { display: none; }
+.estacao-aluno .area-trabalho-conteudo { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 2px 8px 12px 2px; }
+.estacao-aluno .acoes-estacao-aluno { flex: none; border-top: 1px solid #cbd5e1; padding: .65rem; background: white; border-radius: .65rem; box-shadow: 0 -4px 16px -12px #034AA6; }
+.estacao-aluno .acoes-estacao-aluno:empty { display: none; }
+.estacao-aluno .acoes-estacao-aluno [role="status"] { max-width: 100%; max-height: 3rem; overflow-y: auto; }
+.estacao-aluno .subabas-estacao { position: sticky; top: 0; z-index: 20; background: #F8FAFC; padding: .4rem 0; flex-wrap: nowrap; overflow-x: auto; margin-bottom: .5rem; }
+.estacao-aluno .subabas-estacao button { flex-shrink: 0; font-size: .75rem; padding: .5rem .65rem; box-shadow: none; }
+.estacao-aluno .cartao-executivo { padding: 1rem; border-radius: .75rem; box-shadow: none; }
+.estacao-aluno .cartao-executivo > div:first-child:has(> h2) { margin: -1rem -1rem .75rem; padding: .6rem 1rem; border-radius: .75rem .75rem 0 0; }
+.estacao-aluno .formulario-estacao { display: flex; flex-direction: column; gap: .75rem; }
+.estacao-aluno .formulario-estacao > * { margin-top: 0; }
+.estacao-aluno .formulario-estacao > p { display: none; }
+.estacao-aluno .formulario-estacao details > summary { font-size: .8rem; }
+.estacao-aluno .missao-decisao { padding: .75rem; }
+.estacao-aluno .quadros-analise > * { min-height: 130px; padding: 1rem; }
+@media (max-width: 767px) {
+  .painel-executivo .estacao-aluno { grid-template-columns: minmax(0,1fr); grid-template-rows: auto minmax(0,1fr); gap: .5rem; }
+  .estacao-aluno > aside { max-height: 120px; height: auto; padding: .5rem; border-radius: .5rem; }
+  .estacao-aluno > aside > div:first-child { display: none; }
+  .estacao-aluno > aside nav { margin: 0; }
+  .estacao-aluno [aria-label="Turma e rodada atual"] > div > div:first-child { display: none; }
+  .estacao-aluno [aria-label="Turma e rodada atual"] > div > div:last-child { width: 100%; justify-content: space-between; }
+  .estacao-aluno [aria-label="Turma e rodada atual"] > div > div:last-child > div > p:last-child { display: none; }
+  .estacao-aluno .acoes-estacao-aluno button { font-size: .7rem; padding: .4rem .5rem; }
+  .estacao-aluno .area-trabalho-conteudo { padding-right: 2px; }
+}
+
+.estacao-aluno .area-trabalho > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
+.estacao-aluno .menu-movel-gatilho { display: none; }
+@media (max-width: 767px) {
+ .estacao-aluno .menu-movel-gatilho { display: block; width: 100%; text-align: left; font-size: .8rem; font-weight: 700; padding: .4rem; }
+ .estacao-aluno > aside.menu-movel-fechado nav { display: none; }
+ .estacao-aluno > aside.menu-movel-aberto { max-height: 230px; }
+}
+
+.estacao-aluno .controle-valor { padding: .4rem .6rem; background: #fff; border-color: #cbd5e1; border-radius: .5rem; }
+.estacao-aluno .controle-valor > div:first-child { display: none; }
+.estacao-aluno .controle-valor input { margin-top: 0; padding: .4rem .5rem; }
+.estacao-aluno .formulario-estacao > div:has(> details) > p { display: none; }
+.estacao-aluno .missao-decisao { margin-top: .5rem; }
+.estacao-aluno .cabecalho-missao { padding: .4rem .7rem; font-size: .85rem; }

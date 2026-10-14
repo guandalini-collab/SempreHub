@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { ValorMonetario } from "../../componentes/ui";
 import { IconeMissao } from "../../componentes/IdentidadeExecutiva";
 import IndicadoresDepartamentais, { AREAS_INDICADORES } from "../../componentes/IndicadoresDepartamentais";
@@ -298,7 +299,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <SecaoPainel id="departamentos" ativa={secao}><Cartao titulo="Departamentos"><p>Escolha uma área para planejar, conferir e salvar as decisões da rodada.</p><nav aria-label="Departamentos" className="mt-4 flex flex-wrap gap-2">{DEPARTAMENTOS.map(d=><Botao key={d.id} onClick={()=>setSecao(d.id)}>{d.titulo}</Botao>)}</nav></Cartao></SecaoPainel>
       <SecaoPainel id={(AREAS_DECISAO.includes(secao) || ["pd", "rh"].includes(secao) || secao === "estrategia" || secao.startsWith("ferramenta-")) ? secao : "decisoes"} ativa={secao}>
         <div>
-          <nav aria-label="Subabas dos departamentos" className="mb-4 flex flex-wrap gap-2">{DEPARTAMENTOS.map(d=><Botao key={d.id} variante={secao===d.id || (d.id==="estrategia" && secao.startsWith("ferramenta-")) ? "primario" : "secundario"} onClick={()=>setSecao(d.id)}>{d.titulo}</Botao>)}</nav>
+          <nav className="subabas-estacao mb-4 flex flex-wrap gap-2" aria-label="Subabas dos departamentos">{DEPARTAMENTOS.map(d=><Botao key={d.id} variante={secao===d.id || (d.id==="estrategia" && secao.startsWith("ferramenta-")) ? "primario" : "secundario"} onClick={()=>setSecao(d.id)}>{d.titulo}</Botao>)}</nav>
           {(secao==="estrategia" || secao.startsWith("ferramenta-")) && <nav aria-label="Ferramentas de estratégia" className="mb-4 flex flex-wrap gap-2">{FERRAMENTAS.map(f=><Botao key={f} variante={secao===`ferramenta-${f}` ? "primario" : "secundario"} onClick={()=>setSecao(`ferramenta-${f}`)}>{f==="CONCORRENCIA" ? "Concorrentes" : f==="SEGMENTACAO" ? "Segmentação" : f}</Botao>)}</nav>}
           {encerrada ? (
             <Cartao titulo="Simulação encerrada">
@@ -516,7 +517,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
       setD(entrada);
       setBase({ entrada, versao: versaoServidor, rodada: turma.rodada_atual });
       setConflitoServidor(false);
-      setMensagem(null);
+      if (base.rodada !== turma.rodada_atual || base.versao !== versaoServidor) setMensagem(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [turma.rodada_atual, versaoServidor]);
@@ -588,6 +589,10 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
     }
   }
 
+  const [etapaFinanceira, setEtapaFinanceira] = useState("credito");
+  const [destinoAcoes, setDestinoAcoes] = useState<HTMLElement | null>(null);
+  useEffect(() => { setDestinoAcoes(document.getElementById("acoes-estacao-aluno")); }, []);
+
   return (
     <Cartao
       titulo={`${area === "estrategia" ? "Ferramentas estratégicas e segmentação" : area === "pd" ? "P&D - tecnologia e inovação" : area === "rh" ? "Recursos humanos" : area === "financas" ? "Planejamento financeiro" : area === "producao" ? "Produção e operação" : area === "logistica" ? "Logística" : "Decisões comerciais"} · mês ${turma.rodada_atual}`}
@@ -599,7 +604,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         )
       }
     >
-      <form onSubmit={e => {e.preventDefault();setConfirmandoEnvio(true);}} className="space-y-6">
+      <form id={`form-decisao-${empresa.id}`} onSubmit={e => {e.preventDefault();setConfirmandoEnvio(true);}} className="formulario-estacao space-y-6">
         {painel.decisao_atual?.enviada_em && <div role="status" className="sticky top-0 z-20 rounded-xl border border-emerald-300 bg-emerald-50 p-4 font-semibold text-emerald-900">🔒 Decisões salvas! Modo de leitura ativado. Aguardando o encerramento do prazo pelo professor.</div>}
         {somenteLeitura && !painel.decisao_atual?.enviada_em && <Aviso tipo="info">Você está em modo de visualização. Discuta as decisões com o líder, que registra e envia pela equipe.</Aviso>}
         <p className="text-sm text-slate-600">Decisões da equipe · salve ao concluir esta etapa. Envie a rodada após revisar todos os departamentos.</p>
@@ -644,9 +649,10 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
 
         </div>
         <div hidden={area !== "financas"}>
-        <div className="mb-4 rounded-xl border-l-4 border-blue-600 bg-blue-50 p-4 text-sm"><h3 className="font-bold text-blue-900">Planeje antes de enviar</h3><p className="mt-2">Use preço de venda, custo unitário e despesas para analisar a margem e o ponto de equilíbrio. A prévia abaixo reúne os valores calculados para você conferir seu planejamento.</p><p className="mt-2 font-semibold">Preço escolhido: <ValorMonetario valor={d.preco}/> · Custo unitário: <ValorMonetario valor={d.plano_comercial?.custo_unitario ?? p.custo_unitario}/> · Caixa atual: <ValorMonetario valor={empresa.caixa}/></p></div>
+        <nav aria-label="Etapas de Finanças" className="mb-3 flex flex-wrap gap-2">{[["credito","Crédito e tributos"],["compras","Compras a prazo"],["vendas","Vendas a prazo"]].map(([id,nome])=><button key={id} type="button" aria-pressed={etapaFinanceira===id} onClick={()=>setEtapaFinanceira(id)} className={`rounded-lg px-3 py-2 text-sm font-semibold ${etapaFinanceira===id ? "bg-corporativo text-white" : "bg-slate-100 text-corporativo"}`}>{nome}</button>)}</nav>
+        <div className="mb-3 rounded-lg bg-slate-50 px-3 py-2 text-xs"><p className="font-semibold">Preço escolhido: <ValorMonetario valor={d.preco}/> · Custo unitário: <ValorMonetario valor={d.plano_comercial?.custo_unitario ?? p.custo_unitario}/> · Caixa atual: <ValorMonetario valor={empresa.caixa}/></p></div>
         {d.emprestimo > 0 && <Aviso tipo="info">Atenção: dinheiro do banco tem custo alto e pode comprometer a empresa. Juros estimados deste pedido: até <ValorMonetario valor={Math.min(d.emprestimo, Math.max(0, p.limite_credito - empresa.divida)) * p.taxa_juros_mensal}/> por mês, além da dívida atual, à taxa de {percentual(p.taxa_juros_mensal, 2)}. Os juros reduzem lucro e capital de giro, podem subir com a Selic e continuam enquanto houver saldo devedor. O principal precisa ser devolvido; crédito depende do caixa e do limite disponível.</Aviso>}
-        <Secao titulo="Finanças e tributos">
+        <Secao titulo="Finanças e tributos" oculto={etapaFinanceira !== "credito"}>
           <Campo
             rotulo="Novo empréstimo"
             ajuda={`Juros de ${percentual(p.taxa_juros_mensal, 2)} ao mês. Limite disponível: ${reais(Math.max(0, p.limite_credito - empresa.divida))}.`}
@@ -685,7 +691,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
 
         </div>
         {turma.modo_jogo === "LEGADO" && ["producao", "logistica"].includes(area) && <div className="rounded-xl border-l-4 border-blue-600 bg-blue-50 p-5"><h3 className="font-bold">{area === "producao" ? "Capacidade no modelo básico" : "Logística no modelo básico"}</h3><p className="mt-2 text-sm">{area === "producao" ? "Neste modelo, a capacidade depende da equipe de funcionários. Estoques, máquinas e planejamento de produção são controles do modelo Empresa tradicional." : "Este modelo não possui escolha de frete ou entregas. Esses controles estão disponíveis no modelo Empresa tradicional; no modelo Startup, a operação é digital."}</p><p className="mt-2 text-sm">Confira a capacidade e os gastos previstos na prévia abaixo.</p></div>}
-        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
+        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao etapaFinanceira={etapaFinanceira} rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
 
         <details className="rounded-lg bg-slate-50 p-4 text-sm">
           <summary className="cursor-pointer font-semibold text-corporativo">Consultar prévia financeira e operacional</summary><div className="mt-4">
@@ -734,16 +740,16 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}
         {!somenteLeitura && <><p className="text-xs text-slate-600">O rascunho pode ficar incompleto. No envio final, o programa informa as pendências e impede o envio até que sejam resolvidas.</p>
         {!!painel.pendencias_envio?.length && <Aviso tipo="info"><p className="font-bold">Pendências da versão salva:</p><ul className="list-disc pl-5">{painel.pendencias_envio.map(p=><li key={p}>{p}</li>)}</ul></Aviso>}
-        <div className="flex flex-wrap justify-end gap-2"><Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho</Botao>{proxima&&<Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para a próxima etapa →</Botao>}<Botao variante="final" type="submit" carregando={carregando} disabled={conflito}>Enviar decisão final</Botao></div></>}
+        {destinoAcoes && createPortal(<div className="flex flex-wrap items-center justify-end gap-2" aria-label="Ações da decisão">{mensagem && <span role="status" className={`mr-auto text-sm ${mensagem.tipo === "erro" ? "text-red-700" : "text-corporativo"}`}>{mensagem.texto}</span>}<Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho</Botao>{proxima&&<Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para a próxima etapa →</Botao>}<Botao variante="final" type="submit" form={`form-decisao-${empresa.id}`} carregando={carregando} disabled={conflito}>Enviar decisão final</Botao></div>, destinoAcoes)}</>}
       </form>
       {confirmandoEnvio && <Modal titulo="Confirmar decisão final" aoFechar={()=>setConfirmandoEnvio(false)}><p className="text-sm">Esta é a decisão final da equipe para este mês? Após enviar, todas as escolhas ficam visíveis em modo de leitura até a próxima rodada. Use o rascunho se ainda precisar alterar algo.</p><div className="mt-6 flex justify-end gap-3"><Botao variante="secundario" onClick={()=>setConfirmandoEnvio(false)}>Voltar e revisar</Botao><Botao variante="final" carregando={carregando} onClick={()=>{setConfirmandoEnvio(false);salvar(false);}}>Confirmar envio final</Botao></div></Modal>}
     </Cartao>
   );
 }
 
-function Secao({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+function Secao({ titulo, children, oculto = false }: { titulo: string; children: React.ReactNode; oculto?: boolean }) {
   return (
-    <fieldset className="missao-decisao">
+    <fieldset hidden={oculto} className="missao-decisao">
       <legend className="cabecalho-missao"><IconeMissao titulo={titulo}/>{titulo}</legend>
       <div className="grid gap-4 sm:grid-cols-2">{children}</div>
     </fieldset>
