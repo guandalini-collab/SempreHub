@@ -662,3 +662,8 @@ A barra de prazo no painel docente representa somente as últimas 24 horas da da
 ### Critérios de coerência estratégica
 
 As incompatibilidades estruturadas podem reduzir a demanda comercial: SWOT e posicionamento, 4%; BCG e quadrante, 3%; público e preço, 5%; cobertura, 3%; canais, 4%; mídias, 4%. A redução total é limitada a 20%. Diagnósticos de consulta e textos livres não recebem penalidades automáticas. Demanda, capacidade, custos e concorrência continuam influenciando os resultados; nenhuma escolha garante lucro.
+
+
+### Navegação focada dos alunos
+
+As subabas de Departamentos exibem uma área por vez. Ao trocar de submenu, o conteúdo selecionado aparece no topo. A comparação de concorrentes fica na subaba Concorrentes de Estratégia. O checklist completo de revisões e a prévia financeira podem ser expandidos quando necessários; a confirmação da área permanece visível. Esses controles de apresentação não alteram as regras de envio ou os dados salvos.

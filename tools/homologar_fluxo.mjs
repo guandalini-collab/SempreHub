@@ -2,7 +2,7 @@ import {createRequire} from 'node:module';
 import fs from 'node:fs';import os from 'node:os';import path from 'node:path';import assert from 'node:assert/strict';
 const require=createRequire(import.meta.url);
 const {chromium,request}=require(path.join(os.homedir(),'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'));
-const base='http://127.0.0.1:8000';const out='tmp/qa';fs.mkdirSync(out,{recursive:true});
+const base=process.env.QA_BASE_URL || 'http://127.0.0.1:8000';const out='tmp/qa';fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({headless:true,channel:'chrome'});
 const erros=[];const stamp=Date.now();const evidencias=[];
 const http=await request.newContext();
@@ -19,28 +19,54 @@ async function equipe(modo){
  for(const aluno of alunos.slice(0,2))await req(`/api/aluno/empresas/${id}/lider`,aluno,'POST',{aluno_id:alunos[0].usuario.id,rodada:1});
  return {turma,id,alunos};
 }
-async function abrir(sessao,url){const ctx=await browser.newContext({viewport:{width:1440,height:1000}});await ctx.addInitScript(s=>{localStorage.setItem('semprehub.token',s.token);localStorage.setItem('semprehub.usuario',JSON.stringify(s.usuario));},sessao);const p=await ctx.newPage();p.on('pageerror',e=>erros.push(e.message));await p.goto(base+url);await p.waitForLoadState('networkidle');return p;}
-async function fecharAvisos(page){await page.waitForTimeout(250);for(let i=0;i<3 && await page.getByRole('dialog').count();i++){await page.getByRole('dialog').getByRole('button',{name:'Fechar',exact:true}).click();await page.waitForTimeout(100);}}
+async function abrir(sessao,url){const ctx=await browser.newContext({viewport:{width:1440,height:1000}});await ctx.addInitScript(s=>{localStorage.setItem('semprehub.token',s.token);localStorage.setItem('semprehub.usuario',JSON.stringify(s.usuario));},sessao);const p=await ctx.newPage();p.on('pageerror',e=>erros.push(e.message));await p.goto(base+url);await p.waitForLoadState('networkidle');await p.locator('button[aria-expanded="false"]').evaluateAll(xs=>xs.forEach(x=>x.click()));return p;}
+async function fecharAvisos(page){await page.waitForTimeout(250);await page.locator('button[aria-expanded="false"]').evaluateAll(xs=>xs.forEach(x=>x.click()));for(let i=0;i<3 && await page.getByRole('dialog').count();i++){await page.getByRole('dialog').getByRole('button',{name:'Fechar',exact:true}).click();await page.waitForTimeout(100);}}
 async function menus(page){await fecharAvisos(page);const botoes=page.locator('button[aria-controls^="secao-"]');const ids=await botoes.evaluateAll(xs=>xs.map(x=>x.getAttribute('aria-controls')));for(const id of [...new Set(ids)]){await page.locator(`button[aria-controls="${id}"]`).first().click();await page.waitForTimeout(80);assert.equal(await page.locator('[id^="secao-"]:visible').count(),1,'Painel duplicado em '+id);}evidencias.push(`Menus: ${ids.length} submenus conferidos`);}
 const anon=await browser.newPage();await anon.goto(base);assert.equal(await anon.getByText('Manuais',{exact:true}).count(),0);for(const nome of ['aluno','professor','midias'])assert.equal((await anon.request.get(base+`/manuais/manual-${nome}.pdf`)).status(),401);
 for(const modo of ['TRADICIONAL','STARTUP']){
  console.log('Homologando '+modo);const e=await equipe(modo);const lider=await abrir(e.alunos[0],`/#/empresa/${e.id}`);const membro=await abrir(e.alunos[1],`/#/empresa/${e.id}`);
  await lider.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await membro.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();
- const preco=lider.getByRole('slider',{name:'Preço de venda',exact:true});await preco.waitFor();assert(!(await preco.isDisabled()));assert(await membro.getByRole('slider',{name:'Preço de venda',exact:true}).isDisabled());
- await preco.evaluate(el=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'123');el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));});const salvo=lider.waitForResponse(r=>r.url().endsWith(`/api/aluno/empresas/${e.id}/decisao`) && r.request().method()==='PUT');await lider.getByRole('button',{name:'Salvar rascunho',exact:true}).click();assert((await salvo).ok());
- await lider.reload();await lider.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();assert.equal(await lider.getByRole('slider',{name:'Preço de venda',exact:true}).inputValue(),'123');
- await membro.reload();await membro.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();assert.equal(await membro.getByRole('slider',{name:'Preço de venda',exact:true}).inputValue(),'123');
+ const preco=lider.getByRole('spinbutton',{name:'Preço de venda',exact:true});await preco.waitFor();assert(!(await preco.isDisabled()));assert(await membro.getByRole('spinbutton',{name:'Preço de venda',exact:true}).isDisabled());
+ await preco.fill('123');const salvo=lider.waitForResponse(r=>r.url().endsWith(`/api/aluno/empresas/${e.id}/decisao`) && r.request().method()==='PUT');await lider.getByRole('button',{name:'Salvar rascunho',exact:true}).click();assert((await salvo).ok());
+ await lider.reload();await fecharAvisos(lider);await lider.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();assert.equal(await lider.getByRole('spinbutton',{name:'Preço de venda',exact:true}).inputValue(),'123');
+ await membro.reload();await fecharAvisos(membro);await membro.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();assert.equal(await membro.getByRole('spinbutton',{name:'Preço de venda',exact:true}).inputValue(),'123');
  await lider.getByRole('button',{name:'Enviar decisão final',exact:true}).click();await lider.getByRole('button',{name:'Confirmar envio final',exact:true}).click();await lider.getByText(/Você não pode enviar/).first().waitFor();
  const painel=await req(`/api/aluno/empresas/${e.id}`,e.alunos[0]);
- const completa={rodada:1,versao:painel.equipe.versao_decisao,rascunho:false,preco:123,marketing:0,pd:0,networking:0,contratar:3,demitir:0,emprestimo:0,amortizacao:0,analise_financeira:'Comparar margem, custos, estoque e caixa antes de expandir.',revisao_areas:{decisoes:true,financas:true,producao:true,logistica:true},simulacao:{producao:100,comprar_mp:100,manutencao:1000,treinamento:300,salario:2100,beneficio:150,horas_extras:0,modal:'PADRAO',capacidade_nuvem:100}};
- await req(`/api/aluno/empresas/${e.id}/decisao`,e.alunos[0],'PUT',{...completa,rascunho:true});await lider.reload();await lider.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await lider.getByRole('button',{name:'Enviar decisão final',exact:true}).click();const enviado=lider.waitForResponse(r=>r.url().endsWith(`/api/aluno/empresas/${e.id}/decisao`) && r.request().method()==='PUT');await lider.getByRole('button',{name:'Confirmar envio final',exact:true}).click();assert((await enviado).ok());
- for(const p of [lider,membro]){await p.reload();await p.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await p.getByText(/Decisões salvas! Modo de leitura ativado/).waitFor();assert(await p.getByRole('slider',{name:'Preço de venda',exact:true}).isDisabled());}
+ const completa={rodada:1,versao:painel.equipe.versao_decisao,rascunho:false,preco:123,marketing:0,pd:0,networking:0,contratar:3,demitir:0,emprestimo:0,amortizacao:0,revisao_areas:{decisoes:true,financas:true,producao:true,logistica:true},simulacao:{producao:100,comprar_mp:100,manutencao:1000,treinamento:300,salario:2100,beneficio:150,horas_extras:0,modal:'PADRAO',capacidade_nuvem:100}};
+ // Percorre a interface como aluno: decisões reais digitadas em cada departamento.
+ const departamento=async nome=>{await lider.getByRole('navigation',{name:'Subabas dos departamentos'}).getByRole('button',{name:nome,exact:true}).click();};
+ await departamento('RH');
+ await lider.getByRole('spinbutton',{name:'Contratar funcionários',exact:true}).fill('3');
+ await lider.locator('select').filter({has:lider.getByRole('option',{name:'Definir salário da empresa',exact:true})}).selectOption('PROPRIO');
+ await lider.getByRole('spinbutton',{name:'salario',exact:true}).fill('2100');
+ await lider.getByRole('spinbutton',{name:'beneficio',exact:true}).fill('150');
+ await lider.getByRole('spinbutton',{name:'treinamento',exact:true}).fill('300');
+ await departamento('Produção');
+ if(modo==='TRADICIONAL'){
+   await lider.getByRole('spinbutton',{name:'producao',exact:true}).fill('100');
+   await lider.getByRole('spinbutton',{name:'comprar mp',exact:true}).fill('100');
+   await lider.getByRole('spinbutton',{name:'manutencao',exact:true}).fill('1000');
+ }else await lider.getByRole('spinbutton',{name:'capacidade nuvem',exact:true}).fill('100');
+ for(const nome of ['Produtos e marketing','Finanças','Produção',...(modo==='TRADICIONAL'?['Logística']:[])]){
+   await departamento(nome);await lider.getByRole('checkbox',{name:'Conferi os valores desta área',exact:true}).check();
+ }
+ await lider.getByRole('button',{name:'Salvar rascunho',exact:true}).click();
+ await lider.getByText(/Rascunho salvo/).first().waitFor();
+ await lider.reload();await fecharAvisos(lider);await lider.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await lider.getByRole('button',{name:'Enviar decisão final',exact:true}).click();const enviado=lider.waitForResponse(r=>r.url().endsWith(`/api/aluno/empresas/${e.id}/decisao`) && r.request().method()==='PUT');await lider.getByRole('button',{name:'Confirmar envio final',exact:true}).click();assert((await enviado).ok());
+ for(const p of [lider,membro]){await p.reload();await fecharAvisos(p);await p.getByRole('button',{name:'Produtos e marketing',exact:false}).first().click();await p.getByText(/Decisões salvas! Modo de leitura ativado/).waitFor();assert(await p.getByRole('spinbutton',{name:'Preço de venda',exact:true}).isDisabled());}
  const resposta=await req(`/api/professor/turmas/${e.turma.id}/fechar-rodada`,prof,'POST',{rodada:1,forcar:true,evento:'NENHUM'});assert.equal(resposta.turma.rodada_atual,2);
  const resultado=(await req(`/api/aluno/empresas/${e.id}`,e.alunos[0])).resultados[0];assert.equal(resultado.engine_version,'2.0.0-deterministic-indicators');assert(resultado.detalhes_simulacao.operacao.enps>0);
  await lider.reload();await menus(lider);await lider.getByRole('button',{name:/Manuais · baixar PDF/}).click();assert.equal(await lider.getByRole('link',{name:/Baixar PDF:/}).count(),2);
  const docente=await abrir(prof,`/#/turma/${e.turma.id}`);await menus(docente);await docente.getByRole('button',{name:/Manuais · baixar PDF/}).click();assert.equal(await docente.getByRole('link',{name:/Baixar PDF:/}).count(),3);
  for(const page of [lider,docente]){const links=page.getByRole('link',{name:/Baixar PDF:/});for(let i=0;i<await links.count();i++){const baixa=page.waitForEvent('download');await links.nth(i).click();assert.equal(await (await baixa).failure(),null);}}
  const popupPromise=docente.waitForEvent('popup');const abriu=docente.waitForResponse(r=>r.url().endsWith('/api/manuais/manual-professor.pdf'));await docente.getByRole('link',{name:'Visualizar: Manual do professor',exact:true}).click();assert.equal((await abriu).status(),200);const preview=await popupPromise;await preview.waitForURL(url=>url.protocol==='blob:');await preview.close();
+ await lider.getByRole('button',{name:'SWOT (FOFA)',exact:true}).click();
+ await lider.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
+ await lider.getByRole('button',{name:'PESTEL',exact:true}).first().click();
+ const tituloAnalise=await lider.locator('h2[tabindex="-1"]').boundingBox();
+ assert(tituloAnalise && tituloAnalise.y>=0 && tituloAnalise.y<500,'Análise selecionada deve aparecer no topo visível');
+ assert.equal(await lider.locator('[id^="secao-"]:visible').count(),1);
+ await lider.screenshot({path:`${out}/${modo.toLowerCase()}-analise-foco.png`});
  await lider.getByRole('button',{name:/Histórico/,exact:false}).first().click();await lider.screenshot({path:`${out}/${modo.toLowerCase()}-historico.png`,fullPage:true});
  // Segunda rodada extrema: produção zero, sem funcionários e caixa em déficit.
  const atual=await req(`/api/aluno/empresas/${e.id}`,e.alunos[0]);await req(`/api/aluno/empresas/${e.id}/decisao`,e.alunos[0],'PUT',{...completa,rodada:2,versao:atual.equipe.versao_decisao,contratar:0,demitir:atual.empresa.funcionarios,marketing:100000,simulacao:{...completa.simulacao,producao:0,comprar_mp:0,manutencao:0,treinamento:0,beneficio:0,capacidade_nuvem:0}});

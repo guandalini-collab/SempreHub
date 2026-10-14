@@ -36,7 +36,7 @@ import type { Decisao, DecisaoEntrada, EventoRodada, PainelAluno, PrevisaoDecisa
 import { CONFIGURACAO_MOTOR_PADRAO, DECISAO_SIMULACAO_PADRAO } from "../../tiposSimulacao";
 import type { DecisaoSimulacao } from "../../tiposSimulacao";
 
-const FERRAMENTAS = ["SWOT", "PORTER", "BCG", "PESTEL", "SEGMENTACAO"];
+const FERRAMENTAS = ["SWOT", "PORTER", "BCG", "PESTEL", "CONCORRENCIA", "SEGMENTACAO"];
 const ANALISES_APRENDIZAGEM = ["5 Forças de Porter", "PESTEL", "Análise de mercado", "SWOT (FOFA)", "Análise financeira", "Segmentação de mercado"];
 const DEPARTAMENTOS = [{id:"decisoes",titulo:"Produtos e marketing"},{id:"pd",titulo:"P&D"},{id:"rh",titulo:"RH"},{id:"estrategia",titulo:"Estratégia"},{id:"financas",titulo:"Finanças"},{id:"producao",titulo:"Produção"},{id:"logistica",titulo:"Logística"}];
 const ITENS_PAINEL = [
@@ -299,7 +299,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <SecaoPainel id={(AREAS_DECISAO.includes(secao) || ["pd", "rh"].includes(secao) || secao === "estrategia" || secao.startsWith("ferramenta-")) ? secao : "decisoes"} ativa={secao}>
         <div>
           <nav aria-label="Subabas dos departamentos" className="mb-4 flex flex-wrap gap-2">{DEPARTAMENTOS.map(d=><Botao key={d.id} variante={secao===d.id || (d.id==="estrategia" && secao.startsWith("ferramenta-")) ? "primario" : "secundario"} onClick={()=>setSecao(d.id)}>{d.titulo}</Botao>)}</nav>
-          {(secao==="estrategia" || secao.startsWith("ferramenta-")) && <nav aria-label="Ferramentas de estratégia" className="mb-4 flex flex-wrap gap-2">{FERRAMENTAS.map(f=><Botao key={f} variante={secao===`ferramenta-${f}` ? "primario" : "secundario"} onClick={()=>setSecao(`ferramenta-${f}`)}>{f==="SEGMENTACAO" ? "Segmentação" : f}</Botao>)}</nav>}
+          {(secao==="estrategia" || secao.startsWith("ferramenta-")) && <nav aria-label="Ferramentas de estratégia" className="mb-4 flex flex-wrap gap-2">{FERRAMENTAS.map(f=><Botao key={f} variante={secao===`ferramenta-${f}` ? "primario" : "secundario"} onClick={()=>setSecao(`ferramenta-${f}`)}>{f==="CONCORRENCIA" ? "Concorrentes" : f==="SEGMENTACAO" ? "Segmentação" : f}</Botao>)}</nav>}
           {encerrada ? (
             <Cartao titulo="Simulação encerrada">
               <p className="text-sm text-slate-600">
@@ -602,12 +602,12 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
       <form onSubmit={e => {e.preventDefault();setConfirmandoEnvio(true);}} className="space-y-6">
         {painel.decisao_atual?.enviada_em && <div role="status" className="sticky top-0 z-20 rounded-xl border border-emerald-300 bg-emerald-50 p-4 font-semibold text-emerald-900">🔒 Decisões salvas! Modo de leitura ativado. Aguardando o encerramento do prazo pelo professor.</div>}
         {somenteLeitura && !painel.decisao_atual?.enviada_em && <Aviso tipo="info">Você está em modo de visualização. Discuta as decisões com o líder, que registra e envia pela equipe.</Aviso>}
-        <p className="rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-900">As escolhas de Marketing, Finanças, Produção e Logística compõem uma única decisão. Ao enviar, todas as áreas preenchidas são registradas juntas.</p>
-        <div className="rounded-xl border border-blue-200 p-4"><h3 className="font-bold">Revisão antes do envio</h3><p className="mt-1 text-sm text-slate-600">Confira cada área e marque a revisão. Alterar escolhas pede nova revisão das áreas afetadas. Valores zero são escolhas válidas para ações opcionais. Todas as áreas aplicáveis precisam estar revisadas para o envio final.</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{AREAS_DECISAO.map(id => {
+        <p className="text-sm text-slate-600">Decisões da equipe · salve ao concluir esta etapa. Envie a rodada após revisar todos os departamentos.</p>
+        <div className="rounded-xl border border-blue-200 p-3"><details><summary className="cursor-pointer text-sm font-bold">Conferir revisão dos departamentos</summary><p className="mt-1 text-sm text-slate-600">Confira cada área e marque a revisão. Alterar escolhas pede nova revisão das áreas afetadas. Valores zero são escolhas válidas para ações opcionais. Todas as áreas aplicáveis precisam estar revisadas para o envio final.</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{AREAS_DECISAO.map(id => {
           const aplicavel = id !== "logistica" || turma.modo_jogo === "TRADICIONAL";
           const revisada = !!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>];
           return <button type="button" key={id} onClick={() => aoNavegar(id)} className={`rounded-lg border p-3 text-left text-sm ${aplicavel && revisada ? "border-emerald-300 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>{id === "decisoes" ? "Produtos e marketing" : id === "financas" ? "Finanças" : id === "producao" ? "Produção" : "Logística"} · {aplicavel ? revisada ? "Revisado ✓" : "Revisar →" : "Sem decisão neste modelo"}</button>;
-        })}</div><label className="mt-4 flex items-center gap-3 text-sm font-semibold"><input type="checkbox" disabled={somenteLeitura || (area === "logistica" && turma.modo_jogo !== "TRADICIONAL")} checked={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e => setD(atual => ({ ...atual, revisao_areas: { ...atual.revisao_areas, [area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)]: e.target.checked } }))} />Conferi os valores desta área</label><p className="mt-2 text-xs text-slate-500">As revisões ficam registradas ao salvar ou enviar esta versão da decisão.</p></div>
+        })}</div></details><label className="mt-3 flex items-center gap-3 text-sm font-semibold"><input type="checkbox" disabled={somenteLeitura || (area === "logistica" && turma.modo_jogo !== "TRADICIONAL")} checked={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e => setD(atual => ({ ...atual, revisao_areas: { ...atual.revisao_areas, [area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)]: e.target.checked } }))} />Conferi os valores desta área</label><p className="mt-2 text-xs text-slate-500">As revisões ficam registradas ao salvar ou enviar esta versão da decisão.</p></div>
         {turma.modo_equipe && <p className="text-sm text-slate-600">Somente o líder altera e envia. Todos podem consultar o planejamento e contribuir na discussão. O envio final será bloqueado se houver etapas obrigatórias pendentes.</p>}
         {conflito && <div className="space-y-2"><Aviso tipo="info">Outra atualização chegou enquanto você editava. Seus campos foram mantidos. Carregue a decisão salva da empresa antes de continuar; essa ação substitui os valores do formulário.</Aviso><Botao type="button" variante="secundario" disabled={carregando} onClick={carregarDecisaoSalva}>Carregar decisão salva</Botao></div>}
         <RevisaoCampos.Provider value={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]}><fieldset disabled={carregando || somenteLeitura} className={`space-y-6 ${somenteLeitura ? "opacity-50 pointer-events-none" : ""}`}>
@@ -687,8 +687,8 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         {turma.modo_jogo === "LEGADO" && ["producao", "logistica"].includes(area) && <div className="rounded-xl border-l-4 border-blue-600 bg-blue-50 p-5"><h3 className="font-bold">{area === "producao" ? "Capacidade no modelo básico" : "Logística no modelo básico"}</h3><p className="mt-2 text-sm">{area === "producao" ? "Neste modelo, a capacidade depende da equipe de funcionários. Estoques, máquinas e planejamento de produção são controles do modelo Empresa tradicional." : "Este modelo não possui escolha de frete ou entregas. Esses controles estão disponíveis no modelo Empresa tradicional; no modelo Startup, a operação é digital."}</p><p className="mt-2 text-sm">Confira a capacidade e os gastos previstos na prévia abaixo.</p></div>}
         {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
 
-        <div className="rounded-lg bg-slate-50 p-4 text-sm">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Prévia do mês</p>
+        <details className="rounded-lg bg-slate-50 p-4 text-sm">
+          <summary className="cursor-pointer font-semibold text-corporativo">Consultar prévia financeira e operacional</summary><div className="mt-4">
           {!previsao && !erroPrevisao && <p role="status">Calculando prévia…</p>}
           {erroPrevisao && (
             <div className="space-y-2">
@@ -728,6 +728,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
             </>
           )}
         </div>
+        </details>
         </fieldset></RevisaoCampos.Provider>
 
         {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}

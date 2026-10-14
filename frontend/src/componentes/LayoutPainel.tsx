@@ -47,16 +47,21 @@ export default function LayoutPainel({
 }) {
   const grupoAtivo = itens.find(i => i.id === ativa)?.grupo ?? "Menu";
   const grupos = [...new Set(itens.map(i => i.grupo ?? "Menu"))];
-  const [gruposAbertos, setGruposAbertos] = useState<string[]>(grupos);
+  const [gruposAbertos, setGruposAbertos] = useState<string[]>([grupoAtivo]);
   useEffect(() => {
     setGruposAbertos(anteriores => anteriores.includes(grupoAtivo) ? anteriores : [...anteriores, grupoAtivo]);
   }, [ativa, grupoAtivo, perfil]);
 
   const titulo = useRef<HTMLHeadingElement>(null);
+  const contextoRef = useRef<HTMLDivElement>(null);
   const anterior = useRef(ativa);
   useEffect(() => {
     if (anterior.current !== ativa) {
-      titulo.current?.focus();
+      titulo.current?.focus({ preventScroll: true });
+      if (titulo.current) {
+        const topo = window.scrollY + titulo.current.getBoundingClientRect().top;
+        window.scrollTo({ top: Math.max(0, topo - (contextoRef.current?.offsetHeight ?? 0) - 16), behavior: "instant" });
+      }
       anterior.current = ativa;
     }
   }, [ativa]);
@@ -119,7 +124,7 @@ export default function LayoutPainel({
         </div>
       </aside>
       <div className="min-w-0 space-y-6">
-        {contexto && <div className="sticky top-0 z-30 rounded-xl border border-blue-200 bg-white/95 p-4 shadow-sm backdrop-blur" aria-label="Turma e rodada atual">
+        {contexto && <div ref={contextoRef} className="sticky top-0 z-30 rounded-xl border border-blue-200 bg-white/95 p-4 shadow-sm backdrop-blur" aria-label="Turma e rodada atual">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Turma</p><p className="text-lg font-bold">{contexto.turma}</p>{contexto.empresa && <p className="text-sm text-slate-600">Sua empresa: {contexto.empresa}</p>}{contexto.codigo && <p className="text-sm text-slate-600">Código de entrada: <strong className="font-mono">{contexto.codigo}</strong></p>}</div>
             <div className="flex flex-wrap items-center gap-3">{contexto.caixa !== undefined && <div><p className="text-xs text-slate-500">Caixa disponível</p><p className={`text-xl font-bold tabular-nums ${contexto.caixa >= 0 ? "text-emerald-700" : "text-red-700"}`}>{contexto.caixa.toLocaleString("pt-BR", {style:"currency",currency:"BRL"})}</p><p className="text-xs text-amber-800">{contexto.alertas ? `${contexto.alertas} pendência(s) de consistência` : "Sem pendências registradas"}</p></div>}<div><p className="font-bold text-corporativo">Rodada {Math.min(rodada, total)} de {total}</p><p className="text-sm text-slate-600">{contexto.status}</p></div><button type="button" onClick={() => { const grupo = itens.find(i => i.id === "rodada")?.grupo ?? "Menu"; setGruposAbertos(anteriores => anteriores.includes(grupo) ? anteriores : [...anteriores, grupo]); aoSelecionar("rodada"); }} hidden={perfil === "Professor"} className="rounded-lg bg-hub px-4 py-3 text-sm font-bold text-white hover:bg-blue-800">Abrir rodada atual →</button><a href="#/" className="rounded-lg border border-slate-300 px-3 py-3 text-sm font-semibold">Trocar turma</a></div>
@@ -129,7 +134,7 @@ export default function LayoutPainel({
           <h2
             ref={titulo}
             tabIndex={-1}
-            className="text-2xl font-bold outline-none"
+            className="scroll-mt-40 text-2xl font-bold outline-none"
           >
             {item.titulo}
           </h2>

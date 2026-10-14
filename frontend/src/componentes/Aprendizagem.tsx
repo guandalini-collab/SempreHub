@@ -259,10 +259,10 @@ export function BibliotecaAprendizagem({ rodada, modo, empresaId, mercadoSeparad
 
   return (
     <Cartao
-      titulo="Biblioteca de aprendizagem"
+      titulo={conteudo === "ANALISES" && ferramenta !== undefined ? ["5 Forças de Porter", "PESTEL", "Análise de mercado", "SWOT (FOFA)", "Análise financeira", "Segmentação de mercado"][ferramenta] : "Biblioteca de aprendizagem"}
       acao={<span className="text-xs text-slate-500">Consulte antes de decidir</span>}
     >
-      <p className="mb-4 max-w-3xl text-sm leading-relaxed text-slate-600">
+      <p hidden={conteudo === "ANALISES" && ferramenta !== undefined} className="mb-4 max-w-3xl text-sm leading-relaxed text-slate-600">
         Use este material para justificar escolhas da simulação. As referências ajudam a formular hipóteses; os indicadores da sua empresa mostram o efeito de cada decisão.
         {modo === "STARTUP" ? " Em uma startup, observe também aquisição, retenção e capacidade de atendimento." : " Em uma empresa tradicional, conecte mercado, operação, estoque e caixa."}
       </p>
