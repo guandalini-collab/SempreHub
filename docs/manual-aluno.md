@@ -151,7 +151,7 @@ Se o líder precisar trocar de turma, deve transferir a liderança e aguardar su
 
 Leia **Notícias e mercado** e discuta o cenário. Ao selecionar um submenu, o painel leva ao início do conteúdo escolhido. Os grupos do menu podem ser abertos ou recolhidos. Em **Departamentos**, use as subabas para percorrer as áreas; em Estratégia, a comparação de concorrentes tem sua própria subaba **Concorrentes**.
 
-Na faixa inferior, **Revisão** abre a visão geral dos departamentos e **Prévia** abre as estimativas em uma janela. A confirmação da área atual permanece na faixa inferior. Fechar essas janelas não apaga as decisões. Depois, percorra as áreas:
+Na faixa inferior, **Prévia estimada** abre uma consulta que ainda não representa o resultado da rodada. A revisão dos conjuntos de decisões e o envio definitivo ficam exclusivamente em **Conferir e enviar**. Fechar a prévia não apaga as escolhas. Percorra as áreas:
 
 1. **Produtos e marketing:** preços, canais, campanhas, posicionamento e mix de cada produto.
 2. **Ferramentas e segmentação:** SWOT, Porter, PESTEL, concorrência, diretriz, BCG e público-alvo.
@@ -160,9 +160,9 @@ Na faixa inferior, **Revisão** abre a visão geral dos departamentos e **Prévi
 5. **P&D e RH:** tecnologia, contratação, demissão, remuneração e capacitação.
 6. **Logística:** frete e localização, quando disponíveis no modo Empresa tradicional.
 
-O líder pode clicar em **Salvar rascunho** ou em **Salvar e ir para a próxima etapa**. O rascunho pode ficar incompleto e ainda não representa a entrega da rodada. Os colegas consultam a versão salva, então combine momentos para revisar juntos.
+O líder pode clicar em **Salvar rascunho completo** ou em **Salvar e ir para [nome da próxima área]**. O rascunho pode ficar incompleto e ainda não representa a entrega da rodada. Os colegas consultam a versão salva, então combine momentos para revisar juntos.
 
-As áreas formam **uma única decisão da rodada**. O envio final registra o conjunto; avançar uma etapa não encerra a rodada. Depois de conferir uma área, marque **Conferi os valores desta área**. Alterar escolhas pede uma nova revisão das áreas afetadas.
+As áreas formam **uma única decisão da rodada**. O envio final registra o conjunto; avançar uma etapa não encerra a rodada. Na tela **Conferir e enviar**, confirme os conjuntos Comercial/P&D/Estratégia, Produção/RH, Finanças e Logística quando aplicável. Essas confirmações correspondem aos conjuntos exigidos pelas regras existentes. Alterar escolhas remove a confirmação dos conjuntos afetados.
 
 ### Trava de envio final
 
@@ -272,7 +272,7 @@ Antes de começar, confirme o nome da turma com o professor, entre nela, forme s
 6. Em **Finanças**, escolha crédito, amortização, prazos e regime quando aplicáveis. Analise os números da equipe para definir as decisões; não há texto de análise financeira obrigatório para enviar a rodada.
 7. Em **Produção**, compare capacidade, demanda esperada, pessoas, estoques e investimento. Escolha contratações, demissões, horas extras e compras quando disponíveis no seu modelo.
 8. Em **Logística**, quando disponível, selecione a entrega. No modelo em que essa decisão não se aplica, o submenu não é apresentado como uma obrigação.
-9. Confirme a revisão de cada área depois de conferir seus campos. Clique em **Salvar rascunho** para guardar sem entregar, ou **Salvar e ir para a próxima etapa** para continuar.
+9. Abra **Conferir e enviar** e confirme os conjuntos depois de conferir seus campos. Clique em **Salvar rascunho completo** para guardar sem entregar, ou **Salvar e ir para [nome da próxima área]** para continuar.
 10. Faça a conferência final e clique em **Enviar decisão final**. Confirme que a tela informa envio concluído. Aguarde o professor encerrar a rodada para consultar resultados.
 
 **Exemplo de organização:** uma equipe divide a leitura do mercado, a comparação de custos e a estimativa de capacidade entre seus integrantes. O líder registra as escolhas acordadas. Essa divisão é uma forma de colaboração, não uma transferência de permissão de edição.
@@ -747,7 +747,7 @@ A equipe deve interpretar a origem do custo ao definir preço, margem, produçã
 
 ## Painel de comando executivo
 
-O menu lateral abre uma área de trabalho por vez. Os cartões brancos sobre fundo claro separam decisões, consultas e resultados. Os cabeçalhos azuis e ícones identificam as missões de cada departamento. O foco em ciano destaca o campo em edição; o botão laranja de envio final mantém a confirmação e a trava de leitura já previstas nas regras.
+O menu lateral abre uma área de trabalho por vez. Os cartões brancos sobre fundo claro separam decisões, consultas e resultados. Títulos escuros e divisórias discretas identificam os departamentos; o ciano destaca a seleção atual. O foco em ciano destaca o campo em edição; o botão laranja de envio final mantém a confirmação e a trava de leitura já previstas nas regras.
 
 SWOT apresenta Forças e Oportunidades na linha superior, Fraquezas e Ameaças na inferior. PESTEL e Porter usam blocos responsivos. No celular, os blocos se reorganizam em uma coluna, sem mudar os dados.
 
@@ -762,7 +762,15 @@ As incompatibilidades estruturadas podem reduzir a demanda comercial: SWOT e pos
 
 ### Área de trabalho do aluno
 
-No computador, o menu lateral, o resumo da empresa e as ações da decisão permanecem visíveis. Somente o conteúdo da etapa atual rola, quando necessário. A faixa inferior reúne Salvar rascunho, Salvar e ir para a próxima etapa e Enviar decisão final. Em Finanças, selecione Crédito e tributos, Compras a prazo ou Vendas a prazo para preencher uma etapa por vez. A troca de submenu volta ao início do conteúdo e mantém as escolhas ainda em edição. No celular, toque em Menu para escolher uma área; o menu se recolhe após a seleção. O grupo ativo fica aberto e os demais podem ser expandidos conforme a necessidade.
+No computador, o menu lateral, o resumo da empresa, o prazo de Brasília e as ações da decisão permanecem visíveis. O percurso é Começar a rodada, Decisões, Estratégia e público, Conferência e envio e Resultados. A tela inicial oferece acesso direto ao mercado, ao planejamento e à conferência. Valores reaproveitados são ponto de partida, não uma decisão já enviada.
+
+A faixa inferior informa alterações ainda não salvas ou a versão do rascunho completo. Salvar rascunho completo guarda todos os departamentos. O botão de continuação identifica a próxima área e só avança após o salvamento. Trocar de submenu mantém as escolhas em edição; recarregar ou fechar a página com alterações ainda não salvas exige atenção ao aviso do navegador. Não há salvamento automático garantido.
+
+Em Finanças, escolha Crédito e tributos, Compras a prazo no modelo Tradicional ou Vendas a prazo. No modelo Startup, Investidores reúne aporte e valuation. Em RH, use Contratar e demitir, Salário e benefícios ou Treinamento e horas extras. Na Produção tradicional, use Volume e insumos, Máquinas e manutenção e Localização. A entrega física não aparece nas decisões do modelo Startup.
+
+A BCG separa Dados do produto, Fonte e registro, Produtos registrados e Matriz gráfica. A segmentação separa Perfil do público, Preço e região, Canais de compra e Mídias do público; a busca e a paginação ajudam a encontrar mídias sem percorrer uma lista longa. Notícias, relatórios e indicadores também são consultados em partes. Gráficos são selecionados por assunto.
+
+O envio definitivo aparece apenas em Conferir e enviar e mantém a confirmação final e as validações do servidor. Depois do envio, os valores ficam bloqueados para edição, mas a navegação de consulta continua disponível. Integrantes sem permissão de decisão consultam as escolhas do líder. Investimentos opcionais podem ser zero. No celular ou com ampliação de acessibilidade, o conteúdo pode exigir rolagem para preservar a legibilidade; informações não são cortadas para caber artificialmente.
 
 
 ### Etapas curtas de Produtos e Marketing

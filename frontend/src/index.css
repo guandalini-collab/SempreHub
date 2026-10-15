@@ -187,3 +187,78 @@
 .estacao-aluno .produto-etapa .p-4 { padding: .75rem; }
 .estacao-aluno .produto-etapa label.rounded-xl { padding: .5rem .75rem; }
 .estacao-aluno .produto-etapa label.rounded-xl { padding-top: .35rem; padding-bottom: .35rem; }
+
+/* Hierarquia serena, restrita à área autenticada do aluno. */
+.painel-executivo:has(.estacao-aluno) > header { background: #fff; color: #18344c; border-bottom: 1px solid #e2e8f0; }
+.painel-executivo:has(.estacao-aluno) > header p { color: #475569; }
+.painel-executivo:has(.estacao-aluno) > header button { color: #18344c; }
+.estacao-aluno > aside { background: #fff; color: #18344c; border: 1px solid #e2e8f0; box-shadow: none; }
+.estacao-aluno #menu-painel button { color: #334155; border: none; border-left: 3px solid transparent; box-shadow: none; background: transparent; padding: .5rem .6rem; }
+.estacao-aluno #menu-painel button[aria-expanded] { font-size: .75rem; color: #475569; }
+.estacao-aluno #menu-painel button[aria-expanded="true"] { color: #18344c; }
+.estacao-aluno #menu-painel button:hover { background: #f1f5f9; color: #18344c; }
+.estacao-aluno #menu-painel button[aria-current="page"] { background: #e8f7f8; border-left-color: #0AADBF; color: #164b53; font-weight: 700; }
+.estacao-aluno #menu-painel [id^="submenu-"] { border-color: #e2e8f0; margin-left: .25rem; padding-left: .25rem; }
+.estacao-aluno .cartao-executivo > div:first-child:has(> h2),
+.estacao-aluno .cabecalho-missao { background: #fff; color: #18344c; border-bottom: 1px solid #e2e8f0; border-radius: 0; box-shadow: none; }
+.estacao-aluno .icone-missao { display: none; }
+.estacao-aluno .missao-decisao { border: none; box-shadow: none; }
+.estacao-aluno .missao-decisao > legend { padding-left: 0; }
+.estacao-aluno .quadros-analise > * { background: #fff; box-shadow: none; border-top: 2px solid #cbd5e1; min-height: 0; }
+.estacao-aluno .acao-final { box-shadow: none; border-radius: .5rem; }
+.estacao-aluno .acao-final:hover:not(:disabled) { transform: none; }
+.estacao-aluno .prazo-estacao { margin-top: .2rem; color: #475569; }
+.estacao-aluno .barra-decisao { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.estacao-aluno .situacao-rascunho { flex: 1; min-width: 180px; font-size: .8rem; color: #475569; }
+.estacao-aluno .situacao-rascunho[role="alert"] { color: #b91c1c; }
+.estacao-aluno .consulta-previa { font-size: .8rem; color: #034AA6; text-decoration: underline; padding: .4rem; }
+.estacao-aluno .roteiro-rodada { margin: 1rem 0; background: #fff; border: 1px solid #e2e8f0; border-radius: .75rem; }
+.estacao-aluno .roteiro-rodada li { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid #f1f5f9; }
+.estacao-aluno .roteiro-rodada li:last-child { border-bottom: 0; }
+.estacao-aluno .roteiro-rodada p { font-size: .85rem; color: #64748b; }
+.estacao-aluno .roteiro-rodada button { margin-left: auto; padding: .5rem; color: #034AA6; font-weight: 600; }
+.estacao-aluno .numero-etapa { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; background: #f1f5f9; color: #334155; flex-shrink: 0; }
+.estacao-aluno .resumo-conferencia { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .75rem; padding: 1rem 0; }
+.estacao-aluno .resumo-conferencia span { font-size: .8rem; color: #475569; }
+.estacao-aluno .resumo-conferencia strong { display: block; color: #18344c; font-size: 1rem; }
+.estacao-aluno .lista-conferencia { margin: .75rem 0; }
+.estacao-aluno .lista-conferencia label { display: flex; align-items: center; gap: .65rem; padding: .65rem 0; border-bottom: 1px solid #e2e8f0; font-size: .85rem; }
+.estacao-aluno .lista-conferencia button { margin-left: auto; color: #034AA6; font-size: .8rem; }
+.estacao-aluno .etapas-curtas { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .75rem; }
+.estacao-aluno .etapas-curtas button { padding: .4rem .65rem; border: 1px solid #e2e8f0; border-radius: .4rem; font-size: .8rem; background: #fff; color: #475569; }
+.estacao-aluno .etapas-curtas button[aria-pressed="true"] { border-color: #0AADBF; background: #e8f7f8; color: #164b53; }
+.estacao-aluno .origem-diagnostico { font-size: .8rem; color: #64748b; margin-bottom: .5rem; }
+.estacao-aluno .ferramenta-compacta { border: none; background: white; padding: .5rem; margin-top: 0; }
+.estacao-aluno .ferramenta-compacta > h3, .estacao-aluno .ferramenta-compacta > p { display: none; }
+@media(max-width:767px) { .estacao-aluno .resumo-conferencia { grid-template-columns: repeat(2,minmax(0,1fr)); } .estacao-aluno .roteiro-rodada li { padding: .65rem; gap: .5rem; } }
+.estacao-aluno .cartao-executivo > div:first-child > h2 { color: #18344c; }
+.estacao-aluno .barra-decisao > button.bg-marinho { background: #fff; color: #034AA6; border: 1px solid #cbd5e1; }
+.estacao-aluno .barra-decisao > button.bg-hub { background: #034AA6; color: #fff; }
+.estacao-aluno .quadros-analise { gap: .65rem; }
+.estacao-aluno .quadros-analise article { padding: .65rem; }
+.estacao-aluno .ferramenta-compacta .quadros-analise article > h5 { font-size: .85rem; }
+.estacao-aluno .ferramenta-compacta .quadros-analise article ul { font-size: .8rem; }
+.estacao-aluno .conferencia-rodada > p { margin: .25rem 0; }
+.estacao-aluno .conferencia-rodada .resumo-conferencia { padding: .65rem 0; }
+.estacao-aluno .conferencia-rodada .lista-conferencia label { padding: .5rem 0; }
+.estacao-aluno .ferramenta-compacta .quadros-analise > section { padding: .6rem; }
+.estacao-aluno .ferramenta-compacta .quadros-analise > section h4 { margin-bottom: .35rem; }
+.estacao-aluno .ferramenta-compacta .quadros-analise > section textarea { min-height: 3rem; }
+.estacao-aluno #secao-evolucao svg { max-height: 330px; width: 100%; }
+.estacao-aluno .cartao-executivo table td { padding-top: .4rem; padding-bottom: .4rem; }
+.estacao-aluno .ferramenta-compacta > div[role="region"] > h4 { margin: .3rem 0; font-size: 1rem; }
+.estacao-aluno .ferramenta-compacta > div[role="region"] > p { margin: .3rem 0; font-size: .8rem; }
+.estacao-aluno .conferencia-rodada { font-size: .85rem; }
+.estacao-aluno .lista-conferencia { margin: .35rem 0; }
+.estacao-aluno .resumo-conferencia { gap: .4rem; }
+@media(min-width:768px) { .estacao-aluno .subabas-estrategia { display: none; } }
+.estacao-aluno .area-trabalho-conteudo:has([aria-label="Informações da equipe"]) .bg-ouro\/10 { background: #f8fafc; border: 1px solid #e2e8f0; }
+.estacao-aluno #secao-equipe .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: .5rem; }
+.estacao-aluno #secao-equipe .rounded-xl.border-2 { padding: .75rem; }
+.estacao-aluno .area-trabalho-conteudo { padding-bottom: 8px; }
+.estacao-aluno .matriz-bcg { margin-top: 0; padding: .4rem; border: none; }
+.estacao-aluno .matriz-bcg > h4 { font-size: .9rem; }
+.estacao-aluno .grafico-bcg { display: block; width: min(100%, 440px); height: auto; margin-inline: auto; }
+.estacao-aluno .matriz-bcg .consulta-previa { padding: .15rem; }
+.estacao-aluno .matriz-bcg > p { margin-top: .2rem; font-size: .8rem; }
+.estacao-aluno .grafico-bcg { width: min(100%, 420px); }

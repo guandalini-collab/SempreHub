@@ -7,9 +7,9 @@ import React from "react";
 
 import { inteiro, percentual, reais, umDecimal } from "../formatos";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, PreviaSimulacao } from "../tiposSimulacao";
-import { Campo, Cartao, EntradaNumero, estiloEntrada } from "./ui";
+import { Campo, Cartao, EntradaNumero, Modal, estiloEntrada } from "./ui";
 
-export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, area = "decisoes", rodada, etapaFinanceira }: {
+export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, area = "decisoes", rodada, etapaFinanceira, etapaRH = "equipe" }: {
   modo: ModoJogo;
   valores: DecisaoSimulacao;
   aoMudar: (valores: DecisaoSimulacao) => void;
@@ -19,8 +19,11 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
   mixSelecionado?: boolean;
   area?: string;
   etapaFinanceira?: string;
+  etapaRH?: string;
   rodada: number;
 }) {
+  const [mostrarImpacto,setMostrarImpacto]=React.useState(false);
+  const [etapaProducao, setEtapaProducao] = React.useState("volume");
   const estudo = valores.centro_gravidade;
   const volume = estudo?.pontos.reduce((s, p) => s + p.volume, 0) ?? 0;
   const temLocalizacao = !!estudo && estudo.local_x != null && estudo.local_y != null && volume > 0;
@@ -30,21 +33,25 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
   const baseFrete = valores.modal === "RAPIDO" ? config.frete_rapido : valores.modal === "ECONOMICO" ? config.frete_economico : config.frete_padrao;
   const mudar = <K extends keyof DecisaoSimulacao>(campo: K, valor: DecisaoSimulacao[K]) => aoMudar({ ...valores, [campo]: valor });
   return <div className="space-y-6">
+    {area === "producao" && modo === "TRADICIONAL" && <nav aria-label="Etapas de Produção" className="etapas-curtas">{[["volume","Volume e insumos"],["maquinas","Máquinas e manutenção"],["localizacao","Localização"]].map(([id,t])=><button type="button" key={id} aria-pressed={etapaProducao===id} onClick={()=>setEtapaProducao(id)}>{t}</button>)}</nav>}
+    {mostrarImpacto && <Modal titulo="Impacto estimado da compra de máquinas" aoFechar={()=>setMostrarImpacto(false)}>        <p className="mb-2 text-sm text-slate-600">Vida útil: {config.vida_util_maquina} meses · compra opcional · ativação na rodada seguinte.</p><dl className="mt-2 grid gap-2 rounded-lg bg-slate-50 p-2 text-sm sm:grid-cols-2"><div><dt>Investimento total</dt><dd className="font-bold"><ValorMonetario valor={valores.comprar_maquinas * config.preco_maquina}/></dd></div><div><dt>Capacidade adicional nominal</dt><dd className="font-bold">{inteiro(valores.comprar_maquinas * config.capacidade_maquina)} un./mês</dd></div><div><dt>Disponível no mês</dt><dd className="font-bold">{rodada + 1}</dd></div><div><dt>Depreciação mensal estimada</dt><dd className="font-bold"><ValorMonetario valor={valores.comprar_maquinas * config.preco_maquina / config.vida_util_maquina}/></dd></div></dl><p className="mt-2 text-xs text-slate-600">A compra reduz o caixa; a depreciação afeta o lucro nos meses de operação.</p></Modal>}
     {modo === "TRADICIONAL" && <>
-      <Secao titulo="Horas extras opcionais da equipe" oculto={area !== "rh"}>
+      <Secao titulo="Horas extras opcionais da equipe" oculto={area !== "rh" || etapaRH !== "desenvolvimento"}>
         <Campo rotulo="Horas extras por funcionário neste mês" ajuda="Pode deixar em zero. Até 40 h por empregado, com adicional de 50% e encargos. Base didática: salário / 220 h. Aumenta a capacidade de trabalho, mas máquinas e matéria-prima ainda limitam a produção; o gasto reduz lucro e caixa.">
           <ControleVisual rotulo="Horas extras por funcionário" moeda={false} valor={valores.horas_extras ?? 0} limite={40} aoMudar={(v) => mudar("horas_extras", v)} />
         </Campo>
       </Secao>
-      <Secao titulo="Produção e investimento" oculto={area !== "producao"}>
-        <p className="mb-3 rounded-lg bg-blue-50 p-3 text-sm">Vida útil contábil das máquinas nesta turma: <strong>{config.vida_util_maquina} meses</strong>. A depreciação reduz o valor contábil; manutenção e condição afetam a capacidade. Comprar máquinas é opcional, a partir do mês 3, com ativação na rodada seguinte.</p>
+      <Secao titulo="Produção e investimento" oculto={area !== "producao" || etapaProducao !== "volume"}>
         <Campo rotulo="Produção planejada" ajuda="Unidades a produzir neste mês. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><ControleVisual rotulo="producao" moeda={false} inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} limite={10000} /></Campo>
         <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar neste mês. O que não for consumido continua no estoque para as próximas rodadas."><ControleVisual rotulo="comprar mp" moeda={false} inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} limite={10000} /></Campo>
-        {rodada >= 3 ? <><Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={100} /></Campo><dl className="mt-3 grid gap-2 rounded-lg bg-blue-50 p-4 text-sm sm:grid-cols-2"><div><dt>Investimento total</dt><dd className="font-bold"><ValorMonetario valor={valores.comprar_maquinas * config.preco_maquina}/></dd></div><div><dt>Capacidade adicional nominal</dt><dd className="font-bold">{inteiro(valores.comprar_maquinas * config.capacidade_maquina)} un./mês</dd></div><div><dt>Disponível no mês</dt><dd className="font-bold">{rodada + 1}</dd></div><div><dt>Depreciação mensal estimada</dt><dd className="font-bold"><ValorMonetario valor={valores.comprar_maquinas * config.preco_maquina / config.vida_util_maquina}/></dd></div></dl><p className="mt-2 text-xs text-slate-600">A capacidade efetiva também depende de pessoas, matéria-prima e condição das máquinas. A compra reduz o caixa; a depreciação afeta o lucro nos meses de operação.</p></> : <p className="rounded-lg bg-blue-50 p-4 text-sm text-blue-900"><strong>Expansão do maquinário a partir do mês 3.</strong> Nos dois primeiros meses, planeje a produção com as máquinas iniciais e cuide da manutenção.</p>}
+      </Secao>
+      <Secao titulo="Máquinas e manutenção" oculto={area !== "producao" || etapaProducao !== "maquinas"}>
+
+        {rodada >= 3 ? <><Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={100} /></Campo><button type="button" className="consulta-previa" onClick={()=>setMostrarImpacto(true)}>Consultar impacto da compra</button></> : <p className="rounded-lg bg-blue-50 p-4 text-sm text-blue-900"><strong>Expansão do maquinário a partir do mês 3.</strong> Nos dois primeiros meses, planeje a produção com as máquinas iniciais e cuide da manutenção.</p>}
         <Campo rotulo="Manutenção do mês" ajuda="Cuida das condições das máquinas e da capacidade das próximas rodadas."><ControleVisual rotulo="manutencao"  valor={valores.manutencao} aoMudar={(v) => mudar("manutencao", v)} limite={100000} /></Campo>
 
       </Secao>
-      <div hidden={area !== "producao"}><CentroGravidade estudo={valores.centro_gravidade} aoMudar={(estudo) => mudar("centro_gravidade", estudo)} /></div>
+      <div hidden={area !== "producao" || etapaProducao !== "localizacao"}><CentroGravidade estudo={valores.centro_gravidade} aoMudar={(estudo) => mudar("centro_gravidade", estudo)} /></div>
       <Secao titulo="Logística e entregas" oculto={area !== "logistica"}>
         <Campo rotulo="Entrega" ajuda="O frete é cobrado por unidade vendida. A experiência da entrega afeta a satisfação futura.">
           <div role="radiogroup" aria-label="Transportadora" className="grid gap-3 sm:grid-cols-3">{(["RAPIDO", "PADRAO", "ECONOMICO"] as const).map(modal=><button type="button" key={modal} role="radio" aria-checked={valores.modal===modal} onClick={()=>mudar("modal",modal)} className={`rounded-xl border-2 p-4 text-left transition ${valores.modal===modal ? "border-cyan-500 bg-cyan-50 shadow-[0_0_12px_#0AADBF40]" : "border-slate-200 bg-white hover:border-cyan-300"}`}><span className="block font-bold">{modal === "RAPIDO" ? "Rápida" : modal === "PADRAO" ? "Padrão" : "Econômica"}</span><span className="text-sm"><ValorMonetario valor={modal === "RAPIDO" ? config.frete_rapido : modal === "PADRAO" ? config.frete_padrao : config.frete_economico}/> / unidade</span></button>)}</div>
@@ -60,18 +67,20 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
       <Secao titulo="Capacidade do serviço digital" oculto={area !== "producao"}>
       <Campo rotulo="Capacidade da nuvem" ajuda="Número de clientes que a operação consegue atender neste mês. Os clientes sem atendimento continuam na base, com impacto na satisfação."><ControleVisual rotulo="capacidade nuvem" moeda={false} inteiro valor={valores.capacidade_nuvem} aoMudar={(v) => mudar("capacidade_nuvem", v)} limite={10000} /></Campo>
       </Secao>
-      <Secao titulo="Investidores e financiamento" oculto={area !== "financas" || (!!etapaFinanceira && etapaFinanceira !== "credito")}>
+      <Secao titulo="Investidores e financiamento" oculto={area !== "financas" || (!!etapaFinanceira && etapaFinanceira !== "aporte")}>
       <Campo rotulo="Aporte de investidores" ajuda="Entrada de capital no caixa em troca de participação. Não é receita nem lucro e pode reduzir a participação dos fundadores."><ControleVisual rotulo="aporte"  valor={valores.aporte} aoMudar={(v) => mudar("aporte", v)} limite={100000} /></Campo>
       <Campo rotulo="Valuation antes do aporte" ajuda="Valor da empresa usado para definir a participação do investidor."><ControleVisual rotulo="valuation"  minimo={0.01} valor={valores.valuation} aoMudar={(v) => mudar("valuation", v)} limite={100000} /></Campo>
     </Secao>
       {area === "logistica" && <div className="rounded-xl bg-blue-50 p-5 text-sm"><h3 className="font-bold">Operação digital</h3><p className="mt-2">A entrega deste serviço acontece pela nuvem. Planeje a capacidade de atendimento em Produção e operação.</p></div>}
     </>}
-    <Secao titulo="Pessoas e desenvolvimento" oculto={area !== "rh"}>
+    <Secao titulo="Pessoas e desenvolvimento" oculto={area !== "rh" || etapaRH !== "remuneracao"}>
       <Campo rotulo="Salário da equipe de funcionários" ajuda={`O padrão da turma é ${reais(salarioBase)} por funcionário. Salários, benefícios e treinamento influenciam moral, qualificação e rotatividade.`}>
         <select className={estiloEntrada} value={valores.salario === null ? "PADRAO" : "PROPRIO"} onChange={(e) => mudar("salario", e.target.value === "PADRAO" ? null : salarioBase)}><option value="PADRAO">Usar salário-base da turma</option><option value="PROPRIO">Definir salário da empresa</option></select>
       </Campo>
       {valores.salario !== null && <Campo rotulo="Salário por funcionário"><ControleVisual rotulo="salario"  valor={valores.salario} aoMudar={(v) => mudar("salario", v)} limite={100000} /></Campo>}
       <Campo rotulo="Benefício por funcionário" ajuda="Valor mensal por empregado; aparece como despesa de benefícios."><ControleVisual rotulo="beneficio"  valor={valores.beneficio} aoMudar={(v) => mudar("beneficio", v)} limite={100000} /></Campo>
+    </Secao>
+    <Secao titulo="Treinamento" oculto={area !== "rh" || etapaRH !== "desenvolvimento"}>
       <Campo rotulo="Treinamento do mês" ajuda="Investimento total em capacitação dos funcionários; o desenvolvimento passa para as rodadas seguintes."><ControleVisual rotulo="treinamento"  valor={valores.treinamento} aoMudar={(v) => mudar("treinamento", v)} limite={100000} /></Campo>
     </Secao>
     {!mixSelecionado && <Secao titulo="Posicionamento e canais" oculto={area !== "decisoes"}>
@@ -122,12 +131,13 @@ export function PainelOperacional({ estado, modo }: { estado: EstadoSimulacao; m
 }
 
 export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao }) {
+  const [abaFinanceira,setAbaFinanceira] = React.useState(0);
   const { dfc, balanco } = detalhes;
   return <div className="space-y-4">
-    <ResultadoProdutos produtos={(detalhes.operacao.produtos as LinhaProduto[]|undefined)??[]}/>
+    <nav className="etapas-curtas" aria-label="Relatórios contábeis">{["Produtos","Fluxo de caixa","Balanço","Capital de giro","Operação"].map((t,n)=><button key={t} type="button" aria-pressed={abaFinanceira===n} onClick={()=>setAbaFinanceira(n)}>{t}</button>)}</nav><div hidden={abaFinanceira!==0}><ResultadoProdutos produtos={(detalhes.operacao.produtos as LinhaProduto[]|undefined)??[]}/></div>
     <p className="rounded-lg bg-sky-50 p-3 text-xs leading-relaxed text-sky-900">Lucro e caixa medem coisas diferentes. A DRE registra o resultado das vendas e despesas; o fluxo de caixa registra o dinheiro que entrou e saiu. Estoque, prazos, investimentos e financiamentos explicam as diferenças.</p>
-    <div className="grid gap-4 lg:grid-cols-2">
-      <Cartao titulo="Fluxo de caixa da rodada">
+    <div className="grid gap-4">
+      <div hidden={abaFinanceira!==1}><Cartao titulo="Fluxo de caixa da rodada">
         <ListaFinanceira linhas={[
           ["Caixa no início", dfc.caixa_inicial],
           ["Recebimentos operacionais", dfc.recebimentos],
@@ -138,8 +148,8 @@ export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao 
           ["Variação de caixa", dfc.variacao],
           ["Caixa no fim", dfc.caixa_final],
         ]} />
-      </Cartao>
-      <Cartao titulo="Balanço patrimonial ao fim da rodada">
+      </Cartao></div>
+      <div hidden={abaFinanceira!==2}><Cartao titulo="Balanço patrimonial ao fim da rodada">
         <ListaFinanceira linhas={[
           ["Disponibilidades (caixa e bancos)", balanco.disponibilidades ?? Math.max(0,balanco.caixa)],
           ["Contas a receber", balanco.receber],
@@ -154,9 +164,9 @@ export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao 
           ["Passivo + patrimônio líquido", balanco.pagar + balanco.divida + (balanco.cheque_especial ?? Math.max(0,-balanco.caixa)) + balanco.patrimonio],
           ["Necessidade de capital de giro (estoques + receber − pagar)", balanco.receber + balanco.estoques - balanco.pagar],
         ]} />
-      </Cartao>
+      </Cartao></div>
     </div>
-    <Cartao titulo="Capital de giro e liquidez">
+    <div hidden={abaFinanceira!==3}><Cartao titulo="Capital de giro e liquidez">
       <ListaFinanceira linhas={[
         ["Dinheiro disponível no caixa", balanco.caixa],
         ["Recursos presos no ciclo operacional", balanco.receber + balanco.estoques - balanco.pagar],
@@ -165,8 +175,8 @@ export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao 
       ]} />
       <p className="mt-3 text-xs text-slate-600">Estoque e vendas a prazo exigem financiamento até o dinheiro entrar. Contratação, horas extras, P&D e juros consomem caixa; máquinas geram saída de investimento. Caixa negativo exige atenção. A necessidade operacional não é dinheiro disponível.</p>
       {balanco.caixa < 0 && <p className="mt-2 font-semibold text-red-700">Caixa negativo: a empresa depende de financiamento e pode pagar cheque especial.</p>}
-    </Cartao>
-    <Cartao titulo={detalhes.modo === "STARTUP" ? "Aquisição e retenção de clientes" : "Produção e entregas da rodada"}>
+    </Cartao></div>
+    <div hidden={abaFinanceira!==4}><Cartao titulo={detalhes.modo === "STARTUP" ? "Aquisição e retenção de clientes" : "Produção e entregas da rodada"}>
       <dl className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
         {detalhes.modo === "STARTUP" ? <>
           <Operacao detalhes={detalhes} campo="clientes_iniciais" rotulo="Clientes no início" />
@@ -193,7 +203,7 @@ export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao 
         </>}
       </dl>
       {detalhes.modo === "STARTUP" && <p className="mt-3 text-xs text-slate-500">Indicadores sem uma base válida aparecem como “—”. CAC e LTV são estimativas da simulação, calculadas a partir desta rodada.</p>}
-    </Cartao>
+    </Cartao></div>
   </div>;
 }
 
@@ -221,7 +231,8 @@ function Titulos({ titulo, titulos }: { titulo: string; titulos: EstadoSimulacao
 }
 
 function ListaFinanceira({ linhas }: { linhas: [string, number][] }) {
-  return <dl className="divide-y divide-slate-100 text-sm">{linhas.map(([rotulo, valor]) => <div key={rotulo} className="flex justify-between gap-3 py-1.5"><dt className="text-slate-600">{rotulo}</dt><dd className={`whitespace-nowrap font-semibold ${valor < 0 ? "text-red-700" : "text-marinho"}`}><ValorMonetario valor={valor}/></dd></div>)}</dl>;
+  const [pagina,setPagina]=React.useState(0);
+  return <><dl className="divide-y divide-slate-100 text-sm">{linhas.slice(pagina*6,pagina*6+6).map(([rotulo, valor]) => <div key={rotulo} className="flex justify-between gap-3 py-1.5"><dt className="text-slate-600">{rotulo}</dt><dd className={`whitespace-nowrap font-semibold ${valor < 0 ? "text-red-700" : "text-marinho"}`}><ValorMonetario valor={valor}/></dd></div>)}</dl>{linhas.length>6&&<nav className="etapas-curtas mt-3" aria-label="Páginas do demonstrativo"><button type="button" disabled={!pagina} onClick={()=>setPagina(n=>n-1)}>← Anterior</button><span className="self-center text-xs">{pagina+1}/{Math.ceil(linhas.length/6)}</span><button type="button" disabled={(pagina+1)*6>=linhas.length} onClick={()=>setPagina(n=>n+1)}>Próxima →</button></nav>}</>;
 }
 
 function Operacao({ detalhes, campo, rotulo, tipo = "inteiro" }: { detalhes: DetalhesSimulacao; campo: string; rotulo: string; tipo?: "inteiro" | "moeda" | "percentual" | "decimal" }) {

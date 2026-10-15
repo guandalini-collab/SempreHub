@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export interface ItemPainel {
   id: string;
@@ -42,14 +42,14 @@ export default function LayoutPainel({
   total: number;
   concluidas: number;
   perfil: string;
-  contexto?: { turma: string; empresa?: string; status: string; codigo?: string; caixa?: number; alertas?: number };
+  contexto?: { turma: string; empresa?: string; status: string; codigo?: string; caixa?: number; alertas?: number; prazo?: string | null };
   children: React.ReactNode;
 }) {
   const grupoAtivo = itens.find(i => i.id === ativa)?.grupo ?? "Menu";
-  const grupos = [...new Set(itens.map(i => i.grupo ?? "Menu"))];
+  const grupos = [...new Set(itens.map(i => i.grupo ?? "Menu"))].sort((a,b)=>perfil === "Aluno" ? a.localeCompare(b,"pt-BR") : 0);
   const [menuMovelAberto, setMenuMovelAberto] = useState(false);
   const [gruposAbertos, setGruposAbertos] = useState<string[]>([grupoAtivo]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     setGruposAbertos([grupoAtivo]);
   }, [ativa, grupoAtivo, perfil]);
 
@@ -99,7 +99,7 @@ export default function LayoutPainel({
                 <span>{grupo}</span><span aria-hidden="true">{expandido ? "▾" : "▸"}</span>
               </button>
               <div id={`submenu-${indice}`} hidden={!expandido} className="ml-3 mt-2 space-y-1 border-l-2 border-blue-300/40 pl-2">
-                {itens.filter(i => (i.grupo ?? "Menu") === grupo && !i.pai).map(i => <React.Fragment key={i.id}><button type="button" key={i.id} aria-current={ativa === i.id ? "page" : undefined} aria-controls={`secao-${i.id}`} title={i.descricao} onClick={() => { aoSelecionar(i.id); }} className={`w-full rounded-lg px-3 py-3 text-left text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-ouro ${ativa === i.id ? "bg-ouro font-bold text-marinho" : "text-white hover:bg-white/10"}`}><span className="block">{i.titulo}</span>{i.estado && <span className="mt-1 block text-[11px] opacity-80">{i.estado}</span>}</button>{itens.some(f => f.pai === i.id) && <div className="ml-3 space-y-1 border-l border-white/30 pl-2" aria-label={`Submenu de ${i.titulo}`}>{itens.filter(f => f.pai === i.id).map(f => <button key={f.id} type="button" aria-current={ativa === f.id ? "page" : undefined} aria-controls={`secao-${f.id}`} onClick={() => aoSelecionar(f.id)} className={`w-full rounded-lg px-3 py-2 text-left text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-ouro ${ativa === f.id ? "bg-ouro font-bold text-marinho" : "text-blue-100 hover:bg-white/10"}`}>{f.titulo}</button>)}</div>}</React.Fragment>)}
+                {itens.filter(i => (i.grupo ?? "Menu") === grupo && !i.pai && i.id !== "manuais").map(i => <React.Fragment key={i.id}><button type="button" key={i.id} aria-current={ativa === i.id ? "page" : undefined} aria-controls={`secao-${i.id}`} title={i.descricao} onClick={() => { aoSelecionar(i.id); }} className={`w-full rounded-lg px-3 py-3 text-left text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-ouro ${ativa === i.id ? "bg-ouro font-bold text-marinho" : "text-white hover:bg-white/10"}`}><span className="block">{i.titulo}</span>{i.estado && <span className="mt-1 block text-[11px] opacity-80">{i.estado}</span>}</button>{itens.some(f => f.pai === i.id) && <div className="ml-3 space-y-1 border-l border-white/30 pl-2" aria-label={`Submenu de ${i.titulo}`}>{itens.filter(f => f.pai === i.id).map(f => <button key={f.id} type="button" aria-current={ativa === f.id ? "page" : undefined} aria-controls={`secao-${f.id}`} onClick={() => aoSelecionar(f.id)} className={`w-full rounded-lg px-3 py-2 text-left text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-ouro ${ativa === f.id ? "bg-ouro font-bold text-marinho" : "text-blue-100 hover:bg-white/10"}`}>{f.titulo}</button>)}</div>}</React.Fragment>)}
               </div>
             </div>;
           })}
@@ -133,7 +133,7 @@ export default function LayoutPainel({
         {contexto && <div ref={contextoRef} className="sticky top-0 z-30 rounded-xl border border-blue-200 bg-white/95 p-4 shadow-sm backdrop-blur" aria-label="Turma e rodada atual">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Turma</p><p className="text-lg font-bold">{contexto.turma}</p>{contexto.empresa && <p className="text-sm text-slate-600">Sua empresa: {contexto.empresa}</p>}{contexto.codigo && <p className="text-sm text-slate-600">Código de entrada: <strong className="font-mono">{contexto.codigo}</strong></p>}</div>
-            <div className="flex flex-wrap items-center gap-3">{contexto.caixa !== undefined && <div><p className="text-xs text-slate-500">Caixa disponível</p><p className={`text-xl font-bold tabular-nums ${contexto.caixa >= 0 ? "text-emerald-700" : "text-red-700"}`}>{contexto.caixa.toLocaleString("pt-BR", {style:"currency",currency:"BRL"})}</p><p className="text-xs text-amber-800">{contexto.alertas ? `${contexto.alertas} pendência(s) de consistência` : "Sem pendências registradas"}</p></div>}<div><p className="font-bold text-corporativo">Rodada {Math.min(rodada, total)} de {total}</p><p className="text-sm text-slate-600">{contexto.status}</p></div><button type="button" onClick={() => { const grupo = itens.find(i => i.id === "rodada")?.grupo ?? "Menu"; setGruposAbertos(anteriores => anteriores.includes(grupo) ? anteriores : [...anteriores, grupo]); aoSelecionar("rodada"); }} hidden={perfil === "Professor"} className="rounded-lg bg-hub px-4 py-3 text-sm font-bold text-white hover:bg-blue-800">Abrir rodada atual →</button><a href="#/" className="rounded-lg border border-slate-300 px-3 py-3 text-sm font-semibold">Trocar turma</a></div>
+            <div className="flex flex-wrap items-center gap-3">{contexto.caixa !== undefined && <div><p className="text-xs text-slate-500">Caixa disponível</p><p className={`text-xl font-bold tabular-nums ${contexto.caixa >= 0 ? "text-emerald-700" : "text-red-700"}`}>{contexto.caixa.toLocaleString("pt-BR", {style:"currency",currency:"BRL"})}</p><p className="text-xs text-amber-800">{contexto.alertas ? `${contexto.alertas} pendência(s) de consistência` : "Sem pendências registradas"}</p></div>}<div><p className="font-bold text-corporativo">Rodada {Math.min(rodada, total)} de {total}</p><p className="text-sm text-slate-600">{contexto.status}</p>{perfil === "Aluno" && <p className="prazo-estacao">{contexto.prazo ? `Prazo: ${new Date(contexto.prazo).toLocaleString("pt-BR",{timeZone:"America/Sao_Paulo",dateStyle:"short",timeStyle:"short"})} · Brasília` : "Prazo ainda não definido pelo professor"}</p>}</div><button type="button" onClick={() => { const grupo = itens.find(i => i.id === "rodada")?.grupo ?? "Menu"; setGruposAbertos(anteriores => anteriores.includes(grupo) ? anteriores : [...anteriores, grupo]); aoSelecionar("rodada"); }} hidden={perfil === "Professor"} className="rounded-lg bg-hub px-4 py-3 text-sm font-bold text-white hover:bg-blue-800">Abrir rodada atual →</button><a href="#/" className="rounded-lg border border-slate-300 px-3 py-3 text-sm font-semibold">Trocar turma</a></div>
           </div>
         </div>}
         <header className="titulo-area-trabalho">
@@ -147,7 +147,7 @@ export default function LayoutPainel({
           <p className="mt-1 text-sm text-slate-600">{item.descricao}</p>
         </header>
         <div ref={conteudoRef} className="area-trabalho-conteudo">{children}</div>
-        {perfil === "Aluno" && <div id="acoes-estacao-aluno" className="acoes-estacao-aluno" hidden={!["decisoes", "pd", "rh", "estrategia", "financas", "producao", "logistica"].includes(ativa) && !ativa.startsWith("ferramenta-")} />}
+        {perfil === "Aluno" && <div id="acoes-estacao-aluno" className="acoes-estacao-aluno" hidden={!["decisoes", "pd", "rh", "estrategia", "financas", "producao", "logistica", "conferencia"].includes(ativa) && !ativa.startsWith("ferramenta-")} />}
       </div>
     </div>
   );

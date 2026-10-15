@@ -320,15 +320,16 @@ function SempreHubNews({ noticias }: { noticias: EventoEducacional[] }) {
 }
 
 function Referencias() {
+  const [referenciaAtiva,setReferenciaAtiva] = useState(0);
   const [fontes, setFontes] = useState<{id:string;autor:string;obra:string;localizacao:string;contribuicao:string;nota_edicao:string}[]>([]);
   const [erro, setErro] = useState("");
   useEffect(() => { api.get<{referencias:typeof fontes}>("/api/educacao/referencias").then(r => setFontes(r.referencias)).catch(e => setErro(e.message)); }, []);
   return (
     <div className="space-y-3">
       <p className="text-xs leading-relaxed text-slate-500">Os autores abaixo são referências para estudo e discussão. Consulte a edição disponível na sua instituição; a plataforma não substitui a leitura das obras.</p>
-      <div className="grid gap-3 md:grid-cols-2">
+      <nav className="etapas-curtas" aria-label="Autores de referência">{fontes.map((f,n)=><button type="button" key={f.id} aria-pressed={referenciaAtiva===n} onClick={()=>setReferenciaAtiva(n)}>{f.autor}</button>)}</nav><div className="grid gap-3">
         {erro && <p role="alert">{erro}</p>}
-        {fontes.map((item) => (
+        {fontes.filter((_,n)=>n===referenciaAtiva).map((item) => (
           <article key={item.autor} className="rounded-lg border border-slate-200 p-4">
             <p className="text-sm font-semibold text-marinho">{item.autor}</p>
             <p className="mt-1 text-xs font-semibold text-ouro">{item.obra}</p>

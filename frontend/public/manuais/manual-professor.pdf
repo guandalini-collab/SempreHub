@@ -2689,10 +2689,10 @@ endobj
 223 0 obj
 <<
 /Author (Professor Guandalini)
-/CreationDate (D\07220261014175617\05503\04700\047)
+/CreationDate (D\07220261015111657\05503\04700\047)
 /Creator (\050unspecified\051)
 /Keywords ()
-/ModDate (D\07220261014175617\05503\04700\047)
+/ModDate (D\07220261015111657\05503\04700\047)
 /Producer (ReportLab PDF Library \055 \050opensource\051)
 /Subject (\050unspecified\051)
 /Title (SempreHub \055 Manual do professor)
@@ -11064,7 +11064,7 @@ endstream
 endobj
 262 0 obj
 <<
-/Length 4235
+/Length 4254
 >>
 stream
 q
@@ -11106,7 +11106,7 @@ Q
 q
 1 0 0 1 91.03937 586.8504 cm
 q
-BT 1 0 0 1 0 42 Tm 2.743034 Tw 18 TL /F1 12 Tf 0 0 0 rg (O aluno percorre produtos e marketing, ferramentas e segmenta\347\343o, finan\347as,) Tj T* 0 Tw .609276 Tw (produ\347\343o e log\355stica quando aplic\341vel. O l\355der pode guardar o trabalho em ) Tj /F2 12 Tf (Salvar) Tj T* 0 Tw (rascunho) Tj /F1 12 Tf ( ou ) Tj /F2 12 Tf (Salvar e ir para a pr\363xima etapa) Tj /F1 12 Tf (.) Tj T* ET
+BT 1 0 0 1 0 42 Tm 2.743034 Tw 18 TL /F1 12 Tf 0 0 0 rg (O aluno percorre produtos e marketing, ferramentas e segmenta\347\343o, finan\347as,) Tj T* 0 Tw .609276 Tw (produ\347\343o e log\355stica quando aplic\341vel. O l\355der pode guardar o trabalho em ) Tj /F2 12 Tf (Salvar) Tj T* 0 Tw (rascunho completo) Tj /F1 12 Tf ( ou ) Tj /F2 12 Tf (Salvar e ir para [nome da pr\363xima \341rea]) Tj /F1 12 Tf (.) Tj T* ET
 Q
 Q
 q
@@ -22951,7 +22951,7 @@ endstream
 endobj
 302 0 obj
 <<
-/Length 4451
+/Length 4483
 >>
 stream
 q
@@ -23017,7 +23017,7 @@ q
 1 0 0 1 91.03937 252.8504 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 78 Tm /F1 12 Tf 18 TL -0.142907 Tw (O menu lateral abre uma \341rea de trabalho por vez. Os cart\365es brancos sobre fundo) Tj T* 0 Tw 2.269531 Tw (claro separam decis\365es, consultas e resultados. Os cabe\347alhos azuis e \355cones) Tj T* 0 Tw .723276 Tw (identificam as miss\365es de cada departamento. O foco em ciano destaca o campo) Tj T* 0 Tw -0.13338 Tw (em edi\347\343o; o bot\343o laranja de envio final mant\351m a confirma\347\343o e a trava de leitura) Tj T* 0 Tw (j\341 previstas nas regras.) Tj T* ET
+BT 1 0 0 1 0 78 Tm /F1 12 Tf 18 TL -0.142907 Tw (O menu lateral abre uma \341rea de trabalho por vez. Os cart\365es brancos sobre fundo) Tj T* 0 Tw 4.155034 Tw (claro separam decis\365es, consultas e resultados. T\355tulos escuros e divis\363rias) Tj T* 0 Tw 1.515573 Tw (discretas identificam os departamentos; o ciano destaca a sele\347\343o atual. O foco) Tj T* 0 Tw 1.619379 Tw (em ciano destaca o campo em edi\347\343o; o bot\343o laranja de envio final mant\351m a) Tj T* 0 Tw (confirma\347\343o e a trava de leitura j\341 previstas nas regras.) Tj T* ET
 Q
 Q
 q
@@ -23520,7 +23520,7 @@ endstream
 endobj
 304 0 obj
 <<
-/Length 3656
+/Length 4386
 >>
 stream
 q
@@ -23572,7 +23572,7 @@ q
 1 0 0 1 91.03937 378.8504 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 78 Tm /F1 12 Tf 18 TL .000254 Tw (As subabas de Departamentos exibem uma \341rea por vez. Ao trocar de submenu, o) Tj T* 0 Tw 2.264731 Tw (conte\372do selecionado aparece no topo. A compara\347\343o de concorrentes fica na) Tj T* 0 Tw 1.868731 Tw (subaba Concorrentes de Estrat\351gia. Os bot\365es Revis\343o e Pr\351via abrem janelas) Tj T* 0 Tw 2.001931 Tw (quando necess\341rios; a confirma\347\343o da \341rea permanece na faixa inferior. Esses) Tj T* 0 Tw (controles de apresenta\347\343o n\343o alteram as regras de envio ou os dados salvos.) Tj T* ET
+BT 1 0 0 1 0 78 Tm /F1 12 Tf 18 TL 8.340413 Tw (Os departamentos ficam diretamente acess\355veis no grupo Decis\365es. A) Tj T* 0 Tw 1.273392 Tw (compara\347\343o de concorrentes fica no grupo Estrat\351gia e p\372blico, com sele\347\343o de) Tj T* 0 Tw 2.871931 Tw (concorrente e crit\351rio. A Pr\351via estimada abre uma consulta; as confirma\347\365es) Tj T* 0 Tw 3.09521 Tw (ficam em Conferir e enviar. Esses controles de apresenta\347\343o n\343o alteram as) Tj T* 0 Tw (regras de envio ou os dados salvos.) Tj T* ET
 Q
 Q
 q
@@ -23583,10 +23583,24 @@ BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (22.3 \301rea de trabalho do aluno) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 192.8504 cm
+1 0 0 1 91.03937 246.8504 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 132 Tm /F1 12 Tf 18 TL 2.360562 Tw (No computador, o menu lateral, o resumo da empresa e as a\347\365es da decis\343o) Tj T* 0 Tw 6.889701 Tw (permanecem vis\355veis. Somente o conte\372do da etapa atual rola, quando) Tj T* 0 Tw -0.100361 Tw (necess\341rio. A faixa inferior re\372ne Salvar rascunho, Salvar e ir para a pr\363xima etapa) Tj T* 0 Tw .003276 Tw (e Enviar decis\343o final. Em Finan\347as, selecione Cr\351dito e tributos, Compras a prazo) Tj T* 0 Tw .760522 Tw (ou Vendas a prazo para preencher uma etapa por vez. A troca de submenu volta) Tj T* 0 Tw 1.179024 Tw (ao in\355cio do conte\372do e mant\351m as escolhas ainda em edi\347\343o. No celular, toque) Tj T* 0 Tw 1.572236 Tw (em Menu para escolher uma \341rea; o menu se recolhe ap\363s a sele\347\343o. O grupo) Tj T* 0 Tw (ativo fica aberto e os demais podem ser expandidos conforme a necessidade.) Tj T* ET
+BT 1 0 0 1 0 78 Tm /F1 12 Tf 18 TL 1.477951 Tw (No computador, o menu lateral, o resumo da empresa, o prazo de Bras\355lia e as) Tj T* 0 Tw 5.005531 Tw (a\347\365es da decis\343o permanecem vis\355veis. O percurso \351 Come\347ar a rodada,) Tj T* 0 Tw 2.06321 Tw (Decis\365es, Estrat\351gia e p\372blico, Confer\352ncia e envio e Resultados. A tela inicial) Tj T* 0 Tw 3.200731 Tw (oferece acesso direto ao mercado, ao planejamento e \340 confer\352ncia. Valores) Tj T* 0 Tw (reaproveitados s\343o ponto de partida, n\343o uma decis\343o j\341 enviada.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 130.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 96 Tm /F1 12 Tf 18 TL 2.835276 Tw (A faixa inferior informa altera\347\365es ainda n\343o salvas ou a vers\343o do rascunho) Tj T* 0 Tw .865531 Tw (completo. Salvar rascunho completo guarda todos os departamentos. O bot\343o de) Tj T* 0 Tw 1.056276 Tw (continua\347\343o identifica a pr\363xima \341rea e s\363 avan\347a ap\363s o salvamento. Trocar de) Tj T* 0 Tw 2.669755 Tw (submenu mant\351m as escolhas em edi\347\343o; recarregar ou fechar a p\341gina com) Tj T* 0 Tw 4.059573 Tw (altera\347\365es ainda n\343o salvas exige aten\347\343o ao aviso do navegador. N\343o h\341) Tj T* 0 Tw (salvamento autom\341tico garantido.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 68.85039 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 42 Tm /F1 12 Tf 18 TL .792301 Tw (Em Finan\347as, escolha Cr\351dito e tributos, Compras a prazo no modelo Tradicional) Tj T* 0 Tw .443276 Tw (ou Vendas a prazo. No modelo Startup, Investidores re\372ne aporte e valuation. Em) Tj T* 0 Tw 1.114276 Tw (RH, use Contratar e demitir, Sal\341rio e benef\355cios ou Treinamento e horas extras.) Tj T* 0 Tw ET
 Q
 Q
  
@@ -24075,7 +24089,7 @@ endstream
 endobj
 306 0 obj
 <<
-/Length 1491
+/Length 3192
 >>
 stream
 q
@@ -24096,14 +24110,35 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (36) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 732.8504 cm
+1 0 0 1 91.03937 714.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 24 Tm /F1 12 Tf 18 TL 3.735931 Tw (Na Produ\347\343o tradicional, use Volume e insumos, M\341quinas e manuten\347\343o e) Tj T* 0 Tw (Localiza\347\343o. A entrega f\355sica n\343o aparece nas decis\365es do modelo Startup.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 616.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 78 Tm /F1 12 Tf 18 TL .946276 Tw (A BCG separa Dados do produto, Fonte e registro, Produtos registrados e Matriz) Tj T* 0 Tw -0.165724 Tw (gr\341fica. A segmenta\347\343o separa Perfil do p\372blico, Pre\347o e regi\343o, Canais de compra) Tj T* 0 Tw 3.027024 Tw (e M\355dias do p\372blico; a busca e a pagina\347\343o ajudam a encontrar m\355dias sem) Tj T* 0 Tw 6.527034 Tw (percorrer uma lista longa. Not\355cias, relat\363rios e indicadores tamb\351m s\343o) Tj T* 0 Tw (consultados em partes. Gr\341ficos s\343o selecionados por assunto.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 482.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 114 Tm /F1 12 Tf 18 TL 1.058276 Tw (O envio definitivo aparece apenas em Conferir e enviar e mant\351m a confirma\347\343o) Tj T* 0 Tw 1.613276 Tw (final e as valida\347\365es do servidor. Depois do envio, os valores ficam bloqueados) Tj T* 0 Tw 1.398331 Tw (para edi\347\343o, mas a navega\347\343o de consulta continua dispon\355vel. Integrantes sem) Tj T* 0 Tw 2.448367 Tw (permiss\343o de decis\343o consultam as escolhas do l\355der. Investimentos opcionais) Tj T* 0 Tw .445276 Tw (podem ser zero. No celular ou com amplia\347\343o de acessibilidade, o conte\372do pode) Tj T* 0 Tw 1.670731 Tw (exigir rolagem para preservar a legibilidade; informa\347\365es n\343o s\343o cortadas para) Tj T* 0 Tw (caber artificialmente.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 452.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (22.4 Etapas curtas de Produtos e Marketing) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 594.8504 cm
+1 0 0 1 91.03937 314.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 114 Tm /F1 12 Tf 18 TL .666276 Tw (Selecione um produto por vez. Use as etapas Produto e pre\347o, Posicionamento e) Tj T* 0 Tw .778276 Tw (canais, M\355dias e Conferir produto. Na etapa M\355dias, selecione o canal que deseja) Tj T* 0 Tw 1.093392 Tw (configurar; escolher qual m\355dia visualizar n\343o contrata o servi\347o. A contrata\347\343o \351) Tj T* 0 Tw .225276 Tw (marcada na caixa de sele\347\343o da m\355dia. Detalhes e servi\347os abrem as informa\347\365es) Tj T* 0 Tw .907937 Tw (de apoio; Preencher or\347amento abre os campos de cota\347\343o quando exigidos. Na) Tj T* 0 Tw -0.102207 Tw (\372ltima etapa, confira os custos e marque a revis\343o do produto. Os demais produtos) Tj T* 0 Tw (e as escolhas j\341 preenchidas permanecem preservados ao mudar de etapa.) Tj T* ET
@@ -26400,72 +26435,72 @@ xref
 0003335965 00000 n 
 0003339415 00000 n 
 0003356089 00000 n 
-0003360378 00000 n 
-0003377052 00000 n 
-0003379281 00000 n 
-0003395955 00000 n 
-0003400397 00000 n 
-0003417071 00000 n 
-0003421175 00000 n 
-0003437849 00000 n 
-0003442210 00000 n 
-0003458884 00000 n 
-0003463509 00000 n 
-0003480183 00000 n 
-0003484683 00000 n 
-0003501357 00000 n 
-0003505583 00000 n 
-0003522257 00000 n 
-0003526562 00000 n 
-0003543236 00000 n 
-0003547858 00000 n 
-0003564532 00000 n 
-0003568982 00000 n 
-0003585656 00000 n 
-0003590101 00000 n 
-0003606775 00000 n 
-0003611328 00000 n 
-0003628002 00000 n 
-0003632208 00000 n 
-0003648882 00000 n 
-0003653292 00000 n 
-0003669966 00000 n 
-0003674425 00000 n 
-0003691099 00000 n 
-0003695545 00000 n 
-0003712219 00000 n 
-0003716644 00000 n 
-0003733318 00000 n 
-0003737721 00000 n 
-0003754395 00000 n 
-0003758755 00000 n 
-0003775429 00000 n 
-0003779934 00000 n 
-0003796608 00000 n 
-0003800318 00000 n 
-0003816992 00000 n 
-0003818537 00000 n 
-0003835211 00000 n 
-0003835252 00000 n 
-0003835361 00000 n 
-0003835475 00000 n 
-0003835825 00000 n 
-0003836174 00000 n 
-0003836524 00000 n 
-0003837304 00000 n 
-0003838084 00000 n 
-0003838440 00000 n 
-0003838793 00000 n 
-0003839144 00000 n 
-0003839497 00000 n 
-0003858304 00000 n 
+0003360397 00000 n 
+0003377071 00000 n 
+0003379300 00000 n 
+0003395974 00000 n 
+0003400416 00000 n 
+0003417090 00000 n 
+0003421194 00000 n 
+0003437868 00000 n 
+0003442229 00000 n 
+0003458903 00000 n 
+0003463528 00000 n 
+0003480202 00000 n 
+0003484702 00000 n 
+0003501376 00000 n 
+0003505602 00000 n 
+0003522276 00000 n 
+0003526581 00000 n 
+0003543255 00000 n 
+0003547877 00000 n 
+0003564551 00000 n 
+0003569001 00000 n 
+0003585675 00000 n 
+0003590120 00000 n 
+0003606794 00000 n 
+0003611347 00000 n 
+0003628021 00000 n 
+0003632227 00000 n 
+0003648901 00000 n 
+0003653311 00000 n 
+0003669985 00000 n 
+0003674444 00000 n 
+0003691118 00000 n 
+0003695564 00000 n 
+0003712238 00000 n 
+0003716663 00000 n 
+0003733337 00000 n 
+0003737740 00000 n 
+0003754414 00000 n 
+0003758774 00000 n 
+0003775448 00000 n 
+0003779985 00000 n 
+0003796659 00000 n 
+0003801099 00000 n 
+0003817773 00000 n 
+0003821019 00000 n 
+0003837693 00000 n 
+0003837734 00000 n 
+0003837843 00000 n 
+0003837957 00000 n 
+0003838307 00000 n 
+0003838656 00000 n 
+0003839006 00000 n 
+0003839786 00000 n 
+0003840566 00000 n 
+0003840922 00000 n 
+0003841275 00000 n 
+0003841626 00000 n 
+0003841979 00000 n 
+0003860786 00000 n 
 trailer
 <<
 /Size 322
 /Root 1 0 R
 /Info 223 0 R
-/ID [ <3b3342d696e4a7c7bbab597f84e8a90d> <3b3342d696e4a7c7bbab597f84e8a90d> ]
+/ID [ (\336\261xi\230\030\375Mgv\010\044\050f\074\210) (\336\261xi\230\030\375Mgv\010\044\050f\074\210) ]
 >>
 startxref
-3878456
+3880938
 %%EOF

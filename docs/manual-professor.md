@@ -158,7 +158,7 @@ O aluno não recebe decisões prontas. **BCG, segmentação e interpretação fi
 
 ## 5. Envio final e fechamento da rodada
 
-O aluno percorre produtos e marketing, ferramentas e segmentação, finanças, produção e logística quando aplicável. O líder pode guardar o trabalho em **Salvar rascunho** ou **Salvar e ir para a próxima etapa**.
+O aluno percorre produtos e marketing, ferramentas e segmentação, finanças, produção e logística quando aplicável. O líder pode guardar o trabalho em **Salvar rascunho completo** ou **Salvar e ir para [nome da próxima área]**.
 
 **Rascunho não é entrega.** O envio final só ocorre quando todas as informações exigidas estiverem presentes. A mensagem de bloqueio indica as pendências.
 
@@ -651,7 +651,7 @@ A equipe deve interpretar a origem do custo ao definir preço, margem, produçã
 
 ## Painel de comando executivo
 
-O menu lateral abre uma área de trabalho por vez. Os cartões brancos sobre fundo claro separam decisões, consultas e resultados. Os cabeçalhos azuis e ícones identificam as missões de cada departamento. O foco em ciano destaca o campo em edição; o botão laranja de envio final mantém a confirmação e a trava de leitura já previstas nas regras.
+O menu lateral abre uma área de trabalho por vez. Os cartões brancos sobre fundo claro separam decisões, consultas e resultados. Títulos escuros e divisórias discretas identificam os departamentos; o ciano destaca a seleção atual. O foco em ciano destaca o campo em edição; o botão laranja de envio final mantém a confirmação e a trava de leitura já previstas nas regras.
 
 SWOT apresenta Forças e Oportunidades na linha superior, Fraquezas e Ameaças na inferior. PESTEL e Porter usam blocos responsivos. No celular, os blocos se reorganizam em uma coluna, sem mudar os dados.
 
@@ -666,12 +666,20 @@ As incompatibilidades estruturadas podem reduzir a demanda comercial: SWOT e pos
 
 ### Navegação focada dos alunos
 
-As subabas de Departamentos exibem uma área por vez. Ao trocar de submenu, o conteúdo selecionado aparece no topo. A comparação de concorrentes fica na subaba Concorrentes de Estratégia. Os botões Revisão e Prévia abrem janelas quando necessários; a confirmação da área permanece na faixa inferior. Esses controles de apresentação não alteram as regras de envio ou os dados salvos.
+Os departamentos ficam diretamente acessíveis no grupo Decisões. A comparação de concorrentes fica no grupo Estratégia e público, com seleção de concorrente e critério. A Prévia estimada abre uma consulta; as confirmações ficam em Conferir e enviar. Esses controles de apresentação não alteram as regras de envio ou os dados salvos.
 
 
 ### Área de trabalho do aluno
 
-No computador, o menu lateral, o resumo da empresa e as ações da decisão permanecem visíveis. Somente o conteúdo da etapa atual rola, quando necessário. A faixa inferior reúne Salvar rascunho, Salvar e ir para a próxima etapa e Enviar decisão final. Em Finanças, selecione Crédito e tributos, Compras a prazo ou Vendas a prazo para preencher uma etapa por vez. A troca de submenu volta ao início do conteúdo e mantém as escolhas ainda em edição. No celular, toque em Menu para escolher uma área; o menu se recolhe após a seleção. O grupo ativo fica aberto e os demais podem ser expandidos conforme a necessidade.
+No computador, o menu lateral, o resumo da empresa, o prazo de Brasília e as ações da decisão permanecem visíveis. O percurso é Começar a rodada, Decisões, Estratégia e público, Conferência e envio e Resultados. A tela inicial oferece acesso direto ao mercado, ao planejamento e à conferência. Valores reaproveitados são ponto de partida, não uma decisão já enviada.
+
+A faixa inferior informa alterações ainda não salvas ou a versão do rascunho completo. Salvar rascunho completo guarda todos os departamentos. O botão de continuação identifica a próxima área e só avança após o salvamento. Trocar de submenu mantém as escolhas em edição; recarregar ou fechar a página com alterações ainda não salvas exige atenção ao aviso do navegador. Não há salvamento automático garantido.
+
+Em Finanças, escolha Crédito e tributos, Compras a prazo no modelo Tradicional ou Vendas a prazo. No modelo Startup, Investidores reúne aporte e valuation. Em RH, use Contratar e demitir, Salário e benefícios ou Treinamento e horas extras. Na Produção tradicional, use Volume e insumos, Máquinas e manutenção e Localização. A entrega física não aparece nas decisões do modelo Startup.
+
+A BCG separa Dados do produto, Fonte e registro, Produtos registrados e Matriz gráfica. A segmentação separa Perfil do público, Preço e região, Canais de compra e Mídias do público; a busca e a paginação ajudam a encontrar mídias sem percorrer uma lista longa. Notícias, relatórios e indicadores também são consultados em partes. Gráficos são selecionados por assunto.
+
+O envio definitivo aparece apenas em Conferir e enviar e mantém a confirmação final e as validações do servidor. Depois do envio, os valores ficam bloqueados para edição, mas a navegação de consulta continua disponível. Integrantes sem permissão de decisão consultam as escolhas do líder. Investimentos opcionais podem ser zero. No celular ou com ampliação de acessibilidade, o conteúdo pode exigir rolagem para preservar a legibilidade; informações não são cortadas para caber artificialmente.
 
 
 ### Etapas curtas de Produtos e Marketing

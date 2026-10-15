@@ -98,6 +98,7 @@ export function Botao({
   );
 }
 
+export const LeituraDecisao = React.createContext(false);
 export const RevisaoCampos = React.createContext<boolean | null>(null);
 
 export function Campo({
@@ -111,8 +112,9 @@ export function Campo({
   ajuda?: React.ReactNode;
   children: React.ReactElement;
 }) {
+  const leitura = React.useContext(LeituraDecisao);
   const revisada = React.useContext(RevisaoCampos);
-  const indicacao = revisada === null ? ajuda : pendente ? "Falta tomar esta decisão." : revisada ? "Decisão conferida." : "Falta confirmar esta decisão.";
+  const indicacao = revisada === null ? ajuda : pendente ? "Falta tomar esta decisão." : undefined;
   const id = React.useId();
   const idAjuda = `${id}-ajuda`;
   const campo = React.cloneElement(children, {
@@ -125,7 +127,7 @@ export function Campo({
         {rotulo}
         {/DRE|P&D|Pesquisa e desenvolvimento|Canal|Capital de giro/i.test(rotulo) && <span className="group relative ml-2 inline-flex normal-case"><button type="button" aria-label={`O que significa ${rotulo}?`} className="rounded-full border border-cyan-500 px-1.5 text-xs text-cyan-800">?</button><span role="tooltip" className="pointer-events-none absolute bottom-full left-0 z-40 mb-2 hidden w-64 rounded-lg bg-slate-900 p-3 text-left text-xs font-normal text-white shadow-lg group-hover:block group-focus-within:block">{/DRE/i.test(rotulo) ? "DRE reúne receitas e despesas para mostrar o lucro ou prejuízo do mês." : /Capital de giro/i.test(rotulo) ? "Recursos que sustentam a operação entre pagamentos e recebimentos." : /Canal/i.test(rotulo) ? "Caminho usado para vender e entregar o produto ao cliente." : "P&D é pesquisa e desenvolvimento: investimento em tecnologia e melhoria do produto."}</span></span>}
       </label>
-      {campo}
+      <fieldset disabled={leitura} className="min-w-0">{campo}</fieldset>
       {indicacao && (
         <p id={idAjuda} className={`mt-1 text-xs ${revisada !== null && (pendente || !revisada) ? "font-semibold text-amber-800" : "text-slate-500"}`}>
           {indicacao}
@@ -186,6 +188,7 @@ export function EntradaNumero({
   casas?: number;
   aoLimpar?: () => void;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type">) {
+  const leitura = React.useContext(LeituraDecisao);
   const casasDecimais = inteiro ? 0 : casas ?? (moeda ? 2 : 4);
   const formatar = (v: number) => (Number.isFinite(v) ? formatarNumeroBr(v, casasDecimais, moeda) : "");
   const [texto, setTexto] = React.useState(() => formatar(valor));
@@ -226,7 +229,7 @@ export function EntradaNumero({
       {moeda && <span className="select-none pl-3 text-sm font-medium text-slate-500">R$</span>}
       <input
         {...props}
-        disabled={disabled}
+        disabled={disabled || leitura}
         type="text"
         inputMode={inteiro ? "numeric" : "decimal"}
         autoComplete="off"
@@ -383,16 +386,19 @@ export function DicaTermo({termo, texto}: {termo: string; texto: string}) {
   return <span className="group relative ml-2 inline-flex align-middle"><button type="button" aria-label={`O que significa ${termo}?`} aria-describedby={id} className="rounded-full border border-cyan-500 px-1.5 text-xs text-cyan-800">?</button><span id={id} role="tooltip" className="pointer-events-none absolute bottom-full left-0 z-40 mb-2 hidden w-64 rounded-lg bg-slate-900 p-3 text-left text-xs font-normal text-white shadow-lg group-hover:block group-focus-within:block">{texto}</span></span>;
 }
 
-export function TabelaDre({ dre }: { dre: Dre }) {
+export function TabelaDre({ dre, paginar = false }: { dre: Dre; paginar?: boolean }) {
+  const [pagina,setPagina]=React.useState(0);
+  const linhas=LINHAS_DRE.filter(({chave})=>dre[chave]!=null&&(dre[chave]!==0||["impostos","cmv","custos_fixos"].includes(chave)));
+  const total=Math.ceil(linhas.length/4);
   return (
-    <table className="w-full border-collapse text-sm">
+    <><table className="w-full border-collapse text-sm">
       <caption className="mb-3 text-left font-semibold">DRE<DicaTermo termo="DRE" texto="Demonstração do Resultado do Exercício: reúne receitas e despesas para mostrar o lucro ou prejuízo do mês." /></caption>
       <tbody>
         <tr className="border-b border-slate-200">
           <td className="py-1.5 font-semibold text-marinho">Receita bruta</td>
           <td className="py-1.5 text-right font-semibold text-marinho"><ValorMonetario valor={dre.receita}/></td>
         </tr>
-        {LINHAS_DRE.filter(({ chave }) => dre[chave] != null && (dre[chave] !== 0 || ["impostos", "cmv", "custos_fixos"].includes(chave))).map(
+        {(paginar?linhas.slice(pagina*4,pagina*4+4):linhas).map(
           ({ chave, rotulo }) => (
             <tr key={chave} className="border-b border-slate-100">
               <td className="py-1.5 text-slate-600">{rotulo}</td>
@@ -409,7 +415,7 @@ export function TabelaDre({ dre }: { dre: Dre }) {
           </td>
         </tr>
       </tfoot>
-    </table>
+    </table>{paginar&&total>1&&<nav className="etapas-curtas mt-2" aria-label="Páginas da DRE"><button type="button" disabled={!pagina} onClick={()=>setPagina(n=>n-1)}>← Anterior</button><span className="self-center text-xs">Despesas {pagina+1}/{total} · receita e lucro são totais do mês</span><button type="button" disabled={pagina+1>=total} onClick={()=>setPagina(n=>n+1)}>Próxima →</button></nav>}</>
   );
 }
 

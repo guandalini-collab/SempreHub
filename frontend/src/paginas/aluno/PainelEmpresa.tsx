@@ -1,3 +1,4 @@
+import LinkManual from "../../componentes/LinkManual";
 import { createPortal } from "react-dom";
 import { ValorMonetario } from "../../componentes/ui";
 import { IconeMissao } from "../../componentes/IdentidadeExecutiva";
@@ -18,6 +19,7 @@ import EquipeEmpresa from "../../componentes/EquipeEmpresa";
 import { ControlesSimulacao, PainelOperacional, PreviaOperacional, RelatorioFinanceiro } from "../../componentes/SimulacaoAvancada";
 import {
   RevisaoCampos,
+  LeituraDecisao,
   Aviso,
   BarraProgresso,
   Botao,
@@ -91,7 +93,7 @@ const ITENS_PAINEL = [
   {id: "pd", titulo: "P&D", descricao: "Tecnologia e melhoria dos produtos.", simbolo: "", grupo: "Decisões da rodada"},
   {id: "rh", titulo: "RH", descricao: "Funcionários, remuneração e capacitação.", simbolo: "", grupo: "Decisões da rodada"},
   { "id": "estrategia", "titulo": "Ferramentas e segmentação", "descricao": "SWOT, Porter, BCG, PESTEL e público-alvo.", "simbolo": "◇", "grupo": "Decisões da rodada" },
-  ...FERRAMENTAS.map(id => ({id: `ferramenta-${id}`, titulo: id === "PORTER" ? "Porter - 5 forças" : id === "SEGMENTACAO" ? "Segmentação do mercado" : id, descricao: "Consulte e registre as escolhas desta ferramenta.", simbolo: "", grupo: "Decisões da rodada", pai: "estrategia"})),
+  ...FERRAMENTAS.map(id => ({id: `ferramenta-${id}`, titulo: id === "PORTER" ? "Porter - 5 forças" : id === "SEGMENTACAO" ? "Segmentação do mercado" : id === "CONCORRENCIA" ? "Concorrentes" : id, descricao: "Consulte e registre as escolhas desta ferramenta.", simbolo: "", grupo: "Decisões da rodada", pai: "estrategia"})),
   {
     "id": "financas",
     "titulo": "Finanças",
@@ -169,6 +171,8 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   const [painel, setPainel] = useState<PainelAluno | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [eventoAberto, setEventoAberto] = useState<EventoRodada | null>(null);
+  const [graficoAtivo,setGraficoAtivo] = useState(0);
+  const [demonstrativoAtivo,setDemonstrativoAtivo] = useState(0);
   const [secao, setSecao] = useState("rodada");
   const sequenciaCarga = useRef(0);
 
@@ -211,13 +215,13 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   }
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL.map(i => ({...i, ...(DEPARTAMENTOS.some(d => d.id === i.id) ? {grupo:"Decisões da rodada",pai:"departamentos"} : ["mercado", "equipe"].includes(i.id) ? {grupo: "Rodada atual", pai: "rodada"} : {}), estado: i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL" ? "Sem decisão neste modelo" : (AREAS_DECISAO.includes(i.id) || ["pd", "rh"].includes(i.id)) ? painel.decisao_atual?.enviada_em ? "Enviada" : painel.decisao_atual?.revisao_areas?.[(AREA_REVISAO[i.id] || i.id) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>] ? "Rascunho salvo · conferido" : "Decisão pendente" : undefined}))} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · acompanhe a rodada" : "Decisão pendente · prepare e envie" }}>
+    <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : "Rascunho · envio ainda pendente", prazo: turma.prazo_rodada }}>
       <SecaoPainel id="rodada" ativa={secao}>
-        <Cartao titulo={encerrada ? "Simulação concluída" : `O que fazer na rodada ${turma.rodada_atual}`}>
-          <p className="mb-5 text-sm text-slate-600">{encerrada ? "Consulte os resultados e os relatórios da sua empresa." : painel.decisao_atual?.enviada_em ? "O líder enviou a decisão. Acompanhe os resultados quando a rodada encerrar." : "Siga os passos no menu lateral. Produtos, finanças, produção e logística fazem parte de uma única decisão da rodada."}</p>
-          <p className="mb-4 text-sm">Última versão salva: {AREAS_DECISAO.filter(a => a !== "logistica" || turma.modo_jogo === "TRADICIONAL").map(a => `${a === "decisoes" ? "Marketing" : a === "financas" ? "Finanças" : a === "producao" ? "Produção" : "Logística"}: ${painel.decisao_atual?.revisao_areas?.[a as keyof NonNullable<DecisaoEntrada["revisao_areas"]>] ? "revisado" : "revisar"}`).join(" · ")}</p>
-          <p className="mt-5 text-sm text-slate-600">Use o submenu “O que fazer nesta rodada”, à esquerda, para abrir cada área.</p>
-        </Cartao>
+        <div className="inicio-rodada">
+          <p className="text-sm text-slate-600">{encerrada ? "Consulte o desempenho final da empresa." : painel.decisao_atual?.enviada_em ? "Decisão enviada. As escolhas permanecem disponíveis em modo leitura." : "Consulte o mercado, planeje os departamentos e confira a decisão completa antes de enviar."}</p>
+          <ol className="roteiro-rodada">{[["mercado","Consultar o mercado","Cenário e notícias deste mês"],["decisoes","Planejar os departamentos","Preços, operação, pessoas e finanças"],["conferencia","Conferir e enviar","Pendências e confirmação definitiva"],["resultados","Acompanhar resultados","Disponíveis após o fechamento"]].map(([id,titulo,descricao],n)=><li key={id}><span className="numero-etapa">{n+1}</span><div><strong>{titulo}</strong><p>{descricao}</p></div><button type="button" onClick={()=>setSecao(id)}>{id==="decisoes" && painel.decisao_atual ? "Continuar" : "Abrir"} →</button></li>)}</ol>
+          <p className="text-sm text-slate-600">{painel.decisao_atual ? `Último rascunho da rodada: versão ${painel.decisao_atual.versao}.` : "Ainda não há rascunho salvo nesta rodada. Valores anteriores são um ponto de partida e precisam ser revisados."}</p>
+        </div>
       </SecaoPainel>
       <SecaoPainel id="visao" ativa={secao}>
       <div className="resumo-inicial grid gap-3 sm:grid-cols-3">
@@ -233,16 +237,15 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <SecaoPainel id="equipe" ativa={secao}>
       {!turma.modo_equipe && <Cartao titulo="Participação individual"><p>Você administra esta empresa individualmente.</p></Cartao>}
       {turma.modo_equipe && painel.equipe && <EquipeEmpresa empresaId={empresa.id} equipe={painel.equipe} podeEditar={!encerrada && turma.rodada_atual === 1 && painel.equipe.pode_gerenciar} aoSalvar={carregar} rodada={turma.rodada_atual} encerrada={encerrada} />}
-      {empresa.estado_simulacao && <PainelOperacional estado={empresa.estado_simulacao} modo={turma.modo_jogo} />}
+      <details><summary>Consultar estrutura operacional da empresa</summary>{empresa.estado_simulacao && <PainelOperacional estado={empresa.estado_simulacao} modo={turma.modo_jogo} />}</details>
       </SecaoPainel>
       <SecaoPainel id="conquistas" ativa={secao}><Conquistas jornada={painel.jornada} /></SecaoPainel>
       <SecaoPainel id="mercado" ativa={secao}>
-      <CompetitividadeMercado config={turma.parametros?.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} equipes={painel.total_empresas} />
-      <FeedResultados jornada={painel.jornada} aoResultados={() => setSecao("resultados")} />
+
       <MercadoPublicado visao="mercado" empresaId={empresa.id} rodada={turma.rodada_atual} />
       </SecaoPainel>
       <SecaoPainel id="manuais" ativa={secao}><CentralManuais perfil="ALUNO" /></SecaoPainel>
-      <SecaoPainel id="midias" ativa={secao}><ManualMidias /></SecaoPainel>
+<SecaoPainel id="midias" ativa={secao}><Cartao titulo="Manual de mídias e campanhas"><p className="mb-4 text-sm">Consulte formatos, tarifas e critérios no manual. Para decidir a campanha, use Produtos e marketing.</p><div className="flex gap-4"><LinkManual arquivo="manual-midias" className="consulta-previa">Abrir manual de mídias</LinkManual><LinkManual arquivo="manual-midias" baixar className="consulta-previa">Baixar PDF</LinkManual></div></Cartao></SecaoPainel>
       <SecaoPainel id="aprendizagem" ativa={secao}>
       <BibliotecaAprendizagem mercadoSeparado conteudo="REFERENCIAS" rodada={turma.rodada_atual} modo={turma.modo_jogo} empresaId={empresa.id} />
       </SecaoPainel>
@@ -253,11 +256,11 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <RelatorioPrimeiraRodada empresaId={empresa.id} disponivel={resultados.some(r => r.rodada === 1)} />
 
       </SecaoPainel>
-      <SecaoPainel id="departamentos" ativa={secao}><Cartao titulo="Departamentos"><p>Escolha uma área para planejar, conferir e salvar as decisões da rodada.</p><nav aria-label="Departamentos" className="mt-4 flex flex-wrap gap-2">{DEPARTAMENTOS.map(d=><Botao key={d.id} onClick={()=>setSecao(d.id)}>{d.titulo}</Botao>)}</nav></Cartao></SecaoPainel>
-      <SecaoPainel id={(AREAS_DECISAO.includes(secao) || ["pd", "rh"].includes(secao) || secao === "estrategia" || secao.startsWith("ferramenta-")) ? secao : "decisoes"} ativa={secao}>
+      <SecaoPainel id="departamentos" ativa={secao}><Cartao titulo="Departamentos"><p>Escolha uma área para planejar, conferir e salvar as decisões da rodada.</p><nav aria-label="Departamentos" className="mt-4 flex flex-wrap gap-2">{DEPARTAMENTOS.map(d=><Botao key={d.id} onClick={()=>setSecao(d.id==="estrategia"?"ferramenta-SWOT":d.id)}>{d.titulo}</Botao>)}</nav></Cartao></SecaoPainel>
+      <SecaoPainel id={(AREAS_DECISAO.includes(secao) || ["pd", "rh"].includes(secao) || secao === "estrategia" || secao === "conferencia" || secao.startsWith("ferramenta-")) ? secao : "decisoes"} ativa={secao}>
         <div>
-          <nav className="subabas-estacao mb-4 flex flex-wrap gap-2" aria-label="Subabas dos departamentos">{DEPARTAMENTOS.map(d=><Botao key={d.id} variante={secao===d.id || (d.id==="estrategia" && secao.startsWith("ferramenta-")) ? "primario" : "secundario"} onClick={()=>setSecao(d.id)}>{d.titulo}</Botao>)}</nav>
-          {(secao==="estrategia" || secao.startsWith("ferramenta-")) && <nav aria-label="Ferramentas de estratégia" className="mb-4 flex flex-wrap gap-2">{FERRAMENTAS.map(f=><Botao key={f} variante={secao===`ferramenta-${f}` ? "primario" : "secundario"} onClick={()=>setSecao(`ferramenta-${f}`)}>{f==="CONCORRENCIA" ? "Concorrentes" : f==="SEGMENTACAO" ? "Segmentação" : f}</Botao>)}</nav>}
+          <nav className="subabas-estacao mb-4 flex flex-wrap gap-2" aria-label="Subabas dos departamentos">{DEPARTAMENTOS.map(d=><Botao key={d.id} variante={secao===d.id || (d.id==="estrategia" && secao.startsWith("ferramenta-")) ? "primario" : "secundario"} onClick={()=>setSecao(d.id==="estrategia"?"ferramenta-SWOT":d.id)}>{d.titulo}</Botao>)}</nav>
+          {(secao==="estrategia" || secao.startsWith("ferramenta-")) && <nav className="subabas-estrategia mb-4 flex flex-wrap gap-2" aria-label="Ferramentas de estratégia">{FERRAMENTAS.map(f=><Botao key={f} variante={secao===`ferramenta-${f}` ? "primario" : "secundario"} onClick={()=>setSecao(`ferramenta-${f}`)}>{f==="CONCORRENCIA" ? "Concorrentes" : f==="SEGMENTACAO" ? "Segmentação" : f}</Botao>)}</nav>}
           {encerrada ? (
             <Cartao titulo="Simulação encerrada">
               <p className="text-sm text-slate-600">
@@ -269,16 +272,17 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
               </p>
             </Cartao>
           ) : (
-            <FormularioDecisao key={empresa.id} painel={painel} area={secao.startsWith("ferramenta-") ? "estrategia" : secao} ferramenta={secao.startsWith("ferramenta-") ? secao.slice(11) : undefined} aoNavegar={setSecao} aoEnviar={carregar} />
+            <FormularioDecisao key={empresa.id} painel={painel} area={secao.startsWith("ferramenta-") ? "estrategia" : secao} ferramenta={secao.startsWith("ferramenta-") ? secao.slice(11) : undefined} aoNavegar={id=>setSecao(id==="estrategia"?"ferramenta-SWOT":id)} aoEnviar={carregar} />
           )}
         </div>
       </SecaoPainel>
       <SecaoPainel id="resultados" ativa={secao}><Cartao titulo="Resultados da empresa"><p>Selecione uma área no submenu lateral. Compare os valores e consulte o manual do aluno para interpretar os indicadores antes de decidir a próxima rodada.</p>{ultimo&&<p className="mt-4 font-semibold">Última rodada concluída: {ultimo.rodada} · Caixa: <ValorMonetario valor={ultimo.caixa_final}/> · Lucro líquido: <ValorMonetario valor={ultimo.dre.lucro_liquido}/></p>}</Cartao></SecaoPainel>
       {AREAS_INDICADORES.map(a=><SecaoPainel key={a.id} id={`resultado-${a.id}`} ativa={secao}><IndicadoresDepartamentais area={a.id} resultado={ultimo}/></SecaoPainel>)}
       <SecaoPainel id="demonstrativos" ativa={secao}>
-      {ultimo && <IndicadoresFinanceiros resultado={ultimo} />}
-        <div className="grid gap-6 xl:grid-cols-2">
-          <Cartao titulo={ultimo ? `Resultado do mês ${ultimo.rodada}` : "Resultado do mês"}>
+      <nav className="etapas-curtas" aria-label="Demonstrativos">{["Indicadores e balanço","DRE do mês","Comparar mercado"].map((t,n)=><button key={t} type="button" aria-pressed={demonstrativoAtivo===n} onClick={()=>setDemonstrativoAtivo(n)}>{t}</button>)}</nav>
+      <div hidden={demonstrativoAtivo!==0}>{ultimo && <IndicadoresFinanceiros resultado={ultimo} />}</div>
+        <div className="grid gap-6">
+          <div hidden={demonstrativoAtivo!==1}><Cartao titulo={ultimo ? `Resultado do mês ${ultimo.rodada}` : "Resultado do mês"}>
             {ultimo ? (
               <>
                 <div className="mb-4 grid grid-cols-3 gap-2 rounded-lg bg-slate-50 p-3 text-center text-xs">
@@ -295,7 +299,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
                     <p className="text-base font-semibold text-marinho">{percentual(ultimo.participacao_mercado)}</p>
                   </div>
                 </div>
-                <details className="rounded-xl border border-slate-200 p-4"><summary className="cursor-pointer font-semibold">Ver DRE completa</summary><div className="mt-4"><TabelaDre dre={ultimo.dre} /></div></details>
+                <details className="rounded-xl border border-slate-200 p-4"><summary className="cursor-pointer font-semibold">Ver DRE completa</summary><div className="mt-4"><TabelaDre paginar dre={ultimo.dre} /></div></details>
                 <p className="mt-2 text-xs text-slate-500">
                   Alíquota efetiva de tributos: {percentual(ultimo.aliquota_efetiva, 2)} da receita.
                 </p>
@@ -314,8 +318,8 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
                 Nenhuma rodada fechada ainda. Envie suas decisões e aguarde o fechamento do mês pelo sistema.
               </p>
             )}
-          </Cartao>
-          <Cartao titulo="Mercado no último mês">
+          </Cartao></div>
+          <div hidden={demonstrativoAtivo!==2}><Cartao titulo="Mercado no último mês">
             {painel.mercado.length ? (
               <table className="w-full text-sm">
                 <thead>
@@ -338,15 +342,15 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
             ) : (
               <p className="text-sm text-slate-500">Os preços dos concorrentes aparecem após a primeira rodada.</p>
             )}
-          </Cartao>
+          </Cartao></div>
         </div>
 
       </SecaoPainel>
       <SecaoPainel id="evolucao" ativa={secao}>
       {!resultados.length && <Cartao titulo="Evolução por rodada"><p>Os gráficos estarão disponíveis após o fechamento da primeira rodada.</p></Cartao>}
       {resultados.length > 0 && (
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Cartao titulo="Caixa e lucro mensal">
+        <div><nav className="etapas-curtas" aria-label="Gráficos da empresa">{["Caixa e lucro","Receita e custos","Demanda e vendas","Dívida","Mercado"].map((t,n)=><button key={t} type="button" aria-pressed={graficoAtivo===n} onClick={()=>setGraficoAtivo(n)}>{t}</button>)}</nav>
+          <div hidden={graficoAtivo!==0}><Cartao titulo="Caixa e lucro mensal">
             <GraficoLinhas
               rotulosX={resultados.map((r) => `M${r.rodada}`)}
               series={[
@@ -354,17 +358,17 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
                 { nome: "Lucro do mês", cor: "#D9851E", valores: resultados.map((r) => r.dre.lucro_liquido) },
               ]}
             />
-          </Cartao>
-          <Cartao titulo="Receita e custos do mês"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} series={[{nome:"Receita",cor:"#034AA6",valores:resultados.map(r=>r.dre.receita)},{nome:"Custos e despesas",cor:"#666666",valores:resultados.map(r=>r.dre.receita-r.dre.lucro_liquido)}]}/></Cartao>
-          <Cartao titulo="Demanda, capacidade e vendas"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} formatar={v=>inteiro(v)} series={[{nome:"Demanda",cor:"#666666",valores:resultados.map(r=>r.demanda)},{nome:"Capacidade",cor:"#034AA6",valores:resultados.map(r=>r.capacidade)},{nome:"Vendas",cor:"#9B6518",valores:resultados.map(r=>r.unidades_vendidas)}]}/></Cartao>
-          <Cartao titulo="Dívida ao final da rodada"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} series={[{nome:"Dívida",cor:"#666666",valores:resultados.map(r=>r.divida_final)}]}/></Cartao>
-          <Cartao titulo="Participação de mercado">
+          </Cartao></div>
+          <div hidden={graficoAtivo!==1}><Cartao titulo="Receita e custos do mês"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} series={[{nome:"Receita",cor:"#034AA6",valores:resultados.map(r=>r.dre.receita)},{nome:"Custos e despesas",cor:"#666666",valores:resultados.map(r=>r.dre.receita-r.dre.lucro_liquido)}]}/></Cartao></div>
+          <div hidden={graficoAtivo!==2}><Cartao titulo="Demanda, capacidade e vendas"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} formatar={v=>inteiro(v)} series={[{nome:"Demanda",cor:"#666666",valores:resultados.map(r=>r.demanda)},{nome:"Capacidade",cor:"#034AA6",valores:resultados.map(r=>r.capacidade)},{nome:"Vendas",cor:"#9B6518",valores:resultados.map(r=>r.unidades_vendidas)}]}/></Cartao></div>
+          <div hidden={graficoAtivo!==3}><Cartao titulo="Dívida ao final da rodada"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} series={[{nome:"Dívida",cor:"#666666",valores:resultados.map(r=>r.divida_final)}]}/></Cartao></div>
+          <div hidden={graficoAtivo!==4}><Cartao titulo="Participação de mercado">
             <GraficoLinhas
               rotulosX={resultados.map((r) => `M${r.rodada}`)}
               series={[{ nome: "Participação", cor: "#D9851E", valores: resultados.map((r) => r.participacao_mercado) }]}
               formatar={(v) => percentual(v, 0)}
             />
-          </Cartao>
+          </Cartao></div>
         </div>
       )}
 
@@ -373,7 +377,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       {resultados.length > 0 ? <Historico painel={painel} /> : <Cartao titulo="Histórico"><p>Aguarde a primeira rodada concluída.</p></Cartao>}
 
       </SecaoPainel>
-      <ViradaRodada painel={painel} podeAbrir={!eventoAberto} />
+      <div hidden={!["rodada","resultados","historico"].includes(secao)}><ViradaRodada painel={painel} podeAbrir={false} /></div>
       {eventoAberto && (
         <Modal
           titulo={`Mês ${eventoAberto.rodada}: ${eventoAberto.titulo}`}
@@ -452,7 +456,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
   const [confirmandoEnvio, setConfirmandoEnvio] = useState(false);
   const somenteLeitura = !!painel.decisao_atual?.enviada_em || (turma.modo_equipe && !painel.equipe?.pode_decidir);
   const sequencia = ["decisoes", "pd", "estrategia", "producao", "rh", "financas", ...(turma.modo_jogo === "TRADICIONAL" ? ["logistica"] : [])];
-  const proxima = sequencia[sequencia.indexOf(area) + 1];
+  const proxima = sequencia.includes(area) ? sequencia[sequencia.indexOf(area) + 1] ?? "conferencia" : undefined;
   const versaoServidor = painel.equipe?.versao_decisao ?? painel.decisao_atual?.versao ?? 0;
   const [d, setD] = useState<DecisaoEntrada>(() => decisaoInicial(painel));
   const [base, setBase] = useState(() => ({ entrada: decisaoInicial(painel), versao: versaoServidor, rodada: turma.rodada_atual }));
@@ -496,8 +500,15 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
     }
   }
 
+  useEffect(() => { if (alterada) setMensagem(null); }, [JSON.stringify(d)]);
+  useEffect(() => {
+    const proteger = (e: BeforeUnloadEvent) => { if (alterada && !somenteLeitura) { e.preventDefault(); e.returnValue = ""; } };
+    window.addEventListener("beforeunload", proteger);
+    return () => window.removeEventListener("beforeunload", proteger);
+  }, [alterada, somenteLeitura]);
+
   const atualizar = <K extends keyof DecisaoEntrada>(campo: K, valor: DecisaoEntrada[K]) =>
-    setD((atual) => manterRevisoes(atual, { ...atual, [campo]: valor }));
+    !somenteLeitura && setD((atual) => manterRevisoes(atual, { ...atual, [campo]: valor }));
 
   useEffect(() => {
     let cancelada = false;
@@ -547,6 +558,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
   }
 
   const [painelAuxiliar, setPainelAuxiliar] = useState<"revisao" | "previa" | null>(null);
+  const [etapaRH, setEtapaRH] = useState("equipe");
   const [etapaFinanceira, setEtapaFinanceira] = useState("credito");
   const [destinoAcoes, setDestinoAcoes] = useState<HTMLElement | null>(null);
   useEffect(() => { setDestinoAcoes(document.getElementById("acoes-estacao-aluno")); }, []);
@@ -562,8 +574,8 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         )
       }
     >
-      <form id={`form-decisao-${empresa.id}`} onSubmit={e => {e.preventDefault();setConfirmandoEnvio(true);}} className="formulario-estacao space-y-6">
-        {painel.decisao_atual?.enviada_em && <div role="status" className="sticky top-0 z-20 rounded-xl border border-emerald-300 bg-emerald-50 p-4 font-semibold text-emerald-900">🔒 Decisões salvas! Modo de leitura ativado. Aguardando o encerramento do prazo pelo professor.</div>}
+      <form id={`form-decisao-${empresa.id}`} onSubmit={e => {e.preventDefault();if(area === "conferencia") setConfirmandoEnvio(true);}} className="formulario-estacao space-y-6">
+        {painel.decisao_atual?.enviada_em && <div role="status" className="sticky top-0 z-20 rounded-xl border border-emerald-300 bg-emerald-50 p-4 font-semibold text-emerald-900">🔒 Decisões salvas! Modo de leitura ativado. Aguardando o encerramento do prazo pelo professor. Rodada {turma.rodada_atual} · envio em {new Date(painel.decisao_atual.enviada_em).toLocaleString("pt-BR",{timeZone:"America/Sao_Paulo"})} (Brasília).</div>}
         {somenteLeitura && !painel.decisao_atual?.enviada_em && <Aviso tipo="info">Você está em modo de visualização. Discuta as decisões com o líder, que registra e envia pela equipe.</Aviso>}
         <p className="text-sm text-slate-600">Decisões da equipe · salve ao concluir esta etapa. Envie a rodada após revisar todos os departamentos.</p>
         {painelAuxiliar === "revisao" && <Modal titulo="Revisão dos departamentos" aoFechar={()=>setPainelAuxiliar(null)}><p className="mt-1 text-sm text-slate-600">Confira cada área e marque a revisão. Alterar escolhas pede nova revisão das áreas afetadas. Valores zero são escolhas válidas para ações opcionais. Todas as áreas aplicáveis precisam estar revisadas para o envio final.</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{AREAS_DECISAO.map(id => {
@@ -573,7 +585,15 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         })}</div></Modal>}
         {turma.modo_equipe && <p className="text-sm text-slate-600">Somente o líder altera e envia. Todos podem consultar o planejamento e contribuir na discussão. O envio final será bloqueado se houver etapas obrigatórias pendentes.</p>}
         {conflito && <div className="space-y-2"><Aviso tipo="info">Outra atualização chegou enquanto você editava. Seus campos foram mantidos. Carregue a decisão salva da empresa antes de continuar; essa ação substitui os valores do formulário.</Aviso><Botao type="button" variante="secundario" disabled={carregando} onClick={carregarDecisaoSalva}>Carregar decisão salva</Botao></div>}
-        <RevisaoCampos.Provider value={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]}><fieldset disabled={carregando || somenteLeitura} className={`space-y-6 ${somenteLeitura ? "opacity-50 pointer-events-none" : ""}`}>
+        {area === "conferencia" && <section className="conferencia-rodada" aria-label="Conferência da rodada">
+          <p className="text-sm text-slate-600">Esta conferência inclui todos os departamentos. Investimentos opcionais podem permanecer em zero.</p>
+          <div className="resumo-conferencia"><span>Preço <strong>{reais(d.preco)}</strong></span><span>Campanhas <strong>{reais(d.marketing)}</strong></span><span>P&D <strong>{reais(d.pd)}</strong></span><span>Contratações <strong>{d.contratar}</strong></span><span>Demissões <strong>{d.demitir}</strong></span><span>Empréstimo <strong>{reais(d.emprestimo)}</strong></span></div>
+          <p className="text-sm">Confira os conjuntos exigidos pelo jogo. Alterações posteriores removem automaticamente as confirmações afetadas.</p>
+          <div className="lista-conferencia">{AREAS_DECISAO.filter(id=>id!=="logistica" || turma.modo_jogo==="TRADICIONAL").map(id=><label key={id}><input type="checkbox" disabled={somenteLeitura || carregando} checked={!!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e=>setD(atual=>({...atual,revisao_areas:{...atual.revisao_areas,[id]:e.target.checked}}))}/><span>{id==="decisoes" ? "Comercial, P&D e estratégia" : id==="producao" ? "Produção e recursos humanos" : id==="financas" ? "Finanças" : "Logística"}</span><button type="button" onClick={()=>aoNavegar(id)}>Conferir valores →</button></label>)}</div>
+          <button type="button" className="consulta-previa" onClick={()=>setPainelAuxiliar("previa")}>Consultar prévia estimada</button>
+          {painel.pendencias_envio?.length>0 && <details><summary>Pendências da última versão salva ({painel.pendencias_envio.length})</summary><ul>{painel.pendencias_envio.map((p,n)=><li key={n}>{p}</li>)}</ul><p>Salve o rascunho para atualizar esta lista.</p></details>}
+        </section>}
+        <RevisaoCampos.Provider value={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]}><LeituraDecisao.Provider value={somenteLeitura}><fieldset disabled={carregando} className="space-y-6">
         <div hidden={area !== "decisoes" && area !== "estrategia" && area !== "pd"}>
         <div hidden={area === "pd"}><EditorMix ferramenta={ferramenta || "SWOT"} precoAtual={d.preco} visao={area === "estrategia" ? "estrategia" : "mix"} aoNavegar={aoNavegar} empresaId={empresa.id} rodada={turma.rodada_atual} plano={d.plano_comercial} aoMudar={(plano,total,preco)=>!somenteLeitura && setD(atual=>manterRevisoes(atual,{...atual,plano_comercial:plano,marketing:total,preco:preco??atual.preco,simulacao:atual.simulacao?{...atual.simulacao,marketing_digital:0}:null}))} /></div>
           <div hidden={area !== "decisoes" || !!d.plano_comercial?.produtos?.length}><Secao titulo="Mercado e posicionamento">
@@ -595,7 +615,8 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         </Secao></div>
 
         </div>
-        <div hidden={area !== "rh"}>
+        {area === "rh" && <nav className="etapas-curtas" aria-label="Etapas de RH">{[["equipe","Contratar e demitir"],["remuneracao","Salário e benefícios"],["desenvolvimento","Treinamento e horas extras"]].map(([id,t])=><button type="button" key={id} aria-pressed={etapaRH===id} onClick={()=>setEtapaRH(id)}>{t}</button>)}</nav>}
+        <div hidden={area !== "rh" || etapaRH !== "equipe"}>
         <Secao titulo="Funcionários e capacidade de atendimento">
           <Campo rotulo="Contratar" ajuda={`Salário-base ${reais(p.salario_base)}. A prévia aplica os encargos do regime efetivo.`}>
             <ControleVisual rotulo="Contratar funcionários" moeda={false} inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} limite={20} />
@@ -607,7 +628,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
 
         </div>
         <div hidden={area !== "financas"}>
-        <nav aria-label="Etapas de Finanças" className="mb-3 flex flex-wrap gap-2">{[["credito","Crédito e tributos"],["compras","Compras a prazo"],["vendas","Vendas a prazo"]].map(([id,nome])=><button key={id} type="button" aria-pressed={etapaFinanceira===id} onClick={()=>setEtapaFinanceira(id)} className={`rounded-lg px-3 py-2 text-sm font-semibold ${etapaFinanceira===id ? "bg-corporativo text-white" : "bg-slate-100 text-corporativo"}`}>{nome}</button>)}</nav>
+        <nav aria-label="Etapas de Finanças" className="mb-3 flex flex-wrap gap-2">{[["credito","Crédito e tributos"],...(turma.modo_jogo === "TRADICIONAL" ? [["compras","Compras a prazo"]] : []),["vendas","Vendas a prazo"],...(turma.modo_jogo === "STARTUP" ? [["aporte","Investidores"]] : [])].map(([id,nome])=><button key={id} type="button" aria-pressed={etapaFinanceira===id} onClick={()=>setEtapaFinanceira(id)} className={`rounded-lg px-3 py-2 text-sm font-semibold ${etapaFinanceira===id ? "bg-corporativo text-white" : "bg-slate-100 text-corporativo"}`}>{nome}</button>)}</nav>
         <div className="mb-3 rounded-lg bg-slate-50 px-3 py-2 text-xs"><p className="font-semibold">Preço escolhido: <ValorMonetario valor={d.preco}/> · Custo unitário: <ValorMonetario valor={d.plano_comercial?.custo_unitario ?? p.custo_unitario}/> · Caixa atual: <ValorMonetario valor={empresa.caixa}/></p></div>
         {d.emprestimo > 0 && <Aviso tipo="info">Atenção: dinheiro do banco tem custo alto e pode comprometer a empresa. Juros estimados deste pedido: até <ValorMonetario valor={Math.min(d.emprestimo, Math.max(0, p.limite_credito - empresa.divida)) * p.taxa_juros_mensal}/> por mês, além da dívida atual, à taxa de {percentual(p.taxa_juros_mensal, 2)}. Os juros reduzem lucro e capital de giro, podem subir com a Selic e continuam enquanto houver saldo devedor. O principal precisa ser devolvido; crédito depende do caixa e do limite disponível.</Aviso>}
         <Secao titulo="Finanças e tributos" oculto={etapaFinanceira !== "credito"}>
@@ -649,9 +670,9 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
 
         </div>
         {turma.modo_jogo === "LEGADO" && ["producao", "logistica"].includes(area) && <div className="rounded-xl border-l-4 border-blue-600 bg-blue-50 p-5"><h3 className="font-bold">{area === "producao" ? "Capacidade no modelo básico" : "Logística no modelo básico"}</h3><p className="mt-2 text-sm">{area === "producao" ? "Neste modelo, a capacidade depende da equipe de funcionários. Estoques, máquinas e planejamento de produção são controles do modelo Empresa tradicional." : "Este modelo não possui escolha de frete ou entregas. Esses controles estão disponíveis no modelo Empresa tradicional; no modelo Startup, a operação é digital."}</p><p className="mt-2 text-sm">Confira a capacidade e os gastos previstos na prévia abaixo.</p></div>}
-        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao etapaFinanceira={etapaFinanceira} rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
+        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao etapaRH={etapaRH} etapaFinanceira={etapaFinanceira} rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
 
-        {painelAuxiliar === "previa" && <Modal titulo="Prévia financeira e operacional" aoFechar={()=>setPainelAuxiliar(null)}><div className="text-sm">
+        {painelAuxiliar === "previa" && <Modal titulo="Prévia estimada — não é o resultado da rodada" aoFechar={()=>setPainelAuxiliar(null)}><div className="text-sm">
           {!previsao && !erroPrevisao && <p role="status">Calculando prévia…</p>}
           {erroPrevisao && (
             <div className="space-y-2">
@@ -692,14 +713,14 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
           )}
         </div>
         </Modal>}
-        </fieldset></RevisaoCampos.Provider>
+        </fieldset></LeituraDecisao.Provider></RevisaoCampos.Provider>
 
-        {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}
+
         {!somenteLeitura && <><p className="text-xs text-slate-600">O rascunho pode ficar incompleto. No envio final, o programa informa as pendências e impede o envio até que sejam resolvidas.</p>
 
-        {destinoAcoes && createPortal(<div className="flex flex-wrap items-center justify-end gap-2" aria-label="Ações da decisão"><label className="mt-3 flex items-center gap-3 text-sm font-semibold"><input type="checkbox" disabled={somenteLeitura || (area === "logistica" && turma.modo_jogo !== "TRADICIONAL")} checked={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e => setD(atual => ({ ...atual, revisao_areas: { ...atual.revisao_areas, [area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)]: e.target.checked } }))} />Conferi os valores desta área</label><button type="button" className="text-xs font-semibold text-corporativo" onClick={()=>setPainelAuxiliar("previa")}>Prévia</button><button type="button" className="text-xs font-semibold text-corporativo" onClick={()=>setPainelAuxiliar("revisao")}>Revisão</button>{mensagem && <span role="status" className={`mr-auto text-sm ${mensagem.tipo === "erro" ? "text-red-700" : "text-corporativo"}`}>{mensagem.texto}</span>}<Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho</Botao>{proxima&&<Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para a próxima etapa →</Botao>}<Botao variante="final" type="submit" form={`form-decisao-${empresa.id}`} carregando={carregando} disabled={conflito}>Enviar decisão final</Botao></div>, destinoAcoes)}</>}
+        {destinoAcoes && createPortal(<div className="barra-decisao" aria-label="Ações da decisão"><div className="situacao-rascunho" role={mensagem?.tipo === "erro" ? "alert" : "status"}>{mensagem ? mensagem.texto : alterada ? "Alterações ainda não salvas" : painel.decisao_atual ? `Rascunho completo salvo · versão ${base.versao}` : "Valores iniciais · ainda não salvos"}</div><button type="button" className="consulta-previa" onClick={()=>setPainelAuxiliar("previa")}>Prévia estimada</button><Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho completo</Botao>{area === "conferencia" ? <Botao variante="final" type="submit" form={`form-decisao-${empresa.id}`} carregando={carregando} disabled={conflito}>Enviar decisão final</Botao> : proxima && <Botao type="button" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para {proxima === "conferencia" ? "conferência" : DEPARTAMENTOS.find(x=>x.id===proxima)?.titulo ?? proxima} →</Botao>}</div>, destinoAcoes)}</>}
       </form>
-      {confirmandoEnvio && <Modal titulo="Confirmar decisão final" aoFechar={()=>setConfirmandoEnvio(false)}><p className="text-sm">Esta é a decisão final da equipe para este mês? Após enviar, todas as escolhas ficam visíveis em modo de leitura até a próxima rodada. Use o rascunho se ainda precisar alterar algo.</p><div className="mt-6 flex justify-end gap-3"><Botao variante="secundario" onClick={()=>setConfirmandoEnvio(false)}>Voltar e revisar</Botao><Botao variante="final" carregando={carregando} onClick={()=>{setConfirmandoEnvio(false);salvar(false);}}>Confirmar envio final</Botao></div></Modal>}
+      {confirmandoEnvio && <Modal titulo="Confirmar decisão final" aoFechar={()=>setConfirmandoEnvio(false)}><p className="text-sm">Confirma o envio de todos os departamentos para a rodada {turma.rodada_atual}? Após enviar, todas as escolhas ficam visíveis em modo de leitura até a próxima rodada. Use o rascunho se ainda precisar alterar algo.</p><div className="mt-6 flex justify-end gap-3"><Botao variante="secundario" onClick={()=>setConfirmandoEnvio(false)}>Voltar e revisar</Botao><Botao variante="final" carregando={carregando} onClick={()=>{setConfirmandoEnvio(false);salvar(false);}}>Confirmar envio final</Botao></div></Modal>}
     </Cartao>
   );
 }
@@ -723,13 +744,15 @@ function Previa({ rotulo, valor }: { rotulo: string; valor: React.ReactNode }) {
 }
 
 function Historico({ painel }: { painel: PainelAluno }) {
+  const [paginaHistorico,setPaginaHistorico]=useState(0);
+  const [mostrarHistoricoDetalhes,setMostrarHistoricoDetalhes]=useState(false);
   const eventos = new Map(painel.eventos.map((e) => [e.rodada, e.titulo]));
   const [rodadaSelecionada, setRodadaSelecionada] = useState(painel.resultados[painel.resultados.length - 1]?.rodada);
   const temDetalhes = painel.resultados.some((r) => r.detalhes_simulacao);
   const selecionado = painel.resultados.find((r) => r.rodada === rodadaSelecionada);
   return (
     <Cartao titulo="Histórico">
-      <div className="overflow-x-auto">
+      <div hidden={mostrarHistoricoDetalhes} className="overflow-x-auto">
         <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="text-left text-xs uppercase text-slate-500">
@@ -745,7 +768,7 @@ function Historico({ painel }: { painel: PainelAluno }) {
             </tr>
           </thead>
           <tbody>
-            {[...painel.resultados].reverse().map((r) => (
+            {[...painel.resultados].reverse().slice(paginaHistorico*5,paginaHistorico*5+5).map((r) => (
               <tr key={r.rodada} className="border-t border-slate-100">
                 <td className="py-1.5">{r.rodada}</td>
                 <td className="py-1.5 text-right"><ValorMonetario valor={r.preco}/></td>
@@ -757,25 +780,28 @@ function Historico({ painel }: { painel: PainelAluno }) {
                 <td className="py-1.5 text-right"><ValorMonetario valor={r.caixa_final}/></td>
                 <td className="py-1.5">{NOME_REGIME[r.regime]}</td>
                 <td className="py-1.5 text-slate-500">{eventos.get(r.rodada) ?? "—"}</td>
-                {temDetalhes && <td className="py-1.5">{r.detalhes_simulacao && <button className={`rounded-md px-2 py-1 text-xs font-semibold ${rodadaSelecionada === r.rodada ? "bg-marinho text-white" : "bg-slate-100 text-marinho"}`} aria-pressed={rodadaSelecionada === r.rodada} onClick={() => setRodadaSelecionada(r.rodada)}>Ver mês {r.rodada}</button>}</td>}
+                {temDetalhes && <td className="py-1.5">{r.detalhes_simulacao && <button className={`rounded-md px-2 py-1 text-xs font-semibold ${rodadaSelecionada === r.rodada ? "bg-marinho text-white" : "bg-slate-100 text-marinho"}`} aria-pressed={rodadaSelecionada === r.rodada} onClick={() => {setRodadaSelecionada(r.rodada);setMostrarHistoricoDetalhes(true);}}>Ver mês {r.rodada}</button>}</td>}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {selecionado?.detalhes_simulacao && <div className="mt-5 space-y-4"><h3 className="text-sm font-semibold text-marinho">Demonstrativos e operação do mês {selecionado.rodada}</h3><RelatorioFinanceiro detalhes={selecionado.detalhes_simulacao} /></div>}
+      {!mostrarHistoricoDetalhes && painel.resultados.length>5 && <nav className="etapas-curtas mt-3" aria-label="Páginas do histórico"><button type="button" disabled={!paginaHistorico} onClick={()=>setPaginaHistorico(n=>n-1)}>← Anterior</button><span className="self-center text-sm">{paginaHistorico+1}/{Math.ceil(painel.resultados.length/5)}</span><button type="button" disabled={(paginaHistorico+1)*5>=painel.resultados.length} onClick={()=>setPaginaHistorico(n=>n+1)}>Próxima →</button></nav>}
+      {mostrarHistoricoDetalhes && <button type="button" className="consulta-previa" onClick={()=>setMostrarHistoricoDetalhes(false)}>← Voltar à lista de rodadas</button>}
+      {mostrarHistoricoDetalhes && selecionado?.detalhes_simulacao && <div className="mt-5 space-y-4"><h3 className="text-sm font-semibold text-marinho">Demonstrativos e operação do mês {selecionado.rodada}</h3><RelatorioFinanceiro detalhes={selecionado.detalhes_simulacao} /></div>}
     </Cartao>
   );
 }
 
 function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resultados"][number] }) {
+  const [mostrarDetalhes,setMostrarDetalhes] = useState(false);
   const { dre, detalhes_simulacao: detalhes } = resultado;
   const margem = dre.receita > 0 ? dre.lucro_liquido / dre.receita : null;
   const b = detalhes?.balanco;
   const ativos = b ? (b.ativo_total ?? Math.max(0,b.caixa) + b.receber + b.estoques + b.imobilizado) : null;
   const passivos = b ? (b.passivo_total ?? b.pagar + b.divida + Math.max(0,-b.caixa)) : null;
   return <Cartao titulo={`KPIs e indicadores financeiros · rodada ${resultado.rodada}`}>
-    <dl className="grid gap-4 sm:grid-cols-3">
+    <dl hidden={mostrarDetalhes} className="grid gap-4 sm:grid-cols-3">
       <div><dt className="text-sm text-slate-500">Margem líquida</dt><dd className="font-bold text-marinho">{margem === null ? "—" : percentual(margem)}</dd></div>
       <div><dt className="text-sm text-slate-500">Participação no mercado</dt><dd className="font-bold text-marinho">{percentual(resultado.participacao_mercado)}</dd><p className="text-xs text-slate-500">Parcela do mercado conquistada nesta rodada.</p></div>
       <div><dt className="text-sm text-slate-500">Atendimento da demanda</dt><dd className="font-bold text-marinho">{resultado.demanda > 0 ? percentual(resultado.unidades_vendidas / resultado.demanda) : "—"}</dd></div>
@@ -785,8 +811,8 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
         <div><dt className="text-sm text-slate-500">Caixa operacional</dt><dd className="font-bold text-marinho"><ValorMonetario valor={detalhes!.dfc.operacional}/></dd></div>
       </>}
     </dl>
-    <p className="mt-3 text-xs text-slate-500">“—” indica ausência de uma base válida para cálculo. Compare com as rodadas anteriores e com os demonstrativos.</p>
-    <details className="mt-5 rounded-xl border border-slate-200 p-4"><summary className="cursor-pointer font-semibold">Ver balanço e demonstrativos completos</summary>
+    <p hidden={mostrarDetalhes} className="mt-3 text-xs text-slate-500">“—” indica ausência de uma base válida para cálculo. Compare com as rodadas anteriores e com os demonstrativos.</p>
+    <button type="button" className="consulta-previa" onClick={()=>setMostrarDetalhes(v=>!v)}>{mostrarDetalhes ? "← Voltar aos indicadores" : "Ver balanço e demonstrativos completos"}</button><div hidden={!mostrarDetalhes}>
     {resultado.balanco_basico && <div className="mt-5 rounded border p-4"><h3 className="font-semibold">Balanço patrimonial · modelo básico · rodada {resultado.rodada}</h3><p className="my-2 text-xs text-slate-500">O modelo básico opera à vista, sem estoques, imobilizado ou contas a prazo. Saldo de caixa negativo aparece como cheque especial no passivo.</p><dl className="grid gap-3 sm:grid-cols-3">{([
       ["Caixa e bancos",resultado.balanco_basico.caixa],
       ["Empréstimos",resultado.balanco_basico.emprestimos],
@@ -797,6 +823,6 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
     ] as const).map(([nome,valor])=><div key={nome}><dt className="text-sm text-slate-500">{nome}</dt><dd className="font-bold"><ValorMonetario valor={valor}/></dd></div>)}</dl></div>}
     {!detalhes && <ResultadoProdutos produtos={resultado.produtos_resultado??[]}/>}
     {detalhes && <div className="mt-5"><RelatorioFinanceiro detalhes={detalhes} /></div>}
-    </details>
+    </div>
   </Cartao>;
 }
