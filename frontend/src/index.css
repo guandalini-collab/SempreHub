@@ -262,3 +262,9 @@
 .estacao-aluno .matriz-bcg .consulta-previa { padding: .15rem; }
 .estacao-aluno .matriz-bcg > p { margin-top: .2rem; font-size: .8rem; }
 .estacao-aluno .grafico-bcg { width: min(100%, 420px); }
+/* Abas compartilhadas também permanecem legíveis nas consultas do professor. */
+.painel-executivo .etapas-curtas { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .75rem; }
+.painel-executivo .etapas-curtas button { padding: .4rem .65rem; border: 1px solid #e2e8f0; border-radius: .4rem; font-size: .8rem; background: #fff; color: #475569; }
+.painel-executivo .etapas-curtas button[aria-pressed="true"] { border-color: #0AADBF; background: #e8f7f8; color: #164b53; }
+.painel-executivo .etapas-curtas button:disabled { opacity: .45; cursor: not-allowed; }
+.painel-executivo .consulta-previa { font-size: .8rem; color: #034AA6; text-decoration: underline; padding: .4rem; }
