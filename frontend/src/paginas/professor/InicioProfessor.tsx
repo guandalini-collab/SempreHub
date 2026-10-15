@@ -12,6 +12,9 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
   const [turmas, setTurmas] = useState<Turma[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [criando, setCriando] = useState(false);
+  const [aba,setAba]=useState("turmas");
+  const [pagina,setPagina]=useState(0);
+  const [busca,setBusca]=useState("");
 
   useEffect(() => {
     api
@@ -26,24 +29,26 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
   if (erro) return <Aviso>{erro}</Aviso>;
   if (!turmas) return <Carregando />;
 
+  const filtradas=turmas.filter(t=>t.nome.toLocaleLowerCase("pt-BR").includes(busca.toLocaleLowerCase("pt-BR")));
   return (
-    <div className="space-y-6">
+    <div className="inicio-professor space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-marinho">Minhas turmas</h1>
           <p className="text-sm text-slate-500">Crie uma turma, divulgue o código e conduza as rodadas.</p>
         </div>
-        {!criando && <Botao onClick={() => setCriando(true)}>Nova turma</Botao>}
+        {!criando && <Botao onClick={() => {setCriando(true);setAba("turmas");}}>Nova turma</Botao>}
       </div>
 
-      <TourGuiado perfil="PROFESSOR" />
+      <nav className="etapas-curtas" aria-label="Área do professor">{[{id:"turmas",titulo:"Minhas turmas"},{id:"teste",titulo:"Alunos de teste"},{id:"referencias",titulo:"Referências"},{id:"marca",titulo:"Identidade do programa"}].map(a=><button key={a.id} type="button" aria-pressed={aba===a.id} onClick={()=>{setAba(a.id);setCriando(false);}}>{a.titulo}</button>)}</nav>
+      {turmas.length===0&&!criando&&aba==="turmas"&&<TourGuiado perfil="PROFESSOR"/>}
 
       {criando && (
         <NovaTurma aoCriar={(t) => abrirTurma(t.id)} aoCancelar={turmas.length ? () => setCriando(false) : undefined} />
       )}
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {turmas.map((t) => (
+      {aba==="turmas"&&!criando&&<><input aria-label="Buscar turma" placeholder="Buscar turma" className={estiloEntrada} value={busca} onChange={e=>{setBusca(e.target.value);setPagina(0);}}/><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {filtradas.slice(pagina*3,pagina*3+3).map((t) => (
           <button
             key={t.id}
             onClick={() => abrirTurma(t.id)}
@@ -69,12 +74,13 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
         ))}
       </div>
 
-      <AlunosTeste />
-      <BibliotecaAprendizagem />
-      <Cartao titulo="Comunicação do programa">
+      <nav aria-label="Paginação de turmas" className="flex justify-between text-sm"><button disabled={pagina===0} onClick={()=>setPagina(pagina-1)}>← Anterior</button><span>{filtradas.length} turma(s) · Página {pagina+1}</span><button disabled={(pagina+1)*3>=filtradas.length} onClick={()=>setPagina(pagina+1)}>Próxima →</button></nav></>}
+      {aba==="teste"&&<AlunosTeste />}
+      {aba==="referencias"&&<BibliotecaAprendizagem />}
+      {aba==="marca"&&<Cartao titulo="Comunicação do programa">
         <p className="mb-2 text-sm text-slate-600">Use a identidade do SempreHub nos materiais de apresentação da turma.</p>
         <a href="/marca/semprehub-original.svg" download className="text-sm font-semibold text-marinho underline">Baixar logo do SempreHub</a>
-      </Cartao>
+      </Cartao>}
     </div>
   );
 }

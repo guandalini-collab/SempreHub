@@ -28,7 +28,6 @@ import {
   Carregando,
   Cartao,
   GraficoLinhas,
-  Indicador,
   Modal,
   SeloFase,
   TabelaDre,
@@ -44,14 +43,19 @@ const FERRAMENTAS_ANALISE = ["5 Forças de Porter", "PESTEL", "Análise de merca
 
 const ITENS_PAINEL = [
   {id: "manuais", titulo: "Manuais", descricao: "Consulte ou baixe os manuais em PDF.", simbolo: "", grupo: "Manuais"},
-  { id: "visao", titulo: "1. Dados e ingresso", descricao: "Confira o nome da turma e libere seu ingresso para os alunos.", simbolo: "", grupo: "Preparar turma" },
+  { id: "visao", titulo: "Visão geral", descricao: "Confira o nome da turma e libere seu ingresso para os alunos.", simbolo: "", grupo: "Preparar turma" },
+  { id: "ingresso", titulo: "Ingresso e formação", descricao: "Organize a entrada e as equipes.", simbolo: "", grupo: "Preparar turma" },
+  { id: "calendario", titulo: "Calendário simulado", descricao: "Defina o calendário e a sazonalidade.", simbolo: "", grupo: "Preparar turma" },
   { id: "configuracao", titulo: "2. Configurar simulação", descricao: "Revise os parâmetros antes de orientar os alunos.", simbolo: "", grupo: "Preparar turma" },
   { id: "parametros", titulo: "Parâmetros", descricao: "Revise e ajuste os parâmetros da turma.", simbolo: "", grupo: "Preparar turma", pai: "configuracao" },
   { id: "equipes", titulo: "3. Conferir participantes", descricao: "Confira alunos, empresas e pendências de envio.", simbolo: "", grupo: "Preparar turma" },
   { id: "mercado", titulo: "4. Preparar rodada", descricao: "Pesquise, revise e publique notícias e produtos para os alunos.", simbolo: "", grupo: "Conduzir rodada" },
   { id: "rodada", titulo: "5. Acompanhar envios", descricao: "Acompanhe as decisões e veja o que falta para encerrar a rodada.", simbolo: "", grupo: "Conduzir rodada" },
+  { id: "prazo", titulo: "Prazo da rodada", descricao: "Defina quando os envios serão encerrados.", simbolo: "", grupo: "Conduzir rodada" },
+  { id: "concorrencia", titulo: "Concorrência", descricao: "Confira a estrutura competitiva do mercado.", simbolo: "", grupo: "Conduzir rodada" },
   { id: "fechamento", titulo: "6. Encerrar rodada", descricao: "Confira os envios e confirme o encerramento. O sistema sorteia os eventos e calcula os resultados.", simbolo: "", grupo: "Conduzir rodada" },
   { id: "resultados", titulo: "7. Consultar resultados", descricao: "Analise os resultados. Para a próxima rodada, retome a etapa 4 no menu lateral.", simbolo: "", grupo: "Consultar resultados" },
+  ...[{id:"avaliacao",titulo:"Avaliação pedagógica"},{id:"caixas",titulo:"Evolução do caixa"},{id:"mercado-resultados",titulo:"Receita e lucro"},{id:"eventos",titulo:"Eventos da turma"}].map(item=>({...item,descricao:"Consulte os resultados consolidados da turma.",simbolo:"",grupo:"Consultar resultados"})),
   { id: "aprendizagem", titulo: "Autores e referências", descricao: "Consulte as referências para orientar a atividade.", simbolo: "", grupo: "Apoio" },
   { id: "analises", titulo: "Ferramentas de análise", descricao: "Consulte os conceitos e as ferramentas para orientar os alunos.", simbolo: "", grupo: "Apoio" },
   ...FERRAMENTAS_ANALISE.map((titulo, indice) => ({ id: `analise-${indice}`, titulo, descricao: "Consulte esta ferramenta para orientar a turma.", simbolo: "", grupo: "Apoio", pai: "analises" })),
@@ -66,6 +70,8 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const [empresaAberta, setEmpresaAberta] = useState<number | null>(null);
   const [editandoParametros, setEditandoParametros] = useState(false);
   const [secao, setSecao] = useState("visao");
+  const [paginaEquipes, setPaginaEquipes] = useState(0);
+  const [paginaEventos, setPaginaEventos] = useState(0);
   const sequenciaCarga = useRef(0);
   const [historicos, setHistoricos] = useState<Record<number, Resultado[]>>({});
 
@@ -113,51 +119,24 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const { turma, empresas, ranking, mercado } = dados;
   const enviadas = empresas.filter((e) => e.decisao_enviada).length;
   const aberta = turma.status === "ABERTA";
-  const rotulos = Array.from({ length: rodadasJogadas }, (_, i) => `M${i + 1}`);
+  const rotulos = Array.from({ length: rodadasJogadas }, (_, i) => `R${i + 1}`);
 
   return (
     <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={(id) => { setSecao(id); setEditandoParametros(id === "parametros"); }} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
-      {aberta && !turma.prazo_rodada && (
-        <div role="status" className="alerta-controle mb-4 rounded-xl border border-ouro/25 bg-white p-4 text-amber-950">
-          <p className="font-semibold">Configuração pendente: rodada {turma.rodada_atual} sem data limite.</p>
-          <p className="mt-1 text-sm">Antes de orientar os alunos a iniciar esta rodada, confira o prazo. Sem uma data salva, as decisões permanecem abertas e o encerramento será somente manual. O prazo da rodada anterior não é reutilizado.</p>
-          <button type="button" className="mt-3 rounded-lg border border-amber-400 px-3 py-2 text-sm font-semibold hover:bg-amber-100" onClick={() => setSecao("fechamento")}>Configurar prazo da rodada</button>
-        </div>
-      )}
       <SecaoPainel id="visao" ativa={secao}>
-      <FormacaoTurma turma={turma} aoAtualizar={carregar}/>
-      <div className="rounded-xl bg-marinho p-5 text-white shadow-lg">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-ouro">Turma</p>
-            <h1 className="text-2xl font-bold">{turma.nome}</h1>
-            <p className="mt-1 text-xs text-white/70">{turma.modo_equipe ? "Equipes de 3 a 5 alunos · envio pelo líder" : "Participação individual"} · {turma.modo_jogo === "STARTUP" ? "Startup" : turma.modo_jogo === "TRADICIONAL" ? "Empresa tradicional" : "Modelo básico"}{turma.cenario === "CRISE" ? " · recuperação de empresa" : ""}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-xs uppercase tracking-wide text-white/60">Ingresso pelo nome da turma</p>
-            <p className="text-lg font-bold text-ouro">{turma.visivel_ingresso ? "Disponível" : "Oculta para ingresso"}</p>
-          </div>
-        </div>
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <Indicador rotulo="Rodada" valor={aberta ? `${turma.rodada_atual} de ${turma.total_rodadas}` : "Encerrada"} destaque />
-          <Indicador rotulo="Empresas" valor={empresas.length} />
-          <Indicador rotulo={turma.modo_equipe ? "Equipes prontas" : "Decisões enviadas"} valor={aberta ? `${enviadas} de ${empresas.length}` : "—"} />
-          <Indicador rotulo="Juros atuais" valor={`${percentual(turma.parametros!.taxa_juros_mensal, 2)} a.m.`} />
-        </div>
-        {(turma.greve_rodadas_restantes ?? 0) > 0 && (
-          <p className="mt-4 rounded-lg bg-white/10 px-3 py-2 text-sm">
-            Greve na logística em curso: CMV 40% mais caro por mais {turma.greve_rodadas_restantes} rodada(s).
-          </p>
-        )}
-      </div>
-
-      <Cartao titulo="Prontidão da turma"><p className="mb-3 text-sm text-slate-600">{enviadas} de {empresas.length} empresas prontas nesta rodada</p><div className="h-3 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label="Empresas com decisões enviadas" aria-valuenow={empresas.length ? Math.round(enviadas / empresas.length * 100) : 0} aria-valuemin={0} aria-valuemax={100}><div className="h-full bg-emerald-500 transition-all" style={{ width: `${empresas.length ? enviadas / empresas.length * 100 : 0}%` }} /></div><p className="mt-3 text-xs text-slate-500">Os envios finais dos líderes atualizam este painel automaticamente.</p></Cartao>
-
+        <Cartao titulo="Conduzir a turma">
+          <div className="resumo-conferencia"><div><span>Empresas</span><strong>{empresas.length}</strong></div><div><span>Decisões enviadas</span><strong>{enviadas} de {empresas.length}</strong></div><div><span>Ingresso</span><strong>{turma.visivel_ingresso ? "Disponível" : "Oculto"}</strong></div></div>
+          <ol className="roteiro-rodada">{[{id:"mercado",titulo:"Preparar o mercado",texto:"Notícias e catálogo para a rodada"},{id:"prazo",titulo:"Definir o prazo",texto:turma.prazo_rodada ? "Prazo configurado" : "Pendente · sem data, o fechamento é manual"},{id:"equipes",titulo:"Acompanhar as equipes",texto:`${empresas.length-enviadas} envio(s) pendente(s)`},{id:"fechamento",titulo:"Encerrar e consultar resultados",texto:"Confirme o fechamento após conferir os envios"}].map((passo,i)=><li key={passo.id}><span className="numero-etapa">{i+1}</span><div><strong>{passo.titulo}</strong><p>{passo.texto}</p></div><button type="button" onClick={()=>setSecao(passo.id)}>Abrir →</button></li>)}</ol>
+          {(turma.greve_rodadas_restantes??0)>0&&<p role="status">Greve logística em curso: confira os efeitos antes de encerrar.</p>}
+        </Cartao>
       </SecaoPainel>
+      <SecaoPainel id="ingresso" ativa={secao}><FormacaoTurma turma={turma} aoAtualizar={carregar}/></SecaoPainel>
+      <SecaoPainel id="calendario" ativa={secao}><CalendarioTurma turma={turma} aoSalvar={carregar}/></SecaoPainel>
+      <SecaoPainel id="concorrencia" ativa={secao}><CompetitividadeMercado config={turma.parametros?.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} equipes={empresas.length}/></SecaoPainel>
+      <SecaoPainel id="prazo" ativa={secao}>{aberta ? <PrazoRodada turmaId={turma.id} rodada={turma.rodada_atual} prazo={turma.prazo_rodada} aoSalvar={carregar}/> : <p>Simulação encerrada.</p>}</SecaoPainel>
       {erro && <Aviso>{erro}</Aviso>}
 
       <SecaoPainel id="mercado" ativa={secao}>
-      <CompetitividadeMercado config={turma.parametros?.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} equipes={empresas.length} />
       <GestaoMercado turmaId={turmaId} rodada={dados.turma.rodada_atual} empresas={dados.empresas} />
       </SecaoPainel>
       <SecaoPainel id="manuais" ativa={secao}><CentralManuais perfil="PROFESSOR" /></SecaoPainel>
@@ -185,7 +164,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       </SecaoPainel>
       <SecaoPainel id="fechamento" ativa={secao}>
           {aberta ? (
-            <><PrazoRodada turmaId={turma.id} rodada={turma.rodada_atual} prazo={turma.prazo_rodada} aoSalvar={carregar} /><FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} empresas={empresas} aoFechar={carregar} /></>
+            <><FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} empresas={empresas} aoFechar={carregar} /></>
           ) : (
             <Cartao titulo="Simulação encerrada">
               <p className="text-sm text-slate-600">
@@ -195,7 +174,6 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
           )}
       </SecaoPainel>
       <SecaoPainel id="configuracao" ativa={secao}>
-      <CalendarioTurma turma={turma} aoSalvar={carregar} />
           <Cartao
             titulo="Parâmetros e dados"
             acao={
@@ -242,7 +220,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {ranking.map((linha) => {
+                  {ranking.slice(paginaEquipes*5,paginaEquipes*5+5).map((linha) => {
                     const empresa = empresas.find((e) => e.id === linha.empresa_id)!;
                     return (
                       <tr
@@ -277,7 +255,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
                   })}
                 </tbody>
               </table>
-              <p className="mt-2 text-xs text-slate-500">Clique numa empresa para ver decisões e resultados.</p>
+              <Paginacao pagina={paginaEquipes} total={ranking.length} aoMudar={setPaginaEquipes}/><p className="mt-2 text-xs text-slate-500">Clique numa empresa para ver decisões e resultados.</p>
             </div>
           )}
         </Cartao>
@@ -285,10 +263,12 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       <SecaoPainel id="resultados" ativa={secao}>
       <RelatoriosEmpresariaisProfessor turmaId={turmaId} ultimaRodada={rodadasJogadas} empresas={empresas} />
       {rodadasJogadas === 0 && <Cartao titulo="Resultados ainda indisponíveis"><p>Os gráficos e indicadores serão disponibilizados após o encerramento da primeira rodada. As empresas podem ser acompanhadas em Alunos e empresas.</p></Cartao>}
+      </SecaoPainel><SecaoPainel id="avaliacao" ativa={secao}>
       {turma.modo_jogo !== "LEGADO" && <RelatorioPedagogico turmaId={turma.id} rodada={turma.rodada_atual} temResultados={rodadasJogadas > 0} abrirEmpresa={setEmpresaAberta} rankingPatrimonial={ranking} />}
 
-      {rodadasJogadas > 0 && (
-        <div className="grid gap-6 lg:grid-cols-2">
+      </SecaoPainel><SecaoPainel id="caixas" ativa={secao}>
+      {rodadasJogadas > 0 ? (
+        <>
           <Cartao titulo="Caixa por empresa">
             <GraficoLinhas
               rotulosX={rotulos}
@@ -301,9 +281,12 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
                 }))}
             />
           </Cartao>
+        </>
+      ) : <p>Disponível após o primeiro fechamento.</p>}
+      </SecaoPainel><SecaoPainel id="mercado-resultados" ativa={secao}>
           <Cartao titulo="Mercado da turma">
             <GraficoLinhas
-              rotulosX={mercado.map((m) => `M${m.rodada}`)}
+              rotulosX={mercado.map((m) => `R${m.rodada}`)}
               series={[
                 { nome: "Receita total", cor: "#034AA6", valores: mercado.map((m) => m.receita) },
                 { nome: "Lucro total", cor: "#D9851E", valores: mercado.map((m) => m.lucro) },
@@ -313,19 +296,18 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
               Preço médio na última rodada: {mercado.length ? reais(mercado[mercado.length - 1].preco_medio) : "—"}
             </p>
           </Cartao>
-        </div>
-      )}
-
+      </SecaoPainel><SecaoPainel id="eventos" ativa={secao}>
+      {dados.eventos.length === 0 && <p>Nenhum evento registrado.</p>}
       {dados.eventos.length > 0 && (
         <Cartao titulo="Eventos da turma">
           <ul className="divide-y divide-slate-100 text-sm">
-            {[...dados.eventos].reverse().map((e) => (
+            {[...dados.eventos].reverse().slice(paginaEventos*5,paginaEventos*5+5).map((e) => (
               <li key={e.rodada} className="py-2">
-                <span className="font-semibold text-marinho">Mês {e.rodada}: {e.titulo}.</span>{" "}
+                <span className="font-semibold text-marinho">Rodada {e.rodada}: {e.titulo}.</span>{" "}
                 <span className="text-slate-600">{e.narrativa}</span>
               </li>
             ))}
-          </ul>
+          </ul><Paginacao pagina={paginaEventos} total={dados.eventos.length} aoMudar={setPaginaEventos}/>
         </Cartao>
       )}
 
@@ -440,6 +422,7 @@ function FecharRodada({
 function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: number; empresaId: number; modo: ModoJogo; aoFechar: () => void }) {
   const [dados, setDados] = useState<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; jornada?: Jornada; equipe?: Equipe | null } | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [abaDetalhe,setAbaDetalhe]=useState("resumo");
   const [rodadaSelecionada, setRodadaSelecionada] = useState<number | null>(null);
 
   useEffect(() => {
@@ -460,16 +443,17 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
         <Carregando />
       ) : (
         <div className="space-y-4">
-          <details className="rounded-xl border p-3"><summary className="cursor-pointer font-semibold">Conquistas e evolução desta empresa</summary><div className="mt-3"><Conquistas jornada={dados.jornada} /></div></details>
+          <nav className="etapas-curtas" aria-label="Detalhes da empresa">{["resumo","equipe","operações","diagnósticos","decisões","DRE","financeiro"].map(a=><button type="button" key={a} aria-pressed={abaDetalhe===a} onClick={()=>setAbaDetalhe(a)}>{a}</button>)}</nav>
+          <div hidden={abaDetalhe!=="resumo"}><details className="rounded-xl border p-3"><summary className="cursor-pointer font-semibold">Conquistas e evolução desta empresa</summary><div className="mt-3"><Conquistas jornada={dados.jornada} /></div></details>
           <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
             <span>{dados.empresa.aluno} · {dados.empresa.aluno_email}</span>
             <SeloFase fase={dados.empresa.fase_atual} />
           </div>
-          {dados.equipe ? <>
+          </div><div hidden={abaDetalhe!=="equipe"}>{dados.equipe ? <>
             <EquipeEmpresa empresaId={dados.empresa.id} equipe={dados.equipe} />
             <div className="space-y-2">{dados.equipe.membros.map((m) => <div key={m.aluno_id} className="flex flex-wrap items-center justify-between gap-2"><span className="text-sm text-slate-600">{m.nome}</span><BotaoRedefinirSenha alunoId={m.aluno_id} nome={m.nome} /></div>)}</div>
           </> : <BotaoRedefinirSenha alunoId={dados.empresa.aluno_id} nome={dados.empresa.aluno ?? "o aluno"} />}
-          <div className="grid grid-cols-2 gap-3 rounded-lg bg-slate-50 p-3 text-sm sm:grid-cols-4">
+          </div><div hidden={abaDetalhe!=="resumo"} className="grid grid-cols-2 gap-3 rounded-lg bg-slate-50 p-3 text-sm sm:grid-cols-4">
             <Dado rotulo="Perfil" valor={`${NOME_GEM[dados.empresa.tipo_entrada_gem]}`} />
             <Dado rotulo="Tipo" valor={NOME_DORNELAS[dados.empresa.classe_dornelas]} />
             <Dado rotulo="Regime" valor={NOME_REGIME[dados.empresa.regime_tributario]} />
@@ -479,10 +463,10 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
             <Dado rotulo="Autoeficácia" valor={dados.empresa.autoeficacia.toFixed(0)} />
             <Dado rotulo="Networking" valor={dados.empresa.networking.toFixed(0)} />
           </div>
-          {dados.empresa.estado_simulacao && <PainelOperacional estado={dados.empresa.estado_simulacao} modo={modo} />}
-          <DiagnosticosEmpresa turmaId={turmaId} empresaId={empresaId}/>
+          <div hidden={abaDetalhe!=="operações"}>{dados.empresa.estado_simulacao && <PainelOperacional estado={dados.empresa.estado_simulacao} modo={modo} />}
+          </div><div hidden={abaDetalhe!=="diagnósticos"}><DiagnosticosEmpresa turmaId={turmaId} empresaId={empresaId}/>
           {dados.decisoes.filter(d => d.plano_comercial?.analises).map(d => <ResumoAnalises key={d.rodada} rodada={d.rodada} valor={d.plano_comercial!.analises!} />)}
-          {dados.resultados.length === 0 ? (
+          </div>{dados.resultados.length === 0 ? (
             <p className="text-sm text-slate-500">A empresa ainda não tem rodadas fechadas.</p>
           ) : (
             <>
@@ -495,13 +479,13 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
                       r.rodada === rodadaSelecionada ? "bg-marinho text-white" : "bg-slate-100 text-slate-600"
                     }`}
                   >
-                    M{r.rodada}
+                    R{r.rodada}
                   </button>
                 ))}
               </div>
               {resultado && (
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
+                <div>
+                  <div hidden={abaDetalhe!=="decisões"}>
                     <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Decisões</p>
                     {decisao ? (
                       <dl className="grid grid-cols-2 gap-2 text-sm">
@@ -525,11 +509,11 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
                       <Dado rotulo="Participação" valor={percentual(resultado.participacao_mercado)} />
                     </dl>
                   </div>
-                  <div>
+                  <div hidden={abaDetalhe!=="DRE"}>
                     <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Demonstrativo</p>
                     <TabelaDre dre={resultado.dre} />
                   </div>
-                  {resultado.alertas.length > 0 && (
+                  {abaDetalhe==="decisões" && resultado.alertas.length > 0 && (
                     <ul className="space-y-1 md:col-span-2">
                       {resultado.alertas.map((a) => (
                         <li key={a} className="rounded-md border-l-4 border-ouro bg-amber-50 px-3 py-1.5 text-xs text-slate-700">
@@ -540,8 +524,8 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
                   )}
                 </div>
               )}
-              {resultado && !resultado.detalhes_simulacao && <ResultadoProdutos produtos={resultado.produtos_resultado??[]}/>}
-              {resultado?.detalhes_simulacao && <RelatorioFinanceiro detalhes={resultado.detalhes_simulacao} />}
+              {abaDetalhe==="financeiro" && resultado && !resultado.detalhes_simulacao && <ResultadoProdutos produtos={resultado.produtos_resultado??[]}/>}
+              {abaDetalhe==="financeiro" && resultado?.detalhes_simulacao && <RelatorioFinanceiro detalhes={resultado.detalhes_simulacao} />}
             </>
           )}
         </div>
@@ -618,5 +602,7 @@ function PrazoRodada({turmaId, rodada, prazo, aoSalvar}: {turmaId: number; rodad
     catch(e) { setMensagem(e instanceof Error ? e.message : "Erro ao salvar prazo."); }
     finally { setSalvando(false); }
   }
-  return <Cartao titulo="Data limite da rodada"><ProgressoPrazo prazo={prazo}/><p className="mb-4 text-sm">O sistema bloqueia os envios e encerra automaticamente esta rodada às 23:59:59 de Brasília da data escolhida. Sem data, o encerramento é manual. Configure um novo prazo para cada mês.</p><Campo rotulo="Data limite"><input type="date" className={estiloEntrada} value={data} onChange={e=>setData(e.target.value)} /></Campo><div className="mt-4 flex justify-end"><Botao carregando={salvando} onClick={salvar}>Salvar prazo</Botao></div>{mensagem && <p role="status" className="mt-3 text-sm">{mensagem}</p>}</Cartao>;
+  return <Cartao titulo="Data limite da rodada"><ProgressoPrazo prazo={prazo}/><p className="mb-4 text-sm">O sistema bloqueia os envios e encerra automaticamente esta rodada às 23:59:59 de Brasília da data escolhida. Sem data, o encerramento é manual. Configure um novo prazo para cada rodada.</p><Campo rotulo="Data limite"><input type="date" className={estiloEntrada} value={data} onChange={e=>setData(e.target.value)} /></Campo><div className="mt-4 flex justify-end"><Botao carregando={salvando} onClick={salvar}>Salvar prazo</Botao></div>{mensagem && <p role="status" className="mt-3 text-sm">{mensagem}</p>}</Cartao>;
 }
+
+function Paginacao({pagina,total,aoMudar}:{pagina:number;total:number;aoMudar:(n:number)=>void}) {const paginas=Math.max(1,Math.ceil(total/5));return <nav aria-label="Paginação" className="mt-3 flex items-center justify-between gap-3 text-sm"><button type="button" disabled={pagina===0} onClick={()=>aoMudar(pagina-1)}>← Anterior</button><span>Página {pagina+1} de {paginas}</span><button type="button" disabled={pagina+1>=paginas} onClick={()=>aoMudar(pagina+1)}>Próxima →</button></nav>;}

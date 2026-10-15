@@ -73,15 +73,15 @@ export function EditorParametros({
   modoBloqueado?: boolean;
   exibirModo?: boolean;
 }) {
+  const [grupoAtivo, setGrupoAtivo] = React.useState(0);
   return (
     <div className="space-y-5">
-      {GRUPOS.map((grupo) => (
-        <fieldset key={grupo.titulo} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <nav className="etapas-curtas" aria-label="Grupos de parâmetros">{exibirModo&&<button type="button" aria-pressed={grupoAtivo===3} onClick={()=>setGrupoAtivo(3)}>Modelo da simulação</button>}{GRUPOS.map((g,i)=><button key={g.titulo} type="button" aria-pressed={grupoAtivo===i} onClick={()=>setGrupoAtivo(i)}>{g.titulo}</button>)}</nav>
+      {exibirModo&&<div hidden={grupoAtivo!==3}><ConfiguracaoSimulacao valores={valores} aoMudar={(jogo)=>aoMudar({...valores,...jogo})} bloqueado={modoBloqueado||somenteRodadas}/></div>}
+      {GRUPOS.map((grupo,i) => (
+        <fieldset hidden={grupoAtivo!==i} key={grupo.titulo} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <legend className={`float-left w-full px-5 py-4 text-base font-bold ${grupo.cor} ${grupo.cor === "bg-hub" ? "text-sky-950" : "text-white"}`}>{grupo.titulo}</legend>
           <div className="clear-both grid gap-5 p-5 sm:grid-cols-2 xl:grid-cols-3">
-            {grupo.titulo === "Cenário de Mercado" && <div className="sm:col-span-2 xl:col-span-3">
-      {exibirModo && <ConfiguracaoSimulacao valores={valores} aoMudar={(jogo) => aoMudar({ ...valores, ...jogo })} bloqueado={modoBloqueado || somenteRodadas} />}
-            </div>}
             {grupo.titulo === "Custos e Limites da Empresa" && <div className="sm:col-span-2 xl:col-span-3">
       {exibirModo && <Campo rotulo="Participação dos alunos" ajuda={modoBloqueado ? "Ao converter para equipes, empresas e resultados são preservados. Cada aluno atual inicia como CEO; complete a equipe e confirme novamente as decisões da rodada atual." : "Em equipes, 3 a 5 alunos dividem os cargos e todos confirmam cada decisão."}>
         <select className={estiloEntrada} value={valores.modo_equipe ? "EQUIPE" : "INDIVIDUAL"} onChange={(e) => aoMudar({ ...valores, modo_equipe: e.target.value === "EQUIPE" })}>

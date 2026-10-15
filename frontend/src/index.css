@@ -92,179 +92,186 @@
 }
 
 /* Área de trabalho do aluno: controles permanentes e um conteúdo por vez. */
-.painel-executivo:has(.estacao-aluno) { height: 100dvh; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-.painel-executivo:has(.estacao-aluno) > header { flex: none; }
-.painel-executivo:has(.estacao-aluno) > header > div:first-child { padding-top: .5rem; padding-bottom: .5rem; }
-.painel-executivo:has(.estacao-aluno) > main { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; padding-top: .5rem; padding-bottom: .5rem; }
-.painel-executivo:has(.estacao-aluno) > main > button { align-self: flex-start; margin-bottom: .5rem; font-size: .75rem; }
-.painel-executivo .estacao-aluno { flex: 1; min-height: 0; height: 100%; grid-template-columns: 230px minmax(0,1fr); gap: 1rem; }
-.estacao-aluno > aside { position: static; height: 100%; min-height: 0; max-height: none; border-radius: .75rem; padding: .75rem; overscroll-behavior: contain; }
-.estacao-aluno > aside nav { margin-top: .5rem; }
-.estacao-aluno > aside nav button { padding-top: .5rem; padding-bottom: .5rem; }
-.estacao-aluno > aside > div.mt-5 { display: none; }
-.estacao-aluno .area-trabalho { height: 100%; min-height: 0; display: flex; flex-direction: column; gap: .5rem; }
-.estacao-aluno .area-trabalho > * { margin-top: 0; }
-.estacao-aluno [aria-label="Turma e rodada atual"] { position: static; padding: .6rem .9rem; flex: none; box-shadow: none; border-radius: .75rem; }
-.estacao-aluno [aria-label="Turma e rodada atual"] > div { gap: .5rem; }
-.estacao-aluno [aria-label="Turma e rodada atual"] p { font-size: .75rem; line-height: 1.25; }
-.estacao-aluno [aria-label="Turma e rodada atual"] p.text-lg,
-.estacao-aluno [aria-label="Turma e rodada atual"] p.text-xl { font-size: 1rem; }
-.estacao-aluno [aria-label="Turma e rodada atual"] > div > div:first-child > p:first-child,
-.estacao-aluno [aria-label="Turma e rodada atual"] button,
-.estacao-aluno [aria-label="Turma e rodada atual"] .text-amber-800 { display: none; }
-.estacao-aluno [aria-label="Turma e rodada atual"] a { padding: .4rem .6rem; font-size: .75rem; }
-.estacao-aluno .titulo-area-trabalho { flex: none; padding: .25rem .5rem; }
-.estacao-aluno .titulo-area-trabalho h2 { font-size: 1.15rem; line-height: 1.4; }
-.estacao-aluno .titulo-area-trabalho > p { display: none; }
-.estacao-aluno .area-trabalho-conteudo { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 2px 8px 12px 2px; }
-.estacao-aluno .acoes-estacao-aluno { flex: none; border-top: 1px solid #cbd5e1; padding: .65rem; background: white; border-radius: .65rem; box-shadow: 0 -4px 16px -12px #034AA6; }
-.estacao-aluno .acoes-estacao-aluno:empty { display: none; }
-.estacao-aluno .acoes-estacao-aluno [role="status"] { max-width: 100%; max-height: 3rem; overflow-y: auto; }
-.estacao-aluno .subabas-estacao { position: sticky; top: 0; z-index: 20; background: #F8FAFC; padding: .4rem 0; flex-wrap: nowrap; overflow-x: auto; margin-bottom: .5rem; }
-.estacao-aluno .subabas-estacao button { flex-shrink: 0; font-size: .75rem; padding: .5rem .65rem; box-shadow: none; }
-.estacao-aluno .cartao-executivo { padding: 1rem; border-radius: .75rem; box-shadow: none; }
-.estacao-aluno .cartao-executivo > div:first-child:has(> h2) { margin: -1rem -1rem .75rem; padding: .6rem 1rem; border-radius: .75rem .75rem 0 0; }
-.estacao-aluno .formulario-estacao { display: flex; flex-direction: column; gap: .75rem; }
-.estacao-aluno .formulario-estacao > * { margin-top: 0; }
-.estacao-aluno .formulario-estacao > p { display: none; }
-.estacao-aluno .formulario-estacao details > summary { font-size: .8rem; }
-.estacao-aluno .missao-decisao { padding: .75rem; }
-.estacao-aluno .quadros-analise > * { min-height: 130px; padding: 1rem; }
+.painel-executivo:has(:is(.estacao-aluno,.estacao-professor)) { height: 100dvh; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.painel-executivo:has(:is(.estacao-aluno,.estacao-professor)) > header { flex: none; }
+.painel-executivo:has(:is(.estacao-aluno,.estacao-professor)) > header > div:first-child { padding-top: .5rem; padding-bottom: .5rem; }
+.painel-executivo:has(:is(.estacao-aluno,.estacao-professor)) > main { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; padding-top: .5rem; padding-bottom: .5rem; }
+.painel-executivo:has(:is(.estacao-aluno,.estacao-professor)) > main > button { align-self: flex-start; margin-bottom: .5rem; font-size: .75rem; }
+.painel-executivo :is(.estacao-aluno,.estacao-professor) { flex: 1; min-height: 0; height: 100%; grid-template-columns: 230px minmax(0,1fr); gap: 1rem; }
+:is(.estacao-aluno,.estacao-professor) > aside { position: static; height: 100%; min-height: 0; max-height: none; border-radius: .75rem; padding: .75rem; overscroll-behavior: contain; }
+:is(.estacao-aluno,.estacao-professor) > aside nav { margin-top: .5rem; }
+:is(.estacao-aluno,.estacao-professor) > aside nav button { padding-top: .5rem; padding-bottom: .5rem; }
+:is(.estacao-aluno,.estacao-professor) > aside > div.mt-5 { display: none; }
+:is(.estacao-aluno,.estacao-professor) .area-trabalho { height: 100%; min-height: 0; display: flex; flex-direction: column; gap: .5rem; }
+:is(.estacao-aluno,.estacao-professor) .area-trabalho > * { margin-top: 0; }
+:is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] { position: static; padding: .6rem .9rem; flex: none; box-shadow: none; border-radius: .75rem; }
+:is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] > div { gap: .5rem; }
+:is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] p { font-size: .75rem; line-height: 1.25; }
+:is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] p.text-lg,
+:is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] p.text-xl { font-size: 1rem; }
+:is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] > div > div:first-child > p:first-child,
+:is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] button,
+:is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] .text-amber-800 { display: none; }
+:is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] a { padding: .4rem .6rem; font-size: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .titulo-area-trabalho { flex: none; padding: .25rem .5rem; }
+:is(.estacao-aluno,.estacao-professor) .titulo-area-trabalho h2 { font-size: 1.15rem; line-height: 1.4; }
+:is(.estacao-aluno,.estacao-professor) .titulo-area-trabalho > p { display: none; }
+:is(.estacao-aluno,.estacao-professor) .area-trabalho-conteudo { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 2px 8px 12px 2px; }
+:is(.estacao-aluno,.estacao-professor) .acoes-estacao-aluno { flex: none; border-top: 1px solid #cbd5e1; padding: .65rem; background: white; border-radius: .65rem; box-shadow: 0 -4px 16px -12px #034AA6; }
+:is(.estacao-aluno,.estacao-professor) .acoes-estacao-aluno:empty { display: none; }
+:is(.estacao-aluno,.estacao-professor) .acoes-estacao-aluno [role="status"] { max-width: 100%; max-height: 3rem; overflow-y: auto; }
+:is(.estacao-aluno,.estacao-professor) .subabas-estacao { position: sticky; top: 0; z-index: 20; background: #F8FAFC; padding: .4rem 0; flex-wrap: nowrap; overflow-x: auto; margin-bottom: .5rem; }
+:is(.estacao-aluno,.estacao-professor) .subabas-estacao button { flex-shrink: 0; font-size: .75rem; padding: .5rem .65rem; box-shadow: none; }
+:is(.estacao-aluno,.estacao-professor) .cartao-executivo { padding: 1rem; border-radius: .75rem; box-shadow: none; }
+:is(.estacao-aluno,.estacao-professor) .cartao-executivo > div:first-child:has(> h2) { margin: -1rem -1rem .75rem; padding: .6rem 1rem; border-radius: .75rem .75rem 0 0; }
+:is(.estacao-aluno,.estacao-professor) .formulario-estacao { display: flex; flex-direction: column; gap: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .formulario-estacao > * { margin-top: 0; }
+:is(.estacao-aluno,.estacao-professor) .formulario-estacao > p { display: none; }
+:is(.estacao-aluno,.estacao-professor) .formulario-estacao details > summary { font-size: .8rem; }
+:is(.estacao-aluno,.estacao-professor) .missao-decisao { padding: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .quadros-analise > * { min-height: 130px; padding: 1rem; }
 @media (max-width: 767px) {
-  .painel-executivo .estacao-aluno { grid-template-columns: minmax(0,1fr); grid-template-rows: auto minmax(0,1fr); gap: .5rem; }
-  .estacao-aluno > aside { max-height: 120px; height: auto; padding: .5rem; border-radius: .5rem; }
-  .estacao-aluno > aside > div:first-child { display: none; }
-  .estacao-aluno > aside nav { margin: 0; }
-  .estacao-aluno [aria-label="Turma e rodada atual"] > div > div:first-child { display: none; }
-  .estacao-aluno [aria-label="Turma e rodada atual"] > div > div:last-child { width: 100%; justify-content: space-between; }
-  .estacao-aluno [aria-label="Turma e rodada atual"] > div > div:last-child > div > p:last-child { display: none; }
-  .estacao-aluno .acoes-estacao-aluno button { font-size: .7rem; padding: .4rem .5rem; }
-  .estacao-aluno .area-trabalho-conteudo { padding-right: 2px; }
+  .painel-executivo :is(.estacao-aluno,.estacao-professor) { grid-template-columns: minmax(0,1fr); grid-template-rows: auto minmax(0,1fr); gap: .5rem; }
+  :is(.estacao-aluno,.estacao-professor) > aside { max-height: 120px; height: auto; padding: .5rem; border-radius: .5rem; }
+  :is(.estacao-aluno,.estacao-professor) > aside > div:first-child { display: none; }
+  :is(.estacao-aluno,.estacao-professor) > aside nav { margin: 0; }
+  :is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] > div > div:first-child { display: none; }
+  :is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] > div > div:last-child { width: 100%; justify-content: space-between; }
+  :is(.estacao-aluno,.estacao-professor) [aria-label="Turma e rodada atual"] > div > div:last-child > div > p:last-child { display: none; }
+  :is(.estacao-aluno,.estacao-professor) .acoes-estacao-aluno button { font-size: .7rem; padding: .4rem .5rem; }
+  :is(.estacao-aluno,.estacao-professor) .area-trabalho-conteudo { padding-right: 2px; }
 }
 
-.estacao-aluno .area-trabalho > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
-.estacao-aluno .menu-movel-gatilho { display: none; }
+:is(.estacao-aluno,.estacao-professor) .area-trabalho > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
+:is(.estacao-aluno,.estacao-professor) .menu-movel-gatilho { display: none; }
 @media (max-width: 767px) {
- .estacao-aluno .menu-movel-gatilho { display: block; width: 100%; text-align: left; font-size: .8rem; font-weight: 700; padding: .4rem; }
- .estacao-aluno > aside.menu-movel-fechado nav { display: none; }
- .estacao-aluno > aside.menu-movel-aberto { max-height: 230px; }
+ :is(.estacao-aluno,.estacao-professor) .menu-movel-gatilho { display: block; width: 100%; text-align: left; font-size: .8rem; font-weight: 700; padding: .4rem; }
+ :is(.estacao-aluno,.estacao-professor) > aside.menu-movel-fechado nav { display: none; }
+ :is(.estacao-aluno,.estacao-professor) > aside.menu-movel-aberto { max-height: 230px; }
 }
 
-.estacao-aluno .controle-valor { padding: .4rem .6rem; background: #fff; border-color: #cbd5e1; border-radius: .5rem; }
-.estacao-aluno .controle-valor > div:first-child { display: none; }
-.estacao-aluno .controle-valor input { margin-top: 0; padding: .4rem .5rem; }
-.estacao-aluno .formulario-estacao > div:has(> details) > p { display: none; }
-.estacao-aluno .missao-decisao { margin-top: .5rem; }
-.estacao-aluno .cabecalho-missao { padding: .4rem .7rem; font-size: .85rem; }
+:is(.estacao-aluno,.estacao-professor) .controle-valor { padding: .4rem .6rem; background: #fff; border-color: #cbd5e1; border-radius: .5rem; }
+:is(.estacao-aluno,.estacao-professor) .controle-valor > div:first-child { display: none; }
+:is(.estacao-aluno,.estacao-professor) .controle-valor input { margin-top: 0; padding: .4rem .5rem; }
+:is(.estacao-aluno,.estacao-professor) .formulario-estacao > div:has(> details) > p { display: none; }
+:is(.estacao-aluno,.estacao-professor) .missao-decisao { margin-top: .5rem; }
+:is(.estacao-aluno,.estacao-professor) .cabecalho-missao { padding: .4rem .7rem; font-size: .85rem; }
 
 /* Cada decisão começa pelos campos, sem banners ou títulos repetidos. */
-.estacao-aluno .cartao-decisao > div:first-child:has(> h2) { display: none; }
-.estacao-aluno .cartao-decisao { padding: .75rem; border: none; }
-.estacao-aluno .formulario-estacao > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
-.estacao-aluno .formulario-estacao > fieldset > :not([hidden]) ~ :not([hidden]) { margin-top: .5rem; }
-.estacao-aluno .acoes-estacao-aluno label { margin: 0 auto 0 0; font-size: .75rem; }
-.estacao-aluno .acoes-estacao-aluno > div { gap: .65rem; }
-.estacao-aluno .mix-paginado > p { margin-bottom: .5rem; }
-.estacao-aluno .produto-etapa { padding: .25rem; }
-.estacao-aluno .produto-etapa h3 { font-size: .9rem; }
-.estacao-aluno .produto-etapa article > p { font-size: .75rem; }
-.estacao-aluno .resumo-inicial { margin-top: 0; }
-.estacao-aluno #secao-visao { gap: .75rem; }
-.estacao-aluno .area-trabalho-conteudo:has(.formulario-estacao) { padding-top: 0; }
+:is(.estacao-aluno,.estacao-professor) .cartao-decisao > div:first-child:has(> h2) { display: none; }
+:is(.estacao-aluno,.estacao-professor) .cartao-decisao { padding: .75rem; border: none; }
+:is(.estacao-aluno,.estacao-professor) .formulario-estacao > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
+:is(.estacao-aluno,.estacao-professor) .formulario-estacao > fieldset > :not([hidden]) ~ :not([hidden]) { margin-top: .5rem; }
+:is(.estacao-aluno,.estacao-professor) .acoes-estacao-aluno label { margin: 0 auto 0 0; font-size: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .acoes-estacao-aluno > div { gap: .65rem; }
+:is(.estacao-aluno,.estacao-professor) .mix-paginado > p { margin-bottom: .5rem; }
+:is(.estacao-aluno,.estacao-professor) .produto-etapa { padding: .25rem; }
+:is(.estacao-aluno,.estacao-professor) .produto-etapa h3 { font-size: .9rem; }
+:is(.estacao-aluno,.estacao-professor) .produto-etapa article > p { font-size: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .resumo-inicial { margin-top: 0; }
+:is(.estacao-aluno,.estacao-professor) #secao-visao { gap: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .area-trabalho-conteudo:has(.formulario-estacao) { padding-top: 0; }
 
-.estacao-aluno .entrada-mix { padding: 0; border: none; background: transparent; }
-.estacao-aluno .entrada-mix > span:first-child { display: none; }
-.estacao-aluno .entrada-mix > span:last-child { margin-top: .25rem; }
-.estacao-aluno .produto-etapa label { font-size: .8rem; }
-.estacao-aluno .mix-paginado { padding: 0; }
-.estacao-aluno fieldset:has(> .mix-paginado) { padding: .5rem; border: none; }
-.estacao-aluno fieldset:has(> .mix-paginado) > legend { display: none; }
-.estacao-aluno .produto-etapa > div > h4 { margin-top: .5rem; margin-bottom: .5rem; }
+:is(.estacao-aluno,.estacao-professor) .entrada-mix { padding: 0; border: none; background: transparent; }
+:is(.estacao-aluno,.estacao-professor) .entrada-mix > span:first-child { display: none; }
+:is(.estacao-aluno,.estacao-professor) .entrada-mix > span:last-child { margin-top: .25rem; }
+:is(.estacao-aluno,.estacao-professor) .produto-etapa label { font-size: .8rem; }
+:is(.estacao-aluno,.estacao-professor) .mix-paginado { padding: 0; }
+:is(.estacao-aluno,.estacao-professor) fieldset:has(> .mix-paginado) { padding: .5rem; border: none; }
+:is(.estacao-aluno,.estacao-professor) fieldset:has(> .mix-paginado) > legend { display: none; }
+:is(.estacao-aluno,.estacao-professor) .produto-etapa > div > h4 { margin-top: .5rem; margin-bottom: .5rem; }
 
-@media(min-width:768px) { .estacao-aluno .subabas-estacao { display: none; } }
-.estacao-aluno .formulario-estacao fieldset.mb-6 { margin-bottom: 0; }
-.estacao-aluno .produto-etapa > div > .my-4 { margin-top: .75rem; margin-bottom: .5rem; }
-.estacao-aluno .produto-etapa .p-4 { padding: .75rem; }
-.estacao-aluno .produto-etapa label.rounded-xl { padding: .5rem .75rem; }
-.estacao-aluno .produto-etapa label.rounded-xl { padding-top: .35rem; padding-bottom: .35rem; }
+@media(min-width:768px) { :is(.estacao-aluno,.estacao-professor) .subabas-estacao { display: none; } }
+:is(.estacao-aluno,.estacao-professor) .formulario-estacao fieldset.mb-6 { margin-bottom: 0; }
+:is(.estacao-aluno,.estacao-professor) .produto-etapa > div > .my-4 { margin-top: .75rem; margin-bottom: .5rem; }
+:is(.estacao-aluno,.estacao-professor) .produto-etapa .p-4 { padding: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .produto-etapa label.rounded-xl { padding: .5rem .75rem; }
+:is(.estacao-aluno,.estacao-professor) .produto-etapa label.rounded-xl { padding-top: .35rem; padding-bottom: .35rem; }
 
 /* Hierarquia serena, restrita à área autenticada do aluno. */
-.painel-executivo:has(.estacao-aluno) > header { background: #fff; color: #18344c; border-bottom: 1px solid #e2e8f0; }
-.painel-executivo:has(.estacao-aluno) > header p { color: #475569; }
-.painel-executivo:has(.estacao-aluno) > header button { color: #18344c; }
-.estacao-aluno > aside { background: #fff; color: #18344c; border: 1px solid #e2e8f0; box-shadow: none; }
-.estacao-aluno #menu-painel button { color: #334155; border: none; border-left: 3px solid transparent; box-shadow: none; background: transparent; padding: .5rem .6rem; }
-.estacao-aluno #menu-painel button[aria-expanded] { font-size: .75rem; color: #475569; }
-.estacao-aluno #menu-painel button[aria-expanded="true"] { color: #18344c; }
-.estacao-aluno #menu-painel button:hover { background: #f1f5f9; color: #18344c; }
-.estacao-aluno #menu-painel button[aria-current="page"] { background: #e8f7f8; border-left-color: #0AADBF; color: #164b53; font-weight: 700; }
-.estacao-aluno #menu-painel [id^="submenu-"] { border-color: #e2e8f0; margin-left: .25rem; padding-left: .25rem; }
-.estacao-aluno .cartao-executivo > div:first-child:has(> h2),
-.estacao-aluno .cabecalho-missao { background: #fff; color: #18344c; border-bottom: 1px solid #e2e8f0; border-radius: 0; box-shadow: none; }
-.estacao-aluno .icone-missao { display: none; }
-.estacao-aluno .missao-decisao { border: none; box-shadow: none; }
-.estacao-aluno .missao-decisao > legend { padding-left: 0; }
-.estacao-aluno .quadros-analise > * { background: #fff; box-shadow: none; border-top: 2px solid #cbd5e1; min-height: 0; }
-.estacao-aluno .acao-final { box-shadow: none; border-radius: .5rem; }
-.estacao-aluno .acao-final:hover:not(:disabled) { transform: none; }
-.estacao-aluno .prazo-estacao { margin-top: .2rem; color: #475569; }
-.estacao-aluno .barra-decisao { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
-.estacao-aluno .situacao-rascunho { flex: 1; min-width: 180px; font-size: .8rem; color: #475569; }
-.estacao-aluno .situacao-rascunho[role="alert"] { color: #b91c1c; }
-.estacao-aluno .consulta-previa { font-size: .8rem; color: #034AA6; text-decoration: underline; padding: .4rem; }
-.estacao-aluno .roteiro-rodada { margin: 1rem 0; background: #fff; border: 1px solid #e2e8f0; border-radius: .75rem; }
-.estacao-aluno .roteiro-rodada li { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid #f1f5f9; }
-.estacao-aluno .roteiro-rodada li:last-child { border-bottom: 0; }
-.estacao-aluno .roteiro-rodada p { font-size: .85rem; color: #64748b; }
-.estacao-aluno .roteiro-rodada button { margin-left: auto; padding: .5rem; color: #034AA6; font-weight: 600; }
-.estacao-aluno .numero-etapa { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; background: #f1f5f9; color: #334155; flex-shrink: 0; }
-.estacao-aluno .resumo-conferencia { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .75rem; padding: 1rem 0; }
-.estacao-aluno .resumo-conferencia span { font-size: .8rem; color: #475569; }
-.estacao-aluno .resumo-conferencia strong { display: block; color: #18344c; font-size: 1rem; }
-.estacao-aluno .lista-conferencia { margin: .75rem 0; }
-.estacao-aluno .lista-conferencia label { display: flex; align-items: center; gap: .65rem; padding: .65rem 0; border-bottom: 1px solid #e2e8f0; font-size: .85rem; }
-.estacao-aluno .lista-conferencia button { margin-left: auto; color: #034AA6; font-size: .8rem; }
-.estacao-aluno .etapas-curtas { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .75rem; }
-.estacao-aluno .etapas-curtas button { padding: .4rem .65rem; border: 1px solid #e2e8f0; border-radius: .4rem; font-size: .8rem; background: #fff; color: #475569; }
-.estacao-aluno .etapas-curtas button[aria-pressed="true"] { border-color: #0AADBF; background: #e8f7f8; color: #164b53; }
-.estacao-aluno .origem-diagnostico { font-size: .8rem; color: #64748b; margin-bottom: .5rem; }
-.estacao-aluno .ferramenta-compacta { border: none; background: white; padding: .5rem; margin-top: 0; }
-.estacao-aluno .ferramenta-compacta > h3, .estacao-aluno .ferramenta-compacta > p { display: none; }
-@media(max-width:767px) { .estacao-aluno .resumo-conferencia { grid-template-columns: repeat(2,minmax(0,1fr)); } .estacao-aluno .roteiro-rodada li { padding: .65rem; gap: .5rem; } }
-.estacao-aluno .cartao-executivo > div:first-child > h2 { color: #18344c; }
-.estacao-aluno .barra-decisao > button.bg-marinho { background: #fff; color: #034AA6; border: 1px solid #cbd5e1; }
-.estacao-aluno .barra-decisao > button.bg-hub { background: #034AA6; color: #fff; }
-.estacao-aluno .quadros-analise { gap: .65rem; }
-.estacao-aluno .quadros-analise article { padding: .65rem; }
-.estacao-aluno .ferramenta-compacta .quadros-analise article > h5 { font-size: .85rem; }
-.estacao-aluno .ferramenta-compacta .quadros-analise article ul { font-size: .8rem; }
-.estacao-aluno .conferencia-rodada > p { margin: .25rem 0; }
-.estacao-aluno .conferencia-rodada .resumo-conferencia { padding: .65rem 0; }
-.estacao-aluno .conferencia-rodada .lista-conferencia label { padding: .5rem 0; }
-.estacao-aluno .ferramenta-compacta .quadros-analise > section { padding: .6rem; }
-.estacao-aluno .ferramenta-compacta .quadros-analise > section h4 { margin-bottom: .35rem; }
-.estacao-aluno .ferramenta-compacta .quadros-analise > section textarea { min-height: 3rem; }
-.estacao-aluno #secao-evolucao svg { max-height: 330px; width: 100%; }
-.estacao-aluno .cartao-executivo table td { padding-top: .4rem; padding-bottom: .4rem; }
-.estacao-aluno .ferramenta-compacta > div[role="region"] > h4 { margin: .3rem 0; font-size: 1rem; }
-.estacao-aluno .ferramenta-compacta > div[role="region"] > p { margin: .3rem 0; font-size: .8rem; }
-.estacao-aluno .conferencia-rodada { font-size: .85rem; }
-.estacao-aluno .lista-conferencia { margin: .35rem 0; }
-.estacao-aluno .resumo-conferencia { gap: .4rem; }
-@media(min-width:768px) { .estacao-aluno .subabas-estrategia { display: none; } }
-.estacao-aluno .area-trabalho-conteudo:has([aria-label="Informações da equipe"]) .bg-ouro\/10 { background: #f8fafc; border: 1px solid #e2e8f0; }
-.estacao-aluno #secao-equipe .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: .5rem; }
-.estacao-aluno #secao-equipe .rounded-xl.border-2 { padding: .75rem; }
-.estacao-aluno .area-trabalho-conteudo { padding-bottom: 8px; }
-.estacao-aluno .matriz-bcg { margin-top: 0; padding: .4rem; border: none; }
-.estacao-aluno .matriz-bcg > h4 { font-size: .9rem; }
-.estacao-aluno .grafico-bcg { display: block; width: min(100%, 440px); height: auto; margin-inline: auto; }
-.estacao-aluno .matriz-bcg .consulta-previa { padding: .15rem; }
-.estacao-aluno .matriz-bcg > p { margin-top: .2rem; font-size: .8rem; }
-.estacao-aluno .grafico-bcg { width: min(100%, 420px); }
+.painel-executivo:has(:is(.estacao-aluno,.estacao-professor)) > header { background: #fff; color: #18344c; border-bottom: 1px solid #e2e8f0; }
+.painel-executivo:has(:is(.estacao-aluno,.estacao-professor)) > header p { color: #475569; }
+.painel-executivo:has(:is(.estacao-aluno,.estacao-professor)) > header button { color: #18344c; }
+:is(.estacao-aluno,.estacao-professor) > aside { background: #fff; color: #18344c; border: 1px solid #e2e8f0; box-shadow: none; }
+:is(.estacao-aluno,.estacao-professor) #menu-painel button { color: #334155; border: none; border-left: 3px solid transparent; box-shadow: none; background: transparent; padding: .5rem .6rem; }
+:is(.estacao-aluno,.estacao-professor) #menu-painel button[aria-expanded] { font-size: .75rem; color: #475569; }
+:is(.estacao-aluno,.estacao-professor) #menu-painel button[aria-expanded="true"] { color: #18344c; }
+:is(.estacao-aluno,.estacao-professor) #menu-painel button:hover { background: #f1f5f9; color: #18344c; }
+:is(.estacao-aluno,.estacao-professor) #menu-painel button[aria-current="page"] { background: #e8f7f8; border-left-color: #0AADBF; color: #164b53; font-weight: 700; }
+:is(.estacao-aluno,.estacao-professor) #menu-painel [id^="submenu-"] { border-color: #e2e8f0; margin-left: .25rem; padding-left: .25rem; }
+:is(.estacao-aluno,.estacao-professor) .cartao-executivo > div:first-child:has(> h2),
+:is(.estacao-aluno,.estacao-professor) .cabecalho-missao { background: #fff; color: #18344c; border-bottom: 1px solid #e2e8f0; border-radius: 0; box-shadow: none; }
+:is(.estacao-aluno,.estacao-professor) .icone-missao { display: none; }
+:is(.estacao-aluno,.estacao-professor) .missao-decisao { border: none; box-shadow: none; }
+:is(.estacao-aluno,.estacao-professor) .missao-decisao > legend { padding-left: 0; }
+:is(.estacao-aluno,.estacao-professor) .quadros-analise > * { background: #fff; box-shadow: none; border-top: 2px solid #cbd5e1; min-height: 0; }
+:is(.estacao-aluno,.estacao-professor) .acao-final { box-shadow: none; border-radius: .5rem; }
+:is(.estacao-aluno,.estacao-professor) .acao-final:hover:not(:disabled) { transform: none; }
+:is(.estacao-aluno,.estacao-professor) .prazo-estacao { margin-top: .2rem; color: #475569; }
+:is(.estacao-aluno,.estacao-professor) .barra-decisao { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .situacao-rascunho { flex: 1; min-width: 180px; font-size: .8rem; color: #475569; }
+:is(.estacao-aluno,.estacao-professor) .situacao-rascunho[role="alert"] { color: #b91c1c; }
+:is(.estacao-aluno,.estacao-professor) .consulta-previa { font-size: .8rem; color: #034AA6; text-decoration: underline; padding: .4rem; }
+:is(.estacao-aluno,.estacao-professor) .roteiro-rodada { margin: 1rem 0; background: #fff; border: 1px solid #e2e8f0; border-radius: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .roteiro-rodada li { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid #f1f5f9; }
+:is(.estacao-aluno,.estacao-professor) .roteiro-rodada li:last-child { border-bottom: 0; }
+:is(.estacao-aluno,.estacao-professor) .roteiro-rodada p { font-size: .85rem; color: #64748b; }
+:is(.estacao-aluno,.estacao-professor) .roteiro-rodada button { margin-left: auto; padding: .5rem; color: #034AA6; font-weight: 600; }
+:is(.estacao-aluno,.estacao-professor) .numero-etapa { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; background: #f1f5f9; color: #334155; flex-shrink: 0; }
+:is(.estacao-aluno,.estacao-professor) .resumo-conferencia { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .75rem; padding: 1rem 0; }
+:is(.estacao-aluno,.estacao-professor) .resumo-conferencia span { font-size: .8rem; color: #475569; }
+:is(.estacao-aluno,.estacao-professor) .resumo-conferencia strong { display: block; color: #18344c; font-size: 1rem; }
+:is(.estacao-aluno,.estacao-professor) .lista-conferencia { margin: .75rem 0; }
+:is(.estacao-aluno,.estacao-professor) .lista-conferencia label { display: flex; align-items: center; gap: .65rem; padding: .65rem 0; border-bottom: 1px solid #e2e8f0; font-size: .85rem; }
+:is(.estacao-aluno,.estacao-professor) .lista-conferencia button { margin-left: auto; color: #034AA6; font-size: .8rem; }
+:is(.estacao-aluno,.estacao-professor) .etapas-curtas { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .etapas-curtas button { padding: .4rem .65rem; border: 1px solid #e2e8f0; border-radius: .4rem; font-size: .8rem; background: #fff; color: #475569; }
+:is(.estacao-aluno,.estacao-professor) .etapas-curtas button[aria-pressed="true"] { border-color: #0AADBF; background: #e8f7f8; color: #164b53; }
+:is(.estacao-aluno,.estacao-professor) .origem-diagnostico { font-size: .8rem; color: #64748b; margin-bottom: .5rem; }
+:is(.estacao-aluno,.estacao-professor) .ferramenta-compacta { border: none; background: white; padding: .5rem; margin-top: 0; }
+:is(.estacao-aluno,.estacao-professor) .ferramenta-compacta > h3, :is(.estacao-aluno,.estacao-professor) .ferramenta-compacta > p { display: none; }
+@media(max-width:767px) { :is(.estacao-aluno,.estacao-professor) .resumo-conferencia { grid-template-columns: repeat(2,minmax(0,1fr)); } :is(.estacao-aluno,.estacao-professor) .roteiro-rodada li { padding: .65rem; gap: .5rem; } }
+:is(.estacao-aluno,.estacao-professor) .cartao-executivo > div:first-child > h2 { color: #18344c; }
+:is(.estacao-aluno,.estacao-professor) .barra-decisao > button.bg-marinho { background: #fff; color: #034AA6; border: 1px solid #cbd5e1; }
+:is(.estacao-aluno,.estacao-professor) .barra-decisao > button.bg-hub { background: #034AA6; color: #fff; }
+:is(.estacao-aluno,.estacao-professor) .quadros-analise { gap: .65rem; }
+:is(.estacao-aluno,.estacao-professor) .quadros-analise article { padding: .65rem; }
+:is(.estacao-aluno,.estacao-professor) .ferramenta-compacta .quadros-analise article > h5 { font-size: .85rem; }
+:is(.estacao-aluno,.estacao-professor) .ferramenta-compacta .quadros-analise article ul { font-size: .8rem; }
+:is(.estacao-aluno,.estacao-professor) .conferencia-rodada > p { margin: .25rem 0; }
+:is(.estacao-aluno,.estacao-professor) .conferencia-rodada .resumo-conferencia { padding: .65rem 0; }
+:is(.estacao-aluno,.estacao-professor) .conferencia-rodada .lista-conferencia label { padding: .5rem 0; }
+:is(.estacao-aluno,.estacao-professor) .ferramenta-compacta .quadros-analise > section { padding: .6rem; }
+:is(.estacao-aluno,.estacao-professor) .ferramenta-compacta .quadros-analise > section h4 { margin-bottom: .35rem; }
+:is(.estacao-aluno,.estacao-professor) .ferramenta-compacta .quadros-analise > section textarea { min-height: 3rem; }
+:is(.estacao-aluno,.estacao-professor) #secao-evolucao svg { max-height: 330px; width: 100%; }
+:is(.estacao-aluno,.estacao-professor) .cartao-executivo table td { padding-top: .4rem; padding-bottom: .4rem; }
+:is(.estacao-aluno,.estacao-professor) .ferramenta-compacta > div[role="region"] > h4 { margin: .3rem 0; font-size: 1rem; }
+:is(.estacao-aluno,.estacao-professor) .ferramenta-compacta > div[role="region"] > p { margin: .3rem 0; font-size: .8rem; }
+:is(.estacao-aluno,.estacao-professor) .conferencia-rodada { font-size: .85rem; }
+:is(.estacao-aluno,.estacao-professor) .lista-conferencia { margin: .35rem 0; }
+:is(.estacao-aluno,.estacao-professor) .resumo-conferencia { gap: .4rem; }
+@media(min-width:768px) { :is(.estacao-aluno,.estacao-professor) .subabas-estrategia { display: none; } }
+:is(.estacao-aluno,.estacao-professor) .area-trabalho-conteudo:has([aria-label="Informações da equipe"]) .bg-ouro\/10 { background: #f8fafc; border: 1px solid #e2e8f0; }
+:is(.estacao-aluno,.estacao-professor) #secao-equipe .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: .5rem; }
+:is(.estacao-aluno,.estacao-professor) #secao-equipe .rounded-xl.border-2 { padding: .75rem; }
+:is(.estacao-aluno,.estacao-professor) .area-trabalho-conteudo { padding-bottom: 8px; }
+:is(.estacao-aluno,.estacao-professor) .matriz-bcg { margin-top: 0; padding: .4rem; border: none; }
+:is(.estacao-aluno,.estacao-professor) .matriz-bcg > h4 { font-size: .9rem; }
+:is(.estacao-aluno,.estacao-professor) .grafico-bcg { display: block; width: min(100%, 440px); height: auto; margin-inline: auto; }
+:is(.estacao-aluno,.estacao-professor) .matriz-bcg .consulta-previa { padding: .15rem; }
+:is(.estacao-aluno,.estacao-professor) .matriz-bcg > p { margin-top: .2rem; font-size: .8rem; }
+:is(.estacao-aluno,.estacao-professor) .grafico-bcg { width: min(100%, 420px); }
 /* Abas compartilhadas também permanecem legíveis nas consultas do professor. */
 .painel-executivo .etapas-curtas { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .75rem; }
 .painel-executivo .etapas-curtas button { padding: .4rem .65rem; border: 1px solid #e2e8f0; border-radius: .4rem; font-size: .8rem; background: #fff; color: #475569; }
 .painel-executivo .etapas-curtas button[aria-pressed="true"] { border-color: #0AADBF; background: #e8f7f8; color: #164b53; }
 .painel-executivo .etapas-curtas button:disabled { opacity: .45; cursor: not-allowed; }
 .painel-executivo .consulta-previa { font-size: .8rem; color: #034AA6; text-decoration: underline; padding: .4rem; }
+
+/* Gráficos do docente mantêm proporção e rótulos dentro do painel. */
+.estacao-professor #secao-caixas svg,
+.estacao-professor #secao-mercado-resultados svg { display:block; width:min(100%,720px); max-height:360px; height:auto; margin-inline:auto; }
+.estacao-professor .cartao-executivo { border:1px solid #e2e8f0; }
+.estacao-professor fieldset > legend.float-left { background:#fff; color:#18344c; border-bottom:1px solid #e2e8f0; padding:.6rem 1rem; }
+.estacao-professor fieldset > .clear-both { padding:.75rem; gap:.75rem; }

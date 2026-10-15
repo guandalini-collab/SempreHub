@@ -61,7 +61,7 @@ export default function LayoutPainel({
     if (anterior.current !== ativa) {
       setMenuMovelAberto(false);
       titulo.current?.focus({ preventScroll: true });
-      if (perfil === "Aluno") {
+      if (perfil === "Aluno" || perfil === "Professor") {
         conteudoRef.current?.scrollTo({ top: 0, behavior: "instant" });
       } else if (titulo.current) {
         const topo = window.scrollY + titulo.current.getBoundingClientRect().top;
@@ -76,9 +76,9 @@ export default function LayoutPainel({
     Math.round((concluidas / Math.max(1, total)) * 100),
   );
   return (
-    <div className={`${perfil === "Aluno" ? "estacao-aluno" : ""} grid items-start gap-6 lg:grid-cols-[minmax(220px,1fr)_minmax(0,3fr)]`}>
+    <div className={`${perfil === "Aluno" ? "estacao-aluno" : "estacao-professor"} grid items-start gap-6 lg:grid-cols-[minmax(220px,1fr)_minmax(0,3fr)]`}>
       <aside className={`${menuMovelAberto ? "menu-movel-aberto" : "menu-movel-fechado"} max-h-[55dvh] overflow-y-auto rounded-2xl bg-marinho p-4 text-white shadow-lg lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)]`}>
-        {perfil === "Aluno" && <button type="button" className="menu-movel-gatilho" aria-expanded={menuMovelAberto} onClick={()=>setMenuMovelAberto(!menuMovelAberto)}>☰ Menu · {item.titulo}</button>}
+        {<button type="button" className="menu-movel-gatilho" aria-expanded={menuMovelAberto} onClick={()=>setMenuMovelAberto(!menuMovelAberto)}>☰ Menu · {item.titulo}</button>}
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold uppercase tracking-widest text-ouro">
             {perfil}
