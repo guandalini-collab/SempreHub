@@ -350,7 +350,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <div hidden={!["rodada","resultados","historico"].includes(secao)}><ViradaRodada painel={painel} podeAbrir={false} /></div>
       {eventoAberto && (
         <Modal
-          titulo={`Mês ${eventoAberto.rodada}: ${eventoAberto.titulo}`}
+          titulo={`Rodada ${eventoAberto.rodada}: ${eventoAberto.titulo}`}
           aoFechar={fecharEvento}
           rodape={
             <Botao variante="secundario" onClick={fecharEvento}>
@@ -614,10 +614,10 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
             rotulo="Regime tributário"
             ajuda={
               empresa.regime_pretendido
-                ? `Migração obrigatória: a empresa passa ao ${NOME_REGIME[empresa.regime_pretendido]} neste mês.`
+                ? `Migração obrigatória: a empresa passa ao ${NOME_REGIME[empresa.regime_pretendido]} nesta rodada.`
                 : empresa.regime_tributario === "MEI"
                 ? `Faturamento no ano: ${reais(empresa.faturamento_ano)} de ${reais(p.teto_mei_anual)} do teto do MEI.`
-                : "A mudança vale a partir deste mês."
+                : "A mudança vale a partir desta rodada."
             }
           >
             <select
@@ -669,11 +669,11 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
               </div>
               <p className="mt-2 text-xs text-slate-500">
                 Antes de tributos, vendas e novos eventos. Inclui juros, royalties de franquia e efeitos ainda ativos de rodadas anteriores.
-                O caixa acima é anterior aos gastos do mês; o resultado final depende do mercado e do evento no fechamento.
+                O caixa acima é anterior aos gastos da rodada; o resultado final depende do mercado e do evento no fechamento.
               </p>
               {previsao.ponto_equilibrio !== null && previsao.ponto_equilibrio > previsao.capacidade && (
                 <p className="mt-2 text-xs font-semibold text-red-700">
-                  Atenção: mesmo vendendo toda a capacidade, a empresa não cobre os gastos previstos deste mês.
+                  Atenção: mesmo vendendo toda a capacidade, a empresa não cobre os gastos previstos desta rodada.
                 </p>
               )}
               {previsao.alertas.map((alerta) => <p key={alerta} className="mt-2 text-xs font-semibold text-amber-800">{alerta}</p>)}
@@ -725,7 +725,7 @@ function Historico({ painel }: { painel: PainelAluno }) {
         <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="text-left text-xs uppercase text-slate-500">
-              <th className="pb-2">Mês</th>
+              <th className="pb-2">Rodada</th>
               <th className="pb-2 text-right">Preço</th>
               <th className="pb-2 text-right">Vendas</th>
               <th className="pb-2 text-right">Receita</th>
@@ -749,7 +749,7 @@ function Historico({ painel }: { painel: PainelAluno }) {
                 <td className="py-1.5 text-right"><ValorMonetario valor={r.caixa_final}/></td>
                 <td className="py-1.5">{NOME_REGIME[r.regime]}</td>
                 <td className="py-1.5 text-slate-500">{eventos.get(r.rodada) ?? "—"}</td>
-                {temDetalhes && <td className="py-1.5">{r.detalhes_simulacao && <button className={`rounded-md px-2 py-1 text-xs font-semibold ${rodadaSelecionada === r.rodada ? "bg-marinho text-white" : "bg-slate-100 text-marinho"}`} aria-pressed={rodadaSelecionada === r.rodada} onClick={() => {setRodadaSelecionada(r.rodada);setMostrarHistoricoDetalhes(true);}}>Ver mês {r.rodada}</button>}</td>}
+                {temDetalhes && <td className="py-1.5">{r.detalhes_simulacao && <button className={`rounded-md px-2 py-1 text-xs font-semibold ${rodadaSelecionada === r.rodada ? "bg-marinho text-white" : "bg-slate-100 text-marinho"}`} aria-pressed={rodadaSelecionada === r.rodada} onClick={() => {setRodadaSelecionada(r.rodada);setMostrarHistoricoDetalhes(true);}}>Ver rodada {r.rodada}</button>}</td>}
               </tr>
             ))}
           </tbody>
@@ -757,7 +757,7 @@ function Historico({ painel }: { painel: PainelAluno }) {
       </div>
       {!mostrarHistoricoDetalhes && painel.resultados.length>5 && <nav className="etapas-curtas mt-3" aria-label="Páginas do histórico"><button type="button" disabled={!paginaHistorico} onClick={()=>setPaginaHistorico(n=>n-1)}>← Anterior</button><span className="self-center text-sm">{paginaHistorico+1}/{Math.ceil(painel.resultados.length/5)}</span><button type="button" disabled={(paginaHistorico+1)*5>=painel.resultados.length} onClick={()=>setPaginaHistorico(n=>n+1)}>Próxima →</button></nav>}
       {mostrarHistoricoDetalhes && <button type="button" className="consulta-previa" onClick={()=>setMostrarHistoricoDetalhes(false)}>← Voltar à lista de rodadas</button>}
-      {mostrarHistoricoDetalhes && selecionado?.detalhes_simulacao && <div className="mt-5 space-y-4"><h3 className="text-sm font-semibold text-marinho">Demonstrativos e operação do mês {selecionado.rodada}</h3><RelatorioFinanceiro detalhes={selecionado.detalhes_simulacao} /></div>}
+      {mostrarHistoricoDetalhes && selecionado?.detalhes_simulacao && <div className="mt-5 space-y-4"><h3 className="text-sm font-semibold text-marinho">Demonstrativos e operação da rodada {selecionado.rodada}</h3><RelatorioFinanceiro detalhes={selecionado.detalhes_simulacao} /></div>}
     </Cartao>
   );
 }

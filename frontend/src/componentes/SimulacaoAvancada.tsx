@@ -44,12 +44,12 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
         </Campo>
       </Secao>
       <Secao titulo="Produção e investimento" oculto={area !== "producao" || etapaProducao !== "volume"}>
-        <Campo rotulo="Produção planejada" ajuda="Unidades a produzir neste mês. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><ControleVisual rotulo="producao" moeda={false} inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} limite={10000} /></Campo>
-        <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar neste mês. O que não for consumido continua no estoque para as próximas rodadas."><ControleVisual rotulo="comprar mp" moeda={false} inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} limite={10000} /></Campo>
+        <Campo rotulo="Produção planejada" ajuda="Unidades a produzir nesta rodada. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><ControleVisual rotulo="producao" moeda={false} inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} limite={10000} /></Campo>
+        <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar nesta rodada. O que não for consumido continua no estoque para as próximas rodadas."><ControleVisual rotulo="comprar mp" moeda={false} inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} limite={10000} /></Campo>
       </Secao>
       <Secao titulo="Máquinas e manutenção" oculto={area !== "producao" || etapaProducao !== "maquinas"}>
 
-        {rodada >= 3 ? <><Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={100} /></Campo><button type="button" className="consulta-previa" onClick={()=>setMostrarImpacto(true)}>Consultar impacto da compra</button></> : <p className="rounded-lg bg-blue-50 p-4 text-sm text-blue-900"><strong>Expansão do maquinário a partir do mês 3.</strong> Nos dois primeiros meses, planeje a produção com as máquinas iniciais e cuide da manutenção.</p>}
+        {rodada >= 3 ? <><Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={100} /></Campo><button type="button" className="consulta-previa" onClick={()=>setMostrarImpacto(true)}>Consultar impacto da compra</button></> : <p className="rounded-lg bg-blue-50 p-4 text-sm text-blue-900"><strong>Expansão do maquinário a partir da rodada 3.</strong> Nas duas primeiras rodadas, planeje a produção com as máquinas iniciais e cuide da manutenção.</p>}
         <Campo rotulo="Manutenção da rodada" ajuda="Cuida das condições das máquinas e da capacidade das próximas rodadas."><ControleVisual rotulo="manutencao"  valor={valores.manutencao} aoMudar={(v) => mudar("manutencao", v)} limite={100000} /></Campo>
 
       </Secao>
@@ -114,8 +114,8 @@ export function PainelOperacional({ estado, modo }: { estado: EstadoSimulacao; m
         </>}
         <Dado rotulo="Satisfação dos clientes" valor={`${umDecimal(estado.satisfacao)} de 100`} />
       </dl>
-      {modo === "TRADICIONAL" && estado.maquinas.length > 0 && <ul className="mt-4 divide-y divide-slate-100 text-xs text-slate-600">{estado.maquinas.map((m, i) => <li key={i} className="py-2">Máquina {i + 1}: condição {percentual(m.condicao, 0)} · vida útil {m.vida_util} meses · valor líquido <ValorMonetario valor={m.valor_liquido}/> · disponível a partir do mês {m.ativacao}</li>)}</ul>}
-      <p className="mt-3 text-xs text-slate-500">Esses dados passam para a próxima rodada. O histórico mantém o estado de cada mês concluído.</p>
+      {modo === "TRADICIONAL" && estado.maquinas.length > 0 && <ul className="mt-4 divide-y divide-slate-100 text-xs text-slate-600">{estado.maquinas.map((m, i) => <li key={i} className="py-2">Máquina {i + 1}: condição {percentual(m.condicao, 0)} · vida útil {m.vida_util} meses · valor líquido <ValorMonetario valor={m.valor_liquido}/> · disponível a partir da rodada {m.ativacao}</li>)}</ul>}
+      <p className="mt-3 text-xs text-slate-500">Esses dados passam para a próxima rodada. O histórico mantém o estado de cada período concluído.</p>
     </Cartao>
     <Cartao titulo="Pessoas e vencimentos">
       <dl className="mb-4 grid grid-cols-3 gap-3 text-sm">
@@ -127,7 +127,7 @@ export function PainelOperacional({ estado, modo }: { estado: EstadoSimulacao; m
         <Titulos titulo="A receber" titulos={estado.receber} />
         <Titulos titulo="A pagar" titulos={estado.pagar} />
       </div>
-      {estado.vencimento_divida && <p className="mt-3 rounded-lg bg-amber-50 p-2 text-xs text-amber-900">A dívida inicial da recuperação vence no mês {estado.vencimento_divida}. Planeje a amortização e acompanhe os alertas do fechamento.</p>}
+      {estado.vencimento_divida && <p className="mt-3 rounded-lg bg-amber-50 p-2 text-xs text-amber-900">A dívida inicial da recuperação vence na rodada {estado.vencimento_divida}. Planeje a amortização e acompanhe os alertas do fechamento.</p>}
     </Cartao>
   </div>;
 }
@@ -173,7 +173,7 @@ export function RelatorioFinanceiro({ detalhes, somenteBalanco = false }: { deta
         ["Dinheiro disponível no caixa", balanco.caixa],
         ["Recursos presos no ciclo operacional", balanco.receber + balanco.estoques - balanco.pagar],
         ["Contas a pagar pendentes", balanco.pagar],
-        ["Desembolsos operacionais deste mês", dfc.pagamentos],
+        ["Desembolsos operacionais desta rodada", dfc.pagamentos],
       ]} />
       <p className="mt-3 text-xs text-slate-600">Estoque e vendas a prazo exigem financiamento até o dinheiro entrar. Contratação, horas extras, P&D e juros consomem caixa; máquinas geram saída de investimento. Caixa negativo exige atenção. A necessidade operacional não é dinheiro disponível.</p>
       {balanco.caixa < 0 && <p className="mt-2 font-semibold text-red-700">Caixa negativo: a empresa depende de financiamento e pode pagar cheque especial.</p>}
@@ -229,7 +229,7 @@ function Dado({ rotulo, valor }: { rotulo: string; valor: React.ReactNode }) {
 }
 
 function Titulos({ titulo, titulos }: { titulo: string; titulos: EstadoSimulacao["receber"] }) {
-  return <div className="rounded-lg bg-slate-50 p-3"><p className="mb-2 text-xs font-semibold text-marinho">{titulo}</p>{titulos.length ? <ul className="max-h-32 space-y-1 overflow-y-auto text-xs text-slate-600">{titulos.map((t, i) => <li key={i}>Mês {t.vencimento} · <ValorMonetario valor={t.valor}/></li>)}</ul> : <p className="text-xs text-slate-500">Nenhum vencimento pendente.</p>}</div>;
+  return <div className="rounded-lg bg-slate-50 p-3"><p className="mb-2 text-xs font-semibold text-marinho">{titulo}</p>{titulos.length ? <ul className="max-h-32 space-y-1 overflow-y-auto text-xs text-slate-600">{titulos.map((t, i) => <li key={i}>Rodada {t.vencimento} · <ValorMonetario valor={t.valor}/></li>)}</ul> : <p className="text-xs text-slate-500">Nenhum vencimento pendente.</p>}</div>;
 }
 
 function ListaFinanceira({ linhas }: { linhas: [string, number][] }) {

@@ -386,7 +386,7 @@ export function DicaTermo({termo, texto}: {termo: string; texto: string}) {
   return <span className="group relative ml-2 inline-flex align-middle"><button type="button" aria-label={`O que significa ${termo}?`} aria-describedby={id} className="rounded-full border border-cyan-500 px-1.5 text-xs text-cyan-800">?</button><span id={id} role="tooltip" className="pointer-events-none absolute bottom-full left-0 z-40 mb-2 hidden w-64 rounded-lg bg-slate-900 p-3 text-left text-xs font-normal text-white shadow-lg group-hover:block group-focus-within:block">{texto}</span></span>;
 }
 
-export function TabelaDre({ dre, paginar = false, periodo = "mês" }: { dre: Dre; paginar?: boolean; periodo?: string }) {
+export function TabelaDre({ dre, paginar = false, periodo = "período" }: { dre: Dre; paginar?: boolean; periodo?: string }) {
   const [pagina,setPagina]=React.useState(0);
   const linhas=LINHAS_DRE.filter(({chave})=>dre[chave]!=null&&(dre[chave]!==0||["impostos","cmv","custos_fixos"].includes(chave)));
   const total=Math.ceil(linhas.length/4);
@@ -415,7 +415,7 @@ export function TabelaDre({ dre, paginar = false, periodo = "mês" }: { dre: Dre
           </td>
         </tr>
       </tfoot>
-    </table>{paginar&&total>1&&<nav className="etapas-curtas mt-2" aria-label="Páginas da DRE"><button type="button" disabled={!pagina} onClick={()=>setPagina(n=>n-1)}>← Anterior</button><span className="self-center text-xs">Despesas {pagina+1}/{total} · receita e lucro são totais do mês</span><button type="button" disabled={pagina+1>=total} onClick={()=>setPagina(n=>n+1)}>Próxima →</button></nav>}</>
+    </table>{paginar&&total>1&&<nav className="etapas-curtas mt-2" aria-label="Páginas da DRE"><button type="button" disabled={!pagina} onClick={()=>setPagina(n=>n-1)}>← Anterior</button><span className="self-center text-xs">Despesas {pagina+1}/{total} · receita e lucro são totais do período</span><button type="button" disabled={pagina+1>=total} onClick={()=>setPagina(n=>n+1)}>Próxima →</button></nav>}</>
   );
 }
 
