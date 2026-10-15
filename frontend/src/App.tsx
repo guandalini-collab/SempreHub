@@ -45,6 +45,7 @@ export default function App() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (rota.pagina === "empresa") setEntradaDiretaAluno(false);
   }, [rota]);
 
   if (rota.pagina === "redefinir") {
