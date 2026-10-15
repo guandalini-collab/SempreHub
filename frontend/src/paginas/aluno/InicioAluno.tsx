@@ -1,7 +1,7 @@
 import { ValorMonetario } from "../../componentes/ui";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import { api } from "../../api";
+import { api, sessaoSalva } from "../../api";
 import { BibliotecaAprendizagem, ManualRapido, TourGuiado } from "../../componentes/Aprendizagem";
 import { Aviso, Botao, Campo, Carregando, Cartao, estiloEntrada } from "../../componentes/ui";
 import {
@@ -23,12 +23,30 @@ interface Item {
 interface Sala { formacao_encerrada: boolean; disponiveis: {aluno_id:number;nome:string}[]; equipes: {empresa_id:number;nome:string;vagas:number;completa:boolean;membros:{aluno_id:number;nome:string}[]}[] }
 interface Matricula { turma: Turma; sala: Sala }
 
-export default function InicioAluno({ abrirEmpresa }: { abrirEmpresa: (id: number) => void }) {
+export default function InicioAluno({ abrirEmpresa, entradaDireta = true }: { abrirEmpresa: (id: number) => void; entradaDireta?: boolean }) {
+  const [mostrarOrientacao,setMostrarOrientacao] = useState(false);
+  const primeiraCarga = useRef(true);
+  const orientacaoAvaliada = useRef(false);
+  const chaveOrientacao = `semprehub.primeiro-acesso-aluno.${sessaoSalva()?.id ?? "anonimo"}`;
+  function jaApresentada(){try{return localStorage.getItem(chaveOrientacao)==="sim";}catch{return false;}}
+  function registrarApresentacao(){try{localStorage.setItem(chaveOrientacao,"sim");}catch{/* A rodada 2 também impede a repetição. */}}
+
   const [itens,setItens] = useState<Item[]>([]), [matricula,setMatricula] = useState<Matricula|null>(null);
   const [turmas,setTurmas] = useState<Turma[]>([]), [pronto,setPronto] = useState(false);
   const [erro,setErro] = useState(""), [ocupado,setOcupado] = useState(false), [criar,setCriar] = useState(false);
   async function carregar() {
-    try { const [empresas,vinculo,disponiveis] = await Promise.all([api.get<Item[]>("/api/aluno/empresas"),api.get<Matricula|null>("/api/aluno/matricula"),api.get<Turma[]>("/api/aluno/turmas")]); setItens(empresas);setMatricula(vinculo);setTurmas(disponiveis);setPronto(true);setErro(""); }
+    try { const [empresas,vinculo,disponiveis] = await Promise.all([api.get<Item[]>("/api/aluno/empresas"),api.get<Matricula|null>("/api/aluno/matricula"),api.get<Turma[]>("/api/aluno/turmas")]); const rodada = vinculo?.turma.rodada_atual ?? empresas[0]?.turma.rodada_atual;
+      const vista = jaApresentada();
+      if(!orientacaoAvaliada.current && rodada!=null){
+        orientacaoAvaliada.current=true;
+        setMostrarOrientacao(rodada<=1&&!vista);
+        if(rodada<=1&&!vista)registrarApresentacao();
+      }
+      if(primeiraCarga.current && entradaDireta && empresas.length===1 && (empresas[0].turma.rodada_atual>=2 || vista)){
+        primeiraCarga.current=false;abrirEmpresa(empresas[0].empresa.id);return;
+      }
+      primeiraCarga.current=false;
+      setItens(empresas);setMatricula(vinculo);setTurmas(disponiveis);setPronto(true);setErro(""); }
     catch(e){setErro(e instanceof Error?e.message:"Erro ao carregar a turma.");}
   }
   useEffect(()=>{carregar();const intervalo=window.setInterval(carregar,15000);return()=>window.clearInterval(intervalo);},[]);
@@ -38,11 +56,11 @@ export default function InicioAluno({ abrirEmpresa }: { abrirEmpresa: (id: numbe
   return <div className="space-y-6"><h1 className="text-2xl font-bold text-marinho">{matricula?matricula.turma.nome:"Escolha sua turma"}</h1>{erro&&<Aviso>{erro}</Aviso>}
     {!matricula&&<Cartao titulo="Turmas disponíveis"><p className="mb-4 text-sm">Selecione pelo nome a turma indicada pelo professor. Ao entrar, você fica vinculado a ela; outra turma exige autorização.</p><div className="grid gap-3 sm:grid-cols-2">{turmas.map(t=><Botao key={t.id} disabled={ocupado} onClick={()=>entrar(t.id)}>{t.nome} · Prof. {t.professor}</Botao>)}</div>{!turmas.length&&<p>Nenhuma turma liberada para ingresso. Procure seu professor.</p>}</Cartao>}
     {matricula&&turmas.some(t=>t.id!==matricula.turma.id)&&<Cartao titulo="Troca autorizada pelo professor">{turmas.filter(t=>t.id!==matricula.turma.id).map(t=><Botao key={t.id} disabled={ocupado} onClick={()=>entrar(t.id)}>Entrar em {t.nome}</Botao>)}</Cartao>}
-    <TourGuiado perfil="ALUNO"/>
+    {mostrarOrientacao&&<TourGuiado perfil="ALUNO" aoConcluir={()=>{setMostrarOrientacao(false);if(itens.length===1)abrirEmpresa(itens[0].empresa.id);}}/>}
     {matricula&&!itens.length&&<Cartao titulo="Forme sua equipe por afinidade"><p className="mb-4">Converse com os colegas e escolha uma equipe. Cada equipe terá de 3 a 5 integrantes e escolherá seu líder.</p><h3 className="font-bold">Colegas disponíveis</h3><ul className="my-3 flex flex-wrap gap-2">{matricula.sala.disponiveis.map(a=><li key={a.aluno_id} className="rounded-lg bg-slate-100 px-3 py-2">{a.nome}</li>)}</ul><h3 className="mb-3 font-bold">Equipes da turma</h3><div className="grid gap-3 md:grid-cols-2">{matricula.sala.equipes.map(e=><article key={e.empresa_id} className="rounded-xl border p-4"><h4 className="font-bold">{e.nome}</h4><p className="my-2 text-sm">{e.membros.map(m=>m.nome).join(", ")}</p><p className="mb-3 text-sm">{e.membros.length}/5 integrantes · {e.vagas} vagas</p><Botao disabled={ocupado||e.completa||matricula.sala.formacao_encerrada} onClick={()=>equipe(e.empresa_id)}>{e.completa?"Equipe completa":"Entrar nesta equipe"}</Botao></article>)}</div>{matricula.sala.formacao_encerrada?<Aviso tipo="info">A formação foi encerrada. Se você ficou sem equipe, procure o professor para conferir sua distribuição.</Aviso>:<Botao variante="secundario" onClick={()=>setCriar(true)}>{matricula.turma.modo_equipe?"Criar uma nova equipe":"Abrir minha empresa"}</Botao>}</Cartao>}
     {criar&&matricula&&!itens.length&&!matricula.sala.formacao_encerrada&&<FormularioEntrada turmaId={matricula.turma.id} aoCancelar={()=>setCriar(false)} aoEntrar={abrirEmpresa}/>}
     <div className="grid gap-4 md:grid-cols-2">{itens.map(({empresa,turma})=><button key={empresa.id} onClick={()=>abrirEmpresa(empresa.id)} className="rounded-xl bg-white p-5 text-left shadow-sm ring-1 ring-slate-200 hover:ring-ouro"><h2 className="text-lg font-bold text-marinho">{empresa.nome}</h2><p className="text-sm">{turma.nome} · Prof. {turma.professor}</p><p className="my-3 text-sm">{empresa.equipe_membros?.map(m=>m.nome).join(", ")}</p><p>Caixa: <ValorMonetario valor={empresa.caixa}/> · Rodada {turma.rodada_atual}/{turma.total_rodadas}</p><span className="mt-4 block rounded-lg bg-blue-700 p-3 text-center font-bold text-white">Abrir empresa e rodada atual →</span></button>)}</div>
-    <ManualRapido perfil="ALUNO"/><BibliotecaAprendizagem/>
+    {mostrarOrientacao&&<><ManualRapido perfil="ALUNO"/><BibliotecaAprendizagem/></>}
   </div>;
 }
 

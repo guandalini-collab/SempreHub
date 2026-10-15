@@ -23,7 +23,7 @@ function chaveTour() { return `semprehub.tour.aprendizagem.v2.${sessaoSalva()?.i
 const passosAluno = [
   {
     titulo: "1. Entenda a rodada",
-    texto: "Leia o evento do mês e a edição do SempreHub News antes de preencher a decisão.",
+    texto: "Leia o evento da rodada e a edição do SempreHub News antes de preencher a decisão.",
   },
   {
     titulo: "2. Monte a decisão",
@@ -181,7 +181,7 @@ function salvarTourConcluido(valor: boolean) {
   }
 }
 
-export function TourGuiado({ perfil }: { perfil: PerfilAprendizagem }) {
+export function TourGuiado({ perfil, aoConcluir }: { perfil: PerfilAprendizagem; aoConcluir?: () => void }) {
   const [fechado, setFechado] = useState(lerTourConcluido);
   const [naoMostrar, setNaoMostrar] = useState(false);
   const [passoAtual, setPassoAtual] = useState(0);
@@ -221,7 +221,7 @@ export function TourGuiado({ perfil }: { perfil: PerfilAprendizagem }) {
         ))}
       </div>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3">
-        {passoAtual === passos.length - 1 && <label className="flex items-center gap-2 text-xs text-slate-600">
+        {perfil !== "ALUNO" && passoAtual === passos.length - 1 && <label className="flex items-center gap-2 text-xs text-slate-600">
           <input type="checkbox" checked={naoMostrar} onChange={(e) => setNaoMostrar(e.target.checked)} className="h-4 w-4 accent-[#FFC233]" />
           Não mostrar novamente
         </label>}
@@ -231,7 +231,8 @@ export function TourGuiado({ perfil }: { perfil: PerfilAprendizagem }) {
           variante="secundario"
           onClick={() => {
             if (passoAtual < passos.length - 1) { setPassoAtual(passoAtual + 1); return; }
-            if (naoMostrar) salvarTourConcluido(true);
+            if (naoMostrar || perfil === "ALUNO") salvarTourConcluido(true);
+            aoConcluir?.();
             setFechado(true);
           }}
         >

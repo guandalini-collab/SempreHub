@@ -33,6 +33,7 @@ function irPara(caminho: string) {
 
 export default function App() {
   const [usuario, setUsuario] = useState<Usuario | null>(() => sessaoSalva());
+  const [entradaDiretaAluno,setEntradaDiretaAluno] = useState(true);
   const [rota, setRota] = useState<Rota>(lerRota);
 
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function App() {
   }
 
   function sair() {
+    setEntradaDiretaAluno(true);
     encerrarSessao();
     setUsuario(null);
     irPara("/");
@@ -82,16 +84,16 @@ export default function App() {
       rota.pagina === "empresa" ? (
         <PainelEmpresa key={rota.id} empresaId={rota.id} />
       ) : (
-        <InicioAluno abrirEmpresa={(id) => irPara(`/empresa/${id}`)} />
+        <InicioAluno entradaDireta={entradaDiretaAluno} abrirEmpresa={(id) => irPara(`/empresa/${id}`)} />
       );
   }
 
   return (
     <div className="painel-executivo min-h-screen bg-[#F8FAFC] text-marinho">
-      <Cabecalho usuario={usuario} aoSair={sair} aoInicio={() => irPara("/")} />
+      <Cabecalho usuario={usuario} aoSair={sair} aoInicio={() => {setEntradaDiretaAluno(false);irPara("/");}} />
       <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
         {rota.pagina !== "inicio" && (
-          <button onClick={() => irPara("/")} className="mb-4 text-sm font-medium text-slate-500 hover:text-marinho">
+          <button onClick={() => {setEntradaDiretaAluno(false);irPara("/");}} className="mb-4 text-sm font-medium text-slate-500 hover:text-marinho">
             ← {ehProfessor ? "Minhas turmas" : "Minhas empresas"}
           </button>
         )}
