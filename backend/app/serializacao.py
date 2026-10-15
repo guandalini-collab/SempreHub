@@ -57,6 +57,8 @@ def turma(t: Turma, completa: bool = False) -> Dict[str, Any]:
         "professor": t.professor.nome if t.professor else None,
         "quantidade_empresas": len(t.empresas),
     }
+    from .motor.calendario import periodo
+    dados["calendario"] = periodo(t.configuracao_simulacao or {}, t.rodada_atual)
     if completa:
         dados["parametros"] = {campo: getattr(t, campo) for campo in CAMPOS_PARAMETROS}
         from .motor.avancado import config

@@ -1,5 +1,6 @@
 """Esquemas de entrada da API (validação dos dados enviados pelo navegador)."""
 
+from datetime import date
 from math import isclose
 from typing import Annotated, List, Literal, Optional
 
@@ -41,6 +42,11 @@ class ConfiguracaoSimulacao(BaseModel):
 
     model_config = ConfigDict(allow_inf_nan=False, extra="forbid")
 
+    periodicidade: Literal["MENSAL", "SEMANAL"] = "MENSAL"
+    data_inicio_simulada: Optional[str] = None
+    rodada_inicio_calendario: int = Field(1, ge=1, le=60)
+    perfil_sazonal: Literal["NEUTRO", "VAREJO", "ALIMENTACAO", "SERVICOS"] = "NEUTRO"
+
     capacidade_maquina: int = Field(240, ge=1, le=100_000)
     preco_maquina: float = Field(12000.0, gt=0, le=10_000_000)
     vida_util_maquina: int = Field(24, ge=1, le=600)
@@ -66,6 +72,10 @@ class ConfiguracaoSimulacao(BaseModel):
 
     @model_validator(mode="after")
     def validar_pesos(self):
+        if self.periodicidade == "SEMANAL" and self.data_inicio_simulada is None:
+            raise ValueError("Informe a data inicial do calendário semanal.")
+        if self.data_inicio_simulada:
+            date.fromisoformat(self.data_inicio_simulada)
         total = self.peso_lucro + self.peso_patrimonio + self.peso_satisfacao + self.peso_participacao
         if not isclose(total, 1.0, rel_tol=0, abs_tol=1e-6):
             raise ValueError("Os pesos dos indicadores pedagógicos devem somar 1.")
@@ -143,6 +153,13 @@ class ParametrosTurma(BaseModel):
     teto_mei_anual: float = Field(81000.0, gt=0, le=10_000_000)
     das_mei_mensal: float = Field(82.05, ge=0, le=100_000)
     aliquota_icms: float = Field(0.17, ge=0, le=0.4)
+
+
+    @model_validator(mode="after")
+    def validar_calendario_do_modelo(self):
+        if self.modo_jogo == "LEGADO" and self.configuracao_simulacao.periodicidade == "SEMANAL":
+            raise ValueError("O motor legado preserva o calendário mensal. Use Tradicional ou Startup para semanas.")
+        return self
 
 
 class TurmaEntrada(ParametrosTurma):

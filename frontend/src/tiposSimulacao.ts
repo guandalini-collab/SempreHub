@@ -5,6 +5,10 @@ export type Posicionamento = "CUSTO" | "DIFERENCIACAO";
 export type CanalVenda = "DIRETO" | "DISTRIBUIDOR" | "DIGITAL";
 
 export interface ConfiguracaoMotor {
+  periodicidade?: "MENSAL" | "SEMANAL";
+  data_inicio_simulada?: string | null;
+  rodada_inicio_calendario?: number;
+  perfil_sazonal?: "NEUTRO" | "VAREJO" | "ALIMENTACAO" | "SERVICOS";
   capacidade_maquina: number;
   preco_maquina: number;
   vida_util_maquina: number;
@@ -125,6 +129,7 @@ export interface BalancoSimulacao {
 }
 
 export interface DetalhesSimulacao {
+  calendario?: import("./calendario").CalendarioSimulado;
   engine_version?: string;
   versao_motor: number;
   modo: ModoJogo;

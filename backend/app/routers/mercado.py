@@ -11,6 +11,7 @@ from ..models import ConteudoMercado, RelatorioEmpresarial, Usuario, StatusTurma
 from ..seguranca import exigir_professor, exigir_aluno
 from ..inteligencia_mercado import gerar_json
 from ..evidencias_mercado import validar_evidencias
+from .. import serializacao as ser
 from ..relatorios import _rodada
 from .professor import _turma_do_professor
 from .aluno import _empresa_do_aluno
@@ -118,7 +119,7 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     schema = Edicao.model_json_schema()
     schema["$defs"]["Produto"]["properties"]["natureza"] = {"type": "string", "enum": ["FISICO", "SERVICO_DIGITAL"]}
     schema["$defs"]["Produto"]["required"].extend(["natureza", "tipo_documento"])
-    bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True,schema)
+    bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"calendario_simulado":ser.turma(turma).get("calendario"),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True,schema)
     if isinstance(bruto, dict):
         nomes = {"noticias": "notícias", "analises": "análises", "produtos": "produtos com custo documentado"}
         faltas = [f"{nomes[k]}: {len(bruto[k])} de {getattr(dados,k)}" for k in nomes if isinstance(bruto.get(k),list) and len(bruto[k]) < getattr(dados,k)]
@@ -260,7 +261,6 @@ def validar_plano(db,empresa,dados,rascunho=False):
         plano.produtos=itens
     if len({p.produto_id for p in itens})!=len(itens) or {p.produto_id for p in itens}!=set(catalogados):
         raise HTTPException(422,"O mix deve conter todos os produtos do catálogo, uma única vez.")
-    if not rascunho and any(not i.revisado for i in itens): raise HTTPException(422,"Revise o mix de cada produto antes de enviar.")
     from ..custos_campanhas import necessarios, orcamento, validar_dependencias, validar_cotacoes, arredondar
     total=digital=0
     for item in itens:

@@ -1,3 +1,5 @@
+import CalendarioTurma from "../../componentes/CalendarioTurma";
+import {tituloPeriodo} from "../../calendario";
 import { ValorMonetario } from "../../componentes/ui";
 import { ProgressoPrazo, SeloPodio } from "../../componentes/IdentidadeExecutiva";
 import CentralManuais from "../../componentes/CentralManuais";
@@ -114,7 +116,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
   const rotulos = Array.from({ length: rodadasJogadas }, (_, i) => `M${i + 1}`);
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={(id) => { setSecao(id); setEditandoParametros(id === "parametros"); }} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ turma: turma.nome, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
+    <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={(id) => { setSecao(id); setEditandoParametros(id === "parametros"); }} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
       {aberta && !turma.prazo_rodada && (
         <div role="status" className="alerta-controle mb-4 rounded-xl border border-ouro/25 bg-white p-4 text-amber-950">
           <p className="font-semibold">Configuração pendente: rodada {turma.rodada_atual} sem data limite.</p>
@@ -193,6 +195,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
           )}
       </SecaoPainel>
       <SecaoPainel id="configuracao" ativa={secao}>
+      <CalendarioTurma turma={turma} aoSalvar={carregar} />
           <Cartao
             titulo="Parâmetros e dados"
             acao={
@@ -414,7 +417,7 @@ function FecharRodada({
         {mensagem && <Aviso tipo={mensagem.tipo}>{mensagem.texto}</Aviso>}
         {confirmando ? (
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <span className="text-sm text-slate-600">Fechar o mês {rodada}? Não é possível desfazer.</span>
+            <span className="text-sm text-slate-600">Fechar a rodada {rodada}? Não é possível desfazer.</span>
             <Botao variante="secundario" onClick={() => setConfirmando(false)}>
               Voltar
             </Botao>
@@ -615,5 +618,5 @@ function PrazoRodada({turmaId, rodada, prazo, aoSalvar}: {turmaId: number; rodad
     catch(e) { setMensagem(e instanceof Error ? e.message : "Erro ao salvar prazo."); }
     finally { setSalvando(false); }
   }
-  return <Cartao titulo="Data limite da rodada"><ProgressoPrazo prazo={prazo}/><p className="mb-4 text-sm">O sistema bloqueia os envios e encerra automaticamente este mês às 23:59:59 de Brasília da data escolhida. Sem data, o encerramento é manual. Configure um novo prazo para cada mês.</p><Campo rotulo="Data limite"><input type="date" className={estiloEntrada} value={data} onChange={e=>setData(e.target.value)} /></Campo><div className="mt-4 flex justify-end"><Botao carregando={salvando} onClick={salvar}>Salvar prazo</Botao></div>{mensagem && <p role="status" className="mt-3 text-sm">{mensagem}</p>}</Cartao>;
+  return <Cartao titulo="Data limite da rodada"><ProgressoPrazo prazo={prazo}/><p className="mb-4 text-sm">O sistema bloqueia os envios e encerra automaticamente esta rodada às 23:59:59 de Brasília da data escolhida. Sem data, o encerramento é manual. Configure um novo prazo para cada mês.</p><Campo rotulo="Data limite"><input type="date" className={estiloEntrada} value={data} onChange={e=>setData(e.target.value)} /></Campo><div className="mt-4 flex justify-end"><Botao carregando={salvando} onClick={salvar}>Salvar prazo</Botao></div>{mensagem && <p role="status" className="mt-3 text-sm">{mensagem}</p>}</Cartao>;
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { api } from "../../api";
-import { BibliotecaAprendizagem, ManualRapido, TourGuiado } from "../../componentes/Aprendizagem";
+import { BibliotecaAprendizagem, TourGuiado } from "../../componentes/Aprendizagem";
 import { Aviso, Botao, Campo, Carregando, Cartao, estiloEntrada } from "../../componentes/ui";
 import type { Turma } from "../../tipos";
 import AlunosTeste from "./AlunosTeste";
@@ -70,7 +70,6 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
       </div>
 
       <AlunosTeste />
-      <ManualRapido perfil="PROFESSOR" />
       <BibliotecaAprendizagem />
       <Cartao titulo="Comunicação do programa">
         <p className="mb-2 text-sm text-slate-600">Use a identidade do SempreHub nos materiais de apresentação da turma.</p>

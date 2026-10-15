@@ -30,10 +30,11 @@ def test_portfolio_apura_sem_duplicar_caixa_ou_capacidade(cliente,professor,monk
     endpoint=f'/api/aluno/empresas/{empresa}/decisao'
     incompleto=deepcopy(d);incompleto['plano_comercial']['produtos'].pop()
     assert cliente.put(endpoint,headers=aluno,json=completar_decisao(incompleto)).status_code==422
-    sem_revisao=deepcopy(d);sem_revisao['plano_comercial']['produtos'][1]['revisado']=False
-    assert cliente.put(endpoint,headers=aluno,json=completar_decisao(sem_revisao)).status_code==422
     duplicado=deepcopy(d);duplicado['plano_comercial']['produtos'][1]['produto_id']='produto-1'
     assert cliente.put(endpoint,headers=aluno,json=completar_decisao(duplicado)).status_code==422
+    # A confirmação visual por produto deixou de ser obrigatória; o conteúdo continua validado.
+    for produto in d['plano_comercial']['produtos']:
+        produto['revisado'] = False
     d['plano_comercial']['produtos'][1]['custo_unitario']=.01
     r=cliente.put(endpoint,headers=aluno,json=completar_decisao(d));assert r.status_code==200,r.text
     assert r.json()['preco']==150

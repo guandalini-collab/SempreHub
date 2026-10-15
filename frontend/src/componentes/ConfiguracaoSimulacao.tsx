@@ -4,7 +4,7 @@ import type { ConfiguracaoJogo, ConfiguracaoMotor } from "../tiposSimulacao";
 import { Campo, EntradaNumero, estiloEntrada } from "./ui";
 
 type CampoConfiguracao = {
-  campo: { [K in keyof ConfiguracaoMotor]: ConfiguracaoMotor[K] extends number ? K : never }[keyof ConfiguracaoMotor];
+  campo: { [K in keyof ConfiguracaoMotor]-?: ConfiguracaoMotor[K] extends number ? K : never }[keyof ConfiguracaoMotor];
   rotulo: string;
   ajuda: string;
   tipo: "moeda" | "percentual" | "inteiro";
@@ -50,14 +50,17 @@ export default function ConfiguracaoSimulacao({
     <fieldset className="space-y-4 rounded-lg border border-slate-200 p-4">
       <legend className="px-1 text-sm font-semibold text-marinho">Modelo da simulação</legend>
       <fieldset disabled={bloqueado} className="grid gap-4 sm:grid-cols-2">
+        <Campo rotulo="Calendário da simulação"><select className={estiloEntrada} value={config.periodicidade??"MENSAL"} onChange={e=>aoMudar({...valores,configuracao_simulacao:{...config,periodicidade:e.target.value as "MENSAL"|"SEMANAL"}})}><option value="SEMANAL">Uma semana por rodada</option><option value="MENSAL">Mensal histórico</option></select></Campo>
+        {config.periodicidade==="SEMANAL"&&<><Campo rotulo="Data inicial simulada"><input required type="date" className={estiloEntrada} value={config.data_inicio_simulada??""} onChange={e=>aoMudar({...valores,configuracao_simulacao:{...config,data_inicio_simulada:e.target.value}})}/></Campo><Campo rotulo="Perfil sazonal"><select className={estiloEntrada} value={config.perfil_sazonal??"NEUTRO"} onChange={e=>aoMudar({...valores,configuracao_simulacao:{...config,perfil_sazonal:e.target.value as ConfiguracaoMotor['perfil_sazonal']}})}><option value="NEUTRO">Neutro</option><option value="VAREJO">Varejo</option><option value="ALIMENTACAO">Alimentação</option><option value="SERVICOS">Serviços</option></select></Campo><p className="text-xs text-slate-600">Salários, benefícios, capacidade e custos mensais de referência são proporcionais aos dias da semana. Quantidades, compras e investimentos informados são desta rodada. Consulte o calendário e a sazonalidade antes de decidir.</p></>}
+
         <Campo rotulo="Tipo de empresa" ajuda="O modelo define as decisões operacionais e os demonstrativos financeiros.">
-          <select className={estiloEntrada} value={valores.modo_jogo} onChange={(e) => aoMudar({ ...valores, modo_jogo: e.target.value as ConfiguracaoJogo["modo_jogo"] })}>
+          <select className={estiloEntrada} value={valores.modo_jogo} onChange={(e) => aoMudar({ ...valores, modo_jogo: e.target.value as ConfiguracaoJogo["modo_jogo"], configuracao_simulacao: {...config,periodicidade:e.target.value==="LEGADO"?"MENSAL":config.periodicidade} })}>
             <option value="TRADICIONAL">Empresa tradicional · produção e estoque</option>
             <option value="STARTUP">Startup · clientes e serviço digital</option>
             <option value="LEGADO">Modelo básico · compatibilidade com turmas anteriores</option>
           </select>
         </Campo>
-        {valores.modo_jogo !== "LEGADO" && <Campo rotulo="Situação inicial" ajuda="A história começa no mês 1 e os resultados das rodadas passam a ser registrados a partir daí.">
+        {valores.modo_jogo !== "LEGADO" && <Campo rotulo="Situação inicial" ajuda="A história começa no primeiro período e os resultados das rodadas passam a ser registrados a partir daí.">
           <select className={estiloEntrada} value={valores.cenario} onChange={(e) => aoMudar({ ...valores, cenario: e.target.value as ConfiguracaoJogo["cenario"] })}>
             <option value="ZERO">Começar do zero</option>
             <option value="CRISE">Recuperar uma empresa em crise</option>

@@ -2,7 +2,7 @@
 
 ## Sobre o jogo
 
-O SempreHub é um simulador educacional de negócios para estudantes do Ensino Médio e Superior. Em equipe, vocês administram uma empresa, interpretam o mercado e acompanham as consequências de suas escolhas ao longo de rodadas que representam meses.
+O SempreHub é um simulador educacional de negócios para estudantes do Ensino Médio e Superior. Em equipe, vocês administram uma empresa, interpretam o mercado e acompanham as consequências de suas escolhas ao longo de rodadas semanais que acompanham o calendário.
 
 O jogo reúne seis áreas: Produção, Logística, Marketing, Recursos Humanos, Pesquisa e Desenvolvimento (P&D) e Finanças. Escolher um preço, contratar pessoas, comprar máquinas, investir em divulgação ou solicitar crédito modifica recursos, custos e possibilidades da empresa.
 
@@ -26,11 +26,51 @@ As **decisões do simulador se baseiam em situações reais do mercado**. Defini
 
 No SempreHub, vocês experimentam essas relações em um ambiente educacional. Os resultados são simulados, conforme as regras do jogo e as escolhas registradas, e servem para estudar as consequências que decisões semelhantes podem ter em uma empresa.
 
-Cada rodada representa um mês. Se uma escolha não produzir o resultado esperado, use os relatórios para identificar as causas, discutir o que poderia ter sido diferente e preparar a próxima decisão. Aprender também envolve reconhecer erros e ajustar a estratégia.
+Cada nova rodada semanal representa sete dias; turmas mensais históricas preservam sua periodicidade. Se uma escolha não produzir o resultado esperado, use os relatórios para identificar as causas, discutir o que poderia ter sido diferente e preparar a próxima decisão. Aprender também envolve reconhecer erros e ajustar a estratégia.
 
 Espero que esta experiência ajude você a transformar conhecimento em análise, decisão e aprendizagem.
 
 **Prof Guandalini**
+
+## Calendário semanal e sazonalidade
+
+Cada rodada semanal representa sete dias consecutivos, a partir da data inicial simulada definida pelo professor. Os meses seguem o calendário real: não se presume que todo mês tenha quatro semanas. A semana pode atravessar meses, trimestres e anos. O cabeçalho mostra suas datas. O prazo real de entrega às 23:59:59 de Brasília é independente dessas datas simuladas.
+
+### Planejar antes da data comercial
+
+Se a simulação começa em 15 de outubro, o Dia das Crianças já passou. O Natal está aproximadamente dez semanas à frente. A equipe deve avaliar a procura esperada, a capacidade e o estoque antes de contratar, comprar ou anunciar. Comprar máquina em uma semana só libera sua capacidade na rodada seguinte. Aumento esperado de procura não garante vendas nem obriga investimento: preços, concorrentes, disponibilidade e decisões da equipe continuam afetando o resultado.
+
+### Perfis sazonais: Estimativa do Modelo
+
+O professor escolhe um perfil. Neutro mantém o fator de procura em 1. Varejo tem maior sensibilidade; Alimentação responde mais ao Natal e pouco às outras datas; Serviços tem sensibilidade pequena. Estes perfis são simplificações didáticas, não classificações universais nem estatísticas comprovadas. O perfil deve corresponder à proposta do negócio. O modelo inicial contempla Dia das Crianças, Black Friday (última sexta-feira de novembro) e Natal; outras datas e diferenças regionais não estão modeladas nesta edição.
+
+A procura cresce progressivamente nos 42 dias anteriores às datas: picos adicionais de referência de 40%, 45% e 60%, respectivamente, ponderados pelo perfil e pelos dias da semana. Durante sete dias após a data, há redução didática de 12% ponderada pelo perfil. Os efeitos ativos são somados e a procura tem piso de 50% da base. Insumos recebem adicional de 8% da parcela positiva do fator de procura; fretes, 20% dessa parcela. A interface identifica os eventos e o fator aplicado. Não há números aleatórios na sazonalidade.
+
+### Consequências nos departamentos
+
+| Área | O que avaliar na semana |
+| --- | --- |
+| Marketing | Preço, público, campanha e posicionamento antes do pico; a campanha não garante conversão. |
+| Produção e P&D | Capacidade proporcional ao período, matéria-prima, refugo, qualidade e investimentos antecipados. |
+| Recursos humanos | Contratação, salários, benefícios, treinamento e horas extras compatíveis com a operação. Não há contratação automática por sazonalidade. |
+| Logística | Entregas, estoque e pressão de frete; pedidos não atendidos continuam afetando OTIF. |
+| Finanças | Capital de giro, compras, recebimentos, juros e caixa suficientes para financiar a preparação. |
+
+### Valores de referência e valores da rodada
+
+Salário e benefício por funcionário continuam sendo referências mensais; a despesa semanal é proporcional aos dias. Custos fixos, capacidade industrial, produtividade, armazenagem, depreciação, DAS de referência e serviços recorrentes da Startup também são proporcionais. Para cada dia usa-se 1 dividido pela quantidade de dias daquele mês. Uma semana inteiramente em outubro corresponde a 7/31 do valor mensal; uma semana entre fevereiro e março soma as frações dos dois meses. Juros e crescimento usam taxas equivalentes compostas; churn usa sobrevivência equivalente. Quantidades de produção, compras e novas contratações são escolhas da semana, não valores mensais divididos automaticamente. Investimentos, rescisões, treinamento e pagamentos pontuais não são divididos outra vez.
+
+A capacidade da nuvem representa clientes simultâneos e não é dividida por quatro. Mensalidades e custos recorrentes por cliente são proporcionais; MRR continua sendo a receita mensal equivalente, enquanto a DRE mostra a receita do período. O alvo mensal didático de manutenção de R$ 1.000 é proporcional à semana; ausência de manutenção acumula desgaste proporcional ao tempo. A referência salarial usada no eNPS permanece mensal, evitando comparar salário semanal com salário mensal.
+
+Prazos de compra e venda são expressos em semanas nas turmas semanais. PMR e PMP usam sete dias, com saldos originados na própria rodada; no histórico mensal mantêm a convenção de 30 dias. Para classificação didática, o curto prazo semanal abrange 52 rodadas (364 dias). As competências fiscais anuais usam o ano de encerramento da semana; uma semana que cruza o ano é atribuída a esse ano para os controles anuais simplificados. Isso não representa apuração tributária legal.
+
+### DRE e balanço são consultas diferentes
+
+A aba DRE abre o demonstrativo completo da rodada. As visões mensal e trimestral consolidam somente semanas registradas com datas: cada linha é rateada por dia em centavos, sem duplicar uma semana que atravessa competências. Períodos ainda incompletos são apresentados como parciais. O balanço é uma fotografia patrimonial no fim da rodada e não deve ser somado entre semanas. Aportes e empréstimos continuam fora da receita; cheque especial é passivo, e o caixa assinado permanece no fluxo e no cabeçalho.
+
+### Histórico mensal preservado
+
+Turmas anteriores continuam mensais até ativação explícita do calendário semanal pelo professor, antes de salvar decisões da rodada aberta. Os resultados anteriores não são recalculados nem redistribuídos por datas inventadas. A ativação é prospectiva e não pode ser reposicionada. Obrigações futuras sem datas absolutas herdadas do modelo mensal são convertidas pela convenção de 30 dias por mês, arredondando para a semana de vencimento seguinte; essa aproximação não altera snapshots passados. Resultados novos registram a versão 3.0.0-weekly-calendar e o calendário usado. Exemplos mensais neste manual continuam sendo referências mensais ou descrições do histórico, e não uma cobrança integral por semana.
 
 ## A história e o conceito da logomarca SempreHub
 
@@ -69,13 +109,13 @@ Ao observar a rede, lembre-se de verificar as consequências de cada escolha nas
 
 ## Operação docente e calendário
 
-No menu lateral, abra **Encerrar rodada**. Escolha a data em **Data limite da rodada** e clique em **Salvar prazo**. O bloqueio ocorre às **23:59:59 de Brasília**, exclusivamente na data configurada para aquele mês. Antes desse instante, rascunhos e envios finais continuam permitidos. Sem prazo, o encerramento é manual.
+No menu lateral, abra **Encerrar rodada**. Escolha a data em **Data limite da rodada** e clique em **Salvar prazo**. O bloqueio ocorre às **23:59:59 de Brasília**, exclusivamente na data configurada para aquela rodada. Antes desse instante, rascunhos e envios finais continuam permitidos. Sem prazo, o encerramento é manual.
 
 Antes de orientar os alunos a iniciar cada rodada, confira o alerta de configuração no painel. Quando não houver data limite salva, aparecerá **Configuração pendente: rodada sem data limite**. Clique em **Configurar prazo da rodada** para abrir o campo correspondente. O aviso desaparece após salvar a data. O prazo anterior não é reutilizado; manter a rodada sem prazo é permitido, mas exige encerramento manual pelo professor.
 
-O sistema encerra o mês automaticamente quando o prazo vence, inclusive se ninguém estiver conectado. O professor também pode usar **Forçar Fechamento Imediato da Rodada**, com confirmação. Rascunhos existentes são preservados e processados como fechamento automático; sem decisão, o motor mantém as escolhas recorrentes anteriores e zera ações pontuais. Esses casos não equivalem a entrega final voluntária da equipe.
+O sistema encerra a rodada automaticamente quando o prazo vence, inclusive se ninguém estiver conectado. O professor também pode usar **Forçar Fechamento Imediato da Rodada**, com confirmação. Rascunhos existentes são preservados e processados como fechamento automático; sem decisão, o motor mantém as escolhas recorrentes anteriores e zera ações pontuais. Esses casos não equivalem a entrega final voluntária da equipe.
 
-O motor preserva os cálculos da simulação, atualiza caixa, estoque e participação e avança o mês uma única vez. No próximo mês, o líder volta a editar e o professor configura um novo prazo. O mecanismo de inteligência de mercado recebe os dados estruturados para preparar análises e relatórios; suas fontes e controles ficam no painel docente. Projeções são identificadas e dados ausentes não são apresentados como fatos confirmados.
+O motor preserva os cálculos da simulação, atualiza caixa, estoque e participação e avança a rodada uma única vez. No próxima rodada, o líder volta a editar e o professor configura um novo prazo. O mecanismo de inteligência de mercado recebe os dados estruturados para preparar análises e relatórios; suas fontes e controles ficam no painel docente. Projeções são identificadas e dados ausentes não são apresentados como fatos confirmados.
 
 ## Navegação: escolha à esquerda, trabalhe à direita
 
@@ -140,7 +180,7 @@ A equipe escolhe o líder inicial depois de ter três a cinco integrantes. Cada 
 
 ![Transferência feita pelo líder atual](diagramas/transferir-lider.png)
 
-O líder pode escolher outro integrante e clicar em **Transferir liderança para a próxima rodada**. A tela destaca o próximo líder e a rodada de vigência. A permissão não muda no mês atual: a transferência é efetivada somente depois do fechamento. Há uma transferência programada por rodada; não existe transferência para depois da última rodada.
+O líder pode escolher outro integrante e clicar em **Transferir liderança para a próxima rodada**. A tela destaca o próximo líder e a rodada de vigência. A permissão não muda na rodada atual: a transferência é efetivada somente depois do fechamento. Há uma transferência programada por rodada; não existe transferência para depois da última rodada.
 
 ![Próximo líder destacado para a equipe](diagramas/lider-proxima-rodada.png)
 
@@ -172,7 +212,7 @@ O programa exige revisão das áreas aplicáveis, mixes completos, diretriz estr
 4. Confirme o fechamento manual quando necessário; os eventos são sorteados pelo sistema.
 5. Compare resultados e hipóteses com a turma antes da próxima rodada.
 
-O fechamento calcula o mercado compartilhado, custos, produção e finanças; preserva os registros e avança o mês. Também efetiva as transferências de liderança previstas para a nova rodada. Depois do envio final, o líder não pode editar a decisão até o próximo mês.
+O fechamento calcula o mercado compartilhado, custos, produção e finanças; preserva os registros e avança a rodada. Também efetiva as transferências de liderança previstas para a nova rodada. Depois do envio final, o líder não pode editar a decisão até o próxima rodada.
 
 ## 6. BCG e consequências das escolhas
 
@@ -188,7 +228,7 @@ Interpretações se traduzem em escolhas de preço, posicionamento, público, pr
 
 A vida útil contábil padrão de máquinas é **24 meses**, configurável antes da entrada das empresas. O aluno consulta o valor vigente na Produção e a condição de cada máquina no painel operacional. Depreciação reduz o valor contábil; a máquina não é removida automaticamente ao fim da depreciação.
 
-Novas compras são opcionais a partir do mês 3, com pagamento no mês da compra e ativação na rodada seguinte. Funcionários, horas extras, insumos e máquinas impõem limites conjuntos à capacidade. Horas extras usam a premissa didática de até 40 horas por funcionário, adicional de 50%, salário/220 e encargos.
+Novas compras são opcionais a partir do rodada 3, com pagamento no mês da compra e ativação na rodada seguinte. Funcionários, horas extras, insumos e máquinas impõem limites conjuntos à capacidade. Horas extras usam a premissa didática de até 40 horas mensais de referência por funcionário, proporcionais aos dias da semana, adicional de 50%, salário/220 e encargos.
 
 A DRE mostra resultado, a DFC mostra dinheiro, e o balanço mostra ativos e obrigações. A discussão da equipe deve considerar margem, caixa, recebimentos, pagamentos, estoques e capital de giro. Solicitar crédito exibe aviso de custo alto e risco ao lucro e caixa. Em Startup, aporte de investidores não entra como receita comercial e pode diluir os fundadores.
 
@@ -208,7 +248,7 @@ Consulte resultados, demonstrativos, histórico de liderança, decisões e diagn
 4. Em **Conferir participantes**, acompanhe inscrições, grupos e líder escolhido. Pergunte se todos conseguiram entrar. Use a distribuição de alunos sem equipe apenas quando existirem vagas em equipes com pelo menos três integrantes.
 5. Em **Preparar rodada**, escolha o setor e prepare o conteúdo. Revise dados, produtos, custos e projeções antes de publicar. Sem edição publicada, o aluno não consegue completar o catálogo correspondente.
 6. Em **Acompanhar envios**, confira as entregas finais. Um rascunho não comprova entrega. Uma equipe sem líder ou abaixo do mínimo precisa de organização antes de fechar a rodada.
-7. Em **Encerrar rodada**, confira pendências, confirme o fechamento e acompanhe os resultados à direita. Essa ação calcula o mês e pode efetivar transferências de liderança.
+7. Em **Encerrar rodada**, confira pendências, confirme o fechamento e acompanhe os resultados à direita. Essa ação calcula a rodada e pode efetivar transferências de liderança.
 8. Em **Consultar resultados**, compare empresas, demonstrativos e avaliação. Em **Manuais - baixar PDF**, consulte todos os materiais ou indique aos alunos o capítulo adequado.
 
 ## 10. Roteiro para orientar principiantes

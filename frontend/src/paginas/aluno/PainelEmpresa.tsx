@@ -1,3 +1,4 @@
+import {tituloPeriodo,consolidarDres} from "../../calendario";
 import LinkManual from "../../componentes/LinkManual";
 import { createPortal } from "react-dom";
 import { ValorMonetario } from "../../componentes/ui";
@@ -35,7 +36,7 @@ import {
   estiloEntrada,
 } from "../../componentes/ui";
 import { NOME_DORNELAS, NOME_GEM, NOME_REGIME, inteiro, percentual, reais, umDecimal } from "../../formatos";
-import type { Decisao, DecisaoEntrada, EventoRodada, PainelAluno, PrevisaoDecisao, RegimeTributario } from "../../tipos";
+import type { Dre, Decisao, DecisaoEntrada, EventoRodada, PainelAluno, PrevisaoDecisao, RegimeTributario } from "../../tipos";
 import { CONFIGURACAO_MOTOR_PADRAO, DECISAO_SIMULACAO_PADRAO } from "../../tiposSimulacao";
 import type { DecisaoSimulacao } from "../../tiposSimulacao";
 
@@ -117,13 +118,13 @@ const ITENS_PAINEL = [
   },
   {
     "id": "resultados",
-    "titulo": "Resultados, DRE e balanço",
+    "titulo": "Resumo dos resultados",
     "descricao": "Indicadores e demonstrativos financeiros.",
     "simbolo": "▥",
     "grupo": "Resultados e evolução"
   },
   ...AREAS_INDICADORES.map(a => ({id: `resultado-${a.id}`, titulo: a.titulo, descricao: "Consulte os valores da rodada e interprete-os com sua equipe usando o manual.", simbolo: "", grupo: "Resultados e evolução", pai: "resultados"})),
-  {id:"demonstrativos",titulo:"DRE e balanço",descricao:"Demonstrativos e resultado do mês.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
+  {id:"demonstrativos",titulo:"DRE e balanço",descricao:"Demonstrativos e resultado da rodada.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {id:"evolucao",titulo:"Evolução por rodada",descricao:"Compare caixa, lucro e participação ao longo do tempo.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {id:"historico",titulo:"Histórico detalhado",descricao:"Consulte as decisões e os resultados anteriores.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {
@@ -173,6 +174,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   const [eventoAberto, setEventoAberto] = useState<EventoRodada | null>(null);
   const [graficoAtivo,setGraficoAtivo] = useState(0);
   const [demonstrativoAtivo,setDemonstrativoAtivo] = useState(0);
+  const [paginaAlertas,setPaginaAlertas] = useState(0);
   const [secao, setSecao] = useState("rodada");
   const sequenciaCarga = useRef(0);
 
@@ -215,11 +217,13 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   }
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
+    <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.id.startsWith("resultado-") ? "6. Indicadores por departamento" : ["evolucao","historico","relatorios","conquistas"].includes(i.id) ? "7. Histórico e evolução" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
       <SecaoPainel id="rodada" ativa={secao}>
+      {turma.calendario&&<div className="rounded-lg border border-slate-200 bg-white p-3 text-sm"><strong>{tituloPeriodo(turma.calendario)}</strong><p>{turma.calendario.sazonalidade.eventos.join(' · ')||'Sem data sazonal ativa'} · procura estimada: {turma.calendario.sazonalidade.demanda.toFixed(2)}×. Planeje produção, equipe, estoque, caixa e entregas. Fatores didáticos; não são previsões reais.</p></div>}
+
         <div className="inicio-rodada">
           <p className="text-sm text-slate-600">{encerrada ? "Consulte o desempenho final da empresa." : painel.decisao_atual?.enviada_em ? "Decisão enviada. As escolhas permanecem disponíveis em modo leitura." : "Consulte o mercado, planeje os departamentos e confira a decisão completa antes de enviar."}</p>
-          <ol className="roteiro-rodada">{[["mercado","Consultar o mercado","Cenário e notícias deste mês"],["decisoes","Planejar os departamentos","Preços, operação, pessoas e finanças"],["conferencia","Conferir e enviar","Pendências e confirmação definitiva"],["resultados","Acompanhar resultados","Disponíveis após o fechamento"]].map(([id,titulo,descricao],n)=><li key={id}><span className="numero-etapa">{n+1}</span><div><strong>{titulo}</strong><p>{descricao}</p></div><button type="button" onClick={()=>setSecao(id)}>{id==="decisoes" && painel.decisao_atual ? "Continuar" : "Abrir"} →</button></li>)}</ol>
+          <ol className="roteiro-rodada">{[["mercado","Consultar o mercado","Cenário e notícias desta rodada"],["decisoes","Planejar os departamentos","Preços, operação, pessoas e finanças"],["conferencia","Conferir e enviar","Pendências e confirmação definitiva"],["resultados","Acompanhar resultados","Disponíveis após o fechamento"]].map(([id,titulo,descricao],n)=><li key={id}><span className="numero-etapa">{n+1}</span><div><strong>{titulo}</strong><p>{descricao}</p></div><button type="button" onClick={()=>setSecao(id)}>{id==="decisoes" && painel.decisao_atual ? "Continuar" : "Abrir"} →</button></li>)}</ol>
           <p className="text-sm text-slate-600">{painel.decisao_atual ? `Último rascunho da rodada: versão ${painel.decisao_atual.versao}.` : "Ainda não há rascunho salvo nesta rodada. Valores anteriores são um ponto de partida e precisam ser revisados."}</p>
         </div>
       </SecaoPainel>
@@ -279,47 +283,13 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <SecaoPainel id="resultados" ativa={secao}><Cartao titulo="Resultados da empresa"><p>Selecione uma área no submenu lateral. Compare os valores e consulte o manual do aluno para interpretar os indicadores antes de decidir a próxima rodada.</p>{ultimo&&<p className="mt-4 font-semibold">Última rodada concluída: {ultimo.rodada} · Caixa: <ValorMonetario valor={ultimo.caixa_final}/> · Lucro líquido: <ValorMonetario valor={ultimo.dre.lucro_liquido}/></p>}</Cartao></SecaoPainel>
       {AREAS_INDICADORES.map(a=><SecaoPainel key={a.id} id={`resultado-${a.id}`} ativa={secao}><IndicadoresDepartamentais area={a.id} resultado={ultimo}/></SecaoPainel>)}
       <SecaoPainel id="demonstrativos" ativa={secao}>
-      <nav className="etapas-curtas" aria-label="Demonstrativos">{["Indicadores e balanço","DRE do mês","Comparar mercado"].map((t,n)=><button key={t} type="button" aria-pressed={demonstrativoAtivo===n} onClick={()=>setDemonstrativoAtivo(n)}>{t}</button>)}</nav>
+      <nav className="etapas-curtas" aria-label="Demonstrativos">{["Indicadores","DRE","Comparar mercado","Alertas da rodada","Balanço"].map((t,n)=><button key={t} type="button" aria-pressed={demonstrativoAtivo===n} onClick={()=>setDemonstrativoAtivo(n)}>{t}</button>)}</nav>
+      <div hidden={demonstrativoAtivo!==3}><Cartao titulo="Alertas da rodada">{ultimo?.alertas.length ? <><ul className="space-y-3">{ultimo.alertas.slice(paginaAlertas*3,paginaAlertas*3+3).map(alerta=><li key={alerta} className="rounded-lg border-l-4 border-ouro bg-amber-50 p-3 text-sm">{alerta}</li>)}</ul><nav aria-label="Páginas dos alertas" className="mt-4 flex items-center justify-between"><button disabled={paginaAlertas===0} onClick={()=>setPaginaAlertas(p=>p-1)}>← Anterior</button><span>{paginaAlertas+1}/{Math.ceil(ultimo.alertas.length/3)}</span><button disabled={(paginaAlertas+1)*3>=ultimo.alertas.length} onClick={()=>setPaginaAlertas(p=>p+1)}>Próxima →</button></nav></> : <p>Nenhum alerta nesta rodada.</p>}</Cartao></div>
       <div hidden={demonstrativoAtivo!==0}>{ultimo && <IndicadoresFinanceiros resultado={ultimo} />}</div>
         <div className="grid gap-6">
-          <div hidden={demonstrativoAtivo!==1}><Cartao titulo={ultimo ? `Resultado do mês ${ultimo.rodada}` : "Resultado do mês"}>
-            {ultimo ? (
-              <>
-                <div className="mb-4 grid grid-cols-3 gap-2 rounded-lg bg-slate-50 p-3 text-center text-xs">
-                  <div>
-                    <p className="text-slate-500">Vendidas</p>
-                    <p className="text-base font-semibold text-marinho">{inteiro(ultimo.unidades_vendidas)}</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500">Capacidade</p>
-                    <p className="text-base font-semibold text-marinho">{inteiro(ultimo.capacidade)}</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500">Mercado</p>
-                    <p className="text-base font-semibold text-marinho">{percentual(ultimo.participacao_mercado)}</p>
-                  </div>
-                </div>
-                <details className="rounded-xl border border-slate-200 p-4"><summary className="cursor-pointer font-semibold">Ver DRE completa</summary><div className="mt-4"><TabelaDre paginar dre={ultimo.dre} /></div></details>
-                <p className="mt-2 text-xs text-slate-500">
-                  Alíquota efetiva de tributos: {percentual(ultimo.aliquota_efetiva, 2)} da receita.
-                </p>
-                {ultimo.alertas.length > 0 && (
-                  <ul className="mt-4 space-y-2">
-                    {ultimo.alertas.map((alerta) => (
-                      <li key={alerta} className="rounded-md border-l-4 border-ouro bg-amber-50 px-3 py-2 text-xs text-slate-700">
-                        {alerta}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </>
-            ) : (
-              <p className="text-sm text-slate-500">
-                Nenhuma rodada fechada ainda. Envie suas decisões e aguarde o fechamento do mês pelo sistema.
-              </p>
-            )}
-          </Cartao></div>
-          <div hidden={demonstrativoAtivo!==2}><Cartao titulo="Mercado no último mês">
+          <div hidden={demonstrativoAtivo!==1}><DrePorPeriodo resultados={resultados}/></div>
+          <div hidden={demonstrativoAtivo!==4}>{ultimo?.detalhes_simulacao ? <RelatorioFinanceiro detalhes={ultimo.detalhes_simulacao} somenteBalanco/> : ultimo ? <Cartao titulo="Balanço patrimonial">{ultimo.balanco_basico ? <dl className="grid gap-4 sm:grid-cols-2">{Object.entries({"Disponibilidades":ultimo.balanco_basico.caixa,"Empréstimos":ultimo.balanco_basico.emprestimos,"Cheque especial":ultimo.balanco_basico.cheque_especial,"Ativo total":ultimo.balanco_basico.ativo_total,"Passivo total":ultimo.balanco_basico.passivo_total,"Patrimônio líquido":ultimo.balanco_basico.patrimonio_liquido}).map(([nome,valor])=><div key={nome}><dt>{nome}</dt><dd><ValorMonetario valor={valor}/></dd></div>)}</dl> : <p>Dados indisponíveis.</p>}</Cartao> : <p>Disponível após o fechamento.</p>}</div>
+          <div hidden={demonstrativoAtivo!==2}><Cartao titulo="Mercado na última rodada">
             {painel.mercado.length ? (
               <table className="w-full text-sm">
                 <thead>
@@ -350,21 +320,21 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       {!resultados.length && <Cartao titulo="Evolução por rodada"><p>Os gráficos estarão disponíveis após o fechamento da primeira rodada.</p></Cartao>}
       {resultados.length > 0 && (
         <div><nav className="etapas-curtas" aria-label="Gráficos da empresa">{["Caixa e lucro","Receita e custos","Demanda e vendas","Dívida","Mercado"].map((t,n)=><button key={t} type="button" aria-pressed={graficoAtivo===n} onClick={()=>setGraficoAtivo(n)}>{t}</button>)}</nav>
-          <div hidden={graficoAtivo!==0}><Cartao titulo="Caixa e lucro mensal">
+          <div hidden={graficoAtivo!==0}><Cartao titulo="Caixa e lucro por rodada">
             <GraficoLinhas
-              rotulosX={resultados.map((r) => `M${r.rodada}`)}
+              rotulosX={resultados.map((r) => `R${r.rodada}`)}
               series={[
                 { nome: "Caixa", cor: "#034AA6", valores: resultados.map((r) => r.caixa_final) },
-                { nome: "Lucro do mês", cor: "#D9851E", valores: resultados.map((r) => r.dre.lucro_liquido) },
+                { nome: "Lucro da rodada", cor: "#D9851E", valores: resultados.map((r) => r.dre.lucro_liquido) },
               ]}
             />
           </Cartao></div>
-          <div hidden={graficoAtivo!==1}><Cartao titulo="Receita e custos do mês"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} series={[{nome:"Receita",cor:"#034AA6",valores:resultados.map(r=>r.dre.receita)},{nome:"Custos e despesas",cor:"#666666",valores:resultados.map(r=>r.dre.receita-r.dre.lucro_liquido)}]}/></Cartao></div>
-          <div hidden={graficoAtivo!==2}><Cartao titulo="Demanda, capacidade e vendas"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} formatar={v=>inteiro(v)} series={[{nome:"Demanda",cor:"#666666",valores:resultados.map(r=>r.demanda)},{nome:"Capacidade",cor:"#034AA6",valores:resultados.map(r=>r.capacidade)},{nome:"Vendas",cor:"#9B6518",valores:resultados.map(r=>r.unidades_vendidas)}]}/></Cartao></div>
-          <div hidden={graficoAtivo!==3}><Cartao titulo="Dívida ao final da rodada"><GraficoLinhas rotulosX={resultados.map(r=>`M${r.rodada}`)} series={[{nome:"Dívida",cor:"#666666",valores:resultados.map(r=>r.divida_final)}]}/></Cartao></div>
+          <div hidden={graficoAtivo!==1}><Cartao titulo="Receita e custos da rodada"><GraficoLinhas rotulosX={resultados.map(r=>`R${r.rodada}`)} series={[{nome:"Receita",cor:"#034AA6",valores:resultados.map(r=>r.dre.receita)},{nome:"Custos e despesas",cor:"#666666",valores:resultados.map(r=>r.dre.receita-r.dre.lucro_liquido)}]}/></Cartao></div>
+          <div hidden={graficoAtivo!==2}><Cartao titulo="Demanda, capacidade e vendas"><GraficoLinhas rotulosX={resultados.map(r=>`R${r.rodada}`)} formatar={v=>inteiro(v)} series={[{nome:"Demanda",cor:"#666666",valores:resultados.map(r=>r.demanda)},{nome:"Capacidade",cor:"#034AA6",valores:resultados.map(r=>r.capacidade)},{nome:"Vendas",cor:"#9B6518",valores:resultados.map(r=>r.unidades_vendidas)}]}/></Cartao></div>
+          <div hidden={graficoAtivo!==3}><Cartao titulo="Dívida ao final da rodada"><GraficoLinhas rotulosX={resultados.map(r=>`R${r.rodada}`)} series={[{nome:"Dívida",cor:"#666666",valores:resultados.map(r=>r.divida_final)}]}/></Cartao></div>
           <div hidden={graficoAtivo!==4}><Cartao titulo="Participação de mercado">
             <GraficoLinhas
-              rotulosX={resultados.map((r) => `M${r.rodada}`)}
+              rotulosX={resultados.map((r) => `R${r.rodada}`)}
               series={[{ nome: "Participação", cor: "#D9851E", valores: resultados.map((r) => r.participacao_mercado) }]}
               formatar={(v) => percentual(v, 0)}
             />
@@ -391,7 +361,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
           <p className="text-sm leading-relaxed text-slate-700">{eventoAberto.narrativa}</p>
           {ultimo && ultimo.rodada === eventoAberto.rodada && (
             <p className="mt-3 text-sm text-slate-600">
-              Resultado da sua empresa no mês: <strong><ValorMonetario valor={ultimo.dre.lucro_liquido}/></strong>.
+              Resultado da sua empresa na rodada: <strong><ValorMonetario valor={ultimo.dre.lucro_liquido}/></strong>.
             </p>
           )}
         </Modal>
@@ -565,7 +535,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
 
   return (
     <Cartao className="cartao-decisao"
-      titulo={`${area === "estrategia" ? "Ferramentas estratégicas e segmentação" : area === "pd" ? "P&D - tecnologia e inovação" : area === "rh" ? "Recursos humanos" : area === "financas" ? "Planejamento financeiro" : area === "producao" ? "Produção e operação" : area === "logistica" ? "Logística" : "Decisões comerciais"} · mês ${turma.rodada_atual}`}
+      titulo={`${area === "estrategia" ? "Ferramentas estratégicas e segmentação" : area === "pd" ? "P&D - tecnologia e inovação" : area === "rh" ? "Recursos humanos" : area === "financas" ? "Planejamento financeiro" : area === "producao" ? "Produção e operação" : area === "logistica" ? "Logística" : "Decisões comerciais"} · rodada ${turma.rodada_atual}`}
       acao={
         painel.decisao_atual ? (
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${painel.decisao_atual?.enviada_em ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{painel.decisao_atual.enviada_em ? "Decisão final enviada" : `Rascunho · versão ${versaoServidor}`}</span>
@@ -602,13 +572,13 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
           >
             <ControleVisual rotulo="Preço de venda" valor={d.preco} aoMudar={(v) => atualizar("preco", v)} minimo={0.01} limite={p.preco_referencia * 3} />
           </Campo>
-          </div><Campo rotulo="Marketing (no mês)" ajuda={d.plano_comercial ? "Inclui mídia, produção e serviços; somente produzir uma peça não compra audiência." : `Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
+          </div><Campo rotulo="Marketing (na rodada)" ajuda={d.plano_comercial ? "Inclui mídia, produção e serviços; somente produzir uma peça não compra audiência." : `Fortalece a marca. Índice atual: ${umDecimal(empresa.marca)}.`}>
             {d.plano_comercial ? <p className="font-semibold"><ValorMonetario valor={d.marketing}/> · mídia + produção e serviços</p> : <ControleVisual rotulo="Investimento em marketing" valor={d.marketing} aoMudar={(v) => atualizar("marketing", v)} limite={Math.max(1000, empresa.caixa)} />}
           </Campo>
-          </Secao></div><div hidden={area !== "pd"}><Secao titulo="Pesquisa e desenvolvimento"><Campo rotulo="Pesquisa e desenvolvimento (no mês)" ajuda={`Melhora a qualidade percebida. Índice atual: ${umDecimal(empresa.qualidade)}.`}>
+          </Secao></div><div hidden={area !== "pd"}><Secao titulo="Pesquisa e desenvolvimento"><Campo rotulo="Pesquisa e desenvolvimento (na rodada)" ajuda={`Melhora a qualidade percebida. Índice atual: ${umDecimal(empresa.qualidade)}.`}>
             <ControleVisual rotulo="Tecnologia e melhoria do produto (P&D)" valor={d.pd} aoMudar={(v) => atualizar("pd", v)} limite={Math.max(1000, empresa.caixa)} />
           </Campo>
-          <Campo rotulo="Networking e capacitação (no mês)" ajuda="Rede de contadores e parceiros. Networking ≥ 30 evita multas em fiscalizações.">
+          <Campo rotulo="Networking e capacitação (na rodada)" ajuda="Rede de contadores e parceiros. Networking ≥ 30 evita multas em fiscalizações.">
             <ControleVisual rotulo="Networking e capacitação" valor={d.networking} aoMudar={(v) => atualizar("networking", v)} limite={Math.max(1000, empresa.caixa)} />
           </Campo>
         </Secao></div>
@@ -669,7 +639,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
 
         </div>
         {turma.modo_jogo === "LEGADO" && ["producao", "logistica"].includes(area) && <div className="rounded-xl border-l-4 border-blue-600 bg-blue-50 p-5"><h3 className="font-bold">{area === "producao" ? "Capacidade no modelo básico" : "Logística no modelo básico"}</h3><p className="mt-2 text-sm">{area === "producao" ? "Neste modelo, a capacidade depende da equipe de funcionários. Estoques, máquinas e planejamento de produção são controles do modelo Empresa tradicional." : "Este modelo não possui escolha de frete ou entregas. Esses controles estão disponíveis no modelo Empresa tradicional; no modelo Startup, a operação é digital."}</p><p className="mt-2 text-sm">Confira a capacidade e os gastos previstos na prévia abaixo.</p></div>}
-        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao etapaRH={etapaRH} etapaFinanceira={etapaFinanceira} rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
+        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao etapaRH={etapaRH} etapaFinanceira={etapaFinanceira} rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} fatorPeriodo={turma.calendario?.fator_mensal??1} semanal={!!turma.calendario} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
 
         {painelAuxiliar === "previa" && <Modal titulo="Prévia estimada — não é o resultado da rodada" aoFechar={()=>setPainelAuxiliar(null)}><div className="text-sm">
           {!previsao && !erroPrevisao && <p role="status">Calculando prévia…</p>}
@@ -686,7 +656,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
               <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 sm:grid-cols-3">
                 <Previa rotulo="Capacidade de produção" valor={`${inteiro(previsao.capacidade)} un.`} />
                 <Previa rotulo="Folha com encargos" valor={<ValorMonetario valor={previsao.folha}/>} />
-                <Previa rotulo="Gastos previstos do mês" valor={<ValorMonetario valor={previsao.gastos_previstos}/>} />
+                <Previa rotulo="Gastos previstos da rodada" valor={<ValorMonetario valor={previsao.gastos_previstos}/>} />
                 <Previa rotulo="Margem por unidade" valor={<ValorMonetario valor={previsao.margem_unitaria}/>} />
                 <Previa
                   rotulo="Ponto de equilíbrio"
@@ -801,16 +771,16 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
   const passivos = b ? (b.passivo_total ?? b.pagar + b.divida + Math.max(0,-b.caixa)) : null;
   return <Cartao titulo={`KPIs e indicadores financeiros · rodada ${resultado.rodada}`}>
     <dl hidden={mostrarDetalhes} className="grid gap-4 sm:grid-cols-3">
-      <div><dt className="text-sm text-slate-500">Margem líquida</dt><dd className="font-bold text-marinho">{margem === null ? "—" : percentual(margem)}</dd></div>
+      <div><dt className="text-sm text-slate-500">Margem líquida</dt><dd className="font-bold text-marinho">{!Number.isFinite(dre.receita) || !Number.isFinite(dre.lucro_liquido) ? "Dados indisponíveis" : margem === null ? "Não se aplica (sem receita)" : percentual(margem)}</dd></div>
       <div><dt className="text-sm text-slate-500">Participação no mercado</dt><dd className="font-bold text-marinho">{percentual(resultado.participacao_mercado)}</dd><p className="text-xs text-slate-500">Parcela do mercado conquistada nesta rodada.</p></div>
-      <div><dt className="text-sm text-slate-500">Atendimento da demanda</dt><dd className="font-bold text-marinho">{resultado.demanda > 0 ? percentual(resultado.unidades_vendidas / resultado.demanda) : "—"}</dd></div>
-      {b && <>
-        <div><dt className="text-sm text-slate-500">Endividamento sobre ativos</dt><dd className="font-bold text-marinho">{ativos !== null && ativos > 0 && passivos !== null ? percentual(passivos / ativos) : "—"}</dd></div>
-        <div><dt className="text-sm text-slate-500">Retorno sobre o patrimônio · rodada</dt><dd className="font-bold text-marinho">{b.patrimonio > 0 ? percentual(dre.lucro_liquido / b.patrimonio) : "—"}</dd></div>
+      <div><dt className="text-sm text-slate-500">Atendimento da demanda</dt><dd className="font-bold text-marinho">{!Number.isFinite(resultado.demanda) || !Number.isFinite(resultado.unidades_vendidas) ? "Dados indisponíveis" : resultado.demanda > 0 ? percentual(resultado.unidades_vendidas / resultado.demanda) : "Não se aplica (sem demanda)"}</dd></div>
+      {!b && <p>Dados indisponíveis para os indicadores patrimoniais.</p>}{b && <>
+        <div><dt className="text-sm text-slate-500">Endividamento sobre ativos</dt><dd className="font-bold text-marinho">{ativos !== null && ativos > 0 && passivos !== null ? percentual(passivos / ativos) : "Não se aplica (sem ativos)"}</dd></div>
+        <div><dt className="text-sm text-slate-500">Retorno sobre o patrimônio · rodada</dt><dd className="font-bold text-marinho">{b.patrimonio > 0 ? percentual(dre.lucro_liquido / b.patrimonio) : "Não se aplica (patrimônio não positivo)"}</dd></div>
         <div><dt className="text-sm text-slate-500">Caixa operacional</dt><dd className="font-bold text-marinho"><ValorMonetario valor={detalhes!.dfc.operacional}/></dd></div>
       </>}
     </dl>
-    <p hidden={mostrarDetalhes} className="mt-3 text-xs text-slate-500">“—” indica ausência de uma base válida para cálculo. Compare com as rodadas anteriores e com os demonstrativos.</p>
+    <p hidden={mostrarDetalhes} className="mt-3 text-xs text-slate-500">Indicadores sem denominador válido aparecem como “Não se aplica”. Registros ausentes aparecem como “Dados indisponíveis”.</p>
     <button type="button" className="consulta-previa" onClick={()=>setMostrarDetalhes(v=>!v)}>{mostrarDetalhes ? "← Voltar aos indicadores" : "Ver balanço e demonstrativos completos"}</button><div hidden={!mostrarDetalhes}>
     {resultado.balanco_basico && <div className="mt-5 rounded border p-4"><h3 className="font-semibold">Balanço patrimonial · modelo básico · rodada {resultado.rodada}</h3><p className="my-2 text-xs text-slate-500">O modelo básico opera à vista, sem estoques, imobilizado ou contas a prazo. Saldo de caixa negativo aparece como cheque especial no passivo.</p><dl className="grid gap-3 sm:grid-cols-3">{([
       ["Caixa e bancos",resultado.balanco_basico.caixa],
@@ -824,4 +794,13 @@ function IndicadoresFinanceiros({ resultado }: { resultado: PainelAluno["resulta
     {detalhes && <div className="mt-5"><RelatorioFinanceiro detalhes={detalhes} /></div>}
     </div>
   </Cartao>;
+}
+
+function DrePorPeriodo({resultados}:{resultados:PainelAluno["resultados"]}) {
+  const [periodo,setPeriodo]=useState("rodada");const [escolhido,setEscolhido]=useState("");
+  const ultima=resultados[resultados.length-1];
+  const grupos=consolidarDres(resultados,periodo==="trimestre"?"trimestre":"mes");
+  const grupo=grupos.find(g=>g.nome===escolhido)??grupos[grupos.length-1];
+  const dre=periodo==="rodada"?ultima?.dre:grupo?.dre as unknown as Dre|undefined;
+  return <Cartao titulo="Demonstração do Resultado do Exercício"><div className="mb-3 flex gap-4"><label>Período<select className={estiloEntrada} value={periodo} onChange={e=>{setPeriodo(e.target.value);setEscolhido('');}}><option value="rodada">Última rodada</option><option value="mes">Mês do calendário</option><option value="trimestre">Trimestre do calendário</option></select></label>{periodo!=="rodada"&&<label>Competência<select className={estiloEntrada} value={grupo?.nome??''} onChange={e=>setEscolhido(e.target.value)}>{grupos.map(g=><option key={g.nome} value={g.nome}>{g.nome}</option>)}</select></label>}</div>{dre?<><p className="mb-2 text-xs text-slate-600">{periodo==="rodada"?`Rodada ${ultima.rodada} · ${tituloPeriodo(ultima.detalhes_simulacao?.calendario)}`:`${grupo.nome} · ${grupo.dias.size} dias simulados registrados · período pode estar parcial`}. O histórico é preservado.</p><TabelaDre dre={dre} periodo={periodo}/></>:<p>{periodo==="rodada"?'Disponível após o fechamento.':'Sem semanas registradas nesta competência. Resultados mensais históricos não são redistribuídos.'}</p>}</Cartao>;
 }

@@ -86,6 +86,7 @@ def _balanco(estado: dict, caixa: float, divida: float) -> dict:
 
 def _preparar_rh(empresa: dict, decisao: dict, parametros: dict, estado: dict) -> dict:
     simulacao = decisao.get("simulacao") or {}
+    fracao = parametros.get("_calendario", {}).get("fator_mensal",1)
     rh = estado["rh"]
     anteriores = max(0, int(empresa.get("funcionarios", 0)))
     demitidos = min(anteriores, max(0, int(decisao.get("demitir", 0))))
@@ -109,7 +110,7 @@ def _preparar_rh(empresa: dict, decisao: dict, parametros: dict, estado: dict) -
         - min(15, demitidos * 3),
     )
     taxa_rotatividade = max(0.0, (50 - moral) / 100)
-    sairam = min(funcionarios, math.floor(funcionarios * taxa_rotatividade))
+    sairam = min(funcionarios, math.floor(funcionarios * taxa_rotatividade * fracao))
     funcionarios -= sairam
     rh.update(
         moral=moral, qualificacao=qualificacao,
@@ -119,8 +120,8 @@ def _preparar_rh(empresa: dict, decisao: dict, parametros: dict, estado: dict) -
     return {
         "funcionarios": funcionarios, "demitidos": demitidos, "rotatividade": sairam,
         # Encargos simplificados de 45%, independentes do regime comercial antigo.
-        "folha": _dinheiro(_decimal(funcionarios) * _decimal(salario) * Decimal("1.45")),
-        "beneficios": _dinheiro(_decimal(funcionarios) * _decimal(beneficio)),
+        "folha": _dinheiro(_decimal(funcionarios) * _decimal(salario) * _decimal(fracao) * Decimal("1.45")),
+        "beneficios": _dinheiro(_decimal(funcionarios) * _decimal(beneficio) * _decimal(fracao)),
         "treinamento": treinamento, "rescisoes": rescisao,
     }
 
@@ -130,6 +131,11 @@ def preparar(
     multiplicador_custo: float = 1,
 ) -> dict:
     empresa, decisao, parametros = deepcopy(empresa), deepcopy(decisao), deepcopy(parametros)
+    from .calendario import adaptar
+    parametros = adaptar(parametros, rodada)
+    calendario = parametros.get("_calendario")
+    fracao = calendario["fator_mensal"] if calendario else 1
+    multiplicador_custo *= calendario["sazonalidade"]["insumos"] if calendario else 1
     estado_inicial = _estado_normalizado(empresa.get("estado_simulacao"))
     estado = deepcopy(estado_inicial)
     inicializar_indicadores(estado)
@@ -229,6 +235,7 @@ def preparar(
         **{chave: rh[chave] for chave in ("folha", "beneficios", "treinamento", "rescisoes")},
     }
     return {
+        "calendario": calendario, "fracao":fracao,
         "kpis_rh": kpis_rh, "taxa_cheque_especial": parametros.get("taxa_cheque_especial", 0.08),
         "plano_comercial": deepcopy(decisao.get("plano_comercial")),
         "capacidade": capacidade, "atratividade": atratividade,
@@ -285,11 +292,11 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
         ativos=dividir(atendidos,finais)
         estado["clientes_produtos"]={p["produto_id"]:q for p,q in zip(itens,finais)}
         for item,q,f in zip(itens,ativos,finais):
-            linhas.append({"produto_id":item["produto_id"],"nome":item["produto_nome"],"preco":item["preco"],"custos_campanha":deepcopy(item.get("custos_campanha")),"vendas":q,"clientes_finais":f,"receita":_dinheiro(q*item["preco"]),"cmv":_dinheiro(q*item["custo_unitario"]*preparo["multiplicador_custo"])})
+            linhas.append({"produto_id":item["produto_id"],"nome":item["produto_nome"],"preco":item["preco"],"custos_campanha":deepcopy(item.get("custos_campanha")),"vendas":q,"clientes_finais":f,"receita":_dinheiro(q*item["preco"]*preparo["fracao"]),"cmv":_dinheiro(q*item["custo_unitario"]*preparo["fracao"]*preparo["multiplicador_custo"])})
         receita=_soma(*(l["receita"] for l in linhas))
         custo_nuvem=_soma(*(l["cmv"] for l in linhas))
     else:
-        receita = _dinheiro(_decimal(atendidos) * _decimal(preparo["preco"]))
+        receita = _dinheiro(_decimal(atendidos) * _decimal(preparo["preco"]) * _decimal(preparo["fracao"]))
         custo_nuvem = _dinheiro(
             _decimal(atendidos) * _decimal(configuracao["custo_nuvem_cliente"])
             * _decimal(preparo["multiplicador_custo"]),
@@ -340,7 +347,7 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
         "clientes_nao_atendidos": nao_atendidos, "capacidade_nuvem": preparo["capacidade_nuvem"],
         "cac": cac, "ltv": ltv, "burn": burn,
         "runway": max(0.0, caixa) / burn if burn > 0 else None,
-        "mrr": receita, "aporte": preparo["aporte"], "valuation": preparo["valuation"],
+        "mrr": receita / preparo["fracao"], "aporte": preparo["aporte"], "valuation": preparo["valuation"],
         "participacao_anterior": preparo["participacao_anterior"],
         "participacao_fundadores": estado["participacao_fundadores"], "diluicao": preparo["diluicao"],
         "amortizacao_obrigatoria": preparo["amortizacao_obrigatoria"],
@@ -352,7 +359,7 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
             "A base foi preservada, mas a satisfação caiu e pode elevar o churn na próxima rodada.",
         )
     balanco = _balanco(estado, caixa, preparo["divida"])
-    operacao.update(reconciliar_financeiros(balanco, estado, dre, preparo["rodada"], preparo["taxa_cheque_especial"], modo="STARTUP"))
+    operacao.update(reconciliar_financeiros(balanco, estado, dre, preparo["rodada"], preparo["taxa_cheque_especial"], modo="STARTUP", dias=7 if preparo["calendario"] else 30, horizonte=52 if preparo["calendario"] else 12))
     detalhes = {
         "versao_motor": 1, "engine_version": ENGINE_VERSION, "modo": "STARTUP", "perfil_tributario": "SERVICO_DIDATICO",
         "aliquota_servico": aliquota, "estado_inicial": deepcopy(preparo["estado_inicial"]),

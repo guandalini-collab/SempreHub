@@ -2,7 +2,7 @@
 
 ## Sobre o jogo
 
-O SempreHub é um simulador educacional de negócios para estudantes do Ensino Médio e Superior. Em equipe, vocês administram uma empresa, interpretam o mercado e acompanham as consequências de suas escolhas ao longo de rodadas que representam meses.
+O SempreHub é um simulador educacional de negócios para estudantes do Ensino Médio e Superior. Em equipe, vocês administram uma empresa, interpretam o mercado e acompanham as consequências de suas escolhas ao longo de rodadas semanais que acompanham o calendário.
 
 O jogo reúne seis áreas: Produção, Logística, Marketing, Recursos Humanos, Pesquisa e Desenvolvimento (P&D) e Finanças. Escolher um preço, contratar pessoas, comprar máquinas, investir em divulgação ou solicitar crédito modifica recursos, custos e possibilidades da empresa.
 
@@ -26,11 +26,51 @@ As **decisões do simulador se baseiam em situações reais do mercado**. Defini
 
 No SempreHub, vocês experimentam essas relações em um ambiente educacional. Os resultados são simulados, conforme as regras do jogo e as escolhas registradas, e servem para estudar as consequências que decisões semelhantes podem ter em uma empresa.
 
-Cada rodada representa um mês. Se uma escolha não produzir o resultado esperado, use os relatórios para identificar as causas, discutir o que poderia ter sido diferente e preparar a próxima decisão. Aprender também envolve reconhecer erros e ajustar a estratégia.
+Cada nova rodada semanal representa sete dias; turmas mensais históricas preservam sua periodicidade. Se uma escolha não produzir o resultado esperado, use os relatórios para identificar as causas, discutir o que poderia ter sido diferente e preparar a próxima decisão. Aprender também envolve reconhecer erros e ajustar a estratégia.
 
 Espero que esta experiência ajude você a transformar conhecimento em análise, decisão e aprendizagem.
 
 **Prof Guandalini**
+
+## Calendário semanal e sazonalidade
+
+Cada rodada semanal representa sete dias consecutivos, a partir da data inicial simulada definida pelo professor. Os meses seguem o calendário real: não se presume que todo mês tenha quatro semanas. A semana pode atravessar meses, trimestres e anos. O cabeçalho mostra suas datas. O prazo real de entrega às 23:59:59 de Brasília é independente dessas datas simuladas.
+
+### Planejar antes da data comercial
+
+Se a simulação começa em 15 de outubro, o Dia das Crianças já passou. O Natal está aproximadamente dez semanas à frente. A equipe deve avaliar a procura esperada, a capacidade e o estoque antes de contratar, comprar ou anunciar. Comprar máquina em uma semana só libera sua capacidade na rodada seguinte. Aumento esperado de procura não garante vendas nem obriga investimento: preços, concorrentes, disponibilidade e decisões da equipe continuam afetando o resultado.
+
+### Perfis sazonais: Estimativa do Modelo
+
+O professor escolhe um perfil. Neutro mantém o fator de procura em 1. Varejo tem maior sensibilidade; Alimentação responde mais ao Natal e pouco às outras datas; Serviços tem sensibilidade pequena. Estes perfis são simplificações didáticas, não classificações universais nem estatísticas comprovadas. O perfil deve corresponder à proposta do negócio. O modelo inicial contempla Dia das Crianças, Black Friday (última sexta-feira de novembro) e Natal; outras datas e diferenças regionais não estão modeladas nesta edição.
+
+A procura cresce progressivamente nos 42 dias anteriores às datas: picos adicionais de referência de 40%, 45% e 60%, respectivamente, ponderados pelo perfil e pelos dias da semana. Durante sete dias após a data, há redução didática de 12% ponderada pelo perfil. Os efeitos ativos são somados e a procura tem piso de 50% da base. Insumos recebem adicional de 8% da parcela positiva do fator de procura; fretes, 20% dessa parcela. A interface identifica os eventos e o fator aplicado. Não há números aleatórios na sazonalidade.
+
+### Consequências nos departamentos
+
+| Área | O que avaliar na semana |
+| --- | --- |
+| Marketing | Preço, público, campanha e posicionamento antes do pico; a campanha não garante conversão. |
+| Produção e P&D | Capacidade proporcional ao período, matéria-prima, refugo, qualidade e investimentos antecipados. |
+| Recursos humanos | Contratação, salários, benefícios, treinamento e horas extras compatíveis com a operação. Não há contratação automática por sazonalidade. |
+| Logística | Entregas, estoque e pressão de frete; pedidos não atendidos continuam afetando OTIF. |
+| Finanças | Capital de giro, compras, recebimentos, juros e caixa suficientes para financiar a preparação. |
+
+### Valores de referência e valores da rodada
+
+Salário e benefício por funcionário continuam sendo referências mensais; a despesa semanal é proporcional aos dias. Custos fixos, capacidade industrial, produtividade, armazenagem, depreciação, DAS de referência e serviços recorrentes da Startup também são proporcionais. Para cada dia usa-se 1 dividido pela quantidade de dias daquele mês. Uma semana inteiramente em outubro corresponde a 7/31 do valor mensal; uma semana entre fevereiro e março soma as frações dos dois meses. Juros e crescimento usam taxas equivalentes compostas; churn usa sobrevivência equivalente. Quantidades de produção, compras e novas contratações são escolhas da semana, não valores mensais divididos automaticamente. Investimentos, rescisões, treinamento e pagamentos pontuais não são divididos outra vez.
+
+A capacidade da nuvem representa clientes simultâneos e não é dividida por quatro. Mensalidades e custos recorrentes por cliente são proporcionais; MRR continua sendo a receita mensal equivalente, enquanto a DRE mostra a receita do período. O alvo mensal didático de manutenção de R$ 1.000 é proporcional à semana; ausência de manutenção acumula desgaste proporcional ao tempo. A referência salarial usada no eNPS permanece mensal, evitando comparar salário semanal com salário mensal.
+
+Prazos de compra e venda são expressos em semanas nas turmas semanais. PMR e PMP usam sete dias, com saldos originados na própria rodada; no histórico mensal mantêm a convenção de 30 dias. Para classificação didática, o curto prazo semanal abrange 52 rodadas (364 dias). As competências fiscais anuais usam o ano de encerramento da semana; uma semana que cruza o ano é atribuída a esse ano para os controles anuais simplificados. Isso não representa apuração tributária legal.
+
+### DRE e balanço são consultas diferentes
+
+A aba DRE abre o demonstrativo completo da rodada. As visões mensal e trimestral consolidam somente semanas registradas com datas: cada linha é rateada por dia em centavos, sem duplicar uma semana que atravessa competências. Períodos ainda incompletos são apresentados como parciais. O balanço é uma fotografia patrimonial no fim da rodada e não deve ser somado entre semanas. Aportes e empréstimos continuam fora da receita; cheque especial é passivo, e o caixa assinado permanece no fluxo e no cabeçalho.
+
+### Histórico mensal preservado
+
+Turmas anteriores continuam mensais até ativação explícita do calendário semanal pelo professor, antes de salvar decisões da rodada aberta. Os resultados anteriores não são recalculados nem redistribuídos por datas inventadas. A ativação é prospectiva e não pode ser reposicionada. Obrigações futuras sem datas absolutas herdadas do modelo mensal são convertidas pela convenção de 30 dias por mês, arredondando para a semana de vencimento seguinte; essa aproximação não altera snapshots passados. Resultados novos registram a versão 3.0.0-weekly-calendar e o calendário usado. Exemplos mensais neste manual continuam sendo referências mensais ou descrições do histórico, e não uma cobrança integral por semana.
 
 ## A história e o conceito da logomarca SempreHub
 
@@ -78,7 +118,7 @@ Comece na **Visão Geral / Mesa do CEO**: confira nome da empresa, mês, caixa e
 5. **RH:** decida contratações, demissões, horas extras e remuneração.
 6. **Finanças:** avalie crédito, pagamentos, caixa e capital de giro.
 
-Os campos numéricos permitem digitar valores e mostram os limites disponíveis. As decisões ficam reunidas em Departamentos, com subabas para cada área. Ações opcionais podem permanecer em zero. Confira o checklist; salve rascunhos enquanto estiver discutindo. Ao enviar, confirme no modal: depois do envio final, os valores ficam visíveis em **modo de leitura**, sem alterações até o próximo mês.
+Os campos numéricos permitem digitar valores e mostram os limites disponíveis. As decisões ficam reunidas em Departamentos, com subabas para cada área. Ações opcionais podem permanecer em zero. Confira o checklist; salve rascunhos enquanto estiver discutindo. Ao enviar, confirme no modal: depois do envio final, os valores ficam visíveis em **modo de leitura**, sem alterações até o próxima rodada.
 
 ## Navegação: escolha à esquerda, trabalhe à direita
 
@@ -96,7 +136,7 @@ Os campos de decisão mostram pendências, como **Falta tomar esta decisão** ou
 
 Versão 3.5 - outubro de 2026
 
-Aprenda a interpretar o mercado, discutir decisões e observar suas consequências. Cada rodada representa um mês. As imagens mostram as telas do programa com nomes e situações ilustrativos.
+Aprenda a interpretar o mercado, discutir decisões e observar suas consequências. Cada nova rodada semanal representa sete dias; turmas mensais históricas preservam sua periodicidade. As imagens mostram as telas do programa com nomes e situações ilustrativos.
 
 ## 1. Entre na turma indicada pelo professor
 
@@ -141,7 +181,7 @@ O quadro da equipe destaca o líder atual e a regra de transferência. A equipe 
 
 ![Selecione o próximo líder e confirme a transferência](diagramas/transferir-lider.png)
 
-**A troca só vale na próxima rodada.** Durante a rodada atual, o líder anterior continua responsável por salvar e enviar. Depois que o professor fecha o mês, o programa efetiva a transferência e atualiza as permissões. Uma transferência programada não pode ser substituída por outra na mesma rodada. Na última rodada não existe uma próxima rodada para transferir.
+**A troca só vale na próxima rodada.** Durante a rodada atual, o líder anterior continua responsável por salvar e enviar. Depois que o professor fecha a rodada, o programa efetiva a transferência e atualiza as permissões. Uma transferência programada não pode ser substituída por outra na mesma rodada. Na última rodada não existe uma próxima rodada para transferir.
 
 ![Aviso do próximo líder e da rodada de vigência](diagramas/lider-proxima-rodada.png)
 
@@ -174,7 +214,7 @@ Confira todas as áreas aplicáveis, os mixes dos produtos, a diretriz estratég
 
 **Comprar máquinas, contratar funcionários, pagar horas extras, solicitar empréstimos e investir em tecnologia são escolhas opcionais.** Zero é válido para essas ações e não impede o envio. A revisão obrigatória serve para confirmar que a equipe considerou a escolha.
 
-Após o envio final, a decisão fica bloqueada em modo de leitura até o próximo mês. O prazo configurado pelo professor encerra automaticamente a rodada às 23:59:59 de Brasília. O professor também pode forçar o encerramento. Salve rascunhos enquanto a decisão ainda não estiver finalizada.
+Após o envio final, a decisão fica bloqueada em modo de leitura até o próxima rodada. O prazo configurado pelo professor encerra automaticamente a rodada às 23:59:59 de Brasília. O professor também pode forçar o encerramento. Salve rascunhos enquanto a decisão ainda não estiver finalizada.
 
 ![Decisões confirmadas e preservadas em modo de leitura](diagramas/decisao-modo-leitura.png)
 
@@ -226,13 +266,13 @@ A vida útil contábil padrão de uma máquina é **24 meses**, configurável pe
 
 A depreciação mensal reduz o valor contábil ao longo da vida útil. Ela afeta o resultado e o patrimônio, mas não é um pagamento de caixa daquele mês. A máquina não é retirada automaticamente ao zerar o valor contábil: sua condição e a manutenção continuam relevantes para a capacidade produtiva.
 
-Novas compras são opcionais e ficam disponíveis **a partir do mês 3**. O pagamento ocorre na compra, e a máquina entra em operação **na rodada seguinte**. Compare demanda, capacidade, manutenção, condição, custo e caixa antes de investir ou modernizar. Manutenção e expansão são decisões diferentes.
+Novas compras são opcionais e ficam disponíveis **a partir do rodada 3**. O pagamento ocorre na compra, e a máquina entra em operação **na rodada seguinte**. Compare demanda, capacidade, manutenção, condição, custo e caixa antes de investir ou modernizar. Manutenção e expansão são decisões diferentes.
 
 ### Funcionários, horas extras e P&D
 
 Contratar e demitir altera capacidade e gastos; demissões podem gerar rescisões. Salários, benefícios e treinamento influenciam custos e condições da equipe de funcionários.
 
-Horas extras são opcionais no modo Empresa tradicional: até **40 horas por funcionário no mês**, usando a premissa didática de salário dividido por 220 horas, adicional de 50% e encargos. Elas aumentam capacidade de trabalho e gastos, mas máquinas e insumos ainda podem limitar a produção. A escolha não se repete automaticamente na rodada seguinte.
+Horas extras são opcionais no modo Empresa tradicional: até **40 horas mensais de referência por funcionário, proporcionais aos dias da semana**, usando a premissa didática de salário dividido por 220 horas, adicional de 50% e encargos. Elas aumentam capacidade de trabalho e gastos, mas máquinas e insumos ainda podem limitar a produção. A escolha não se repete automaticamente na rodada seguinte.
 
 O investimento em **tecnologia e P&D** tem custo e influencia qualidade e atratividade. No modo Startup, considere também infraestrutura, clientes, satisfação, retenção e participação dos fundadores. No modelo básico, nem todos os controles industriais ou digitais estão disponíveis.
 
@@ -254,7 +294,7 @@ Decisões, versões, responsáveis pelo envio, transferências, eventos e result
 - **Não consigo entrar em outra turma:** a troca exige autorização do professor.
 - **Não tenho equipe:** veja os grupos com vagas ou converse com o professor antes de encerrar a formação.
 - **Não consigo editar:** confira quem é o líder desta rodada. Integrantes têm visualização.
-- **A liderança ainda não mudou:** confira a rodada de vigência; a transferência só vale após o fechamento do mês atual.
+- **A liderança ainda não mudou:** confira a rodada de vigência; a transferência só vale após o fechamento da rodada atual.
 - **Não consigo enviar:** leia a mensagem e complete as áreas indicadas. Salvar rascunho não entrega a rodada.
 - **A prévia não calculou:** corrija os valores indicados e tente novamente; o rascunho pode guardar um planejamento ainda incompleto.
 
@@ -268,7 +308,7 @@ Antes de começar, confirme o nome da turma com o professor, entre nela, forme s
 2. Em **SWOT**, leia os fatores e escolha uma diretriz coerente com o que a empresa consegue oferecer. Em **Porter** e **PESTEL**, examine pressões e mudanças do ambiente. Esses diagnósticos apoiam sua interpretação; não escolhem preços ou investimentos por você.
 3. Em **Segmentação do mercado**, descreva localização e público, escolha cobertura e canais e informe o preço máximo que esse público aceitaria. Consulte a seção Dicionário das decisões comerciais e estratégicas para entender cada campo.
 4. Em **BCG**, registre todos os produtos do mix. Confira crescimento, participação relativa, classificação e se são dados ou projeções. Projeções precisam de premissas escritas.
-5. Em **Produtos e marketing**, complete cada produto: quantidade ou peso de atendimento, preço, posicionamento, canais, cobertura, mídias e serviços. Confira os custos e marque o mix como revisado.
+5. Em **Produtos e marketing**, complete cada produto: quantidade ou peso de atendimento, preço, posicionamento, canais, cobertura, mídias e serviços. Confira o preço, os canais e o custo total da campanha.
 6. Em **Finanças**, escolha crédito, amortização, prazos e regime quando aplicáveis. Analise os números da equipe para definir as decisões; não há texto de análise financeira obrigatório para enviar a rodada.
 7. Em **Produção**, compare capacidade, demanda esperada, pessoas, estoques e investimento. Escolha contratações, demissões, horas extras e compras quando disponíveis no seu modelo.
 8. Em **Logística**, quando disponível, selecione a entrega. No modelo em que essa decisão não se aplica, o submenu não é apresentado como uma obrigação.
@@ -331,7 +371,7 @@ Antes de decidir, compare a expectativa de receita, os custos, as despesas, o di
 
 **Pendente** significa que uma informação ou confirmação está faltando. **Rascunho salvo** significa que o trabalho foi guardado, mas ainda não é entrega final. **Enviada** significa que a versão foi entregue para a rodada. Confira a mensagem após cada ação. Valores digitados sem salvar ainda não são a versão registrada.
 
-Ao alterar uma escolha, revise novamente as áreas afetadas. Antes do envio final, você pode corrigir e salvar novos rascunhos. Depois do envio final, a edição fica bloqueada até o próximo mês. Em caso de atualização concorrente, use **Carregar decisão salva** depois de combinar a correção com a equipe; isso substitui os campos locais pela versão registrada.
+Ao alterar uma escolha, revise novamente as áreas afetadas. Antes do envio final, você pode corrigir e salvar novos rascunhos. Depois do envio final, a edição fica bloqueada até o próxima rodada. Em caso de atualização concorrente, use **Carregar decisão salva** depois de combinar a correção com a equipe; isso substitui os campos locais pela versão registrada.
 
 Se aparecer bloqueio, leia cada pendência, clique no submenu correspondente, complete a informação, confira e salve. Não preencha valores aleatórios apenas para liberar o botão. Solicitar ajuda ao professor é melhor que transformar uma lacuna em uma falsa certeza.
 

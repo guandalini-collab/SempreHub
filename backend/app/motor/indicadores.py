@@ -2,10 +2,10 @@
 from decimal import Decimal, ROUND_HALF_UP
 
 
-def disponibilidade_maquinas(maquinas, investimento):
+def disponibilidade_maquinas(maquinas, investimento, fracao=1):
     """Um único desgaste operacional por equipamento; valor contábil é independente."""
-    cobertura = min(Decimal(1), Decimal(str(max(0, investimento))) / 1000)
-    incremento = Decimal('.05') * (1 - cobertura)
+    cobertura = min(Decimal(1), Decimal(str(max(0, investimento))) / (Decimal(1000)*Decimal(str(fracao))))
+    incremento = Decimal('.05') * Decimal(str(fracao)) * (1 - cobertura)
     total = Decimal(0)
     disponivel = Decimal(0)
     for maquina in maquinas:
@@ -21,34 +21,34 @@ def disponibilidade_maquinas(maquinas, investimento):
     return float(disponivel / total) if total > 0 else 1.0
 
 
-def oee(estado, manutencao, treinamento, funcionarios, maquinas, producao):
+def oee(estado, manutencao, treinamento, funcionarios, maquinas, producao, fracao=1):
     anterior = estado.get('indicadores_didaticos', {})
     performance = Decimal(str(anterior.get('performance', 1)))
     defeito = Decimal(str(anterior.get('taxa_defeito', .02)))
-    disponibilidade = Decimal(str(disponibilidade_maquinas(maquinas, manutencao)))
+    disponibilidade = Decimal(str(disponibilidade_maquinas(maquinas, manutencao, fracao)))
     if maquinas:
         if funcionarios > 0 and treinamento > 0:
             unidades = Decimal(str(treinamento)) / (100 * funcionarios)
             performance = min(Decimal(1), performance + Decimal('.02') * unidades)
             defeito = max(Decimal('.005'), defeito - Decimal('.005') * unidades)
         elif treinamento == 0:
-            performance = max(Decimal(0), performance - Decimal('.005'))
+            performance = max(Decimal(0), performance - Decimal('.005')*Decimal(str(fracao)))
     estado['indicadores_didaticos'] = {**anterior, 'risco_quebra': float(1 - disponibilidade), 'performance': float(performance), 'taxa_defeito': float(defeito)}
     qualidade = 1 - defeito
     return {'oee': float(disponibilidade * performance * qualidade) if maquinas and producao > 0 else None,
             'disponibilidade': float(disponibilidade), 'performance': float(performance), 'qualidade_oee': float(qualidade), 'taxa_defeito': float(defeito)}
 
 
-def capacidades_producao(capacidade_nominal, funcionarios, produtividade, fator_rh, horas_extras, disponibilidade, performance):
+def capacidades_producao(capacidade_nominal, funcionarios, produtividade, fator_rh, horas_extras, disponibilidade, performance, horas_regulares=220):
     """Horas extras aumentam tempo; disponibilidade e performance reduzem rendimento."""
-    horas = max(0, min(40, horas_extras)) if funcionarios > 0 else 0
-    fator_tempo = 1 + horas / 220
+    horas = max(0, min(40 * horas_regulares / 220, horas_extras)) if funcionarios > 0 else 0
+    fator_tempo = 1 + horas / horas_regulares
     trabalho_regular = (1 + funcionarios) * produtividade * fator_rh
-    trabalho_extra = funcionarios * horas / 220 * produtividade * fator_rh
+    trabalho_extra = funcionarios * horas / horas_regulares * produtividade * fator_rh
     nominal_periodo = capacidade_nominal * fator_tempo
     disponivel = nominal_periodo * disponibilidade
     efetiva_maquinas = disponivel * performance
-    return {'capacidade_nominal': capacidade_nominal, 'horas_regulares_por_pessoa': 220,
+    return {'capacidade_nominal': capacidade_nominal, 'horas_regulares_por_pessoa': horas_regulares,
             'fator_tempo_maquinas': fator_tempo, 'capacidade_nominal_periodo': nominal_periodo,
             'capacidade_trabalho_regular': trabalho_regular, 'capacidade_trabalho_extra': trabalho_extra,
             'capacidade_maquinas_disponivel': disponivel, 'capacidade_maquinas_efetiva': efetiva_maquinas,

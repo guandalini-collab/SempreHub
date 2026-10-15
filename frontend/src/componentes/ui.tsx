@@ -386,7 +386,7 @@ export function DicaTermo({termo, texto}: {termo: string; texto: string}) {
   return <span className="group relative ml-2 inline-flex align-middle"><button type="button" aria-label={`O que significa ${termo}?`} aria-describedby={id} className="rounded-full border border-cyan-500 px-1.5 text-xs text-cyan-800">?</button><span id={id} role="tooltip" className="pointer-events-none absolute bottom-full left-0 z-40 mb-2 hidden w-64 rounded-lg bg-slate-900 p-3 text-left text-xs font-normal text-white shadow-lg group-hover:block group-focus-within:block">{texto}</span></span>;
 }
 
-export function TabelaDre({ dre, paginar = false }: { dre: Dre; paginar?: boolean }) {
+export function TabelaDre({ dre, paginar = false, periodo = "mês" }: { dre: Dre; paginar?: boolean; periodo?: string }) {
   const [pagina,setPagina]=React.useState(0);
   const linhas=LINHAS_DRE.filter(({chave})=>dre[chave]!=null&&(dre[chave]!==0||["impostos","cmv","custos_fixos"].includes(chave)));
   const total=Math.ceil(linhas.length/4);
@@ -409,7 +409,7 @@ export function TabelaDre({ dre, paginar = false }: { dre: Dre; paginar?: boolea
       </tbody>
       <tfoot>
         <tr className="border-t-2 border-marinho">
-          <td className="py-2 font-bold text-marinho">Lucro (prejuízo) do mês</td>
+          <td className="py-2 font-bold text-marinho">Lucro (prejuízo) do {periodo}</td>
           <td className={`py-2 text-right font-bold ${dre.lucro_liquido >= 0 ? "text-emerald-700" : "text-red-700"}`}>
             <ValorMonetario valor={dre.lucro_liquido}/>
           </td>

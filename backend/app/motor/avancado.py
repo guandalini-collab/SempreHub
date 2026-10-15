@@ -6,6 +6,7 @@ import math
 
 from ..models import Empresa, Resultado, RegimeTributario, FaseAtual
 from ..schemas import ConfiguracaoSimulacao, DecisaoSimulacao
+from .calendario import adaptar, periodo, VERSAO_SEMANAL
 from .tributos import calcular_imposto, aliquota_efetiva_simples, TOLERANCIA_TETO_MEI
 
 
@@ -133,8 +134,18 @@ def prever(empresa, decisao, turma):
 
 def _tributar(empresa, turma, receita, cmv, alertas):
     regime = empresa.regime_tributario
-    impostos, aliquota = calcular_imposto(regime, receita, cmv, [r.receita for r in empresa.resultados],
-                                         turma.das_mei_mensal, turma.aliquota_icms)
+    temporal = adaptar(parametros(turma), turma.rodada_atual)
+    historico = [r.receita for r in empresa.resultados]
+    if temporal.get('_calendario') and regime == RegimeTributario.SIMPLES_NACIONAL:
+        # Anualização pelo tempo efetivamente simulado, sem contar uma semana como mês.
+        ultimos = empresa.resultados[-52:]
+        equivalentes = sum((r.detalhes_simulacao or {}).get('calendario', {}).get('fator_mensal', 1) for r in ultimos)
+        base = sum(r.receita for r in ultimos)/equivalentes*12 if equivalentes else receita/temporal['_calendario']['fator_mensal']*12
+        aliquota = aliquota_efetiva_simples(base)
+        impostos = receita*aliquota
+    else:
+        impostos, aliquota = calcular_imposto(regime, receita, cmv, historico,
+                                             temporal["das_mei_mensal"], turma.aliquota_icms)
     acumulado = empresa.faturamento_ano + receita
     if regime == RegimeTributario.MEI:
         empresa.das_mei_pago_ano += impostos
@@ -160,18 +171,21 @@ def forca_concorrente(cfg, indice):
 
 def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     cfg = config(turma)
+    temporal = adaptar({"configuracao_simulacao":cfg,"demanda_base_por_empresa":turma.demanda_base_por_empresa}, rodada)
+    cal = temporal.get("_calendario")
     bots = []
     for i in range(cfg["concorrentes_virtuais"]):
         # Política pública, determinística: não lê as decisões privadas dos alunos.
         preco = turma.preco_referencia * (0.9 + .05 * (i % 5))
         bots.append({"empresa": f"Concorrente virtual {i + 1}", "virtual": True, "preco": preco,
                      "atratividade": (turma.preco_referencia / preco) ** 2 * (1 + .02 * (rodada - 1)) * forca_concorrente(cfg, i),
-                     "capacidade": turma.demanda_base_por_empresa})
+                     "capacidade": temporal["demanda_base_por_empresa"]})
     precos = [d.preco for d in decisoes] + [b["preco"] for b in bots]
     media = sum(precos) / len(precos)
-    total = (turma.demanda_base_por_empresa * len(preparos)
-             * (1 + turma.crescimento_mercado_mensal) ** (rodada - 1)
-             * (turma.preco_referencia / media) ** .8 * multiplicador)
+    crescimento_acumulado = sum(periodo(cfg, n)["fator_mensal"] for n in range(cfg.get("rodada_inicio_calendario",1), rodada)) if cal else rodada-1
+    total = (temporal["demanda_base_por_empresa"] * len(preparos)
+             * (1 + turma.crescimento_mercado_mensal) ** crescimento_acumulado
+             * (turma.preco_referencia / media) ** .8 * multiplicador * (cal["sazonalidade"]["demanda"] if cal else 1))
     atrativos = [max(.001, p["atratividade"]) for p in preparos] + [b["atratividade"] for b in bots]
     soma = sum(atrativos)
     demandas = [total * atr / soma for atr in atrativos]
@@ -188,7 +202,9 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
     decisoes, preparos = [], []
     for empresa in empresas:
         d = decisao_vigente(db, empresa, rodada, turma)
-        if rodada > 1 and (rodada - 1) % 12 == 0:
+        calendario = periodo(config(turma), rodada)
+        anterior_calendario = periodo(config(turma), rodada-1) if calendario and rodada>1 else None
+        if (calendario and anterior_calendario and calendario["ano_fiscal"] != anterior_calendario["ano_fiscal"]) or (not calendario and rodada > 1 and (rodada - 1) % 12 == 0):
             empresa.faturamento_ano = 0
             empresa.das_mei_pago_ano = 0
         c = _Calculo(empresa, d)
@@ -230,6 +246,9 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
                               FaseAtual.CAPTACAO if empresa.divida > 0 else
                               FaseAtual.OPERACAO_ESTAVEL if dre["lucro_liquido"] > 0 else FaseAtual.PLANEJAMENTO)
         detalhes = deepcopy(a["detalhes"])
+        if calendario:
+            detalhes["calendario"] = deepcopy(calendario)
+            detalhes["engine_version"] = VERSAO_SEMANAL
         detalhes["avaliacao_estrategica"] = deepcopy(preparo["avaliacao_estrategica"])
         detalhes.update(parametros=parametros(turma), decisao=colunas(d), dre=deepcopy(dre),
                         concorrentes_virtuais=deepcopy(bots), evento=evento.codigo, eventos=list(evento.codigos or (evento.codigo,)))

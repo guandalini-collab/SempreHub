@@ -6,7 +6,7 @@ def dinheiro(v):
     return float(Decimal(str(v)).quantize(Decimal('.01'), rounding=ROUND_HALF_UP))
 
 
-def reconciliar_financeiros(balanco, estado, dre, rodada, taxa_cheque, compras=None, modo='TRADICIONAL'):
+def reconciliar_financeiros(balanco, estado, dre, rodada, taxa_cheque, compras=None, modo='TRADICIONAL', dias=30, horizonte=12):
     # Saldo assinado é preservado no DFC e no campo legado; nunca vira segunda dívida.
     caixa = balanco['caixa']
     disponivel, cheque = max(0, caixa), max(0, -caixa)
@@ -18,11 +18,11 @@ def reconciliar_financeiros(balanco, estado, dre, rodada, taxa_cheque, compras=N
         titulos=estado.get(nome)
         if not isinstance(titulos,list) or any(not isinstance(t.get('vencimento'),(int,float)) for t in titulos):
             return None
-        return (dinheiro(sum(t['valor'] for t in titulos if t['vencimento'] <= rodada+12)),
-                dinheiro(sum(t['valor'] for t in titulos if t['vencimento'] > rodada+12)))
+        return (dinheiro(sum(t['valor'] for t in titulos if t['vencimento'] <= rodada+horizonte)),
+                dinheiro(sum(t['valor'] for t in titulos if t['vencimento'] > rodada+horizonte)))
     receber,pagar=prazos('receber'),prazos('pagar')
     divida=balanco['divida']; vencimento=estado.get('vencimento_divida')
-    divida_cp = 0 if not divida else (divida if vencimento <= rodada+12 else 0) if isinstance(vencimento,(int,float)) else None
+    divida_cp = 0 if not divida else (divida if vencimento <= rodada+horizonte else 0) if isinstance(vencimento,(int,float)) else None
     def razao(a,b):
         return a/b if b is not None and b>0 else None
     geral=razao(disponivel+balanco['receber']+balanco['estoques'],balanco['pagar']+divida+cheque) if receber is not None and pagar is not None else None
@@ -50,8 +50,8 @@ def reconciliar_financeiros(balanco, estado, dre, rodada, taxa_cheque, compras=N
     resultado = {'liquidez_corrente':razao(ac,pc) if ac is not None else None,
                  'liquidez_seca':razao(ac-balanco['estoques'],pc) if ac is not None else None,
                  'liquidez_imediata':razao(disponivel,pc), 'liquidez_geral':geral,
-                 'ebit':ebit, 'ebitda':ebitda, 'pmr':pmr*30 if pmr is not None else None,
-                 'pmp':pmp*30 if pmp is not None else None, 'compras_mes':compras,
+                 'ebit':ebit, 'ebitda':ebitda, 'pmr':pmr*dias if pmr is not None else None,
+                 'pmp':pmp*dias if pmp is not None else None, 'compras_mes':compras,
                  'margem_contribuicao':margem, 'ponto_equilibrio':equilibrio,
                  'ponto_equilibrio_status':status}
     if modo == 'TRADICIONAL':

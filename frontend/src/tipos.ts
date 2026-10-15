@@ -45,6 +45,7 @@ export interface Parametros {
 }
 
 export interface Turma {
+  calendario?: import("./calendario").CalendarioSimulado | null;
   prazo_rodada?: string | null;
   visivel_ingresso: boolean;
   formacao_encerrada: boolean;

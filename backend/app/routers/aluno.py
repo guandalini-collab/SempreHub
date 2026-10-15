@@ -245,10 +245,14 @@ def _validar_decisao(empresa: Empresa, dados: DecisaoEntrada) -> None:
     if empresa.turma.modo_jogo != "STARTUP" and dados.simulacao and dados.simulacao.aporte:
         raise HTTPException(422, "Aportes de investidores estão disponíveis no modo Startup.")
     if empresa.turma.modo_jogo == "TRADICIONAL" and dados.simulacao and dados.simulacao.comprar_maquinas and empresa.turma.rodada_atual < 3:
-        raise HTTPException(422, "Novos investimentos em máquinas estão disponíveis a partir do terceiro mês, após as duas primeiras rodadas.")
+        raise HTTPException(422, "Novos investimentos em máquinas estão disponíveis a partir da terceira rodada.")
     if empresa.turma.status != StatusTurma.ABERTA:
         raise HTTPException(422, "A turma foi encerrada; não há mais rodadas para decidir.")
     if dados.simulacao and dados.simulacao.horas_extras:
+        from ..motor.calendario import periodo
+        cal = periodo(empresa.turma.configuracao_simulacao or {}, empresa.turma.rodada_atual)
+        if cal and dados.simulacao.horas_extras > 40 * cal["fator_mensal"] + 1e-8:
+            raise HTTPException(422, "Horas extras excedem o limite proporcional desta semana.")
         if empresa.turma.modo_jogo != "TRADICIONAL":
             raise HTTPException(422, "Horas extras de produção estão disponíveis no modo Empresa tradicional.")
         if empresa.funcionarios + dados.contratar - dados.demitir <= 0:

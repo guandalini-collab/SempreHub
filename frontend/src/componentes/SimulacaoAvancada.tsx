@@ -9,7 +9,7 @@ import { inteiro, percentual, reais, umDecimal } from "../formatos";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, PreviaSimulacao } from "../tiposSimulacao";
 import { Campo, Cartao, EntradaNumero, Modal, estiloEntrada } from "./ui";
 
-export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, area = "decisoes", rodada, etapaFinanceira, etapaRH = "equipe" }: {
+export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, area = "decisoes", rodada, etapaFinanceira, etapaRH = "equipe" }: {
   modo: ModoJogo;
   valores: DecisaoSimulacao;
   aoMudar: (valores: DecisaoSimulacao) => void;
@@ -20,6 +20,8 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
   area?: string;
   etapaFinanceira?: string;
   etapaRH?: string;
+  fatorPeriodo?: number;
+  semanal?: boolean;
   rodada: number;
 }) {
   const [mostrarImpacto,setMostrarImpacto]=React.useState(false);
@@ -37,7 +39,7 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
     {mostrarImpacto && <Modal titulo="Impacto estimado da compra de máquinas" aoFechar={()=>setMostrarImpacto(false)}>        <p className="mb-2 text-sm text-slate-600">Vida útil: {config.vida_util_maquina} meses · compra opcional · ativação na rodada seguinte.</p><dl className="mt-2 grid gap-2 rounded-lg bg-slate-50 p-2 text-sm sm:grid-cols-2"><div><dt>Investimento total</dt><dd className="font-bold"><ValorMonetario valor={valores.comprar_maquinas * config.preco_maquina}/></dd></div><div><dt>Capacidade adicional nominal</dt><dd className="font-bold">{inteiro(valores.comprar_maquinas * config.capacidade_maquina)} un./mês</dd></div><div><dt>Disponível no mês</dt><dd className="font-bold">{rodada + 1}</dd></div><div><dt>Depreciação mensal estimada</dt><dd className="font-bold"><ValorMonetario valor={valores.comprar_maquinas * config.preco_maquina / config.vida_util_maquina}/></dd></div></dl><p className="mt-2 text-xs text-slate-600">A compra reduz o caixa; a depreciação afeta o lucro nos meses de operação.</p></Modal>}
     {modo === "TRADICIONAL" && <>
       <Secao titulo="Horas extras opcionais da equipe" oculto={area !== "rh" || etapaRH !== "desenvolvimento"}>
-        <Campo rotulo="Horas extras por funcionário neste mês" ajuda="Pode deixar em zero. Até 40 h por empregado, com adicional de 50% e encargos. Base didática: salário / 220 h. Aumenta a capacidade de trabalho, mas máquinas e matéria-prima ainda limitam a produção; o gasto reduz lucro e caixa.">
+        <Campo rotulo="Horas extras por funcionário nesta rodada" ajuda="Pode deixar em zero. Até 40 h por empregado, com adicional de 50% e encargos. Base didática: salário / 220 h. Aumenta a capacidade de trabalho, mas máquinas e matéria-prima ainda limitam a produção; o gasto reduz lucro e caixa.">
           <ControleVisual rotulo="Horas extras por funcionário" moeda={false} valor={valores.horas_extras ?? 0} limite={40} aoMudar={(v) => mudar("horas_extras", v)} />
         </Campo>
       </Secao>
@@ -48,7 +50,7 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
       <Secao titulo="Máquinas e manutenção" oculto={area !== "producao" || etapaProducao !== "maquinas"}>
 
         {rodada >= 3 ? <><Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={100} /></Campo><button type="button" className="consulta-previa" onClick={()=>setMostrarImpacto(true)}>Consultar impacto da compra</button></> : <p className="rounded-lg bg-blue-50 p-4 text-sm text-blue-900"><strong>Expansão do maquinário a partir do mês 3.</strong> Nos dois primeiros meses, planeje a produção com as máquinas iniciais e cuide da manutenção.</p>}
-        <Campo rotulo="Manutenção do mês" ajuda="Cuida das condições das máquinas e da capacidade das próximas rodadas."><ControleVisual rotulo="manutencao"  valor={valores.manutencao} aoMudar={(v) => mudar("manutencao", v)} limite={100000} /></Campo>
+        <Campo rotulo="Manutenção da rodada" ajuda="Cuida das condições das máquinas e da capacidade das próximas rodadas."><ControleVisual rotulo="manutencao"  valor={valores.manutencao} aoMudar={(v) => mudar("manutencao", v)} limite={100000} /></Campo>
 
       </Secao>
       <div hidden={area !== "producao" || etapaProducao !== "localizacao"}><CentroGravidade estudo={valores.centro_gravidade} aoMudar={(estudo) => mudar("centro_gravidade", estudo)} /></div>
@@ -60,12 +62,12 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
       {area === "logistica" && <div className="rounded-lg bg-blue-50 p-4 text-sm"><h3 className="font-bold">Frete e localização</h3><p className="mt-2">Modalidade: <ValorMonetario valor={baseFrete}/>/unidade · taxa didática: <ValorMonetario valor={taxaKm}/>/unidade/km.</p><p className="mt-2">Distância média ponderada: {distancia.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} km · adicional: <ValorMonetario valor={adicionalFrete}/>/unidade.</p><p className="mt-2 font-bold">Frete estimado: <ValorMonetario valor={baseFrete + adicionalFrete}/> por unidade vendida.</p><p className="mt-2">{temLocalizacao ? "A localização escolhida em Produção afeta o frete registrado na DRE e no caixa." : "Sem localização definida e volumes positivos, aplica-se apenas o custo da modalidade. Complete o estudo em Produção para incluir as distâncias."}</p></div>}
       <Secao titulo="Compras a prazo" oculto={area !== "financas" || (!!etapaFinanceira && etapaFinanceira !== "compras")}>
         <Campo rotulo="Parcela das compras a prazo" ajuda="A compra entra no estoque agora; o pagamento ocorre no vencimento. O restante é pago à vista."><ControleVisual rotulo="Compras a prazo (%)" moeda={false} valor={valores.compras_prazo * 100} limite={100} aoMudar={(v) => mudar("compras_prazo", v / 100)} /></Campo>
-        <Campo rotulo="Prazo de pagamento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_pagamento} onChange={(e) => mudar("prazo_pagamento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} mês(es)</option>)}</select></Campo>
+        <Campo rotulo="Prazo de pagamento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_pagamento} onChange={(e) => mudar("prazo_pagamento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} {semanal?"semana(s)":"mês(es)"}</option>)}</select></Campo>
       </Secao>
     </>}
     {modo === "STARTUP" && <>
       <Secao titulo="Capacidade do serviço digital" oculto={area !== "producao"}>
-      <Campo rotulo="Capacidade da nuvem" ajuda="Número de clientes que a operação consegue atender neste mês. Os clientes sem atendimento continuam na base, com impacto na satisfação."><ControleVisual rotulo="capacidade nuvem" moeda={false} inteiro valor={valores.capacidade_nuvem} aoMudar={(v) => mudar("capacidade_nuvem", v)} limite={10000} /></Campo>
+      <Campo rotulo="Capacidade da nuvem" ajuda="Número de clientes que a operação consegue atender neste período. Os clientes sem atendimento continuam na base, com impacto na satisfação."><ControleVisual rotulo="capacidade nuvem" moeda={false} inteiro valor={valores.capacidade_nuvem} aoMudar={(v) => mudar("capacidade_nuvem", v)} limite={10000} /></Campo>
       </Secao>
       <Secao titulo="Investidores e financiamento" oculto={area !== "financas" || (!!etapaFinanceira && etapaFinanceira !== "aporte")}>
       <Campo rotulo="Aporte de investidores" ajuda="Entrada de capital no caixa em troca de participação. Não é receita nem lucro e pode reduzir a participação dos fundadores."><ControleVisual rotulo="aporte"  valor={valores.aporte} aoMudar={(v) => mudar("aporte", v)} limite={100000} /></Campo>
@@ -77,11 +79,11 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
       <Campo rotulo="Salário da equipe de funcionários" ajuda={`O padrão da turma é ${reais(salarioBase)} por funcionário. Salários, benefícios e treinamento influenciam moral, qualificação e rotatividade.`}>
         <select className={estiloEntrada} value={valores.salario === null ? "PADRAO" : "PROPRIO"} onChange={(e) => mudar("salario", e.target.value === "PADRAO" ? null : salarioBase)}><option value="PADRAO">Usar salário-base da turma</option><option value="PROPRIO">Definir salário da empresa</option></select>
       </Campo>
-      {valores.salario !== null && <Campo rotulo="Salário por funcionário"><ControleVisual rotulo="salario"  valor={valores.salario} aoMudar={(v) => mudar("salario", v)} limite={100000} /></Campo>}
-      <Campo rotulo="Benefício por funcionário" ajuda="Valor mensal por empregado; aparece como despesa de benefícios."><ControleVisual rotulo="beneficio"  valor={valores.beneficio} aoMudar={(v) => mudar("beneficio", v)} limite={100000} /></Campo>
+      {valores.salario !== null && <Campo rotulo="Salário mensal de referência por funcionário"><ControleVisual rotulo="salario"  valor={valores.salario} aoMudar={(v) => mudar("salario", v)} limite={100000} /></Campo>}
+      <Campo rotulo="Benefício mensal de referência por funcionário" ajuda="Valor mensal por empregado; aparece como despesa de benefícios."><ControleVisual rotulo="beneficio"  valor={valores.beneficio} aoMudar={(v) => mudar("beneficio", v)} limite={100000} /></Campo>
     </Secao>
     <Secao titulo="Treinamento" oculto={area !== "rh" || etapaRH !== "desenvolvimento"}>
-      <Campo rotulo="Treinamento do mês" ajuda="Investimento total em capacitação dos funcionários; o desenvolvimento passa para as rodadas seguintes."><ControleVisual rotulo="treinamento"  valor={valores.treinamento} aoMudar={(v) => mudar("treinamento", v)} limite={100000} /></Campo>
+      <Campo rotulo="Treinamento da rodada" ajuda="Investimento total em capacitação dos funcionários; o desenvolvimento passa para as rodadas seguintes."><ControleVisual rotulo="treinamento"  valor={valores.treinamento} aoMudar={(v) => mudar("treinamento", v)} limite={100000} /></Campo>
     </Secao>
     {!mixSelecionado && <Secao titulo="Posicionamento e canais" oculto={area !== "decisoes"}>
       <Campo rotulo="Estratégia de posicionamento"><select className={estiloEntrada} value={valores.posicionamento} onChange={(e) => mudar("posicionamento", e.target.value as DecisaoSimulacao["posicionamento"])}><option value="CUSTO">Liderança em custo</option><option value="DIFERENCIACAO">Diferenciação</option></select></Campo>
@@ -91,7 +93,7 @@ export function ControlesSimulacao({ modo, valores, aoMudar, config, salarioBase
     }
     <Secao titulo="Vendas a prazo" oculto={area !== "financas" || (!!etapaFinanceira && etapaFinanceira !== "vendas")}>
       <Campo rotulo="Parcela das vendas a prazo" ajuda="A venda gera receita e lucro nesta rodada, mas o dinheiro só chega ao caixa no vencimento."><ControleVisual rotulo="Vendas a prazo (%)" moeda={false} valor={valores.vendas_prazo * 100} limite={100} aoMudar={(v) => mudar("vendas_prazo", v / 100)} /></Campo>
-      <Campo rotulo="Prazo de recebimento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_recebimento} onChange={(e) => mudar("prazo_recebimento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} mês(es)</option>)}</select></Campo>
+      <Campo rotulo="Prazo de recebimento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_recebimento} onChange={(e) => mudar("prazo_recebimento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} {semanal?"semana(s)":"mês(es)"}</option>)}</select></Campo>
     </Secao>
   </div>;
 }
@@ -130,12 +132,12 @@ export function PainelOperacional({ estado, modo }: { estado: EstadoSimulacao; m
   </div>;
 }
 
-export function RelatorioFinanceiro({ detalhes }: { detalhes: DetalhesSimulacao }) {
-  const [abaFinanceira,setAbaFinanceira] = React.useState(0);
+export function RelatorioFinanceiro({ detalhes, somenteBalanco = false }: { detalhes: DetalhesSimulacao; somenteBalanco?: boolean }) {
+  const [abaFinanceira,setAbaFinanceira] = React.useState(somenteBalanco ? 2 : 0);
   const { dfc, balanco } = detalhes;
   return <div className="space-y-4">
-    <nav className="etapas-curtas" aria-label="Relatórios contábeis">{["Produtos","Fluxo de caixa","Balanço","Capital de giro","Operação"].map((t,n)=><button key={t} type="button" aria-pressed={abaFinanceira===n} onClick={()=>setAbaFinanceira(n)}>{t}</button>)}</nav><div hidden={abaFinanceira!==0}><ResultadoProdutos produtos={(detalhes.operacao.produtos as LinhaProduto[]|undefined)??[]}/></div>
-    <p className="rounded-lg bg-sky-50 p-3 text-xs leading-relaxed text-sky-900">Lucro e caixa medem coisas diferentes. A DRE registra o resultado das vendas e despesas; o fluxo de caixa registra o dinheiro que entrou e saiu. Estoque, prazos, investimentos e financiamentos explicam as diferenças.</p>
+    <nav hidden={somenteBalanco} className="etapas-curtas" aria-label="Relatórios contábeis">{["Produtos","Fluxo de caixa","Balanço","Capital de giro","Operação"].map((t,n)=><button key={t} type="button" aria-pressed={abaFinanceira===n} onClick={()=>setAbaFinanceira(n)}>{t}</button>)}</nav><div hidden={abaFinanceira!==0}><ResultadoProdutos produtos={(detalhes.operacao.produtos as LinhaProduto[]|undefined)??[]}/></div>
+    <p hidden={somenteBalanco} className="rounded-lg bg-sky-50 p-3 text-xs leading-relaxed text-sky-900">Lucro e caixa medem coisas diferentes. A DRE registra o resultado das vendas e despesas; o fluxo de caixa registra o dinheiro que entrou e saiu. Estoque, prazos, investimentos e financiamentos explicam as diferenças.</p>
     <div className="grid gap-4">
       <div hidden={abaFinanceira!==1}><Cartao titulo="Fluxo de caixa da rodada">
         <ListaFinanceira linhas={[

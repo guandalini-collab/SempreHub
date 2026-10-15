@@ -218,9 +218,6 @@ def pendencias_envio(empresa, dados):
             motivos.append("Preencha a matriz BCG para todos os produtos.")
         if a and any(p.base == "PROJECAO" and not p.premissas.strip() for p in a.bcg):
             motivos.append("Informe as premissas das projeções da matriz BCG.")
-        for p in plano.produtos:
-            if not p.revisado:
-                motivos.append("Revise o mix do produto: " + (p.produto_nome or p.produto_id) + ".")
     return motivos
 
 

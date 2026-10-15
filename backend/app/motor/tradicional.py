@@ -59,6 +59,11 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
              multiplicador_custo: float = 1) -> dict:
     """Prepara produção e obrigações certas sem modificar os argumentos."""
     e, d, p = deepcopy(empresa), deepcopy(decisao), deepcopy(parametros)
+    from .calendario import adaptar
+    p = adaptar(p, rodada)
+    fracao = p.get("_calendario", {}).get("fator_mensal", 1)
+    sazonal = p.get("_calendario", {}).get("sazonalidade", {})
+    multiplicador_custo *= sazonal.get("insumos", 1)
     s = deepcopy(e.get("estado_simulacao") or {})
     inicial = deepcopy(s)
     inicializar_indicadores(s)
@@ -110,7 +115,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     funcionarios_inicio = max(0, int(e.get("funcionarios", 0)))
     # Clima baixo produz saídas no ciclo seguinte, com fração persistida para equipes pequenas.
     taxa_turnover = max(0, (60 - rh["moral"]) / 100) * 0.20
-    acumulado = rh["rotatividade_acumulada"] + funcionarios_inicio * taxa_turnover
+    acumulado = rh["rotatividade_acumulada"] + funcionarios_inicio * taxa_turnover * fracao
     turnover = min(funcionarios_inicio, int(math.floor(acumulado + 1e-12)))
     rh["rotatividade_acumulada"] = round(acumulado - turnover, 8)
     demitidos = min(max(0, int(d.get("demitir", 0))), funcionarios_inicio - turnover)
@@ -125,32 +130,32 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     rh["moral"] = _limitar(rh["moral"] + 8 * (salario_relativo - 1)
                            + (min(6, beneficio / salario_base * 20) if salario_base > 0 else 0)
                            - demitidos * 2)
-    rh["qualificacao"] = _limitar(rh["qualificacao"] * 0.95
+    rh["qualificacao"] = _limitar(rh["qualificacao"] * (0.95 ** fracao)
                                   + 6 * math.sqrt(treinamento / (1000 * max(1, funcionarios))))
     regime = e.get("regime_tributario", "SIMPLES_NACIONAL")
     fatores = {"MEI": 1.45, "SIMPLES_NACIONAL": 1.45, "LUCRO_PRESUMIDO": 1.82}
-    folha = _produto(funcionarios, salario, fatores.get(regime, 1.45))
-    horas_extras = max(0, min(40, op.get("horas_extras", 0))) if funcionarios else 0
+    folha = _produto(funcionarios, salario * fracao, fatores.get(regime, 1.45))
+    horas_extras = max(0, min(40 * fracao, op.get("horas_extras", 0))) if funcionarios else 0
     custo_horas_extras = _produto(funcionarios, salario / 220, horas_extras, 1.5, fatores.get(regime, 1.45))
-    beneficios = _produto(funcionarios, beneficio)
+    beneficios = _produto(funcionarios, beneficio * fracao)
     rescisoes = _produto(demitidos, salario)
     fator_rh = 0.75 + 0.25 * rh["moral"] / 100 + 0.002 * rh["qualificacao"]
     produtividade = p.get("produtividade_por_pessoa", 120)
     if e.get("autoeficacia", 60) < 30:
         produtividade *= 0.9
         alertas.append("Autoeficácia baixa: produtividade reduzida em 10%.")
-    capacidade_trabalho = (1 + funcionarios + funcionarios * horas_extras / 220) * produtividade * fator_rh
+    capacidade_trabalho = (1 + funcionarios + funcionarios * horas_extras / (220 * fracao)) * produtividade * fator_rh
 
     manutencao = _dinheiro(max(0, op.get("manutencao", 0)))
     ativas = [m for m in s["maquinas"] if m["ativacao"] <= rodada]
-    capacidade_maquinas = sum(m["capacidade"] for m in ativas)
-    kpis_oee = oee(s, manutencao, treinamento, funcionarios, ativas, max(0, op.get("producao", 0)))
-    capacidades = capacidades_producao(capacidade_maquinas, funcionarios, produtividade, fator_rh, horas_extras, kpis_oee["disponibilidade"], kpis_oee["performance"])
+    capacidade_maquinas = sum(m["capacidade"] for m in ativas) * fracao
+    kpis_oee = oee(s, manutencao, treinamento, funcionarios, ativas, max(0, op.get("producao", 0)), fracao)
+    capacidades = capacidades_producao(capacidade_maquinas, funcionarios, produtividade, fator_rh, horas_extras, kpis_oee["disponibilidade"], kpis_oee["performance"], 220 * fracao)
     capacidade_produtiva = capacidades["capacidade_produtiva"]
     kpis_rh = enps(s, funcionarios, salario, salario_base, beneficio, horas_extras)
     depreciacao = 0.0
     for maquina in ativas:
-        parcela = min(maquina["valor_liquido"], _proporcao(maquina["custo"], 1, max(1, maquina["vida_util"])))
+        parcela = min(maquina["valor_liquido"], _proporcao(maquina["custo"], fracao, max(1, maquina["vida_util"])))
         maquina["valor_liquido"] = _soma([maquina["valor_liquido"], -parcela])
         depreciacao = _soma([depreciacao, parcela])
     maquinas_compradas = max(0, int(op.get("comprar_maquinas", 0)))
@@ -355,7 +360,7 @@ def apurar(preparo: dict, demanda: float,
                                 "capacidade_produtiva", "capacidade_maquinas", "utilizacao_maquinas",
                                 "estoque_mp_inicial", "estoque_pa_inicial", "turnover", "horas_extras", "custo_horas_extras")}
     operacao.update(c["kpis"])
-    operacao.update(reconciliar_financeiros(balanco, s, dre, c["rodada"], p.get("taxa_cheque_especial", 0.08), c["compras_mes"]))
+    operacao.update(reconciliar_financeiros(balanco, s, dre, c["rodada"], p.get("taxa_cheque_especial", 0.08), c["compras_mes"], dias=p.get("_calendario", {}).get("dias",30), horizonte=52 if "_calendario" in p else 12))
     operacao.update(indicadores_entrega)
     operacao.update(admissoes=max(0, int(d.get("contratar", 0))), demissoes=max(0, int(d.get("demitir", 0))), treinamento=c["treinamento"], manutencao=c["manutencao"])
     operacao.update(localizacao)

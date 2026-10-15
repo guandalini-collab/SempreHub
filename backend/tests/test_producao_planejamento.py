@@ -24,7 +24,7 @@ def test_maquinas_bloqueadas_ate_mes_tres_e_estudo_persistido(cliente, professor
         for rota in ('previsao', 'decisao'):
             resposta = getattr(cliente, 'post' if rota == 'previsao' else 'put')(f'/api/aluno/empresas/{empresa}/{rota}', headers=aluno, json={**base, 'rodada': rodada})
             assert resposta.status_code == 422
-            assert 'terceiro mês' in resposta.json()['detail']
+            assert 'terceira rodada' in resposta.json()['detail']
         _fechar(cliente, professor, turma, rodada)
     estudo = {"pontos": [{"nome": "A", "x": -10, "y": 20, "volume": 10}, {"nome": "B", "x": 30, "y": 60, "volume": 30}], "local_x": 20, "local_y": 50, "justificativa": "Acesso rodoviário"}
     resposta = cliente.put(f'/api/aluno/empresas/{empresa}/decisao', headers=aluno, json=completar_decisao({**base, 'rodada': 3, 'simulacao': {"comprar_maquinas": 1, "centro_gravidade": estudo}}))

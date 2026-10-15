@@ -63,6 +63,46 @@ def criar_turma(
     return ser.turma(turma, completa=True)
 
 
+class CalendarioEntrada(BaseModel):
+    data_inicio: date
+    perfil_sazonal: str = "NEUTRO"
+
+
+@router.put("/turmas/{turma_id}/calendario")
+def definir_calendario(turma_id: int, dados: CalendarioEntrada, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    turma = _turma_do_professor(db, turma_id, professor)
+    turma = bloquear_turma(db, turma.id)
+    if turma.modo_jogo == "LEGADO":
+        raise HTTPException(422, "O calendário semanal requer o modelo Tradicional ou Startup.")
+    if dados.perfil_sazonal not in {"NEUTRO","VAREJO","ALIMENTACAO","SERVICOS"}:
+        raise HTTPException(422, "Perfil sazonal inválido.")
+    if (turma.configuracao_simulacao or {}).get("periodicidade") == "SEMANAL":
+        raise HTTPException(422, "O calendário semanal já foi definido e não pode ser reposicionado.")
+    if db.query(Decisao).join(Empresa).filter(Empresa.turma_id==turma.id, Decisao.rodada==turma.rodada_atual).first():
+        raise HTTPException(422, "Defina o calendário antes de salvar decisões da rodada atual.")
+    from ..motor.avancado import config
+    from math import ceil
+    from copy import deepcopy
+    cfg = config(turma)
+    cfg.update(periodicidade="SEMANAL", data_inicio_simulada=dados.data_inicio.isoformat(),
+               rodada_inicio_calendario=turma.rodada_atual, perfil_sazonal=dados.perfil_sazonal)
+    # Só obrigações FUTURAS da cópia de estado; snapshots antigos são imutáveis.
+    for empresa in turma.empresas:
+        estado = deepcopy(empresa.estado_simulacao or {})
+        converter = lambda r: turma.rodada_atual+ceil(max(0,r-turma.rodada_atual)*30/7)
+        for nome in ("receber","pagar"):
+            for titulo in estado.get(nome,[]):
+                titulo['vencimento'] = converter(titulo['vencimento'])
+        if estado.get('vencimento_divida') is not None:
+            estado['vencimento_divida'] = converter(estado['vencimento_divida'])
+        for maquina in estado.get('maquinas',[]):
+            maquina['ativacao'] = converter(maquina['ativacao'])
+        empresa.estado_simulacao = estado
+    turma.configuracao_simulacao = cfg
+    db.commit()
+    return ser.turma(turma, completa=True)
+
+
 @router.put("/turmas/{turma_id}/parametros")
 def atualizar_parametros(
     turma_id: int,

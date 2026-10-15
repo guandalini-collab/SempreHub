@@ -113,12 +113,12 @@ def build(stem):
  def page(canvas,doc):
   canvas.saveState();w,h=A4
   if doc.page==1:
-   capa(canvas,title,subtitle,audience,'Edição 3.5 | Outubro de 2026')
+   capa(canvas,title,subtitle,audience,'Edição 4.0 | Outubro de 2026')
   else:
    canvas.setFillColor(BLUE);canvas.setFont('Helvetica',8);canvas.drawRightString(w-RIGHT,h-68,title)
    canvas.setStrokeColor(CYAN);canvas.setLineWidth(.5);canvas.line(LEFT,h-73,w-RIGHT,h-73)
    canvas.setFont('Helvetica',8);canvas.setFillColor(BLUE);canvas.drawString(LEFT,35,'Conceito e marca: Professor Guandalini')
-   canvas.drawRightString(w-RIGHT,35,'SempreHub | Edição 3.5')
+   canvas.drawRightString(w-RIGHT,35,'SempreHub | Edição 4.0')
    if doc.text_start is not None and doc.page>=doc.text_start:
     canvas.setFillColor(BLACK);canvas.setFont('Helvetica',10);canvas.drawRightString(w-RIGHT,h-2*cm,str(doc.page-1))
   canvas.restoreState()
@@ -137,4 +137,4 @@ def build(stem):
  pdf=OUT/f'{stem}.pdf'
  with pdf.open('wb') as f:writer.write(f)
  (OUT/f'{stem}.html').write_text('<!doctype html><html lang="pt-BR"><meta charset="UTF-8"><title>'+title+'</title><link rel="stylesheet" href="../manual.css"><body><h1>'+title+'</h1>'+ '\n'.join(markup)+'</body></html>')
- shutil.copyfile(pdf,PUBLIC/pdf.name);print(f'{stem}: {len(writer.pages)} páginas, edição 3.5, marca vetorial e formatação ABNT adaptada.')
+ shutil.copyfile(pdf,PUBLIC/pdf.name);print(f'{stem}: {len(writer.pages)} páginas, edição 4.0, marca vetorial e formatação ABNT adaptada.')
