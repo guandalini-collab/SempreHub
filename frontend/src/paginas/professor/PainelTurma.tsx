@@ -377,7 +377,7 @@ function FecharRodada({
     setMensagem(null);
     try {
       const resposta = await api.post<{ evento: OpcaoEvento }>(`/api/professor/turmas/${turmaId}/fechar-rodada`, { evento: "SORTEAR", rodada, forcar: true });
-      setMensagem({ tipo: "sucesso", texto: `Mês ${rodada} fechado. Evento: ${resposta.evento.titulo}.` });
+      setMensagem({ tipo: "sucesso", texto: `Rodada ${rodada} fechada. Evento: ${resposta.evento.titulo}.` });
       setConfirmando(false);
       await aoFechar();
     } catch (e) {
@@ -389,7 +389,7 @@ function FecharRodada({
 
 
   return (
-    <Cartao titulo={`Fechar o mês ${rodada}`}>
+    <Cartao titulo={`Fechar a rodada ${rodada}`}>
       <div className="space-y-4">
         <p className="rounded-lg bg-blue-50 p-4 text-sm">Os eventos são sorteados automaticamente ao encerrar a rodada. Podem ocorrer de um a três eventos, com aumentos ou reduções de demanda, juros e outros efeitos. Todos atingem a mesma turma. Também pode haver uma rodada sem eventos, conforme a probabilidade configurada.</p>
         {pendentes.length > 0 && (

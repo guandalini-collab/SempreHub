@@ -370,6 +370,7 @@ const LINHAS_DRE: { chave: keyof Dre; rotulo: string }[] = [
   { chave: "folha", rotulo: "(−) Folha de pagamento com encargos" },
   { chave: "beneficios", rotulo: "(−) Benefícios dos funcionários" },
   { chave: "treinamento", rotulo: "(−) Treinamento" },
+  { chave: "manutencao", rotulo: "(−) Manutenção preventiva" },
   { chave: "comissao_canal", rotulo: "(−) Comissão do canal" },
   { chave: "custos_fixos", rotulo: "(−) Custos fixos (aluguel, energia...)" },
   { chave: "marketing", rotulo: "(−) Marketing" },
@@ -392,7 +393,7 @@ export function TabelaDre({ dre, paginar = false, periodo = "período" }: { dre:
   const total=Math.ceil(linhas.length/4);
   return (
     <><table className="w-full border-collapse text-sm">
-      <caption className="mb-3 text-left font-semibold">DRE<DicaTermo termo="DRE" texto="Demonstração do Resultado do Exercício: reúne receitas e despesas para mostrar o lucro ou prejuízo do mês." /></caption>
+      <caption className="mb-3 text-left font-semibold">DRE<DicaTermo termo="DRE" texto="Demonstração do Resultado do Exercício: reúne receitas e despesas para mostrar o lucro ou prejuízo do período." /></caption>
       <tbody>
         <tr className="border-b border-slate-200">
           <td className="py-1.5 font-semibold text-marinho">Receita bruta</td>

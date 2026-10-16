@@ -166,6 +166,7 @@ export interface Dre {
   depreciacao?: number;
   beneficios?: number;
   treinamento?: number;
+  manutencao?: number;
   comissao_canal?: number;
   receita: number;
   impostos: number;
