@@ -785,3 +785,7 @@ O envio definitivo aparece apenas em Conferir e enviar e mantém a confirmação
 ### Etapas curtas de Produtos e Marketing
 
 Selecione um produto por vez. Use as etapas Produto e preço, Posicionamento e canais, Mídias e Conferir produto. Na etapa Mídias, selecione o canal que deseja configurar; escolher qual mídia visualizar não contrata o serviço. A contratação é marcada na caixa de seleção da mídia. Detalhes e serviços abrem as informações de apoio; Preencher orçamento abre os campos de cotação quando exigidos. Na última etapa, confira os custos e marque a revisão do produto. Os demais produtos e as escolhas já preenchidas permanecem preservados ao mudar de etapa.
+
+### Telemetria automática dos indicadores
+
+Novos fechamentos gravam bases didáticas versionadas em `metricas_semanais`, sem alterar resultados contábeis, decisões ou notas. As fórmulas e convenções estão na seção “Geração automática das bases dos indicadores” do Manual do Aluno. São estimativas de coortes, tráfego, satisfação, ausências, ciclos e expedição; não são pesquisas ou medições reais. Dados manuais têm prioridade por grupo e não são completados com outra população. Rodadas históricas não recebem bases retroativas. Não exigir valores para denominadores zero ou para fenômenos não registrados, como LTV tradicional e retorno causal de treinamento.

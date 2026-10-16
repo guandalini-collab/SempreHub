@@ -130,6 +130,7 @@ export interface BalancoSimulacao {
 }
 
 export interface DetalhesSimulacao {
+  metricas_semanais?: {versao:string;bases:Record<string,number>;convencao:string};
   calendario?: import("./calendario").CalendarioSimulado;
   engine_version?: string;
   versao_motor: number;

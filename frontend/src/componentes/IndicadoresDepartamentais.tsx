@@ -33,6 +33,14 @@ export default function IndicadoresDepartamentais({area,resultado}:{area:string;
   valores['Prazo Médio de Pagamento (PMP)']={valor:numero('pmp'),nota:'Base: fornecedores originados na rodada e compras de insumos do mês; ciclo de 30 dias.'};
   valores['Ponto de Equilíbrio']={valor:numero('ponto_equilibrio'),tipo:'moeda',status:typeof op?.ponto_equilibrio_status==='string'?op.ponto_equilibrio_status:undefined};
   if(detalhe?.modo==='TRADICIONAL')valores['LTV']={valor:null,status:'Dados indisponíveis'};
+  const b=detalhe?.metricas_semanais?.bases;
+  if(b){
+   const estimativa='Estimativa do Modelo · bases didáticas registradas no fechamento.';
+   valores['CAC']={valor:razao(b.marketing,b.novos_clientes),tipo:'moeda',nota:estimativa};
+   valores['Taxa de Conversão']={valor:razao(b.pedidos,b.leads),tipo:'percentual',nota:estimativa};
+   valores['Absenteísmo']={valor:razao(b.horas_ausencia,b.horas_contratadas),tipo:'percentual',nota:estimativa};
+   valores['Produtividade da Mão de Obra']={valor:razao(numero('producao_real'),b.horas_contratadas-b.horas_ausencia+b.horas_extras_realizadas),nota:estimativa};
+  }
  }
  const formato=(v:number,t?:string)=>t==='moeda'?reais(v):t==='percentual'?percentual(v,2):t==='razao'?v.toLocaleString('pt-BR',{maximumFractionDigits:2})+':1':v.toLocaleString('pt-BR',{maximumFractionDigits:2})+(t==='pontos'?' pontos':'');
  return <Cartao titulo={`${AREAS_INDICADORES.find(a=>a.id===area)?.titulo} · ${resultado?`rodada ${resultado.rodada}`:'aguardando resultados'}`}>

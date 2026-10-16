@@ -29,6 +29,10 @@ def test_bases_manuais_nao_reescrevem_dre_e_professor_somente_leitura(cliente,pr
     _fechar(cliente,professor,t,1)
     antes=cliente.get(f'/api/aluno/empresas/{eid}',headers=a).json()['resultados']
     url=f'/api/aluno/empresas/{eid}/dashboard/1'
+    automatico=cliente.get(url,headers=a)
+    assert automatico.status_code==200,automatico.text
+    assert automatico.json()['modelo']['versao']=='1.0.0-telemetria-didatica'
+    assert automatico.json()['indicadores']['rh']['Horas extras realizadas']['valor'] is not None
     r=cliente.put(url,headers=a,json={'marketing':100,'novos_clientes':10})
     assert r.status_code==200,r.text
     assert r.json()['indicadores']['marketing']['CAC']['valor']==10
@@ -82,3 +86,33 @@ def test_metas_direcoes_fronteiras_e_ausencia_de_dados():
     assert calcular_dashboard(r,b)['marketing']['Conversão']['meta']['status']=='Dentro da meta'
     for metas in [{'marketing.CAC':{'alvo':80,'alerta':60}}, {'marketing.Conversão':{'alvo':60,'alerta':80}}, {'marketing.NPS':{'alvo':101,'alerta':20}}, {'producao.Inventado':{'alvo':0,'alerta':0}}]:
         with pytest.raises(ValueError): BasesSemanais(metas=metas)
+
+
+def test_telemetria_automatica_deterministica_e_historico():
+    from app.motor.metricas_semanais import gerar_metricas
+    a={'vendas':20,'funcionarios':4,'satisfacao':80,'dre':{'marketing':100,'frete':30,'armazenagem':10},
+       'detalhes':{'modo':'TRADICIONAL','operacao':{'producao_real':30,'horas_extras':2,'enps':20,'pedidos_despachados':20,'pedidos_incompletos_transporte':1}}}
+    snap=gerar_metricas(a,7)
+    assert snap==gerar_metricas(a,7)
+    r=SimpleNamespace(receita=1000,funcionarios=4,detalhes_simulacao={**a['detalhes'],'metricas_semanais':snap})
+    d=calcular_dashboard(r,{})
+    assert d['marketing']['CAC']['valor']==5
+    assert d['marketing']['Conversão']['valor']==20
+    assert d['marketing']['CAC']['estado']=='Estimativa do Modelo'
+    assert d['logistica']['Custo logístico por pedido']['valor']==2
+    assert d['logistica']['Acuracidade por itens auditados']['valor']==95
+    assert calcular_dashboard(r,{'marketing':50})['marketing']['CAC']['valor'] is None
+    assert calcular_dashboard(r,{'marketing':50,'novos_clientes':5})['marketing']['CAC']['estado']=='Dados informados pela equipe'
+    del r.detalhes_simulacao['metricas_semanais']
+    assert calcular_dashboard(r,{})['marketing']['CAC']['valor'] is None
+
+
+def test_telemetria_startup_sem_clientes_nao_inventa_divisoes():
+    from app.motor.metricas_semanais import gerar_metricas
+    a={'vendas':0,'funcionarios':0,'dre':{'marketing':0},'detalhes':{'modo':'STARTUP','operacao':{'clientes_iniciais':0,'clientes_adquiridos':0,'clientes_perdidos':0}}}
+    snap=gerar_metricas(a,7)
+    r=SimpleNamespace(receita=0,funcionarios=0,detalhes_simulacao={**a['detalhes'],'metricas_semanais':snap})
+    d=calcular_dashboard(r,{})
+    assert d['marketing']['CAC']['valor'] is None
+    assert d['marketing']['NPS']['valor'] is None
+    assert d['producao']['Tempo médio de ciclo']['valor'] is None

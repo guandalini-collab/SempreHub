@@ -257,6 +257,8 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         detalhes["avaliacao_estrategica"] = deepcopy(preparo["avaliacao_estrategica"])
         detalhes.update(parametros=parametros(turma), decisao=colunas(d), dre=deepcopy(dre),
                         concorrentes_virtuais=deepcopy(bots), evento=evento.codigo, eventos=list(evento.codigos or (evento.codigo,)))
+        from .metricas_semanais import gerar_metricas
+        detalhes['metricas_semanais'] = gerar_metricas(a, (calendario or {}).get('dias', 30))
         # Datas ORM não são valores JSON das fotografias.
         detalhes["parametros"].pop("criado_em", None)
         detalhes["decisao"].pop("enviada_em", None)

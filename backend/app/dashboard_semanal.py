@@ -80,6 +80,16 @@ def resultado_semana(db, empresa_id, rodada):
 
 
 def calcular_dashboard(resultado,bases):
+    manuais = dict(bases)
+    automaticas = ((resultado.detalhes_simulacao or {}).get('metricas_semanais') or {}).get('bases', {})
+    grupos = [('marketing','novos_clientes'),('pedidos','leads'),('anuncios','leads','cliques'),
+              ('cancelamentos','base_recorrentes'),('promotores','neutros','detratores'),
+              ('horas_ausencia','horas_contratadas'),('horas_extras_realizadas',),
+              ('ciclo_minutos','ciclos_concluidos'),('custo_logistico','pedidos_expedidos'),
+              ('picking_minutos',),('itens_conformes','itens_auditados')]
+    # Uma base manual parcial não pode ser completada com outra população simulada.
+    bloqueadas = {k for grupo in grupos if any(k in manuais for k in grupo) for k in grupo}
+    bases = {**{k:v for k,v in automaticas.items() if k not in bloqueadas}, **manuais}
     op=(resultado.detalhes_simulacao or {}).get('operacao',{})
     def dividir(a,b,fator=1):
         return a/b*fator if a is not None and b is not None and b>0 else None
@@ -120,6 +130,20 @@ def calcular_dashboard(resultado,bases):
         painel['marketing']['CAC']=item(op['cac'],'Estimativa do Modelo','R$')
     if bases.get('cancelamentos') is None and bases.get('base_recorrentes') is None:
         painel['marketing']['Churn']=item(dividir(op.get('clientes_perdidos'),op.get('clientes_iniciais'),100),'Estimativa do Modelo','%')
+    chaves = {'CAC':('marketing','novos_clientes'),'Conversão':('pedidos','leads'),
+              'CPL':('anuncios','leads'),'CPC':('anuncios','cliques'),
+              'Churn':('cancelamentos','base_recorrentes'),'NPS':('promotores','neutros','detratores'),
+              'Absenteísmo':('horas_ausencia','horas_contratadas'),
+              'Horas extras realizadas':('horas_extras_realizadas',),
+              'Tempo médio de ciclo':('ciclo_minutos','ciclos_concluidos'),
+              'Custo logístico por pedido':('custo_logistico','pedidos_expedidos'),
+              'Tempo médio de separação':('picking_minutos',),
+              'Acuracidade por itens auditados':('itens_conformes','itens_auditados')}
+    for area in painel.values():
+        for nome, indicador in area.items():
+            ks=chaves.get(nome, ())
+            if ks and indicador['valor'] is not None and all(k in automaticas and k not in bloqueadas for k in ks):
+                indicador['estado']='Estimativa do Modelo'
     for area,nome,chave in [("producao","OEE","oee"),("logistica","OTIF","otif"),("rh","eNPS","enps")]:
         if chave in op and op[chave] is None:
             painel[area][nome]["estado"]="Não se aplica"
@@ -148,5 +172,6 @@ def consultar(db,empresa_id,rodada):
     obs=db.query(ObservacaoSemanal).filter_by(empresa_id=empresa_id,rodada=rodada).first()
     bases=obs.dados if obs else {}
     return {'bases':{k:v for k,v in bases.items() if k!='metas'},'metas':bases.get('metas',{}),'direcoes':DIRECOES,'indicadores':calcular_dashboard(r,bases),
+            'modelo':(r.detalhes_simulacao or {}).get('metricas_semanais'),
             'calendario':(r.detalhes_simulacao or {}).get('calendario'),
             'atualizado_em':obs.atualizado_em.isoformat()+'Z' if obs else None}

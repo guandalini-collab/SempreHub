@@ -5,7 +5,7 @@ import type {Resultado} from '../tipos';
 
 type Meta={alvo?:number;alerta?:number};
 type Dado={valor:number|null;estado:string;unidade:string;meta?:Meta&{status:string;direcao:string}};
-type Dados={bases:Record<string,number>;metas:Record<string,Meta>;direcoes:Record<string,Record<string,string>>;indicadores:Record<string,Record<string,Dado>>;atualizado_em:string|null};
+type Dados={bases:Record<string,number>;metas:Record<string,Meta>;direcoes:Record<string,Record<string,string>>;indicadores:Record<string,Record<string,Dado>>;atualizado_em:string|null;modelo?:{versao:string;convencao:string}|null};
 const AREAS=[
  {id:'marketing',nome:'Marketing e vendas',campos:[['marketing','Investimento de aquisição da semana','R$'],['anuncios','Gasto com anúncios da semana','R$'],['novos_clientes','Novos clientes faturados',''],['pedidos','Pedidos faturados',''],['leads','Leads / visitantes',''],['cliques','Cliques',''],['cancelamentos','Clientes cancelados ou pausados distintos',''],['base_recorrentes','Clientes recorrentes no início',''],['promotores','NPS: respostas 9 e 10',''],['neutros','NPS: respostas 7 e 8',''],['detratores','NPS: respostas 0 a 6','']]},
  {id:'rh',nome:'Pessoas',campos:[['horas_ausencia','Horas de ausência','h'],['horas_contratadas','Horas contratadas totais','h'],['horas_extras_realizadas','Horas extras realizadas pela equipe','h'],['desligamentos','Desligamentos informados',''],['colaboradores_inicio','Colaboradores no início da semana','']]},
@@ -50,7 +50,7 @@ export default function DashboardSemanal({empresaId,resultados,turmaId,somenteLe
    {mensagem&&<p role="status" className="my-2 text-sm">{mensagem}</p>}
    {!dados&&!mensagem&&<p>Carregando…</p>}
    {dados&&vista==='indicadores'&&<div className="grid grid-cols-2 gap-3">{itens.slice(pagina*4,pagina*4+4).map(([nome,d])=><article key={nome} className="rounded-lg border border-slate-200 p-3">
-    <h3 className="text-sm font-semibold">{nome}</h3><p className="my-1 text-xl font-bold">{d.valor==null?d.estado==='Não se aplica'?'Não se aplica':'Dados indisponíveis':formatar(d.valor,d.unidade)}</p>
+    <h3 className="text-sm font-semibold">{nome}</h3><p title={dados.modelo?dados.modelo.convencao:"Histórico preservado: novas bases simuladas estarão disponíveis a partir do próximo fechamento."} className="my-1 text-xl font-bold">{d.valor==null?d.estado==='Não se aplica'?'Não se aplica':'Dados indisponíveis':formatar(d.valor,d.unidade)}</p>
     <p hidden={d.valor==null} className="text-xs text-slate-500">{d.estado}</p>
     {d.meta&&<div className="mt-1 text-xs"><span className={`inline-block rounded px-2 py-1 ${CORES[d.meta.status]}`}>{d.meta.status}</span><span className="ml-2">Meta {d.meta.direcao==='MAIOR'?'≥':'≤'} {formatar(d.meta.alvo!,d.unidade)}</span></div>}
    </article>)}</div>}

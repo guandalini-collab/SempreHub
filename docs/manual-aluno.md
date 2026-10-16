@@ -876,3 +876,18 @@ O envio definitivo aparece apenas em Conferir e enviar e mantém a confirmação
 ### Etapas curtas de Produtos e Marketing
 
 Selecione um produto por vez. Use as etapas Produto e preço, Posicionamento e canais, Mídias e Conferir produto. Na etapa Mídias, selecione o canal que deseja configurar; escolher qual mídia visualizar não contrata o serviço. A contratação é marcada na caixa de seleção da mídia. Detalhes e serviços abrem as informações de apoio; Preencher orçamento abre os campos de cotação quando exigidos. Na última etapa, confira os custos e marque a revisão do produto. Os demais produtos e as escolhas já preenchidas permanecem preservados ao mudar de etapa.
+
+### Geração automática das bases dos indicadores
+
+Novos fechamentos dos modelos Tradicional e Startup gravam a telemetria didática versão 1.0.0. Ela não altera demanda, vendas, DRE, caixa ou notas. O histórico não é preenchido retroativamente. Bases manuais substituem o grupo correspondente; uma informação manual parcial não é completada com uma população sintética diferente.
+
+| Base simulada | Regra determinística |
+|---|---|
+| Aquisição e campanhas | Investimento da DRE; no Tradicional, uma unidade vendida representa um comprador da coorte sintética, sem afirmar clientes reais únicos. No Startup, usam-se os clientes adquiridos pelo motor. |
+| Tráfego | Cliques pagos = parte inteira do investimento / R$ 2. Leads = maior valor entre cinco vezes os pedidos da coorte e cliques pagos. O parâmetro de R$ 2 é didático, não cotação de mercado. CPC e CAC ficam indisponíveis quando o denominador é zero. |
+| NPS simulado | Respondentes = unidades vendidas ou clientes atendidos. Promotores = parte inteira de respondentes × satisfação / 100; detratores = parte inteira de respondentes × (100 − satisfação) / 200; demais neutros. Satisfação limitada a 0–100. Não representa pesquisa realizada. |
+| Pessoas | Horas contratadas = colaboradores × 8 × dias do período × 5/7. Ausência estimada = horas × mínimo entre 10% e máximo entre zero e −eNPS/1000. Horas extras realizadas são assumidas iguais às planejadas neste cenário didático. |
+| Produção | Tempo médio de ciclo por unidade = minutos regulares estimados disponíveis / unidades produzidas. É uma estimativa de alocação de trabalho, não medição de máquina ou lead time de produção. |
+| Logística industrial | Custo registrado = frete + armazenagem; tempo de separação = 2 + 3 × (1 − satisfação/100) minutos. Auditoria sintética de expedição: expedidos menos incompletos de transporte / expedidos. Não mede inventário físico nem inclui custos logísticos não registrados. |
+
+Churn aplica-se à base recorrente do Startup. LTV tradicional, ROI causal de treinamento, custo de contratação, ocupação de armazém e última milha continuam indisponíveis sem registros próprios; nenhum zero ou retorno fictício é apresentado como cálculo comprovado. Os valores gerados são identificados como **Estimativa do Modelo**. Indicadores operacionais já calculados continuam usando seus registros originais.
