@@ -359,6 +359,8 @@ def apurar(preparo: dict, demanda: float,
     operacao = {k: c[k] for k in ("producao_planejada", "producao_real", "producao_boa", "refugo",
                                 "capacidade_produtiva", "capacidade_maquinas", "utilizacao_maquinas",
                                 "estoque_mp_inicial", "estoque_pa_inicial", "turnover", "horas_extras", "custo_horas_extras")}
+    operacao.update(funcionarios_inicio=c["empresa"].get("funcionarios",0),
+                    desligamentos_efetivos=c["turnover"]+min(max(0,int(d.get("demitir",0))),max(0,c["empresa"].get("funcionarios",0)-c["turnover"])))
     operacao.update(c["kpis"])
     operacao.update(reconciliar_financeiros(balanco, s, dre, c["rodada"], p.get("taxa_cheque_especial", 0.08), c["compras_mes"], dias=p.get("_calendario", {}).get("dias",30), horizonte=52 if "_calendario" in p else 12))
     operacao.update(indicadores_entrega)

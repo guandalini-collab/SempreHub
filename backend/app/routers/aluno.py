@@ -457,7 +457,10 @@ def salvar_bases_dashboard(empresa_id:int,rodada:int,dados:BasesSemanais,db:Sess
     if not obs:
         obs=ObservacaoSemanal(empresa_id=empresa_id,rodada=rodada)
         db.add(obs)
-    obs.dados=dados.model_dump(exclude_none=True)
+    valores=dados.model_dump(exclude_none=True)
+    if "metas" not in dados.model_fields_set and obs.dados:
+        valores["metas"]=obs.dados.get("metas",{})
+    obs.dados=valores
     obs.atualizado_por=aluno.id
     obs.atualizado_em=agora()
     db.commit()

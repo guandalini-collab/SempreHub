@@ -240,6 +240,8 @@ def preparar(
         "plano_comercial": deepcopy(decisao.get("plano_comercial")),
         "capacidade": capacidade, "atratividade": atratividade,
         "estado_inicial": deepcopy(estado_inicial), "estado": estado,
+        "funcionarios_inicio": max(0,int(empresa.get("funcionarios",0))),
+        "desligamentos_efetivos": rh["demitidos"]+rh["rotatividade"],
         "funcionarios": rh["funcionarios"], "emprestimo": emprestimo,
         "amortizacao": amortizacao, "amortizacao_obrigatoria": obrigatoria,
         "folha": rh["folha"], "juros": juros, "divida": divida,
@@ -339,6 +341,7 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
     cac = _dinheiro(preparo["custos"]["marketing"] / adquiridos) if adquiridos else None
     ltv = _dinheiro(margem_cliente / preparo["churn"]) if margem_cliente is not None and preparo["churn"] > 0 else None
     operacao = {
+        "funcionarios_inicio":preparo["funcionarios_inicio"], "desligamentos_efetivos":preparo["desligamentos_efetivos"],
         **preparo["kpis_rh"], "oee": None, "otif": None,
         "produtos": linhas,
         "clientes_iniciais": preparo["clientes_iniciais"], "clientes_perdidos": preparo["clientes_perdidos"],

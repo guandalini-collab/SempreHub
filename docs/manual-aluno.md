@@ -58,7 +58,7 @@ Marketing e vendas, Pessoas, Produção e Logística aparecem separadamente. Na 
 | --- | --- |
 | CAC semanal | Investimento atribuível / novos clientes faturados. Não confundir unidades vendidas com clientes únicos. No Startup, o motor disponibiliza sua estimativa quando não há bases informadas. |
 | Conversão semanal | Pedidos faturados / leads ou visitantes × 100, da mesma coorte e período. Não misturar pedidos repetidos com aquisição de clientes. |
-| CPL / CPC | Investimento atribuível / leads ou cliques, respectivamente. O gasto deve corresponder ao mesmo conjunto de campanhas e à mesma semana. |
+| CPL / CPC | Gasto com anúncios / leads ou cliques, respectivamente. O gasto deve corresponder ao mesmo conjunto de campanhas e à mesma semana. |
 | Churn realizado | Clientes recorrentes cancelados / base recorrente inicial × 100. Startup usa clientes perdidos efetivos; empresas transacionais sem base recorrente não recebem churn inventado. |
 | NPS | (Promotores − detratores) / total de respostas × 100. Notas 9–10 são promotores, 7–8 neutros e 0–6 detratores. Exige respostas efetivamente informadas. Não é eNPS. |
 | Absenteísmo | Horas de ausência / horas contratadas da equipe × 100. Bases homogêneas; ausências não podem superar as horas contratadas. |
@@ -73,6 +73,28 @@ Marketing e vendas, Pessoas, Produção e Logística aparecem separadamente. Na 
 Denominador zero ou base insuficiente gera Dados indisponíveis. Não há envio automático de pesquisa NPS a clientes reais nem integração automática com plataformas de anúncios, notas fiscais ou leitores de estoque neste módulo. A API autenticada permite registrar e consultar as bases; isso não constitui integração instalada com terceiros.
 
 Referências técnicas verificadas: REICHHELD, Frederick F. The one number you need to grow. Harvard Business Review, dez. 2003. Disponível em: https://hbr.org/2003/12/the-one-number-you-need-to-grow. Acesso em: 15 out. 2026. PEPPERS, Don; ROGERS, Martha. Managing customer experience and relationships: a strategic framework. 3. ed. Hoboken: Wiley, 2016. DOI: 10.1002/9781119239833. Acesso em: 15 out. 2026. As fórmulas didáticas do simulador não são apresentadas como parâmetros empíricos extraídos dessas obras.
+
+### Complementos auditados de métricas e metas
+
+O painel mantém o mesmo calendário semanal. Em cada área, use Indicadores, Bases informadas ou Metas; na Produção, Plano x realizado abre o gráfico separado. Campos não preenchidos permanecem ausentes, não são convertidos em zero. É preciso salvar ou descartar uma edição antes de trocar a semana.
+
+| Indicador complementar | Fórmula e origem |
+| --- | --- |
+| Aderência ao plano | Produção realizada / produção planejada × 100. Sem plano positivo, Dados indisponíveis. Pode superar 100%; produzir além da meta não comprova boa gestão do estoque. |
+| Tempo médio de ciclo | Tempo total dos ciclos medidos, em minutos / ciclos concluídos da mesma unidade ou lote. Base informada, distinta do tempo de atravessamento de um pedido. |
+| Turnover por desligamentos | Desligamentos efetivos / colaboradores no início × 100. Nas novas rodadas, o motor registra a base inicial e as saídas efetivas; no histórico sem essas bases, a equipe pode informá-las. Não substitui a taxa anterior de movimentação, que considera admissões e desligamentos. Pode superar 100% em períodos com admissões e saídas sucessivas. |
+| Horas extras realizadas | Total informado para a equipe. Permanece separado das horas extras planejadas ou estimadas pelo motor. |
+| Custo logístico por pedido | Custo logístico total informado / pedidos expedidos da mesma base. Inclua somente os custos e pedidos da semana analisada. |
+| Custos registrados por pedido | Frete e armazenagem da DRE / pedidos despachados registrados no motor. É um custo parcial identificado; não presume que embalagens e outras despesas foram registradas. |
+| Acuracidade por itens auditados | Itens ou SKUs sem divergência / itens ou SKUs auditados × 100. A conferência deve comparar o mesmo conjunto de itens. A relação entre saldos físicos e registrados continua disponível, mas não substitui esse índice de conformidade. |
+
+CAC utiliza o investimento de aquisição da semana. CPL e CPC utilizam especificamente o gasto com anúncios, dividido por leads e cliques, respectivamente. Um gasto geral de marketing não é automaticamente tratado como gasto de mídia: sem esse dado específico, CPL e CPC exibem Dados indisponíveis.
+
+O OTIF do simulador continua contando pedidos que atendem simultaneamente às condições de prazo e completude, com tratamento de sobreposição de falhas. Não se calcula automaticamente multiplicando percentuais marginais On-Time e In-Full: os grupos de pedidos podem se sobrepor de formas diferentes. A convenção didática do motor continua identificada; não houve reprocessamento do passado. Referência de conferência: ASCM. SCOR Digital Standard, RL.3.1. Disponível em: https://scor.ascm.org/performance/reliability/RL.3.1. Acesso em: 15 out. 2026.
+
+Na aba Metas, defina o alvo e o limite de alerta. Para indicadores em que maior é melhor, o alvo deve ser maior ou igual ao alerta; para aqueles em que menor é melhor, o alvo deve ser menor ou igual ao alerta. Exemplos: CAC até R$ 10,00, alerta até R$ 20,00; conversão de pelo menos 80%, alerta a partir de 60%. A igualdade pertence à faixa correspondente. O painel apresenta texto e cor: Dentro da meta (verde), Em alerta (amarelo), Fora da meta (vermelho) ou Sem dados (neutro). Sem meta configurada, não existe sinalização presumida. A equipe pode remover uma meta.
+
+As metas são referências de comparação escolhidas pela equipe para uma semana registrada, podendo ser configuradas após o fechamento. Não constituem comprovação de meta fixada antecipadamente e não alteram notas, decisões ou demonstrações contábeis. Um sinal verde representa o atendimento à referência escolhida, não uma garantia de saúde da empresa. Somente o líder edita; integrantes e professor consultam. As bases e metas têm persistência independente dos snapshots do motor.
 
 ### Planejar antes da data comercial
 
