@@ -398,3 +398,25 @@ class MatriculaTurma(Base):
     autorizada_turma_id = Column(Integer, ForeignKey("turmas.id"), nullable=True)
     historico = Column(JSON, nullable=False, default=list)
     aluno = relationship("Usuario")
+
+
+class AcessoAba(Base):
+    """Registro de navegação autenticada; não armazena conteúdo digitado."""
+    __tablename__ = "acessos_abas"
+    id = Column(Integer, primary_key=True)
+    aluno_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False, index=True)
+    empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False, index=True)
+    rodada = Column(Integer, nullable=False)
+    aba = Column(String(80), nullable=False)
+    criado_em = Column(DateTime, nullable=False, default=agora)
+
+
+class ObservacaoSemanal(Base):
+    __tablename__ = 'observacoes_semanais'
+    __table_args__ = (UniqueConstraint('empresa_id','rodada',name='uq_observacao_semana'),)
+    id = Column(Integer, primary_key=True)
+    empresa_id = Column(Integer, ForeignKey('empresas.id'), nullable=False)
+    rodada = Column(Integer, nullable=False)
+    dados = Column(JSON, nullable=False, default=dict)
+    atualizado_por = Column(Integer, ForeignKey('usuarios.id'), nullable=False)
+    atualizado_em = Column(DateTime, nullable=False, default=agora)

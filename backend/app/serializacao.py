@@ -59,6 +59,8 @@ def turma(t: Turma, completa: bool = False) -> Dict[str, Any]:
     }
     from .motor.calendario import periodo
     dados["calendario"] = periodo(t.configuracao_simulacao or {}, t.rodada_atual)
+    from .motor.regras_mei import regras_mei
+    dados["regras_mei"] = regras_mei(t)
     if completa:
         dados["parametros"] = {campo: getattr(t, campo) for campo in CAMPOS_PARAMETROS}
         from .motor.avancado import config

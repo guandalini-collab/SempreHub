@@ -27,7 +27,7 @@ from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
 
 
-_HEAD = "0010_prazos"
+_HEAD = "0012_observacoes_semanais"
 
 
 @pytest.fixture()

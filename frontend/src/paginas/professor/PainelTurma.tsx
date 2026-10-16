@@ -1,3 +1,5 @@
+import DashboardSemanal from "../../componentes/DashboardSemanal";
+import RelatorioAcessos from "../../componentes/RelatorioAcessos";
 import CalendarioTurma from "../../componentes/CalendarioTurma";
 import {tituloPeriodo} from "../../calendario";
 import { ValorMonetario } from "../../componentes/ui";
@@ -56,6 +58,7 @@ const ITENS_PAINEL = [
   { id: "fechamento", titulo: "6. Encerrar rodada", descricao: "Confira os envios e confirme o encerramento. O sistema sorteia os eventos e calcula os resultados.", simbolo: "", grupo: "Conduzir rodada" },
   { id: "resultados", titulo: "7. Consultar resultados", descricao: "Analise os resultados. Para a próxima rodada, retome a etapa 4 no menu lateral.", simbolo: "", grupo: "Consultar resultados" },
   ...[{id:"avaliacao",titulo:"Avaliação pedagógica"},{id:"caixas",titulo:"Evolução do caixa"},{id:"mercado-resultados",titulo:"Receita e lucro"},{id:"eventos",titulo:"Eventos da turma"}].map(item=>({...item,descricao:"Consulte os resultados consolidados da turma.",simbolo:"",grupo:"Consultar resultados"})),
+  {id:"acessos",titulo:"Acessos dos alunos",descricao:"Acompanhe a participação por equipe e por aba.",simbolo:"",grupo:"Consultar resultados"},
   { id: "aprendizagem", titulo: "Autores e referências", descricao: "Consulte as referências para orientar a atividade.", simbolo: "", grupo: "Apoio" },
   { id: "analises", titulo: "Ferramentas de análise", descricao: "Consulte os conceitos e as ferramentas para orientar os alunos.", simbolo: "", grupo: "Apoio" },
   ...FERRAMENTAS_ANALISE.map((titulo, indice) => ({ id: `analise-${indice}`, titulo, descricao: "Consulte esta ferramenta para orientar a turma.", simbolo: "", grupo: "Apoio", pai: "analises" })),
@@ -123,6 +126,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
 
   return (
     <LayoutPainel itens={ITENS_PAINEL} ativa={secao} aoSelecionar={(id) => { setSecao(id); setEditandoParametros(id === "parametros"); }} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={aberta ? rodadasJogadas : turma.total_rodadas} perfil="Professor" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, status: aberta ? `${enviadas} de ${empresas.length} empresas enviaram decisões` : "Simulação encerrada" }}>
+      <SecaoPainel id="acessos" ativa={secao}><RelatorioAcessos turmaId={turmaId} rodada={turma.rodada_atual}/></SecaoPainel>
       <SecaoPainel id="visao" ativa={secao}>
         <Cartao titulo="Conduzir a turma">
           <div className="resumo-conferencia"><div><span>Empresas</span><strong>{empresas.length}</strong></div><div><span>Decisões enviadas</span><strong>{enviadas} de {empresas.length}</strong></div><div><span>Ingresso</span><strong>{turma.visivel_ingresso ? "Disponível" : "Oculto"}</strong></div></div>
@@ -443,7 +447,8 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
         <Carregando />
       ) : (
         <div className="space-y-4">
-          <nav className="etapas-curtas" aria-label="Detalhes da empresa">{["resumo","equipe","operações","diagnósticos","decisões","DRE","financeiro"].map(a=><button type="button" key={a} aria-pressed={abaDetalhe===a} onClick={()=>setAbaDetalhe(a)}>{a}</button>)}</nav>
+          <nav className="etapas-curtas" aria-label="Detalhes da empresa">{["resumo","equipe","operações","diagnósticos","decisões","DRE","financeiro","semanal"].map(a=><button type="button" key={a} aria-pressed={abaDetalhe===a} onClick={()=>setAbaDetalhe(a)}>{a}</button>)}</nav>
+          <div hidden={abaDetalhe!=="semanal"}><DashboardSemanal turmaId={turmaId} empresaId={empresaId} resultados={dados.resultados} somenteLeitura/></div>
           <div hidden={abaDetalhe!=="resumo"}><details className="rounded-xl border p-3"><summary className="cursor-pointer font-semibold">Conquistas e evolução desta empresa</summary><div className="mt-3"><Conquistas jornada={dados.jornada} /></div></details>
           <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
             <span>{dados.empresa.aluno} · {dados.empresa.aluno_email}</span>

@@ -66,6 +66,10 @@ def test_login_e_rotas_protegidas(cliente, professor):
 # Jogo completo
 # ---------------------------------------------------------------------------
 def _criar_turma(cliente, professor, **parametros):
+    # Cenários de regressão mensais mantêm explicitamente o contrato histórico.
+    cfg = dict(parametros.get("configuracao_simulacao", {}))
+    cfg.setdefault("calendario_automatico", False)
+    parametros["configuracao_simulacao"] = cfg
     r = cliente.post("/api/professor/turmas", headers=professor, json={"nome": "Empreendedorismo 2026", **parametros})
     assert r.status_code == 201, r.text
     return r.json()

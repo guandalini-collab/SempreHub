@@ -3,7 +3,7 @@ from calendar import monthrange
 from copy import deepcopy
 from datetime import date, timedelta
 
-VERSAO_SEMANAL = '3.0.0-weekly-calendar'
+VERSAO_SEMANAL = '3.1.0-auto-calendar-projected-mei'
 
 
 def periodo(config, rodada):

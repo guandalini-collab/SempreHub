@@ -57,6 +57,10 @@ def criar_turma(
     dados: TurmaEntrada, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)
 ):
     turma = Turma(professor_id=professor.id, codigo=_gerar_codigo(db), **dados.model_dump())
+    if turma.modo_jogo != "LEGADO" and (turma.configuracao_simulacao or {}).get("periodicidade") == "SEMANAL":
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        turma.configuracao_simulacao = {**turma.configuracao_simulacao, "data_inicio_simulada": datetime.now(ZoneInfo("America/Sao_Paulo")).date().isoformat(), "cenario_mei_plp186": True}
     db.add(turma)
     db.commit()
     db.refresh(turma)
@@ -171,6 +175,8 @@ def detalhar_turma(
     turma_id: int, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)
 ):
     turma = _turma_do_professor(db, turma_id, professor)
+    from ..calendario_automatico import iniciar_calendario
+    iniciar_calendario(db, turma)
     enviadas = {
         d.empresa_id
         for d in db.query(Decisao).filter(
@@ -523,3 +529,37 @@ def configurar_prazo(turma_id: int, dados: PrazoEntrada, db: Session = Depends(g
     turma.prazo_numero_rodada = dados.rodada if limite else None
     db.commit()
     return ser.turma(turma, completa=True)
+
+
+@router.get("/turmas/{turma_id}/acessos")
+def relatorio_acessos(turma_id: int, rodada: int = 0, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    from ..models import AcessoAba, agora
+    from sqlalchemy import func
+    turma = _turma_do_professor(db, turma_id, professor)
+    consulta = db.query(AcessoAba.aluno_id, AcessoAba.empresa_id, AcessoAba.aba,
+                        func.count(AcessoAba.id), func.max(AcessoAba.criado_em)).join(Empresa, Empresa.id == AcessoAba.empresa_id).filter(Empresa.turma_id == turma.id)
+    if rodada:
+        consulta = consulta.filter(AcessoAba.rodada == rodada)
+    grupos = consulta.group_by(AcessoAba.aluno_id, AcessoAba.empresa_id, AcessoAba.aba).all()
+    alunos = {u.id: u.nome for u in db.query(Usuario).filter(Usuario.id.in_([g[0] for g in grupos] or [0])).all()}
+    linhas = [{"aluno": alunos.get(a, "Aluno"), "empresa": next(e.nome for e in turma.empresas if e.id == emp),
+               "aba": aba, "acessos": qtd, "ultimo_acesso": dt.isoformat()+"Z"} for a, emp, aba, qtd, dt in grupos]
+    participantes = []
+    for empresa in turma.empresas:
+        ids = {empresa.aluno_id} | {m.aluno_id for m in empresa.membros}
+        for aid in ids:
+            usuario = db.get(Usuario, aid)
+            participantes.append({"aluno": usuario.nome, "empresa": empresa.nome,
+                                  "acessos": sum(g[3] for g in grupos if g[0] == aid and g[1] == empresa.id)})
+    return {"registros": sorted(linhas, key=lambda x: x['ultimo_acesso'], reverse=True), "participantes": participantes,
+            "observacao": "Registros disponíveis desde a implantação. Abrir uma aba não comprova leitura, aprendizagem ou acerto da decisão."}
+
+
+@router.get('/turmas/{turma_id}/empresas/{empresa_id}/dashboard/{rodada}')
+def dashboard_empresa(turma_id:int,empresa_id:int,rodada:int,db:Session=Depends(get_db),professor:Usuario=Depends(exigir_professor)):
+    from ..dashboard_semanal import consultar
+    _turma_do_professor(db,turma_id,professor)
+    empresa=db.get(Empresa,empresa_id)
+    if not empresa or empresa.turma_id!=turma_id:
+        raise HTTPException(404,'Empresa não encontrada.')
+    return consultar(db,empresa_id,rodada)

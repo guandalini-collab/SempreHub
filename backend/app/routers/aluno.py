@@ -180,6 +180,8 @@ def distribuir_cargos(
 def painel(empresa_id: int, db: Session = Depends(get_db), aluno: Usuario = Depends(exigir_aluno)):
     empresa = _empresa_do_aluno(db, empresa_id, aluno)
     turma = empresa.turma
+    from ..calendario_automatico import iniciar_calendario
+    iniciar_calendario(db, turma)
     decisao_atual = (
         db.query(Decisao)
         .filter(Decisao.empresa_id == empresa.id, Decisao.rodada == turma.rodada_atual)
@@ -419,3 +421,44 @@ def escolher_lider(empresa_id: int, dados: LiderEntrada, db: Session = Depends(g
         registrar(db, empresa, aluno, "TRANSFERIR_LIDER", detalhes={"proximo_lider_id": dados.aluno_id, "vigencia": empresa.turma.rodada_atual + 1})
     db.commit()
     return dados_equipe(empresa, decisao_atual(db, empresa), aluno)
+
+
+class AcessoEntrada(BaseModel):
+    aba: str = Field(min_length=1, max_length=80, pattern=r"^[a-z0-9-]+$")
+
+
+@router.post("/empresas/{empresa_id}/acessos", status_code=201)
+def registrar_acesso(empresa_id: int, dados: AcessoEntrada, db: Session = Depends(get_db), aluno: Usuario = Depends(exigir_aluno)):
+    from ..models import AcessoAba
+    empresa = _empresa_do_aluno(db, empresa_id, aluno)
+    db.add(AcessoAba(aluno_id=aluno.id, empresa_id=empresa.id, rodada=empresa.turma.rodada_atual, aba=dados.aba))
+    db.commit()
+    return {"registrado": True}
+
+
+from ..dashboard_semanal import BasesSemanais
+
+
+@router.get('/empresas/{empresa_id}/dashboard/{rodada}')
+def dashboard(empresa_id:int,rodada:int,db:Session=Depends(get_db),aluno:Usuario=Depends(exigir_aluno)):
+    from ..dashboard_semanal import consultar
+    _empresa_do_aluno(db,empresa_id,aluno)
+    return consultar(db,empresa_id,rodada)
+
+
+@router.put('/empresas/{empresa_id}/dashboard/{rodada}')
+def salvar_bases_dashboard(empresa_id:int,rodada:int,dados:BasesSemanais,db:Session=Depends(get_db),aluno:Usuario=Depends(exigir_aluno)):
+    from ..models import ObservacaoSemanal
+    from ..dashboard_semanal import resultado_semana,consultar
+    empresa=_empresa_para_alterar(db,empresa_id,aluno)
+    exigir_lider(empresa,aluno)
+    resultado_semana(db,empresa_id,rodada)
+    obs=db.query(ObservacaoSemanal).filter_by(empresa_id=empresa_id,rodada=rodada).first()
+    if not obs:
+        obs=ObservacaoSemanal(empresa_id=empresa_id,rodada=rodada)
+        db.add(obs)
+    obs.dados=dados.model_dump(exclude_none=True)
+    obs.atualizado_por=aluno.id
+    obs.atualizado_em=agora()
+    db.commit()
+    return consultar(db,empresa_id,rodada)

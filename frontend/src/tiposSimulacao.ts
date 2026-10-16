@@ -5,6 +5,7 @@ export type Posicionamento = "CUSTO" | "DIFERENCIACAO";
 export type CanalVenda = "DIRETO" | "DISTRIBUIDOR" | "DIGITAL";
 
 export interface ConfiguracaoMotor {
+  atividade_rural?: boolean;
   periodicidade?: "MENSAL" | "SEMANAL";
   data_inicio_simulada?: string | null;
   rodada_inicio_calendario?: number;

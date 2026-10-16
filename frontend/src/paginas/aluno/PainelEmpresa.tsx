@@ -1,3 +1,4 @@
+import DashboardSemanal from "../../componentes/DashboardSemanal";
 import {tituloPeriodo,consolidarDres} from "../../calendario";
 import LinkManual from "../../componentes/LinkManual";
 import { createPortal } from "react-dom";
@@ -13,7 +14,7 @@ import { EditorMix, MercadoPublicado } from "../../componentes/MercadoReal";
 import CompetitividadeMercado from "../../componentes/CompetitividadeMercado";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import { api, ErroApi } from "../../api";
+import { api, ErroApi, sessaoSalva } from "../../api";
 import { BibliotecaAprendizagem } from "../../componentes/Aprendizagem";
 import { RelatorioPrimeiraRodada } from "../../componentes/ConteudoRodada";
 import EquipeEmpresa from "../../componentes/EquipeEmpresa";
@@ -125,6 +126,7 @@ const ITENS_PAINEL = [
   },
   ...AREAS_INDICADORES.map(a => ({id: `resultado-${a.id}`, titulo: a.titulo, descricao: "Consulte os valores da rodada e interprete-os com sua equipe usando o manual.", simbolo: "", grupo: "Resultados e evolução", pai: "resultados"})),
   {id:"demonstrativos",titulo:"DRE e balanço",descricao:"Demonstrativos e resultado da rodada.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
+  {id:"dashboard-semanal",titulo:"Painel semanal",descricao:"Compare indicadores e registre bases observadas por semana.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {id:"evolucao",titulo:"Evolução por rodada",descricao:"Compare caixa, lucro e participação ao longo do tempo.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {id:"historico",titulo:"Histórico detalhado",descricao:"Consulte as decisões e os resultados anteriores.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {
@@ -204,6 +206,11 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
     return () => { window.clearInterval(intervalo); sequenciaCarga.current += 1; };
   }, [carregar]);
 
+  useEffect(()=>{
+    if (!painel || painel.empresa.id!==empresaId || document.visibilityState!=="visible") return;
+    api.post(`/api/aluno/empresas/${empresaId}/acessos`,{aba:secao}).catch(()=>undefined);
+  },[empresaId,painel?.empresa.id,painel?.turma.rodada_atual,secao]);
+
   if (erro && !painel) return <Aviso>{erro}</Aviso>;
   if (!painel) return <Carregando />;
 
@@ -280,6 +287,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
           )}
         </div>
       </SecaoPainel>
+      <SecaoPainel id="dashboard-semanal" ativa={secao}><DashboardSemanal empresaId={empresaId} resultados={resultados} somenteLeitura={!!turma.modo_equipe&&painel.equipe?.lider_id!==sessaoSalva()?.id}/></SecaoPainel>
       <SecaoPainel id="resultados" ativa={secao}><Cartao titulo="Resultados da empresa"><p>Selecione uma área no submenu lateral. Compare os valores e consulte o manual do aluno para interpretar os indicadores antes de decidir a próxima rodada.</p>{ultimo&&<p className="mt-4 font-semibold">Última rodada concluída: {ultimo.rodada} · Caixa: <ValorMonetario valor={ultimo.caixa_final}/> · Lucro líquido: <ValorMonetario valor={ultimo.dre.lucro_liquido}/></p>}</Cartao></SecaoPainel>
       {AREAS_INDICADORES.map(a=><SecaoPainel key={a.id} id={`resultado-${a.id}`} ativa={secao}><IndicadoresDepartamentais area={a.id} resultado={ultimo}/></SecaoPainel>)}
       <SecaoPainel id="demonstrativos" ativa={secao}>

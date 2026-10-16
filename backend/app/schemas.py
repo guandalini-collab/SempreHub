@@ -44,6 +44,9 @@ class ConfiguracaoSimulacao(BaseModel):
 
     periodicidade: Literal["MENSAL", "SEMANAL"] = "MENSAL"
     data_inicio_simulada: Optional[str] = None
+    cenario_mei_plp186: bool = False
+    atividade_rural: bool = False
+    calendario_automatico: bool = True
     rodada_inicio_calendario: int = Field(1, ge=1, le=60)
     perfil_sazonal: Literal["NEUTRO", "VAREJO", "ALIMENTACAO", "SERVICOS"] = "NEUTRO"
 
@@ -73,7 +76,9 @@ class ConfiguracaoSimulacao(BaseModel):
     @model_validator(mode="after")
     def validar_pesos(self):
         if self.periodicidade == "SEMANAL" and self.data_inicio_simulada is None:
-            raise ValueError("Informe a data inicial do calendário semanal.")
+            from datetime import datetime
+            from zoneinfo import ZoneInfo
+            self.data_inicio_simulada = datetime.now(ZoneInfo("America/Sao_Paulo")).date().isoformat()
         if self.data_inicio_simulada:
             date.fromisoformat(self.data_inicio_simulada)
         total = self.peso_lucro + self.peso_patrimonio + self.peso_satisfacao + self.peso_participacao

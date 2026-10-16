@@ -92,7 +92,7 @@ def test_fluxo_http_tres_semanas_preserva_snapshots(cliente,professor,modo):
         painel=cliente.get(f'/api/aluno/empresas/{eid}',headers=aluno).json()
         atual=painel['resultados'][-1]
         assert atual['detalhes_simulacao']['calendario']['inicio']==(date(2026,10,15)+timedelta(days=7*(r-1))).isoformat()
-        assert atual['detalhes_simulacao']['engine_version']=='3.0.0-weekly-calendar'
+        assert atual['detalhes_simulacao']['engine_version']=='3.1.0-auto-calendar-projected-mei'
         if primeiro is None: primeiro=deepcopy(atual)
         assert painel['resultados'][0]==primeiro
         assert painel['turma']['calendario']['inicio']==(date(2026,10,15)+timedelta(days=7*r)).isoformat()

@@ -34,7 +34,45 @@ Espero que esta experiência ajude você a transformar conhecimento em análise,
 
 ## Calendário semanal e sazonalidade
 
-Cada rodada semanal representa sete dias consecutivos, a partir da data inicial simulada definida pelo professor. Os meses seguem o calendário real: não se presume que todo mês tenha quatro semanas. A semana pode atravessar meses, trimestres e anos. O cabeçalho mostra suas datas. O prazo real de entrega às 23:59:59 de Brasília é independente dessas datas simuladas.
+Cada rodada semanal representa sete dias consecutivos, a partir da data de início definida automaticamente pelo servidor no horário de Brasília. Os meses seguem o calendário real: não se presume que todo mês tenha quatro semanas. A semana pode atravessar meses, trimestres e anos. O cabeçalho mostra suas datas. O prazo real de entrega às 23:59:59 de Brasília é independente dessas datas simuladas.
+
+### Início automático e preservação do histórico
+
+Não é necessário preencher uma data de início. O calendário assume a data vigente em Brasília quando a turma inicia sua operação semanal e avança sete dias por rodada. Reabrir uma tela não muda a data inicial. Nas turmas mensais existentes, uma rodada com decisões salvas mantém seu contrato; a migração automática ocorre na próxima rodada livre, sem recalcular o passado. O prazo real de envio continua sendo definido pelo professor.
+
+### MEI: cenário projetado para 2027 e 2028
+
+O PLP 186/2026 é uma proposta, ainda não uma lei vigente na consulta de 15/10/2026. O cenário didático identificado como Estimativa do Modelo prevê teto anual de R$ 110.000 em 2027, R$ 140.000 em 2028 e até dois empregados a partir de 2027 apenas nas atividades abrangidas no âmbito rural. A proposta depende de tramitação no Senado, sanção e condições orçamentárias. Empresas sem classificação rural mantêm limite de um empregado neste cenário. A referência temporal é o ano simulado; resultados anteriores permanecem imutáveis. O simulador não presume que o projeto já entrou em vigor. Fonte: https://www.presidencia.gov.br/ccivil_03/projetos/ato_2023_2026/2026/plp/plp-186.htm
+
+### Registros de participação
+
+As aberturas de abas internas são registradas com aluno, equipe, rodada e horário para acompanhamento pelo professor. Não são coletados textos digitados neste relatório. Registros começam na implantação: ausência de registro não comprova ausência anterior. Abertura de aba não comprova leitura nem qualidade da decisão e não gera nota automática. No painel docente, consulte Consultar resultados → Acessos dos alunos, filtrando por rodada e alternando participantes e abas visitadas.
+
+### Painel semanal: bases e indicadores
+
+Em Resultados → Painel semanal, selecione a semana ISO e seu ano, acompanhados das datas exatas dos sete dias. Não são janelas móveis: cada filtro corresponde a uma rodada encerrada. Rodadas mensais legadas continuam identificadas como mensais, sem redistribuição artificial. O professor consulta o mesmo painel, somente em leitura, nos detalhes da empresa → semanal.
+
+Marketing e vendas, Pessoas, Produção e Logística aparecem separadamente. Na aba Bases informadas, somente o líder registra dados complementares; integrantes consultam. Valores ausentes ficam vazios, não são convertidos em zero. As bases não alteram decisões, notas, caixa ou demonstrativos consolidados. Cada indicador informa sua origem: Valor Calculado, Estimativa do Modelo, Dados informados pela equipe ou Dados indisponíveis. Dados informados não são auditados automaticamente na internet.
+
+| Indicador | Base de cálculo e leitura |
+| --- | --- |
+| CAC semanal | Investimento atribuível / novos clientes faturados. Não confundir unidades vendidas com clientes únicos. No Startup, o motor disponibiliza sua estimativa quando não há bases informadas. |
+| Conversão semanal | Pedidos faturados / leads ou visitantes × 100, da mesma coorte e período. Não misturar pedidos repetidos com aquisição de clientes. |
+| CPL / CPC | Investimento atribuível / leads ou cliques, respectivamente. O gasto deve corresponder ao mesmo conjunto de campanhas e à mesma semana. |
+| Churn realizado | Clientes recorrentes cancelados / base recorrente inicial × 100. Startup usa clientes perdidos efetivos; empresas transacionais sem base recorrente não recebem churn inventado. |
+| NPS | (Promotores − detratores) / total de respostas × 100. Notas 9–10 são promotores, 7–8 neutros e 0–6 detratores. Exige respostas efetivamente informadas. Não é eNPS. |
+| Absenteísmo | Horas de ausência / horas contratadas da equipe × 100. Bases homogêneas; ausências não podem superar as horas contratadas. |
+| Receita por colaborador | Receita registrada da rodada / funcionários ativos registrados. Não mede isoladamente esforço ou qualidade individual. |
+| Horas extras | Horas extras planejadas por colaborador multiplicadas pelos funcionários registrados. Não representa horas efetivamente trabalhadas ou um ponto eletrônico. |
+| OEE e refugo | Disponibilidade × performance × qualidade; refugo / produção realizada × 100. Sem operação aplicável, OEE é Não se aplica. |
+| Produção planejada e realizada | Gráfico compara meta e produção registrada em unidades. Não pressupõe que toda produção foi vendida. |
+| OTIF | Pedidos entregues no prazo e completos / pedidos entregues × 100, conforme convenção didática do motor. Emitir nota ou despachar no prazo não comprova entrega ao cliente no prazo. |
+| Separação | Média em minutos informada para o intervalo aprovação → despacho. Não há rastreamento de bipagem ou emissão fiscal real nesta plataforma educacional. |
+| Relação físico / registrado | Quantidades físicas e registradas comparáveis × 100. É uma relação de saldo; pode superar 100% e não substitui uma auditoria de acuracidade por item/SKU. |
+
+Denominador zero ou base insuficiente gera Dados indisponíveis. Não há envio automático de pesquisa NPS a clientes reais nem integração automática com plataformas de anúncios, notas fiscais ou leitores de estoque neste módulo. A API autenticada permite registrar e consultar as bases; isso não constitui integração instalada com terceiros.
+
+Referências técnicas verificadas: REICHHELD, Frederick F. The one number you need to grow. Harvard Business Review, dez. 2003. Disponível em: https://hbr.org/2003/12/the-one-number-you-need-to-grow. Acesso em: 15 out. 2026. PEPPERS, Don; ROGERS, Martha. Managing customer experience and relationships: a strategic framework. 3. ed. Hoboken: Wiley, 2016. DOI: 10.1002/9781119239833. Acesso em: 15 out. 2026. As fórmulas didáticas do simulador não são apresentadas como parâmetros empíricos extraídos dessas obras.
 
 ### Planejar antes da data comercial
 
@@ -42,7 +80,7 @@ Se a simulação começa em 15 de outubro, o Dia das Crianças já passou. O Nat
 
 ### Perfis sazonais: Estimativa do Modelo
 
-O professor escolhe um perfil. Neutro mantém o fator de procura em 1. Varejo tem maior sensibilidade; Alimentação responde mais ao Natal e pouco às outras datas; Serviços tem sensibilidade pequena. Estes perfis são simplificações didáticas, não classificações universais nem estatísticas comprovadas. O perfil deve corresponder à proposta do negócio. O modelo inicial contempla Dia das Crianças, Black Friday (última sexta-feira de novembro) e Natal; outras datas e diferenças regionais não estão modeladas nesta edição.
+O perfil configurado da turma determina a sazonalidade. Neutro mantém o fator de procura em 1. Varejo tem maior sensibilidade; Alimentação responde mais ao Natal e pouco às outras datas; Serviços tem sensibilidade pequena. Estes perfis são simplificações didáticas, não classificações universais nem estatísticas comprovadas. O perfil deve corresponder à proposta do negócio. O modelo inicial contempla Dia das Crianças, Black Friday (última sexta-feira de novembro) e Natal; outras datas e diferenças regionais não estão modeladas nesta edição.
 
 A procura cresce progressivamente nos 42 dias anteriores às datas: picos adicionais de referência de 40%, 45% e 60%, respectivamente, ponderados pelo perfil e pelos dias da semana. Durante sete dias após a data, há redução didática de 12% ponderada pelo perfil. Os efeitos ativos são somados e a procura tem piso de 50% da base. Insumos recebem adicional de 8% da parcela positiva do fator de procura; fretes, 20% dessa parcela. A interface identifica os eventos e o fator aplicado. Não há números aleatórios na sazonalidade.
 
@@ -70,7 +108,7 @@ A aba DRE abre o demonstrativo completo da rodada. As visões mensal e trimestra
 
 ### Histórico mensal preservado
 
-Turmas anteriores continuam mensais até ativação explícita do calendário semanal pelo professor, antes de salvar decisões da rodada aberta. Os resultados anteriores não são recalculados nem redistribuídos por datas inventadas. A ativação é prospectiva e não pode ser reposicionada. Obrigações futuras sem datas absolutas herdadas do modelo mensal são convertidas pela convenção de 30 dias por mês, arredondando para a semana de vencimento seguinte; essa aproximação não altera snapshots passados. Resultados novos registram a versão 3.0.0-weekly-calendar e o calendário usado. Exemplos mensais neste manual continuam sendo referências mensais ou descrições do histórico, e não uma cobrança integral por semana.
+Turmas anteriores migram automaticamente para semanas na primeira rodada aberta sem decisões salvas. Uma rodada mensal já planejada mantém suas regras até o fechamento. Os resultados anteriores não são recalculados nem redistribuídos por datas inventadas. A ativação é prospectiva e não pode ser reposicionada. Obrigações futuras sem datas absolutas herdadas do modelo mensal são convertidas pela convenção de 30 dias por mês, arredondando para a semana de vencimento seguinte; essa aproximação não altera snapshots passados. Resultados novos registram a versão 3.1.0-auto-calendar-projected-mei e o calendário usado. Exemplos mensais neste manual continuam sendo referências mensais ou descrições do histórico, e não uma cobrança integral por semana.
 
 ## A história e o conceito da logomarca SempreHub
 

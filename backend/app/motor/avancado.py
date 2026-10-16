@@ -149,7 +149,8 @@ def _tributar(empresa, turma, receita, cmv, alertas):
     acumulado = empresa.faturamento_ano + receita
     if regime == RegimeTributario.MEI:
         empresa.das_mei_pago_ano += impostos
-        teto = turma.teto_mei_anual
+        from .regras_mei import regras_mei
+        teto = regras_mei(turma)["teto_anual"]
         if acumulado > teto * (1 + TOLERANCIA_TETO_MEI):
             impostos += max(0, acumulado * aliquota_efetiva_simples(acumulado) - empresa.das_mei_pago_ano)
             empresa.regime_tributario = RegimeTributario.SIMPLES_NACIONAL
@@ -210,9 +211,11 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         c = _Calculo(empresa, d)
         if turma.modo_jogo == "TRADICIONAL":
             _aplicar_mudanca_regime(empresa, d, turma, c)
-            if empresa.regime_tributario == RegimeTributario.MEI and empresa.funcionarios + d.contratar - d.demitir > 1:
+            from .regras_mei import regras_mei
+            limite_empregados = regras_mei(turma)["limite_empregados"]
+            if empresa.regime_tributario == RegimeTributario.MEI and empresa.funcionarios + d.contratar - d.demitir > limite_empregados:
                 empresa.regime_tributario = RegimeTributario.SIMPLES_NACIONAL
-                c.alertas.append("Mais de um empregado: migração do MEI para o Simples Nacional.")
+                c.alertas.append(f"Mais de {limite_empregados} empregado(s): migração do MEI para o Simples Nacional.")
         empresa.networking = _limitar(empresa.networking - 1 + 2 * math.sqrt(max(0, d.networking) / 500))
         multa = ev.MULTA_NOTIFICACAO_FISCAL if evento.contem("NOTIFICACAO_FISCAL") and empresa.networking < ev.NETWORKING_MINIMO_DEFESA_FISCAL else 0
         p = preparar(empresa, d, turma, multiplicador_custo, multa)
@@ -248,6 +251,8 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         detalhes = deepcopy(a["detalhes"])
         if calendario:
             detalhes["calendario"] = deepcopy(calendario)
+            from .regras_mei import regras_mei
+            detalhes["regras_mei"] = regras_mei(turma, rodada)
             detalhes["engine_version"] = VERSAO_SEMANAL
         detalhes["avaliacao_estrategica"] = deepcopy(preparo["avaliacao_estrategica"])
         detalhes.update(parametros=parametros(turma), decisao=colunas(d), dre=deepcopy(dre),
