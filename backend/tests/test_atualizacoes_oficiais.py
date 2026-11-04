@@ -54,6 +54,12 @@ def test_execucao_unica_e_falha_preserva_historico(cliente,monkeypatch):
         assert db.query(BoletimOficial).count()==1
         assert a.consultar(db)['itens']==salvo['itens']
         assert a.consultar(db)['erro']
+        c=db.get(ConsultaOficial,1);c.tentado_em=agora()-timedelta(minutes=16);db.commit()
+    # Falhas voltam a ser tentadas em prazo curto, sem recálculo dos dados já
+    # publicados e sem liberar uma sequência contínua de chamadas.
+    monkeypatch.setattr(a,'gerar_json',gerar)
+    assert a.atualizar()
+    assert len(chamadas)==2
 
 
 def test_permissoes_e_nao_dispara_api_sem_chave(cliente,professor):

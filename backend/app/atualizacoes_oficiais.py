@@ -14,6 +14,7 @@ from .evidencias_mercado import obter_documento, normalizar
 from .inteligencia_mercado import gerar_json
 
 INTERVALO = timedelta(hours=6)
+RETRY_FALHA = timedelta(minutes=15)
 
 
 class ItemOficial(BaseModel):
@@ -55,12 +56,16 @@ def reservar(db, instante):
             db.commit()
         except IntegrityError:
             db.rollback()
-    # Reserva atômica também entre réplicas. Limita o custo a uma consulta por seis horas.
-    c=db.get(ConsultaOficial,1)
-    espera=INTERVALO
+    # Reserva atômica também entre réplicas. Consultas confirmadas ficam seis
+    # horas em cache; erros transitórios recebem apenas uma nova tentativa após
+    # quinze minutos, sem transformar uma falha persistente em chamadas contínuas.
     r=db.execute(update(ConsultaOficial).where(ConsultaOficial.id==1,
         or_(ConsultaOficial.ocupado_ate.is_(None),ConsultaOficial.ocupado_ate<=instante),
-        or_(ConsultaOficial.tentado_em.is_(None),ConsultaOficial.tentado_em<=instante-espera))
+        or_(
+            ConsultaOficial.tentado_em.is_(None),
+            ConsultaOficial.tentado_em<=instante-INTERVALO,
+            (ConsultaOficial.estado=='PENDENTE') & (ConsultaOficial.tentado_em<=instante-RETRY_FALHA),
+        ))
         .values(tentado_em=instante,ocupado_ate=instante+timedelta(minutes=15),estado='CONSULTANDO',erro=None))
     db.commit()
     return r.rowcount==1
