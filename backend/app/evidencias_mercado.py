@@ -68,9 +68,13 @@ class FonteInsegura(ValueError):
     pass
 
 
-def obter_documento(url):
+def obter_documento(url, somente_oficial=False):
     """HTTPS público, IP fixado na conexão, redirects conferidos e resposta limitada."""
     for _ in range(4):
+        if somente_oficial:
+            from .fontes_oficiais import fonte_oficial
+            if not fonte_oficial(url):
+                raise FonteInsegura('Fonte ou redirecionamento não oficial.')
         u = urlsplit(url)
         if u.scheme != "https" or not u.hostname or u.username or u.password or u.port not in (None, 443):
             raise FonteInsegura("Fonte precisa usar HTTPS público.")

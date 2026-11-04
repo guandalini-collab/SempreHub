@@ -81,11 +81,12 @@ def _url_sem_rastreamento(url):
 
 
 def validar_fontes(dados, pesquisadas=None):
+    from ..fontes_oficiais import fonte_oficial
     urls = []
     for item in dados.noticias + dados.analises + dados.produtos:
         for fonte in item.fontes:
-            if urlparse(fonte.url).scheme != "https" or not urlparse(fonte.url).hostname:
-                raise HTTPException(422, "As fontes precisam ter URLs HTTPS válidas.")
+            if not fonte_oficial(fonte.url):
+                raise HTTPException(422, "Use somente fontes governamentais ou institutos oficiais de pesquisa autorizados.")
             urls.append(fonte.url)
     if pesquisadas is not None and any(_url_sem_rastreamento(url) not in {_url_sem_rastreamento(u) for u in pesquisadas} for url in urls):
         raise HTTPException(502, "A pesquisa não confirmou todas as fontes; nenhuma edição foi salva.")

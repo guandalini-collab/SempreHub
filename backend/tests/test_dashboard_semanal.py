@@ -116,3 +116,12 @@ def test_telemetria_startup_sem_clientes_nao_inventa_divisoes():
     assert d['marketing']['CAC']['valor'] is None
     assert d['marketing']['NPS']['valor'] is None
     assert d['producao']['Tempo médio de ciclo']['valor'] is None
+
+
+def test_producao_zero_nao_e_dado_ausente():
+    r=SimpleNamespace(receita=0,funcionarios=0,detalhes_simulacao={'operacao':{'producao_real':0,'producao_planejada':0,'oee':None}})
+    d=calcular_dashboard(r,{})['producao']
+    for nome in ('OEE','Aderência ao plano','Tempo médio de ciclo','Refugo'):
+        assert d[nome]['valor'] is None and d[nome]['estado']=='Não se aplica'
+    r.detalhes_simulacao={'operacao':{}}
+    assert calcular_dashboard(r,{})['producao']['Refugo']['estado']=='Dados indisponíveis'

@@ -1,3 +1,4 @@
+import AtualizacoesOficiais from "../../componentes/AtualizacoesOficiais";
 import DashboardSemanal from "../../componentes/DashboardSemanal";
 import RelatorioAcessos from "../../componentes/RelatorioAcessos";
 import CalendarioTurma from "../../componentes/CalendarioTurma";
@@ -36,7 +37,7 @@ import {
   estiloEntrada,
 } from "../../componentes/ui";
 import { NOME_DORNELAS, NOME_GEM, NOME_REGIME, inteiro, percentual, reais } from "../../formatos";
-import type { Decisao, DetalheTurma, Empresa, Equipe, OpcaoEvento, Parametros, Resultado } from "../../tipos";
+import type { Decisao, DetalheTurma, Empresa, Equipe, OpcaoEvento, Parametros, Resultado, Turma } from "../../tipos";
 import type { ModoJogo } from "../../tiposSimulacao";
 import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
@@ -52,6 +53,7 @@ const ITENS_PAINEL = [
   { id: "parametros", titulo: "Parâmetros", descricao: "Revise e ajuste os parâmetros da turma.", simbolo: "", grupo: "Preparar turma", pai: "configuracao" },
   { id: "equipes", titulo: "3. Conferir participantes", descricao: "Confira alunos, empresas e pendências de envio.", simbolo: "", grupo: "Preparar turma" },
   { id: "mercado", titulo: "4. Preparar rodada", descricao: "Pesquise, revise e publique notícias e produtos para os alunos.", simbolo: "", grupo: "Conduzir rodada" },
+  {id:"atualizacoes",titulo:"Atualizações oficiais",descricao:"Consulte fontes primárias atualizadas.",simbolo:"",grupo:"Conduzir rodada"},
   { id: "rodada", titulo: "5. Acompanhar envios", descricao: "Acompanhe as decisões e veja o que falta para encerrar a rodada.", simbolo: "", grupo: "Conduzir rodada" },
   { id: "prazo", titulo: "Prazo da rodada", descricao: "Defina quando os envios serão encerrados.", simbolo: "", grupo: "Conduzir rodada" },
   { id: "concorrencia", titulo: "Concorrência", descricao: "Confira a estrutura competitiva do mercado.", simbolo: "", grupo: "Conduzir rodada" },
@@ -135,6 +137,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         </Cartao>
       </SecaoPainel>
       <SecaoPainel id="ingresso" ativa={secao}><FormacaoTurma turma={turma} aoAtualizar={carregar}/></SecaoPainel>
+      <SecaoPainel id="atualizacoes" ativa={secao}>{secao==='atualizacoes'&&<AtualizacoesOficiais turmaId={turma.id}/>}</SecaoPainel>
       <SecaoPainel id="calendario" ativa={secao}><CalendarioTurma turma={turma} aoSalvar={carregar}/></SecaoPainel>
       <SecaoPainel id="concorrencia" ativa={secao}><CompetitividadeMercado config={turma.parametros?.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} equipes={empresas.length}/></SecaoPainel>
       <SecaoPainel id="prazo" ativa={secao}>{aberta ? <PrazoRodada turmaId={turma.id} rodada={turma.rodada_atual} prazo={turma.prazo_rodada} aoSalvar={carregar}/> : <p>Simulação encerrada.</p>}</SecaoPainel>
@@ -168,7 +171,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       </SecaoPainel>
       <SecaoPainel id="fechamento" ativa={secao}>
           {aberta ? (
-            <><FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} empresas={empresas} aoFechar={carregar} /></>
+            <><FecharRodada turmaId={turma.id} rodada={turma.rodada_atual} modoEquipe={turma.modo_equipe} empresas={empresas} aoFechar={carregar} aoPreparar={() => setSecao('rodada')} /></>
           ) : (
             <Cartao titulo="Simulação encerrada">
               <p className="text-sm text-slate-600">
@@ -355,12 +358,14 @@ function FecharRodada({
   modoEquipe,
   empresas,
   aoFechar,
+  aoPreparar,
 }: {
   turmaId: number;
   rodada: number;
   modoEquipe: boolean;
   empresas: Empresa[];
   aoFechar: () => Promise<void>;
+  aoPreparar: () => void;
 }) {
   const [confirmando, setConfirmando] = useState(false);
   const [carregando, setCarregando] = useState(false);
@@ -369,17 +374,17 @@ function FecharRodada({
 
   useEffect(() => {
     setConfirmando(false);
-    setMensagem(null);
   }, [turmaId, rodada]);
+  useEffect(() => {setMensagem(null);}, [turmaId]);
 
   async function fechar() {
     setCarregando(true);
     setMensagem(null);
     try {
-      const resposta = await api.post<{ evento: OpcaoEvento }>(`/api/professor/turmas/${turmaId}/fechar-rodada`, { evento: "SORTEAR", rodada, forcar: true });
-      setMensagem({ tipo: "sucesso", texto: `Rodada ${rodada} fechada. Evento: ${resposta.evento.titulo}.` });
+      const resposta = await api.post<{ evento: OpcaoEvento; turma: Turma }>(`/api/professor/turmas/${turmaId}/fechar-rodada`, { evento: "SORTEAR", rodada, forcar: true });
       setConfirmando(false);
       await aoFechar();
+      setMensagem({ tipo: "sucesso", texto: `Rodada ${rodada} encerrada com sucesso. ${resposta.turma.status === 'ENCERRADA' ? 'Simulação concluída.' : `Rodada ${resposta.turma.rodada_atual} iniciada; as novas decisões ainda serão preparadas.`}` });
     } catch (e) {
       setMensagem({ tipo: "erro", texto: e instanceof Error ? e.message : "Erro ao fechar a rodada." });
     } finally {
@@ -387,7 +392,7 @@ function FecharRodada({
     }
   }
 
-
+  if(mensagem?.tipo==='sucesso') return <Cartao titulo="Fechamento concluído"><Aviso tipo="sucesso">{mensagem.texto}</Aviso><Botao variante="secundario" onClick={aoPreparar}>Acompanhar a nova rodada</Botao></Cartao>;
   return (
     <Cartao titulo={`Fechar a rodada ${rodada}`}>
       <div className="space-y-4">

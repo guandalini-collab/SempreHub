@@ -83,6 +83,7 @@ def test_ativacao_prospectiva_preserva_historico_e_bloqueia_reposicionamento(cli
 def test_fluxo_http_tres_semanas_preserva_snapshots(cliente,professor,modo):
     from .test_avancado_api import _decisao_avancada, _fechar
     turma=_criar_turma(cliente,professor,modo_jogo=modo,total_rodadas=4,configuracao_simulacao=cfg())
+    inicio=date.fromisoformat(turma['parametros']['configuracao_simulacao']['data_inicio_simulada'])
     aluno=cadastrar(cliente,'Ana',f'semanas-{modo}@aluno.iffar.edu.br')
     eid=_entrar(cliente,aluno,turma['codigo'],'Semanas')
     primeiro=None
@@ -91,11 +92,11 @@ def test_fluxo_http_tres_semanas_preserva_snapshots(cliente,professor,modo):
         _fechar(cliente,professor,turma,r)
         painel=cliente.get(f'/api/aluno/empresas/{eid}',headers=aluno).json()
         atual=painel['resultados'][-1]
-        assert atual['detalhes_simulacao']['calendario']['inicio']==(date(2026,10,15)+timedelta(days=7*(r-1))).isoformat()
+        assert atual['detalhes_simulacao']['calendario']['inicio']==(inicio+timedelta(days=7*(r-1))).isoformat()
         assert atual['detalhes_simulacao']['engine_version']=='3.1.0-auto-calendar-projected-mei'
         if primeiro is None: primeiro=deepcopy(atual)
         assert painel['resultados'][0]==primeiro
-        assert painel['turma']['calendario']['inicio']==(date(2026,10,15)+timedelta(days=7*r)).isoformat()
+        assert painel['turma']['calendario']['inicio']==(inicio+timedelta(days=7*r)).isoformat()
 
 
 def test_migracao_depois_de_mes_nao_altera_mes_fechado(cliente,professor):

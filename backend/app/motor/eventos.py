@@ -22,8 +22,8 @@ class Evento:
 
 NENHUM = Evento(
     "NENHUM",
-    "Mês sem imprevistos",
-    "O mês passa sem grandes sobressaltos macroeconômicos.",
+    "Período sem imprevistos",
+    "O período passa sem grandes sobressaltos macroeconômicos.",
 )
 
 EVENTOS: Dict[str, Evento] = {

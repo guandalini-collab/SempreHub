@@ -23,7 +23,7 @@ def test_recusa_url_valida_sem_sustentacao_do_dado(fonte, alteracao):
     if alteracao == 'custo': p['custo_unitario'] = 2200
     if alteracao == 'trecho': p['evidencia_custo']['trecho'] = 'Produto de teste R$ 2.200,00 no atacado.'
     if alteracao == 'nome': p['nome'] = 'Smartphone de Última Geração'
-    if alteracao == 'url': p['evidencia_custo']['url'] = 'https://example.com/outra'
+    if alteracao == 'url': p['evidencia_custo']['url'] = 'https://www.ibge.gov.br/outra'
     if alteracao == 'data': dados['analises'][0]['data'] = '2026-03'
     if alteracao == 'sem_prova': p.pop('evidencia_custo')
     with pytest.raises(HTTPException) as erro:
@@ -36,7 +36,7 @@ def test_salva_e_publica_estimativa_sem_prova(cliente, professor, monkeypatch, f
     from app.models import ConteudoMercado
     from app.database import SessionLocal
     dados = edicao(); dados['produtos'][0].pop('evidencia_custo')
-    monkeypatch.setattr(mercado, 'gerar_json', lambda *a: (dados, {'https://example.com/produto'}))
+    monkeypatch.setattr(mercado, 'gerar_json', lambda *a: (dados, {'https://www.ibge.gov.br/produto'}))
     turma = _criar_turma(cliente, professor)
     base = f"/api/professor/turmas/{turma['id']}/mercado"
     r = cliente.post(base + '/pesquisar', headers=professor, json={'setor':dados['setor'],'noticias':1,'analises':1,'produtos':1})
@@ -71,7 +71,7 @@ def test_datas_de_jsonld_e_conteudo_oculto():
 @pytest.mark.parametrize('ip', ['127.0.0.1', '10.0.0.1', '169.254.169.254', '::1'])
 def test_fonte_privada_bloqueada_antes_da_conexao(monkeypatch, ip):
     monkeypatch.setattr(provas.socket, 'getaddrinfo', lambda *a, **k: [(None,None,None,None,(ip,443))])
-    with pytest.raises(ValueError): provas.obter_documento('https://example.com/fonte')
+    with pytest.raises(ValueError): provas.obter_documento('https://www.ibge.gov.br/fonte')
 
 
 def test_fonte_inacessivel_nao_vira_evidencia(monkeypatch):

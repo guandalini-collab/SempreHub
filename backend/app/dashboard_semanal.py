@@ -147,6 +147,11 @@ def calcular_dashboard(resultado,bases):
     for area,nome,chave in [("producao","OEE","oee"),("logistica","OTIF","otif"),("rh","eNPS","enps")]:
         if chave in op and op[chave] is None:
             painel[area][nome]["estado"]="Não se aplica"
+    sem_producao = op.get('producao_real') == 0
+    for nome,condicao in [('Aderência ao plano',op.get('producao_planejada') == 0),
+                         ('Refugo',sem_producao),('Tempo médio de ciclo',sem_producao and not any(k in manuais for k in ('ciclo_minutos','ciclos_concluidos')))]:
+        if condicao and painel['producao'][nome]['valor'] is None:
+            painel['producao'][nome]['estado']='Não se aplica'
     for area,indicadores in painel.items():
         for nome,indicador in indicadores.items():
             chave=f'{area}.{nome}'

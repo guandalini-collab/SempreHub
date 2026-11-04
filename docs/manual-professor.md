@@ -42,7 +42,7 @@ Não é necessário preencher uma data de início. O calendário assume a data v
 
 ### MEI: cenário projetado para 2027 e 2028
 
-O PLP 186/2026 é uma proposta, ainda não uma lei vigente na consulta de 15/10/2026. O cenário didático identificado como Estimativa do Modelo prevê teto anual de R$ 110.000 em 2027, R$ 140.000 em 2028 e até dois empregados a partir de 2027 apenas nas atividades abrangidas no âmbito rural. A proposta depende de tramitação no Senado, sanção e condições orçamentárias. Empresas sem classificação rural mantêm limite de um empregado neste cenário. A referência temporal é o ano simulado; resultados anteriores permanecem imutáveis. O simulador não presume que o projeto já entrou em vigor. Fonte: https://www.presidencia.gov.br/ccivil_03/projetos/ato_2023_2026/2026/plp/plp-186.htm
+A Lei Complementar nº 238, de 21/10/2026, publicou o cronograma de teto do MEI: R$ 110.000 em 2027 e R$ 140.000 a partir de 2028. Os efeitos têm datas específicas e a ampliação dos limites depende das condições orçamentárias do art. 3º. O cenário didático mantém identificação como Estimativa do Modelo porque não comprova essa condição nem substitui a apuração tributária legal. A regra de até dois empregados é limitada às atividades abrangidas no âmbito rural no modelo; as demais mantêm um. O ano simulado orienta a seleção das regras. Fotografias antigas não são reescritas. Fonte primária: https://legis.senado.gov.br/norma/44276013/publicacao/44280206
 
 ### Registros de participação
 
@@ -789,3 +789,19 @@ Selecione um produto por vez. Use as etapas Produto e preço, Posicionamento e c
 ### Telemetria automática dos indicadores
 
 Novos fechamentos gravam bases didáticas versionadas em `metricas_semanais`, sem alterar resultados contábeis, decisões ou notas. As fórmulas e convenções estão na seção “Geração automática das bases dos indicadores” do Manual do Aluno. São estimativas de coortes, tráfego, satisfação, ausências, ciclos e expedição; não são pesquisas ou medições reais. Dados manuais têm prioridade por grupo e não são completados com outra população. Rodadas históricas não recebem bases retroativas. Não exigir valores para denominadores zero ou para fenômenos não registrados, como LTV tradicional e retorno causal de treinamento.
+
+
+### Fontes oficiais e atualização automática
+
+A aba Atualizações oficiais está disponível para aluno e professor. O serviço usa a integração OpenAI no servidor, restringe a busca a órgãos públicos e institutos de pesquisa autorizados e confere o trecho citado no documento original. Entre as instituições estão IBGE, Ipea, Banco Central, Receita Federal, CGSN, Planalto, Diário Oficial, Senado e institutos de pesquisa da lista institucional. Blogs, redes sociais, imprensa comercial, agregadores e varejistas não são comprovação aceita para novas pesquisas. Catálogos antigos são preservados.
+
+| Informação | Tratamento |
+|---|---|
+| Instituição e URL | A fonte deve pertencer à lista institucional e ter HTTPS; redirecionamentos também são conferidos. |
+| Publicação e referência | A tela identifica a data original e a competência da informação. A data da consulta não substitui a competência. |
+| Atualização | Há uma consulta automática a cada seis horas, compartilhada entre as turmas para evitar cobranças repetidas. O servidor verifica pendências periodicamente; abrir a aba também solicita uma consulta quando vencida. Não é uma garantia de atualização instantânea da instituição de origem. |
+| Falha ou dúvida | A última edição é preservada com sua data e o aviso de consulta pendente. Valores ausentes não são inventados. |
+| Normas | Publicação, início dos efeitos, fim e condições são informações distintas. Projeto de lei não é imposto vigente. |
+| Motor e histórico | A IA não executa código nem substitui alíquotas ou tabelas arbitrariamente. O cálculo usa as regras versionadas que o motor suporta; normas incompatíveis ou condicionais são informadas, não aplicadas silenciosamente. A consulta disponível fica registrada no novo fechamento. O histórico permanece imutável. |
+
+O boletim nacional não substitui recortes locais nem altera contratos. Novas regras exigem suporte no motor; preços sem prova oficial são estimativas identificadas.

@@ -14,9 +14,9 @@ from .test_fluxo import _criar_turma, _entrar
 
 
 def edicao():
-    fonte={"titulo":"Fonte de aquisição","url":"https://example.com/produto"}
+    fonte={"titulo":"Fonte de aquisição","url":"https://www.ibge.gov.br/produto"}
     artigo={"titulo":"Mercado brasileiro","texto":"Dados de mercado consultados para esta edição.","data":"2026-10-06","fontes":[fonte]}
-    return {"setor":"Eletrônicos e Tecnologia","comercio":"B2C","noticias":[artigo],"analises":[artigo],"produtos":[{"natureza":"FISICO","id":"produto-1","nome":"Produto de teste","descricao":"Descrição de produto de teste","custo_unitario":30,"unidade":"unidade","base_custo":"Preço público de aquisição, não custo industrial.","data":"2026-10-06","fontes":[fonte],"evidencia_custo":{"url":"https://example.com/produto","trecho":"Produto de teste R$ 30,00 por unidade ou cliente/mês."}}]}
+    return {"setor":"Eletrônicos e Tecnologia","comercio":"B2C","noticias":[artigo],"analises":[artigo],"produtos":[{"natureza":"FISICO","id":"produto-1","nome":"Produto de teste","descricao":"Descrição de produto de teste","custo_unitario":30,"unidade":"unidade","base_custo":"Preço público de aquisição, não custo industrial.","data":"2026-10-06","fontes":[fonte],"evidencia_custo":{"url":"https://www.ibge.gov.br/produto","trecho":"Produto de teste R$ 30,00 por unidade ou cliente/mês."}}]}
 
 
 @pytest.mark.parametrize("origem", ["documentado", "varejo", "fallback"])
@@ -26,7 +26,7 @@ def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch,orig
     if origem == "varejo": dados["produtos"][0]["tipo_documento"] = "preco_varejo"
     if origem == "fallback": dados["produtos"][0].pop("evidencia_custo")
     custo = {"documentado": 30, "varejo": 18, "fallback": 40}[origem]
-    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(dados,{"https://example.com/produto"}))
+    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(dados,{"https://www.ibge.gov.br/produto"}))
     turma=_criar_turma(cliente,professor,total_rodadas=3)
     aluno=cadastrar(cliente,"Ana","ana@aluno.iffar.edu.br")
     outro=cadastrar(cliente,"Bia","bia@aluno.iffar.edu.br")
@@ -96,7 +96,7 @@ def test_custo_catalogo_aplicado_servico_digital(cliente,professor,monkeypatch):
     from app.routers import mercado
     digital = edicao()
     digital["produtos"][0].update(natureza="SERVICO_DIGITAL", unidade="cliente/mês")
-    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(digital,{"https://example.com/produto"}))
+    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(digital,{"https://www.ibge.gov.br/produto"}))
     turma=_criar_turma(cliente,professor,modo_jogo="STARTUP",cenario="CRISE")
     aluno=cadastrar(cliente,"Bia","catalogo-startup@aluno.iffar.edu.br")
     empresa=_entrar(cliente,aluno,turma["codigo"],"Serviço digital")
@@ -119,7 +119,7 @@ def test_integracao_organiza_citacoes_sem_inventar_fontes(monkeypatch):
     from app import inteligencia_mercado
     monkeypatch.setenv("OPENAI_API_KEY", "credencial-de-teste")
     respostas=iter([
-        {"status":"completed","output":[{"content":[{"type":"output_text","text":"Aquisição documentada a R$ 30 por unidade.","annotations":[{"type":"url_citation","url":"https://example.com/produto"}]}]}]},
+        {"status":"completed","output":[{"content":[{"type":"output_text","text":"Aquisição documentada a R$ 30 por unidade.","annotations":[{"type":"url_citation","url":"https://www.ibge.gov.br/produto"}]}]}]},
         {"status":"completed","output":[{"content":[{"type":"output_text","text":json.dumps(edicao())}]}]},
     ])
     requisicoes=[]
@@ -130,7 +130,7 @@ def test_integracao_organiza_citacoes_sem_inventar_fontes(monkeypatch):
     from app.routers.mercado import Edicao
     dados,fontes=inteligencia_mercado.gerar_json("Pesquise produtos e devolva JSON",{},True,Edicao.model_json_schema())
     assert dados["produtos"][0]["custo_unitario"]==30
-    assert fontes=={"https://example.com/produto"}
+    assert fontes=={"https://www.ibge.gov.br/produto"}
     assert requisicoes[0]["tools"][0]["type"]=="web_search"
     assert requisicoes[1]["text"]["format"]["type"]=="json_schema"
     assert "tools" not in requisicoes[1]
@@ -141,18 +141,18 @@ def test_fontes_rastreamento_nao_altera_identidade_da_pagina():
     from fastapi import HTTPException
     from app.routers.mercado import Edicao, validar_fontes
     dados=Edicao.model_validate(edicao())
-    validar_fontes(dados,{"https://example.com/produto?utm_source=openai"})
+    validar_fontes(dados,{"https://www.ibge.gov.br/produto?utm_source=openai"})
     with pytest.raises(HTTPException):
-        validar_fontes(dados,{"https://example.com/outro-produto?utm_source=openai"})
+        validar_fontes(dados,{"https://www.ibge.gov.br/outro-produto?utm_source=openai"})
     with pytest.raises(HTTPException):
-        validar_fontes(dados,{"https://example.com/produto?sku=diferente"})
+        validar_fontes(dados,{"https://www.ibge.gov.br/produto?sku=diferente"})
 
 
 def test_pesquisa_insuficiente_explica_o_que_faltou(cliente,professor,monkeypatch):
     from app.routers import mercado
     bruto=edicao()
     bruto["produtos"]=[]
-    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(bruto,{"https://example.com/produto"}))
+    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(bruto,{"https://www.ibge.gov.br/produto"}))
     turma=_criar_turma(cliente,professor)
     base=f"/api/professor/turmas/{turma['id']}/mercado"
     r=cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":3})
@@ -163,7 +163,7 @@ def test_pesquisa_insuficiente_explica_o_que_faltou(cliente,professor,monkeypatc
 
 def test_recusa_produto_fisico_em_startup_e_outro_setor(cliente, professor, monkeypatch):
     from app.routers import mercado
-    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (edicao(), {"https://example.com/produto"}))
+    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (edicao(), {"https://www.ibge.gov.br/produto"}))
     turma = _criar_turma(cliente, professor, modo_jogo="STARTUP")
     base = f"/api/professor/turmas/{turma['id']}/mercado"
     pesquisa = {"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1}

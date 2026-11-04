@@ -410,7 +410,7 @@ export function TabelaDre({ dre, paginar = false, periodo = "período" }: { dre:
       </tbody>
       <tfoot>
         <tr className="border-t-2 border-marinho">
-          <td className="py-2 font-bold text-marinho">Lucro (prejuízo) do {periodo}</td>
+          <td className="py-2 font-bold text-marinho">{periodo==='rodada'?'Resultado da rodada':`Lucro (prejuízo) do ${periodo}`}</td>
           <td className={`py-2 text-right font-bold ${dre.lucro_liquido >= 0 ? "text-emerald-700" : "text-red-700"}`}>
             <ValorMonetario valor={dre.lucro_liquido}/>
           </td>

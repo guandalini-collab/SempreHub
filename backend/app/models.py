@@ -420,3 +420,19 @@ class ObservacaoSemanal(Base):
     dados = Column(JSON, nullable=False, default=dict)
     atualizado_por = Column(Integer, ForeignKey('usuarios.id'), nullable=False)
     atualizado_em = Column(DateTime, nullable=False, default=agora)
+
+
+class BoletimOficial(Base):
+    __tablename__ = 'boletins_oficiais'
+    id = Column(Integer, primary_key=True)
+    dados = Column(JSON, nullable=False)
+    consultado_em = Column(DateTime, nullable=False, default=agora)
+
+
+class ConsultaOficial(Base):
+    __tablename__ = 'consultas_oficiais'
+    id = Column(Integer, primary_key=True)
+    tentado_em = Column(DateTime, nullable=True)
+    ocupado_ate = Column(DateTime, nullable=True)
+    estado = Column(String(80), nullable=False, default='PENDENTE')
+    erro = Column(String(500), nullable=True)

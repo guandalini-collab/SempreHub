@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import CORS_ORIGINS, FRONTEND_DIST
 from .migracoes import preparar_banco
-from .routers import aluno, auth, professor, relatorios, educacao, aprendizagem, mercado, manuais
+from .routers import aluno, auth, professor, relatorios, educacao, aprendizagem, mercado, manuais, atualizacoes
 
 preparar_banco()
 
@@ -33,6 +33,7 @@ app.include_router(educacao.router)
 app.include_router(aprendizagem.router)
 app.include_router(mercado.router)
 app.include_router(manuais.router)
+app.include_router(atualizacoes.router)
 
 
 @app.get("/api/saude")
@@ -73,14 +74,25 @@ async def iniciar_calendario():
                 logging.getLogger(__name__).exception("Calendário temporariamente indisponível; nova tentativa automática.")
             await asyncio.sleep(1)
     app.state.calendario = asyncio.create_task(executar())
+    from .atualizacoes_oficiais import atualizar
+    async def consultar_fontes():
+        while True:
+            try:
+                await asyncio.to_thread(atualizar)
+            except Exception:
+                import logging
+                logging.getLogger(__name__).warning('Serviço de atualização oficial pendente; nova tentativa automática.')
+            await asyncio.sleep(300)
+    app.state.atualizacoes = asyncio.create_task(consultar_fontes())
 
 @app.on_event("shutdown")
 async def parar_calendario():
     import asyncio
-    tarefa = getattr(app.state, "calendario", None)
-    if tarefa:
-        tarefa.cancel()
-        try:
-            await tarefa
-        except asyncio.CancelledError:
-            pass
+    for nome in ('calendario','atualizacoes'):
+        tarefa = getattr(app.state, nome, None)
+        if tarefa:
+            tarefa.cancel()
+            try:
+                await tarefa
+            except asyncio.CancelledError:
+                pass

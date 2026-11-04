@@ -45,7 +45,7 @@ def test_segmentacao_afeta_vendas_e_resultado_preserva_historico(cliente, profes
     catalogo = edicao()
     if modo == 'STARTUP':
         catalogo['produtos'][0].update(natureza='SERVICO_DIGITAL', unidade='cliente/mês')
-    monkeypatch.setattr(mercado, 'gerar_json', lambda *a: (catalogo, {'https://example.com/produto'}))
+    monkeypatch.setattr(mercado, 'gerar_json', lambda *a: (catalogo, {'https://www.ibge.gov.br/produto'}))
     turma = _criar_turma(cliente, professor, modo_jogo=modo, total_rodadas=2, demanda_base_por_empresa=100)
     alunos = [cadastrar(cliente, 'Ana', f'estrategia-{modo}-{i}@aluno.iffar.edu.br') for i in range(2)]
     empresas = [_entrar(cliente, aluno, turma['codigo'], f'Empresa {i}') for i, aluno in enumerate(alunos)]

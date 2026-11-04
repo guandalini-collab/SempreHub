@@ -8,10 +8,10 @@ from .test_mercado import edicao, fontes_documentadas
 
 def preparar(cliente,professor,monkeypatch,modo='TRADICIONAL'):
     from app.routers import mercado
-    cat=edicao();p=deepcopy(cat['produtos'][0]);p.update(id='produto-2',nome='Produto dois',custo_unitario=80,evidencia_custo={'url':'https://example.com/produto','trecho':'Produto dois R$ 80,00 por unidade ou cliente/mês.'});cat['produtos'].append(p)
+    cat=edicao();p=deepcopy(cat['produtos'][0]);p.update(id='produto-2',nome='Produto dois',custo_unitario=80,evidencia_custo={'url':'https://www.ibge.gov.br/produto','trecho':'Produto dois R$ 80,00 por unidade ou cliente/mês.'});cat['produtos'].append(p)
     if modo=='STARTUP':
         for p in cat['produtos']:p.update(natureza='SERVICO_DIGITAL',unidade='cliente/mês')
-    monkeypatch.setattr(mercado,'gerar_json',lambda *a:(cat,{'https://example.com/produto'}))
+    monkeypatch.setattr(mercado,'gerar_json',lambda *a:(cat,{'https://www.ibge.gov.br/produto'}))
     turma=_criar_turma(cliente,professor,modo_jogo=modo,total_rodadas=3,demanda_base_por_empresa=20)
     aluno=cadastrar(cliente,'Ana',f'portfolio-{modo}@aluno.iffar.edu.br');empresa=_entrar(cliente,aluno,turma['codigo'],'Portfólio')
     url=f"/api/professor/turmas/{turma['id']}"
@@ -79,7 +79,7 @@ def test_diagnostico_cache_autorizacao_e_protecao(cliente,professor,monkeypatch)
     from app.routers import mercado
     _,aluno,empresa,url,eid,d=preparar(cliente,professor,monkeypatch)
     chamadas=[]
-    monkeypatch.setattr(mercado,'gerar_json',lambda *args, **kwargs:(chamadas.append(args) or diagnostico(),{"https://example.com/produto"}))
+    monkeypatch.setattr(mercado,'gerar_json',lambda *args, **kwargs:(chamadas.append(args) or diagnostico(),{"https://www.ibge.gov.br/produto"}))
     endpoint=f'/api/aluno/empresas/{empresa}/diagnostico/{eid}'
     primeiro=cliente.post(endpoint,headers=aluno,json={});assert primeiro.status_code==200,primeiro.text
     assert cliente.post(endpoint,headers=aluno,json={}).json()==primeiro.json()
@@ -109,7 +109,7 @@ def test_diagnostico_invalido_pode_repetir(cliente,professor,monkeypatch):
     endpoint=f'/api/aluno/empresas/{empresa}/diagnostico/{eid}'
     assert cliente.post(endpoint,headers=aluno,json={}).status_code==502
     assert cliente.get(url+f'/empresas/{empresa}/diagnosticos',headers=professor).json()==[]
-    monkeypatch.setattr(mercado,'gerar_json',lambda *args, **kwargs:(diagnostico(),{"https://example.com/produto"}))
+    monkeypatch.setattr(mercado,'gerar_json',lambda *args, **kwargs:(diagnostico(),{"https://www.ibge.gov.br/produto"}))
     assert cliente.post(endpoint,headers=aluno,json={}).status_code==200
 
 

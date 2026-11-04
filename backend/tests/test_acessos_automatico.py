@@ -32,7 +32,8 @@ def test_mei_projetado_separado_da_regra_vigente():
     assert regras_mei(t,2)['limite_empregados']==2
     t.configuracao_simulacao['atividade_rural']=False
     assert regras_mei(t,2)['limite_empregados']==1
-    assert 'ainda não vigente' in regras_mei(t,2)['estado']
+    assert 'aplicação condicionada' in regras_mei(t,2)['estado']
+    assert regras_mei(t,2)['norma']=='Lei Complementar 238/2026'
     t.configuracao_simulacao['data_inicio_simulada']='2028-01-01'
     assert regras_mei(t)['teto_anual']==140000
     t.configuracao_simulacao['cenario_mei_plp186']=False

@@ -1,3 +1,4 @@
+import AtualizacoesOficiais from "../../componentes/AtualizacoesOficiais";
 import DashboardSemanal from "../../componentes/DashboardSemanal";
 import {tituloPeriodo,consolidarDres} from "../../calendario";
 import LinkManual from "../../componentes/LinkManual";
@@ -75,6 +76,7 @@ const ITENS_PAINEL = [
     "simbolo": "▤",
     "grupo": "Rodada atual"
   },
+  {id:"atualizacoes",titulo:"Atualizações oficiais",descricao:"Consulte dados e normas com fontes oficiais.",simbolo:"",grupo:"Rodada atual"},
   { "id": "midias", "titulo": "Manual de mídias", "descricao": "Formatos, objetivos e custos das campanhas.", "simbolo": "◉", "grupo": "Estratégia e ajuda" },
   {
     "id": "aprendizagem",
@@ -224,7 +226,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   }
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.id.startsWith("resultado-") ? "6. Indicadores por departamento" : ["evolucao","historico","relatorios","conquistas"].includes(i.id) ? "7. Histórico e evolução" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
+    <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe","atualizacoes"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.id.startsWith("resultado-") ? "6. Indicadores por departamento" : ["evolucao","historico","relatorios","conquistas"].includes(i.id) ? "7. Histórico e evolução" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
       <SecaoPainel id="rodada" ativa={secao}>
       {turma.calendario&&<div className="rounded-lg border border-slate-200 bg-white p-3 text-sm"><strong>{tituloPeriodo(turma.calendario)}</strong><p>{turma.calendario.sazonalidade.eventos.join(' · ')||'Sem data sazonal ativa'} · procura estimada: {turma.calendario.sazonalidade.demanda.toFixed(2)}×. Planeje produção, equipe, estoque, caixa e entregas. Fatores didáticos; não são previsões reais.</p></div>}
 
@@ -251,6 +253,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <details><summary>Consultar estrutura operacional da empresa</summary>{empresa.estado_simulacao && <PainelOperacional estado={empresa.estado_simulacao} modo={turma.modo_jogo} />}</details>
       </SecaoPainel>
       <SecaoPainel id="conquistas" ativa={secao}><Conquistas jornada={painel.jornada} /></SecaoPainel>
+      <SecaoPainel id="atualizacoes" ativa={secao}>{secao==='atualizacoes'&&<AtualizacoesOficiais empresaId={empresaId}/>}</SecaoPainel>
       <SecaoPainel id="mercado" ativa={secao}>
 
       <MercadoPublicado visao="mercado" empresaId={empresa.id} rodada={turma.rodada_atual} />
