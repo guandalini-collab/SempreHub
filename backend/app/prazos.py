@@ -21,10 +21,15 @@ def fechar_vencidas():
     from .database import SessionLocal
     from .motor.simulacao import processar_rodada
     from .routers.mercado import preparar_relatorios_automaticos
+    from .atualizacoes_oficiais import atualizar
     with SessionLocal() as db:
         ids = [t.id for t in db.query(Turma).filter(Turma.status == StatusTurma.ABERTA, Turma.prazo_rodada <= agora(), Turma.prazo_numero_rodada == Turma.rodada_atual).all()]
     for turma_id in ids:
         try:
+            # A rodada seguinte somente é aberta depois da tentativa de
+            # atualização oficial. Uma falha preserva a última edição
+            # confirmada e fica registrada no painel, sem paralisar a turma.
+            atualizar(forcar=True)
             with SessionLocal() as db:
                 turma = bloquear_turma(db, turma_id)
                 if not vencido(turma) or turma.status != StatusTurma.ABERTA:

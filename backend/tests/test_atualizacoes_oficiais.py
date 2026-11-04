@@ -35,6 +35,12 @@ def test_evidencia_obrigatoria_e_data(monkeypatch):
     with pytest.raises(ValueError):a.validar_boletim(boletim(),{URL},date(2026,11,4))
 
 
+def test_consulta_vazia_e_um_resultado_valido():
+    # Não há publicação elegível não é erro: evita que a IA invente uma
+    # atualização apenas para preencher a interface.
+    assert a.validar_boletim({'itens':[]},set(),date(2026,11,4))=={'itens':[]}
+
+
 def test_execucao_unica_e_falha_preserva_historico(cliente,monkeypatch):
     monkeypatch.setenv('OPENAI_API_KEY','somente-teste')
     chamadas=[]
@@ -60,6 +66,10 @@ def test_execucao_unica_e_falha_preserva_historico(cliente,monkeypatch):
     monkeypatch.setattr(a,'gerar_json',gerar)
     assert a.atualizar()
     assert len(chamadas)==2
+    # A abertura de uma nova rodada força nova consulta, ainda que a edição
+    # anterior esteja no intervalo regular de seis horas.
+    assert a.atualizar(forcar=True)
+    assert len(chamadas)==3
 
 
 def test_permissoes_e_nao_dispara_api_sem_chave(cliente,professor):

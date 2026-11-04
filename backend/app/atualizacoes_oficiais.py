@@ -42,14 +42,17 @@ class ItemOficial(BaseModel):
 
 class Boletim(BaseModel):
     model_config=ConfigDict(extra='forbid')
-    itens: list[ItemOficial]=Field(min_length=1,max_length=8)
+    # Uma consulta pode não encontrar nenhuma publicação que passe, ao mesmo
+    # tempo, pelo filtro oficial, pela data e pela prova literal. Isso é um
+    # resultado válido: o sistema registra a consulta vazia, sem inventar item.
+    itens: list[ItemOficial]=Field(min_length=0,max_length=8)
 
 
 def habilitado():
     return bool((os.getenv('OPENAI_API_KEY') or os.getenv('SEMPREHUB_OPENAI_API_KEY')) and os.getenv('SEMPREHUB_ATUALIZACAO_OFICIAL','1')=='1')
 
 
-def reservar(db, instante):
+def reservar(db, instante, forcar=False):
     if not db.get(ConsultaOficial,1):
         try:
             db.add(ConsultaOficial(id=1,estado='PENDENTE'))
@@ -59,13 +62,15 @@ def reservar(db, instante):
     # Reserva atômica também entre réplicas. Consultas confirmadas ficam seis
     # horas em cache; erros transitórios recebem apenas uma nova tentativa após
     # quinze minutos, sem transformar uma falha persistente em chamadas contínuas.
-    r=db.execute(update(ConsultaOficial).where(ConsultaOficial.id==1,
-        or_(ConsultaOficial.ocupado_ate.is_(None),ConsultaOficial.ocupado_ate<=instante),
-        or_(
+    criterios=[ConsultaOficial.id==1,
+        or_(ConsultaOficial.ocupado_ate.is_(None),ConsultaOficial.ocupado_ate<=instante)]
+    if not forcar:
+        criterios.append(or_(
             ConsultaOficial.tentado_em.is_(None),
             ConsultaOficial.tentado_em<=instante-INTERVALO,
             (ConsultaOficial.estado=='PENDENTE') & (ConsultaOficial.tentado_em<=instante-RETRY_FALHA),
         ))
+    r=db.execute(update(ConsultaOficial).where(*criterios)
         .values(tentado_em=instante,ocupado_ate=instante+timedelta(minutes=15),estado='CONSULTANDO',erro=None))
     db.commit()
     return r.rowcount==1
@@ -84,12 +89,18 @@ def validar_boletim(dados, fontes, hoje):
     return b.model_dump(mode='json')
 
 
-def atualizar():
+def atualizar(forcar=False):
+    """Consulta fontes oficiais.
+
+    A rotina periódica respeita o cache. Antes de abrir uma nova rodada,
+    ``forcar=True`` garante uma tentativa nova, sem reutilizar uma consulta
+    antiga. A reserva atômica continua impedindo duas chamadas simultâneas.
+    """
     if not habilitado():
         return False
     with SessionLocal() as db:
         instante=agora()
-        if not reservar(db,instante):
+        if not reservar(db,instante,forcar=forcar):
             return False
     try:
         from zoneinfo import ZoneInfo

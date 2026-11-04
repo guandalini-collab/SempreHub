@@ -254,6 +254,12 @@ def fechar_rodada(
     professor: Usuario = Depends(exigir_professor),
 ):
     turma = _turma_do_professor(db, turma_id, professor)
+    # A consulta ocorre antes de processar a rodada; assim os alunos recebem
+    # a nova etapa somente após uma tentativa atualizada em fontes oficiais.
+    # Se a fonte estiver indisponível, a última edição confirmada é mantida e
+    # o estado PENDENTE deixa isso explícito, em vez de inventar dados.
+    from ..atualizacoes_oficiais import atualizar
+    atualizar(forcar=True)
     turma = bloquear_turma(db, turma.id)
     verificar_rodada(dados.rodada, turma, obrigatoria=turma.modo_jogo != "LEGADO")
     pendencias = pendencias_fechamento(db, turma)
