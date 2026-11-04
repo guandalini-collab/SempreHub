@@ -68,7 +68,7 @@ class FonteInsegura(ValueError):
     pass
 
 
-def obter_documento(url, somente_oficial=False):
+def obter_documento(url, somente_oficial=True):
     """HTTPS público, IP fixado na conexão, redirects conferidos e resposta limitada."""
     for _ in range(4):
         if somente_oficial:

@@ -82,3 +82,9 @@ def test_pesquisa_nao_aceita_citacao_de_portal(monkeypatch):
     assert e.value.status_code==502
     assert 'gov.br' in vistos[0]['tools'][0]['filters']['allowed_domains']
     assert len(vistos)==1
+
+
+def test_leitura_recusa_fonte_nao_oficial_antes_de_acessar_rede(monkeypatch):
+    from app import evidencias_mercado as provas
+    monkeypatch.setattr(provas.socket,'getaddrinfo',lambda *args,**kwargs:(_ for _ in ()).throw(AssertionError('A rede não deve ser consultada.')))
+    with pytest.raises(provas.FonteInsegura):provas.obter_documento('https://portal-comercial.example/noticia')

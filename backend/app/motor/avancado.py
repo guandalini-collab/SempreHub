@@ -234,6 +234,8 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         bot["participacao_mercado"] = bot["unidades_vendidas"] / total_vendas if total_vendas else 0
         bot.pop("atratividade")
         bot.pop("capacidade")
+    from ..atualizacoes_oficiais import consultar as consultar_fontes
+    fontes_da_rodada = consultar_fontes(db)
     for empresa, d, a, demanda, preparo in zip(empresas, decisoes, apuracoes, demandas, preparos):
         empresa.estado_simulacao = deepcopy(a["estado"])
         empresa.caixa, empresa.divida, empresa.funcionarios = a["caixa"], a["divida"], a["funcionarios"]
@@ -259,8 +261,7 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
                         concorrentes_virtuais=deepcopy(bots), evento=evento.codigo, eventos=list(evento.codigos or (evento.codigo,)))
         from .metricas_semanais import gerar_metricas
         detalhes['metricas_semanais'] = gerar_metricas(a, (calendario or {}).get('dias', 30))
-        from ..atualizacoes_oficiais import consultar as consultar_fontes
-        detalhes['atualizacoes_oficiais'] = deepcopy(consultar_fontes(db))
+        detalhes['atualizacoes_oficiais'] = deepcopy(fontes_da_rodada)
         # Datas ORM não são valores JSON das fotografias.
         detalhes["parametros"].pop("criado_em", None)
         detalhes["decisao"].pop("enviada_em", None)
