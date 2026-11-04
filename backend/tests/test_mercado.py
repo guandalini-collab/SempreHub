@@ -136,6 +136,25 @@ def test_integracao_organiza_citacoes_sem_inventar_fontes(monkeypatch):
     assert "tools" not in requisicoes[1]
 
 
+def test_integracao_indica_modelo_ou_parametro_sem_vazar_resposta(monkeypatch):
+    import io
+    import urllib.error
+    import pytest
+    from fastapi import HTTPException
+    from app import inteligencia_mercado
+
+    erro = urllib.error.HTTPError(
+        "https://api.openai.com/v1/responses", 400, "Bad Request", {},
+        io.BytesIO(b'{"error":{"type":"invalid_request_error","param":"tools"}}'),
+    )
+    monkeypatch.setattr(inteligencia_mercado.urllib.request, "urlopen", lambda *_, **__: (_ for _ in ()).throw(erro))
+    with pytest.raises(HTTPException) as resposta:
+        inteligencia_mercado._solicitar({}, "segredo-que-nao-pode-aparecer")
+    assert resposta.value.status_code == 502
+    assert "tools" in resposta.value.detail
+    assert "segredo" not in resposta.value.detail
+
+
 def test_fontes_rastreamento_nao_altera_identidade_da_pagina():
     import pytest
     from fastapi import HTTPException

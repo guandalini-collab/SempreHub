@@ -38,7 +38,28 @@ def _solicitar(corpo, chave):
         with urllib.request.urlopen(req, timeout=120) as resposta:
             saida = json.load(resposta)
     except urllib.error.HTTPError as e:
-        raise HTTPException(502, f"A integração de pesquisa recusou a solicitação (HTTP {e.code}). Verifique credencial, saldo e acesso ao modelo.") from None
+        # A API não deve expor a resposta inteira: ela pode refletir trechos do
+        # pedido. Conservamos somente códigos estruturados e seguros para que o
+        # professor saiba se o ajuste é de modelo, permissão ou parâmetro.
+        detalhe = {}
+        try:
+            detalhe = json.loads(e.read().decode("utf-8")).get("error", {})
+        except (ValueError, UnicodeDecodeError, AttributeError):
+            pass
+        codigo = str(detalhe.get("code") or "").lower()
+        tipo = str(detalhe.get("type") or "").lower()
+        parametro = str(detalhe.get("param") or "")
+        if codigo in {"model_not_found", "unsupported_model"}:
+            motivo = "O modelo configurado não está disponível para esta credencial."
+        elif codigo in {"insufficient_quota", "billing_hard_limit_reached"}:
+            motivo = "Não há saldo ou limite disponível para a pesquisa."
+        elif codigo in {"invalid_api_key", "invalid_api_key_error"}:
+            motivo = "A credencial configurada não foi aceita."
+        elif tipo == "invalid_request_error" and parametro and parametro.replace("_", "").replace(".", "").replace("-", "").isalnum():
+            motivo = f"O parâmetro '{parametro[:80]}' não foi aceito pelo modelo configurado."
+        else:
+            motivo = "A solicitação de pesquisa foi recusada pelo provedor."
+        raise HTTPException(502, f"A integração de pesquisa recusou a solicitação (HTTP {e.code}). {motivo}") from None
     except (urllib.error.URLError, TimeoutError):
         raise HTTPException(502, "A pesquisa não respondeu. Tente novamente.") from None
     if saida.get("status") == "incomplete":
@@ -55,7 +76,9 @@ def gerar_json(instrucoes, dados, pesquisar=False, schema=None, permitir_projeco
     chave = os.getenv("OPENAI_API_KEY") or os.getenv("SEMPREHUB_OPENAI_API_KEY")
     if not chave:
         raise HTTPException(503, "Integração de pesquisa indisponível. Configure a credencial no serviço.")
-    corpo = {"model": os.getenv("SEMPREHUB_OPENAI_MODEL", "gpt-4.1-mini"), "store": False,
+    # GPT-5.4 Mini é o padrão atual de menor custo com suporte ao web search.
+    # A variável permite substituição controlada por ambiente, sem alterar código.
+    corpo = {"model": os.getenv("SEMPREHUB_OPENAI_MODEL", "gpt-5.4-mini"), "store": False,
              "max_output_tokens": 10000,
              "input": [{"role": "system", "content": instrucoes + " Responda exclusivamente com JSON válido."},
                        {"role": "user", "content": json.dumps(dados, ensure_ascii=False)}]}
