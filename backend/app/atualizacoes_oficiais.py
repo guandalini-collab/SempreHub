@@ -159,6 +159,7 @@ def atualizar(forcar=False):
             db.add(BoletimOficial(dados=validado,consultado_em=agora()))
             c=db.get(ConsultaOficial,1);c.estado='CONSULTADO';c.ocupado_ate=None;c.erro=None
             db.commit()
+        logging.getLogger(__name__).info('Consulta oficial confirmada com %s item(ns).',len(validado['itens']))
         return True
     except Exception as erro:
         # Nunca gravar corpo da API, credenciais ou dados pessoais no log.
