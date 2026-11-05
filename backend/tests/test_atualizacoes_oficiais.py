@@ -41,6 +41,14 @@ def test_consulta_vazia_e_um_resultado_valido():
     assert a.validar_boletim({'itens':[]},set(),date(2026,11,4))=={'itens':[]}
 
 
+def test_descarta_apenas_item_sem_prova(monkeypatch):
+    invalido=boletim()
+    invalido['itens'][0]['url']='https://www.ibge.gov.br/documento-movido'
+    dados={'itens':[boletim()['itens'][0],invalido['itens'][0]]}
+    monkeypatch.setattr(a,'obter_documento',lambda url,somente_oficial:SimpleNamespace(texto=a.normalizar(TEXTO) if url==URL else ''))
+    assert a.validar_itens_confirmados(dados,{URL,'https://www.ibge.gov.br/documento-movido'},date(2026,11,4))==boletim()
+
+
 def test_execucao_unica_e_falha_preserva_historico(cliente,monkeypatch):
     monkeypatch.setenv('OPENAI_API_KEY','somente-teste')
     chamadas=[]
@@ -70,6 +78,16 @@ def test_execucao_unica_e_falha_preserva_historico(cliente,monkeypatch):
     # anterior esteja no intervalo regular de seis horas.
     assert a.atualizar(forcar=True)
     assert len(chamadas)==3
+
+
+def test_repete_pesquisa_quando_primeira_resposta_nao_tem_prova(cliente,monkeypatch):
+    monkeypatch.setenv('OPENAI_API_KEY','somente-teste')
+    invalido=boletim()
+    invalido['itens'][0]['url']='https://www.ibge.gov.br/documento-movido'
+    respostas=[(invalido,{'https://www.ibge.gov.br/documento-movido'}),(boletim(),{URL})]
+    monkeypatch.setattr(a,'gerar_json',lambda *args:respostas.pop(0))
+    monkeypatch.setattr(a,'obter_documento',lambda url,somente_oficial:SimpleNamespace(texto=a.normalizar(TEXTO) if url==URL else ''))
+    assert a.atualizar(forcar=True)
 
 
 def test_permissoes_e_nao_dispara_api_sem_chave(cliente,professor):
