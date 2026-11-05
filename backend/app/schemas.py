@@ -1,6 +1,6 @@
 """Esquemas de entrada da API (validação dos dados enviados pelo navegador)."""
 
-from datetime import date
+from datetime import date, time
 from math import isclose
 from typing import Annotated, List, Literal, Optional
 
@@ -169,6 +169,30 @@ class ParametrosTurma(BaseModel):
 
 class TurmaEntrada(ParametrosTurma):
     nome: str = Field(min_length=1, max_length=120)
+
+
+class AgendaAcademicaEntrada(BaseModel):
+    """Calendário real da disciplina; a simulação continua com períodos semanais."""
+
+    inicio_letivo: date
+    fim_letivo: date
+    dia_semana: int = Field(ge=0, le=6, description="0=segunda-feira; 6=domingo")
+    horario_inicio: time
+    recessos: list[date] = Field(default_factory=list, max_length=80)
+
+    @model_validator(mode="after")
+    def validar_periodo(self):
+        if self.fim_letivo < self.inicio_letivo:
+            raise ValueError("O fim do período letivo deve ocorrer depois do início.")
+        if any(data < self.inicio_letivo or data > self.fim_letivo for data in self.recessos):
+            raise ValueError("Os recessos devem estar dentro do período letivo.")
+        return self
+
+
+class ProfessorConvidadoEntrada(BaseModel):
+    nome: str = Field(min_length=3, max_length=120)
+    email: str = Field(min_length=5, max_length=200)
+    senha_provisoria: str = Field(min_length=8, max_length=128)
 
 
 class FecharRodadaEntrada(BaseModel):

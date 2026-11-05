@@ -93,8 +93,14 @@ def usuario_atual(
 
 
 def exigir_professor(usuario: Usuario = Depends(usuario_atual)) -> Usuario:
-    if usuario.papel != Papel.PROFESSOR:
+    if usuario.papel not in (Papel.PROFESSOR, Papel.PROPRIETARIO):
         raise HTTPException(status_code=403, detail="Acesso restrito a professores.")
+    return usuario
+
+
+def exigir_proprietario(usuario: Usuario = Depends(usuario_atual)) -> Usuario:
+    if usuario.papel != Papel.PROPRIETARIO:
+        raise HTTPException(status_code=403, detail="Acesso restrito ao proprietário do SempreHub.")
     return usuario
 
 

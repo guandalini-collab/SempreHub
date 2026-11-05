@@ -39,6 +39,7 @@ def agora() -> datetime:
 class Papel(str, enum.Enum):
     ALUNO = "ALUNO"
     PROFESSOR = "PROFESSOR"
+    PROPRIETARIO = "PROPRIETARIO"
 
 
 class FaseAtual(str, enum.Enum):
@@ -122,6 +123,10 @@ class Turma(Base):
     versao_motor = Column(Integer, nullable=False, default=1, server_default="1")
     prazo_rodada = Column(DateTime, nullable=True)
     prazo_numero_rodada = Column(Integer, nullable=True)
+    # Agenda real de aulas: independente do calendário simulado semanal.
+    # A abertura impede decisões antes do encontro programado.
+    abertura_rodada = Column(DateTime, nullable=True)
+    agenda_academica = Column(JSON, nullable=True)
     criado_em = Column(DateTime, default=agora)
 
     # Parâmetros de mercado e de custos (ajustáveis pelo professor antes da 1ª rodada)

@@ -71,14 +71,14 @@ export default function App() {
     irPara("/");
   }
 
-  const ehProfessor = usuario.papel === "PROFESSOR";
+  const ehProfessor = usuario.papel === "PROFESSOR" || usuario.papel === "PROPRIETARIO";
   let conteudo: React.ReactNode;
   if (ehProfessor) {
     conteudo =
       rota.pagina === "turma" ? (
         <PainelTurma key={rota.id} turmaId={rota.id} />
       ) : (
-        <InicioProfessor abrirTurma={(id) => irPara(`/turma/${id}`)} />
+        <InicioProfessor proprietario={usuario.papel === "PROPRIETARIO"} abrirTurma={(id) => irPara(`/turma/${id}`)} />
       );
   } else {
     conteudo =

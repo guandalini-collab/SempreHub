@@ -1,5 +1,5 @@
 from copy import deepcopy
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import pytest
 from app.motor.calendario import periodo, adaptar
 from app.motor import tradicional, startup
@@ -111,3 +111,35 @@ def test_migracao_depois_de_mes_nao_altera_mes_fechado(cliente,professor):
     painel=cliente.get(f'/api/aluno/empresas/{eid}',headers=aluno).json()
     assert painel['resultados'][0]==antigo
     assert painel['resultados'][1]['detalhes_simulacao']['calendario']['inicio']=='2026-10-15'
+
+
+def test_agenda_academica_programa_todas_rodadas_e_bloqueia_antes_da_aula(cliente, professor):
+    turma = _criar_turma(cliente, professor, modo_jogo='TRADICIONAL', total_rodadas=3)
+    resposta = cliente.put(
+        f"/api/professor/turmas/{turma['id']}/agenda-academica",
+        headers=professor,
+        json={
+            'inicio_letivo': '2027-02-01', 'fim_letivo': '2027-04-30',
+            'dia_semana': 0, 'horario_inicio': '19:00:00', 'recessos': ['2027-02-15'],
+        },
+    )
+    assert resposta.status_code == 200, resposta.text
+    agenda = resposta.json()['agenda_academica']
+    assert [item['rodada'] for item in agenda['rodadas']] == [1, 2, 3]
+    # O recesso pula a semana de 15/02 e alonga a janela anterior.
+    assert agenda['rodadas'][2]['aula'] == '2027-02-22'
+    assert resposta.json()['abertura_rodada'].startswith('2027-02-01T22:00:00')
+    manual = cliente.put(
+        f"/api/professor/turmas/{turma['id']}/prazo", headers=professor,
+        json={'data':'2027-02-03','rodada':1},
+    )
+    assert manual.status_code == 422
+    assert 'programação acadêmica' in manual.json()['detail']
+    from app.prazos import validar_salvamento
+    from fastapi import HTTPException
+    from types import SimpleNamespace
+    janela = agenda['rodadas'][0]
+    modelo = SimpleNamespace(rodada_atual=1, prazo_numero_rodada=1,
+        abertura_rodada=datetime.fromisoformat(janela['abre_em'].replace('Z','+00:00')).replace(tzinfo=None), prazo_rodada=None)
+    with pytest.raises(HTTPException, match='calendário acadêmico'):
+        validar_salvamento(modelo, 1, modelo.abertura_rodada-timedelta(seconds=1))

@@ -52,6 +52,10 @@ DOMINIOS_PROFESSOR = _lista(
 )
 # Código exigido para criar conta de professor (impede que alunos se cadastrem como docentes)
 CODIGO_DOCENTE = os.getenv("SEMPREHUB_CODIGO_DOCENTE", "docente-iffar")
+# Conta(s) que administram a instalação. Elas não são criadas pelo cadastro
+# público: uma conta docente existente é promovida ao entrar, caso seu e-mail
+# esteja nesta lista. Ex.: SEMPREHUB_PROPRIETARIOS=gestor@instituicao.edu.br
+PROPRIETARIOS = _lista(os.getenv("SEMPREHUB_PROPRIETARIOS", ""))
 
 # Endereço público do sistema, usado no link de recuperação de senha
 URL_PUBLICA = os.getenv("SEMPREHUB_URL_PUBLICA", "http://127.0.0.1:8000").rstrip("/")

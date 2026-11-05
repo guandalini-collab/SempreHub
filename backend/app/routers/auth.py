@@ -42,6 +42,9 @@ def _lista_dominios(dominios) -> str:
 def cadastrar(dados: CadastroEntrada, db: Session = Depends(get_db)):
     email = normalizar_email(dados.email)
 
+    if dados.papel == Papel.PROPRIETARIO:
+        raise HTTPException(403, "A conta de proprietário é definida somente pela configuração segura do SempreHub.")
+
     if dados.papel == Papel.ALUNO:
         if _dominio(email) not in config.DOMINIOS_ALUNO:
             mensagem = f"Use seu e-mail institucional de aluno: {_lista_dominios(config.DOMINIOS_ALUNO)}."
@@ -79,6 +82,12 @@ def entrar(dados: LoginEntrada, db: Session = Depends(get_db)):
     usuario = db.query(Usuario).filter(Usuario.email == email).first()
     if usuario is None or not verificar_senha(dados.senha, usuario.senha_hash):
         raise HTTPException(401, "E-mail ou senha incorretos.")
+    # A promoção é declarativa e auditável pela variável de ambiente. Assim não
+    # há código secreto na interface nem um professor convidado que consiga se
+    # promover sozinho.
+    if email in config.PROPRIETARIOS and usuario.papel == Papel.PROFESSOR:
+        usuario.papel = Papel.PROPRIETARIO
+        db.flush()
     # A sessão emitida usa a versão cuja senha foi verificada. Uma troca
     # concorrente de senha deve revogá-la, mesmo se o commit expirar o usuário.
     token = criar_token(usuario)

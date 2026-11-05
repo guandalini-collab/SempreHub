@@ -8,7 +8,9 @@ import AlunosTeste from "./AlunosTeste";
 import ConfiguracaoSimulacao from "../../componentes/ConfiguracaoSimulacao";
 import { EditorParametros, useParametros } from "./Parametros";
 
-export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: number) => void }) {
+type Docente={id:number;nome:string;email:string;turmas:number};
+
+export default function InicioProfessor({ abrirTurma, proprietario=false }: { abrirTurma: (id: number) => void; proprietario?:boolean }) {
   const [turmas, setTurmas] = useState<Turma[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [criando, setCriando] = useState(false);
@@ -40,7 +42,7 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
         {!criando && <Botao onClick={() => {setCriando(true);setAba("turmas");}}>Nova turma</Botao>}
       </div>
 
-      <nav className="etapas-curtas" aria-label="Área do professor">{[{id:"turmas",titulo:"Minhas turmas"},{id:"teste",titulo:"Alunos de teste"},{id:"referencias",titulo:"Referências"},{id:"marca",titulo:"Identidade do programa"}].map(a=><button key={a.id} type="button" aria-pressed={aba===a.id} onClick={()=>{setAba(a.id);setCriando(false);}}>{a.titulo}</button>)}</nav>
+      <nav className="etapas-curtas" aria-label="Área do professor">{[{id:"turmas",titulo:proprietario?"Turmas do SempreHub":"Minhas turmas"},...(proprietario?[{id:"professores",titulo:"Professores"}]:[]),{id:"teste",titulo:"Alunos de teste"},{id:"referencias",titulo:"Referências"},{id:"marca",titulo:"Identidade do programa"}].map(a=><button key={a.id} type="button" aria-pressed={aba===a.id} onClick={()=>{setAba(a.id);setCriando(false);}}>{a.titulo}</button>)}</nav>
       {turmas.length===0&&!criando&&aba==="turmas"&&<TourGuiado perfil="PROFESSOR"/>}
 
       {criando && (
@@ -76,6 +78,7 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
 
       <nav aria-label="Paginação de turmas" className="flex justify-between text-sm"><button disabled={pagina===0} onClick={()=>setPagina(pagina-1)}>← Anterior</button><span>{filtradas.length} turma(s) · Página {pagina+1}</span><button disabled={(pagina+1)*3>=filtradas.length} onClick={()=>setPagina(pagina+1)}>Próxima →</button></nav></>}
       {aba==="teste"&&<AlunosTeste />}
+      {aba==="professores"&&proprietario&&<GestaoProfessores />}
       {aba==="referencias"&&<BibliotecaAprendizagem />}
       {aba==="marca"&&<Cartao titulo="Comunicação do programa">
         <p className="mb-2 text-sm text-slate-600">Use a identidade do SempreHub nos materiais de apresentação da turma.</p>
@@ -83,6 +86,14 @@ export default function InicioProfessor({ abrirTurma }: { abrirTurma: (id: numbe
       </Cartao>}
     </div>
   );
+}
+
+function GestaoProfessores(){
+ const [docentes,setDocentes]=useState<Docente[]|null>(null);const [nome,setNome]=useState('');const [email,setEmail]=useState('');const [senha,setSenha]=useState('');const [erro,setErro]=useState<string|null>(null);const [mensagem,setMensagem]=useState<string|null>(null);const [salvando,setSalvando]=useState(false);
+ const carregar=()=>api.get<Docente[]>('/api/professor/proprietario/professores').then(setDocentes).catch(e=>setErro(e instanceof Error?e.message:'Não foi possível carregar os professores.'));
+ useEffect(()=>{carregar();},[]);
+ async function criar(e:React.FormEvent){e.preventDefault();setErro(null);setMensagem(null);setSalvando(true);try{const r=await api.post<{mensagem:string}>('/api/professor/proprietario/professores',{nome,email,senha_provisoria:senha});setMensagem(r.mensagem);setNome('');setEmail('');setSenha('');carregar();}catch(e){setErro(e instanceof Error?e.message:'Não foi possível criar a conta.');}finally{setSalvando(false);}}
+ return <div className="grid gap-4 lg:grid-cols-2"><Cartao titulo="Conceder acesso docente"><p className="mb-4 text-sm text-slate-600">A conta criada aqui acessa apenas as turmas sob responsabilidade do professor. Ela não visualiza a administração geral do SempreHub.</p><form className="space-y-3" onSubmit={criar}><Campo rotulo="Nome"><input required className={estiloEntrada} value={nome} onChange={e=>setNome(e.target.value)}/></Campo><Campo rotulo="E-mail institucional"><input required type="email" className={estiloEntrada} value={email} onChange={e=>setEmail(e.target.value)}/></Campo><Campo rotulo="Senha provisória" ajuda="Compartilhe-a apenas por um canal seguro."><input required minLength={8} type="password" className={estiloEntrada} value={senha} onChange={e=>setSenha(e.target.value)}/></Campo>{erro&&<Aviso>{erro}</Aviso>}{mensagem&&<p role="status" className="text-sm text-emerald-700">{mensagem}</p>}<Botao type="submit" carregando={salvando}>Criar acesso de professor</Botao></form></Cartao><Cartao titulo="Professores com acesso">{docentes===null?<Carregando/>:docentes.length===0?<p>Nenhum professor convidado ainda.</p>:<div className="space-y-3">{docentes.map(d=><div key={d.id} className="rounded-lg border border-slate-200 p-3"><strong>{d.nome}</strong><p className="text-sm text-slate-600">{d.email} · {d.turmas} turma(s)</p></div>)}</div>}</Cartao></div>;
 }
 
 function NovaTurma({ aoCriar, aoCancelar }: { aoCriar: (t: Turma) => void; aoCancelar?: () => void }) {

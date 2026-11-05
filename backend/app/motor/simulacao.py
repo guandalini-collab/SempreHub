@@ -255,6 +255,11 @@ def processar_rodada(
     turma.rodada_atual = rodada + 1
     if turma.rodada_atual > turma.total_rodadas:
         turma.status = StatusTurma.ENCERRADA
+    else:
+        # Caso exista agenda acadêmica, o próximo período só fica disponível
+        # na aula programada. Sem agenda, preserva o funcionamento manual.
+        from ..agenda_academica import aplicar_proxima_janela
+        aplicar_proxima_janela(turma)
 
     db.commit()
     return db.query(EventoRodada).filter_by(turma_id=turma.id, rodada=rodada).one()

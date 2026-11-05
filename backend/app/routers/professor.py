@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
+from .. import config
 from .. import serializacao as ser
 from ..experiencia import jornada_empresa
 from ..database import get_db
@@ -18,8 +19,8 @@ from ..equipes import bloquear_turma, novo_convite, invalidar_aprovacoes, regist
 from ..models import MatriculaTurma, Decisao, Empresa, MembroEmpresa, Papel, Resultado, StatusTurma, Turma, Usuario
 from ..motor.eventos import opcoes_evento
 from ..motor.simulacao import processar_rodada
-from ..schemas import AlunoTesteEntrada, FecharRodadaEntrada, ParametrosTurma, TurmaEntrada
-from ..seguranca import exigir_professor, gerar_hash_senha, trocar_senha
+from ..schemas import AgendaAcademicaEntrada, AlunoTesteEntrada, FecharRodadaEntrada, ParametrosTurma, ProfessorConvidadoEntrada, TurmaEntrada
+from ..seguranca import exigir_professor, exigir_proprietario, gerar_hash_senha, trocar_senha
 from .auth import normalizar_email
 
 router = APIRouter(prefix="/api/professor", tags=["professor"])
@@ -36,7 +37,7 @@ def _gerar_codigo(db: Session) -> str:
 
 def _turma_do_professor(db: Session, turma_id: int, professor: Usuario) -> Turma:
     turma = db.get(Turma, turma_id)
-    if turma is None or turma.professor_id != professor.id:
+    if turma is None or (turma.professor_id != professor.id and professor.papel != Papel.PROPRIETARIO):
         raise HTTPException(404, "Turma não encontrada.")
     return turma
 
@@ -48,8 +49,47 @@ def listar_eventos(_: Usuario = Depends(exigir_professor)):
 
 @router.get("/turmas")
 def listar_turmas(db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
-    turmas = db.query(Turma).filter(Turma.professor_id == professor.id).order_by(Turma.id.desc()).all()
+    consulta = db.query(Turma)
+    if professor.papel != Papel.PROPRIETARIO:
+        consulta = consulta.filter(Turma.professor_id == professor.id)
+    turmas = consulta.order_by(Turma.id.desc()).all()
     return [ser.turma(t) for t in turmas]
+
+
+@router.get("/proprietario/professores")
+def listar_professores(db: Session = Depends(get_db), _: Usuario = Depends(exigir_proprietario)):
+    docentes = db.query(Usuario).filter(Usuario.papel == Papel.PROFESSOR).order_by(Usuario.nome).all()
+    return [
+        {
+            "id": docente.id,
+            "nome": docente.nome,
+            "email": docente.email,
+            "turmas": db.query(Turma).filter(Turma.professor_id == docente.id).count(),
+        }
+        for docente in docentes
+    ]
+
+
+@router.post("/proprietario/professores", status_code=201)
+def convidar_professor(
+    dados: ProfessorConvidadoEntrada,
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(exigir_proprietario),
+):
+    email = normalizar_email(dados.email)
+    dominio = email.rsplit("@", 1)[-1]
+    if dominio not in config.DOMINIOS_PROFESSOR:
+        dominios = " ou ".join(f"@{item}" for item in config.DOMINIOS_PROFESSOR)
+        raise HTTPException(422, f"Use um e-mail docente autorizado: {dominios}.")
+    if db.query(Usuario).filter(Usuario.email == email).first():
+        raise HTTPException(409, "Já existe uma conta com este e-mail.")
+    docente = Usuario(
+        nome=dados.nome.strip(), email=email, senha_hash=gerar_hash_senha(dados.senha_provisoria), papel=Papel.PROFESSOR,
+    )
+    db.add(docente)
+    db.commit()
+    db.refresh(docente)
+    return {"id": docente.id, "nome": docente.nome, "email": docente.email, "mensagem": "Conta docente criada. Compartilhe a senha provisória por um canal seguro."}
 
 
 @router.post("/turmas", status_code=201)
@@ -104,6 +144,49 @@ def definir_calendario(turma_id: int, dados: CalendarioEntrada, db: Session = De
         empresa.estado_simulacao = estado
     turma.configuracao_simulacao = cfg
     db.commit()
+    return ser.turma(turma, completa=True)
+
+
+@router.put("/turmas/{turma_id}/agenda-academica")
+def programar_agenda_academica(
+    turma_id: int,
+    dados: AgendaAcademicaEntrada,
+    db: Session = Depends(get_db),
+    professor: Usuario = Depends(exigir_professor),
+):
+    """Programa todas as janelas reais de decisão a partir dos encontros da disciplina."""
+    turma = _turma_do_professor(db, turma_id, professor)
+    turma = bloquear_turma(db, turma.id)
+    if turma.status != StatusTurma.ABERTA:
+        raise HTTPException(422, "A simulação já foi encerrada.")
+    if db.query(Decisao).join(Empresa).filter(Empresa.turma_id == turma.id, Decisao.rodada == turma.rodada_atual).first():
+        raise HTTPException(422, "Programe o calendário antes de salvar decisões da rodada atual.")
+    from ..agenda_academica import aplicar_proxima_janela, criar_agenda, descricao
+    rodadas = criar_agenda(dados, turma.rodada_atual, turma.total_rodadas)
+    turma.agenda_academica = {
+        "inicio_letivo": dados.inicio_letivo.isoformat(),
+        "fim_letivo": dados.fim_letivo.isoformat(),
+        "dia_semana": dados.dia_semana,
+        "dia_descricao": descricao(dados.dia_semana),
+        "horario_inicio": dados.horario_inicio.strftime("%H:%M"),
+        "recessos": sorted(data.isoformat() for data in dados.recessos),
+        "rodadas": rodadas,
+    }
+    # O calendário econômico semanal deve acompanhar o primeiro encontro;
+    # resultados históricos continuam imutáveis.
+    if turma.modo_jogo != "LEGADO":
+        from ..motor.avancado import config
+        configuracao = config(turma)
+        configuracao.update(
+            periodicidade="SEMANAL",
+            data_inicio_simulada=rodadas[0]["aula"],
+            rodada_inicio_calendario=turma.rodada_atual,
+            calendario_automatico=True,
+        )
+        turma.configuracao_simulacao = configuracao
+    aplicar_proxima_janela(turma)
+    db.commit()
+    db.refresh(turma)
     return ser.turma(turma, completa=True)
 
 
@@ -528,6 +611,8 @@ def configurar_prazo(turma_id: int, dados: PrazoEntrada, db: Session = Depends(g
     verificar_rodada(dados.rodada, turma, True)
     if turma.status != StatusTurma.ABERTA:
         raise HTTPException(409, "A turma está encerrada.")
+    if turma.agenda_academica:
+        raise HTTPException(422, "Esta turma segue a programação acadêmica. Ajuste o calendário para alterar as datas das rodadas.")
     limite = limite_brasilia(dados.data) if dados.data else None
     if limite and limite <= agora():
         raise HTTPException(422, "Escolha uma data cujo limite ainda não tenha passado em Brasília.")

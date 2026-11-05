@@ -48,7 +48,7 @@ const ITENS_PAINEL = [
   {id: "manuais", titulo: "Manuais", descricao: "Consulte ou baixe os manuais em PDF.", simbolo: "", grupo: "Manuais"},
   { id: "visao", titulo: "Visão geral", descricao: "Confira o nome da turma e libere seu ingresso para os alunos.", simbolo: "", grupo: "Preparar turma" },
   { id: "ingresso", titulo: "Ingresso e formação", descricao: "Organize a entrada e as equipes.", simbolo: "", grupo: "Preparar turma" },
-  { id: "calendario", titulo: "Calendário simulado", descricao: "Defina o calendário e a sazonalidade.", simbolo: "", grupo: "Preparar turma" },
+  { id: "calendario", titulo: "Calendário acadêmico", descricao: "Programe as rodadas pela agenda de aulas.", simbolo: "", grupo: "Preparar turma" },
   { id: "configuracao", titulo: "2. Configurar simulação", descricao: "Revise os parâmetros antes de orientar os alunos.", simbolo: "", grupo: "Preparar turma" },
   { id: "parametros", titulo: "Parâmetros", descricao: "Revise e ajuste os parâmetros da turma.", simbolo: "", grupo: "Preparar turma", pai: "configuracao" },
   { id: "equipes", titulo: "3. Conferir participantes", descricao: "Confira alunos, empresas e pendências de envio.", simbolo: "", grupo: "Preparar turma" },
@@ -140,7 +140,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
       <SecaoPainel id="atualizacoes" ativa={secao}>{secao==='atualizacoes'&&<AtualizacoesOficiais turmaId={turma.id}/>}</SecaoPainel>
       <SecaoPainel id="calendario" ativa={secao}><CalendarioTurma turma={turma} aoSalvar={carregar}/></SecaoPainel>
       <SecaoPainel id="concorrencia" ativa={secao}><CompetitividadeMercado config={turma.parametros?.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} equipes={empresas.length}/></SecaoPainel>
-      <SecaoPainel id="prazo" ativa={secao}>{aberta ? <PrazoRodada turmaId={turma.id} rodada={turma.rodada_atual} prazo={turma.prazo_rodada} aoSalvar={carregar}/> : <p>Simulação encerrada.</p>}</SecaoPainel>
+      <SecaoPainel id="prazo" ativa={secao}>{aberta ? (turma.agenda_academica ? <Cartao titulo="Prazo programado"><p className="text-sm">Esta turma segue o calendário acadêmico. A rodada atual abre em <strong>{turma.abertura_rodada ? new Date(turma.abertura_rodada).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'}) : 'data a confirmar'}</strong> e fecha automaticamente no encontro seguinte.</p><p className="mt-3 text-sm">Para alterar todas as datas, use a seção <strong>Calendário acadêmico</strong> em Preparar turma.</p></Cartao> : <PrazoRodada turmaId={turma.id} rodada={turma.rodada_atual} prazo={turma.prazo_rodada} aoSalvar={carregar}/>) : <p>Simulação encerrada.</p>}</SecaoPainel>
       {erro && <Aviso>{erro}</Aviso>}
 
       <SecaoPainel id="mercado" ativa={secao}>

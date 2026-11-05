@@ -1,7 +1,7 @@
 import type { PlanoComercial } from "./componentes/MercadoReal";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, CenarioJogo, PreviaSimulacao } from "./tiposSimulacao";
 
-export type Papel = "ALUNO" | "PROFESSOR";
+export type Papel = "ALUNO" | "PROFESSOR" | "PROPRIETARIO";
 export type RegimeTributario = "MEI" | "SIMPLES_NACIONAL" | "LUCRO_PRESUMIDO";
 export type FaseAtual =
   | "IDEACAO"
@@ -47,6 +47,8 @@ export interface Parametros {
 export interface Turma {
   calendario?: import("./calendario").CalendarioSimulado | null;
   prazo_rodada?: string | null;
+  abertura_rodada?: string | null;
+  agenda_academica?: AgendaAcademica | null;
   visivel_ingresso: boolean;
   formacao_encerrada: boolean;
   modo_jogo: ModoJogo;
@@ -63,6 +65,16 @@ export interface Turma {
   quantidade_empresas: number;
   parametros?: Parametros;
   greve_rodadas_restantes?: number;
+}
+
+export interface AgendaAcademica {
+  inicio_letivo: string;
+  fim_letivo: string;
+  dia_semana: number;
+  dia_descricao: string;
+  horario_inicio: string;
+  recessos: string[];
+  rodadas: {rodada:number; abre_em:string; fecha_em:string; aula:string}[];
 }
 
 export interface Empresa {

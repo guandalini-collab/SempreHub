@@ -14,7 +14,12 @@ def vencido(turma, instante=None):
     return bool(turma.prazo_rodada and turma.prazo_numero_rodada == turma.rodada_atual and (instante or agora()) >= turma.prazo_rodada)
 
 def validar_salvamento(turma, rodada=None, instante=None):
-    if turma.prazo_rodada and (rodada is None or rodada == turma.prazo_numero_rodada) and (instante or agora()) >= turma.prazo_rodada:
+    instante = instante or agora()
+    abertura = getattr(turma, "abertura_rodada", None)
+    if abertura and (rodada is None or rodada == turma.rodada_atual) and instante < abertura:
+        inicio = abertura.replace(tzinfo=timezone.utc).astimezone(BRASILIA).strftime("%d/%m/%Y às %H:%M")
+        raise HTTPException(403, f"A rodada abre conforme o calendário acadêmico em {inicio} (horário de Brasília).")
+    if turma.prazo_rodada and (rodada is None or rodada == turma.prazo_numero_rodada) and instante >= turma.prazo_rodada:
         raise HTTPException(403, "Prazo encerrado às 23:59:59 de Brasília. A rodada é encerrada automaticamente; atualize o painel para consultar o próximo mês.")
 
 def fechar_vencidas():

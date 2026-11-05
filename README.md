@@ -145,7 +145,7 @@ python -m pytest
 O caminho mais simples é a imagem Docker, que compila o frontend e serve tudo pelo FastAPI numa única porta:
 
 ```bash
-cp .env.example .env        # ajuste SEMPREHUB_SECRET_KEY, SEMPREHUB_CODIGO_DOCENTE e DATABASE_URL
+cp .env.example .env        # ajuste SEMPREHUB_SECRET_KEY, SEMPREHUB_CODIGO_DOCENTE, SEMPREHUB_PROPRIETARIOS e DATABASE_URL
 docker build -t semprehub .
 docker run -d -p 8000:8000 --env-file .env -v semprehub-dados:/app/dados semprehub
 ```
@@ -205,6 +205,7 @@ Veja `.env.example`. As principais:
 | `SEMPREHUB_AMBIENTE` | `producao` exige chave secreta e código docente próprios. |
 | `SEMPREHUB_SECRET_KEY` | Assina os tokens de login. |
 | `SEMPREHUB_CODIGO_DOCENTE` | Código exigido no cadastro de professores. |
+| `SEMPREHUB_PROPRIETARIOS` | E-mails das contas proprietárias, separados por vírgula. Uma conta docente indicada aqui recebe o painel de gestão ao entrar novamente. |
 | `DATABASE_URL` | SQLite (padrão) ou `postgresql://...`. |
 | `SEMPREHUB_DOMINIOS_ALUNO` / `SEMPREHUB_DOMINIOS_PROFESSOR` | Domínios de e-mail aceitos. |
 | `SEMPREHUB_URL_PUBLICA` | Endereço do sistema usado no link de recuperação de senha. |
