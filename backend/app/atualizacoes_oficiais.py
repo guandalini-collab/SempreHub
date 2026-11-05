@@ -137,10 +137,12 @@ def atualizar(forcar=False):
     antiga. A reserva atômica continua impedindo duas chamadas simultâneas.
     """
     if not habilitado():
+        logging.getLogger(__name__).warning('Consulta oficial não iniciada: credencial ou recurso de atualização indisponível.')
         return False
     with SessionLocal() as db:
         instante=agora()
         if not reservar(db,instante,forcar=forcar):
+            logging.getLogger(__name__).info('Consulta oficial aguardando reserva ativa ou intervalo de atualização.')
             return False
     try:
         from zoneinfo import ZoneInfo

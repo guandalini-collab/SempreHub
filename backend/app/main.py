@@ -76,12 +76,17 @@ async def iniciar_calendario():
     app.state.calendario = asyncio.create_task(executar())
     from .atualizacoes_oficiais import atualizar
     async def consultar_fontes():
+        primeira_execucao=True
         while True:
             try:
-                await asyncio.to_thread(atualizar)
+                # Na inicialização, não reutilize uma consulta interrompida por
+                # deploy. A tentativa obrigatória acontece antes de a turma
+                # voltar a operar; depois disso o intervalo regular prevalece.
+                await asyncio.to_thread(atualizar, primeira_execucao)
             except Exception:
                 import logging
                 logging.getLogger(__name__).warning('Serviço de atualização oficial pendente; nova tentativa automática.')
+            primeira_execucao=False
             await asyncio.sleep(300)
     app.state.atualizacoes = asyncio.create_task(consultar_fontes())
 
