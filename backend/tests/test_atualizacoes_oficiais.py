@@ -1,4 +1,4 @@
-from datetime import date,timedelta
+from datetime import date,datetime,timedelta
 from types import SimpleNamespace
 import pytest
 from app import atualizacoes_oficiais as a
@@ -88,6 +88,18 @@ def test_repete_pesquisa_quando_primeira_resposta_nao_tem_prova(cliente,monkeypa
     monkeypatch.setattr(a,'gerar_json',lambda *args:respostas.pop(0))
     monkeypatch.setattr(a,'obter_documento',lambda url,somente_oficial:SimpleNamespace(texto=a.normalizar(TEXTO) if url==URL else ''))
     assert a.atualizar(forcar=True)
+
+
+def test_fallback_selic_usa_api_oficial_bcb(monkeypatch):
+    class Resposta:
+        def read(self): return b'[{"data":"04/11/2026","valor":"12.25"}]'
+        def __enter__(self): return self
+        def __exit__(self,*args): return False
+    monkeypatch.setattr(a.urllib.request,'urlopen',lambda *args,**kwargs:Resposta())
+    item=a.indicador_selic_bcb()
+    assert item['instituicao']=='Banco Central do Brasil (SGS)'
+    assert item['publicado_em']<='2026-11-05'
+    assert item['url'].startswith('https://api.bcb.gov.br/')
 
 
 def test_permissoes_e_nao_dispara_api_sem_chave(cliente,professor):

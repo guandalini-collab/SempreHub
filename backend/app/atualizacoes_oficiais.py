@@ -1,8 +1,12 @@
 """Boletins oficiais automáticos, sem reescrever resultados nem executar código da IA."""
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+import json
 import logging
 import os
 from typing import Literal
+import urllib.error
+import urllib.parse
+import urllib.request
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 from sqlalchemy import or_, update
 from sqlalchemy.exc import IntegrityError
@@ -129,6 +133,44 @@ def prompt_atualizacao(tentativa):
     return instrucao
 
 
+def indicador_selic_bcb():
+    """Obtém a Selic diretamente da API SGS do Banco Central.
+
+    É o caminho determinístico de continuidade do boletim: a API pública do
+    BCB é uma fonte primária estruturada, portanto não depende de a IA
+    reproduzir um trecho de página ou de um portal de notícias intermediário.
+    """
+    from zoneinfo import ZoneInfo
+    hoje=datetime.now(ZoneInfo('America/Sao_Paulo')).date()
+    parametros=urllib.parse.urlencode({
+        'formato':'json',
+        'dataInicial':(hoje-timedelta(days=90)).strftime('%d/%m/%Y'),
+        'dataFinal':hoje.strftime('%d/%m/%Y'),
+    })
+    url='https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?'+parametros
+    requisicao=urllib.request.Request(url,headers={'User-Agent':'SempreHub/atualizacoes-oficiais'})
+    try:
+        with urllib.request.urlopen(requisicao,timeout=20) as resposta:
+            dados=json.loads(resposta.read().decode('utf-8'))
+        registro=dados[-1]
+        referencia=datetime.strptime(registro['data'],'%d/%m/%Y').date()
+        valor=float(str(registro['valor']).replace(',','.'))
+    except (urllib.error.URLError, urllib.error.HTTPError, ValueError, KeyError, IndexError, UnicodeDecodeError):
+        return None
+    if referencia>hoje:
+        return None
+    item=ItemOficial(
+        titulo='Taxa Selic — série SGS 432', tema='ECONOMIA', instituicao='Banco Central do Brasil (SGS)',
+        url=url, publicado_em=referencia, referencia=f'Série SGS 432 · referência {referencia.isoformat()}',
+        resumo=(f'O Banco Central do Brasil informou {valor:.2f}% na última observação disponível da série SGS 432. '
+                'O indicador serve como referência macroeconômica para crédito e planejamento financeiro.'),
+        vigencia_inicio=None, vigencia_fim=None,
+        condicoes='Indicador informativo oficial; não recalcula resultados ou contratos de rodadas já concluídas.',
+        trecho=f"Resposta oficial da API SGS 432: data {registro['data']}; valor {registro['valor']}.",
+    )
+    return item.model_dump(mode='json')
+
+
 def atualizar(forcar=False):
     """Consulta fontes oficiais.
 
@@ -156,7 +198,14 @@ def atualizar(forcar=False):
                 validado=candidato
                 break
         if not validado:
-            raise ValueError('Nenhum documento oficial pôde ser comprovado.')
+            # A pesquisa textual pode apontar páginas que mudaram entre a
+            # consulta e a prova literal. Antes de considerar a atualização
+            # pendente, use uma série oficial, pública e estruturada do BCB.
+            selic=indicador_selic_bcb()
+            if selic:
+                validado={'itens':[selic]}
+            else:
+                raise ValueError('Nenhuma fonte oficial pôde ser confirmada.')
         with SessionLocal() as db:
             db.add(BoletimOficial(dados=validado,consultado_em=agora()))
             c=db.get(ConsultaOficial,1);c.estado='CONSULTADO';c.ocupado_ate=None;c.erro=None
