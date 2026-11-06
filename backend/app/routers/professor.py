@@ -323,6 +323,16 @@ def detalhar_empresa(
         "empresa": ser.empresa(empresa),
         "resultados": [ser.resultado(r) for r in empresa.resultados],
         "decisoes": [decisoes[r] for r in sorted(decisoes)],
+        # O professor pode auditar o que já ocorreu, mas não recebe a semente
+        # do sorteio nem qualquer controle para criar, editar ou antecipar eventos.
+        "eventos_operacionais": [
+            ser.evento_operacional(evento)
+            for evento in sorted(
+                empresa.eventos_operacionais,
+                key=lambda evento: (evento.rodada_inicio, evento.id),
+                reverse=True,
+            )
+        ],
         "jornada": jornada_empresa(empresa),
         "equipe": dados_equipe(empresa, decisao_atual(db, empresa)),
     }

@@ -37,7 +37,7 @@ import {
   estiloEntrada,
 } from "../../componentes/ui";
 import { NOME_DORNELAS, NOME_GEM, NOME_REGIME, inteiro, percentual, reais } from "../../formatos";
-import type { Decisao, DetalheTurma, Empresa, Equipe, OpcaoEvento, Parametros, Resultado, Turma } from "../../tipos";
+import type { Decisao, DetalheTurma, Empresa, Equipe, EventoOperacional, OpcaoEvento, Parametros, Resultado, Turma } from "../../tipos";
 import type { ModoJogo } from "../../tiposSimulacao";
 import { BotaoRedefinirSenha } from "./AlunosTeste";
 import { EditorParametros } from "./Parametros";
@@ -429,14 +429,14 @@ function FecharRodada({
 }
 
 function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: number; empresaId: number; modo: ModoJogo; aoFechar: () => void }) {
-  const [dados, setDados] = useState<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; jornada?: Jornada; equipe?: Equipe | null } | null>(null);
+  const [dados, setDados] = useState<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; eventos_operacionais: EventoOperacional[]; jornada?: Jornada; equipe?: Equipe | null } | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [abaDetalhe,setAbaDetalhe]=useState("resumo");
   const [rodadaSelecionada, setRodadaSelecionada] = useState<number | null>(null);
 
   useEffect(() => {
     api
-      .get<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; jornada?: Jornada; equipe?: Equipe | null }>(`/api/professor/turmas/${turmaId}/empresas/${empresaId}`)
+      .get<{ empresa: Empresa; resultados: Resultado[]; decisoes: Decisao[]; eventos_operacionais: EventoOperacional[]; jornada?: Jornada; equipe?: Equipe | null }>(`/api/professor/turmas/${turmaId}/empresas/${empresaId}`)
       .then((d) => {
         setDados(d);
         if (d.resultados.length) setRodadaSelecionada(d.resultados[d.resultados.length - 1].rodada);
@@ -452,7 +452,7 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
         <Carregando />
       ) : (
         <div className="space-y-4">
-          <nav className="etapas-curtas" aria-label="Detalhes da empresa">{["resumo","equipe","operações","diagnósticos","decisões","DRE","financeiro","semanal"].map(a=><button type="button" key={a} aria-pressed={abaDetalhe===a} onClick={()=>setAbaDetalhe(a)}>{a}</button>)}</nav>
+          <nav className="etapas-curtas" aria-label="Detalhes da empresa">{["resumo","equipe","operações","ocorrências","diagnósticos","decisões","DRE","financeiro","semanal"].map(a=><button type="button" key={a} aria-pressed={abaDetalhe===a} onClick={()=>setAbaDetalhe(a)}>{a}</button>)}</nav>
           <div hidden={abaDetalhe!=="semanal"}><DashboardSemanal turmaId={turmaId} empresaId={empresaId} resultados={dados.resultados} somenteLeitura/></div>
           <div hidden={abaDetalhe!=="resumo"}><details className="rounded-xl border p-3"><summary className="cursor-pointer font-semibold">Conquistas e evolução desta empresa</summary><div className="mt-3"><Conquistas jornada={dados.jornada} /></div></details>
           <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
@@ -476,6 +476,17 @@ function DetalheEmpresa({ turmaId, empresaId, modo, aoFechar }: { turmaId: numbe
           <div hidden={abaDetalhe!=="operações"}>{dados.empresa.estado_simulacao && <PainelOperacional estado={dados.empresa.estado_simulacao} modo={modo} />}
           </div><div hidden={abaDetalhe!=="diagnósticos"}><DiagnosticosEmpresa turmaId={turmaId} empresaId={empresaId}/>
           {dados.decisoes.filter(d => d.plano_comercial?.analises).map(d => <ResumoAnalises key={d.rodada} rodada={d.rodada} valor={d.plano_comercial!.analises!} />)}
+          </div><div hidden={abaDetalhe!=="ocorrências"}>
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-slate-700">
+              <strong>Ocorrências automáticas.</strong> O sistema realiza os sorteios; esta tela é apenas para auditoria e não permite intervenção do professor.
+            </div>
+            {dados.eventos_operacionais.length === 0 ? <p className="mt-3 text-sm text-slate-500">Nenhuma ocorrência operacional foi registrada para esta empresa.</p> : <ul className="mt-3 space-y-2">
+              {dados.eventos_operacionais.map((evento) => <li key={evento.id} className="rounded-xl border border-slate-200 bg-white p-3 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2"><strong>{evento.departamento} · {evento.titulo}</strong><span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${evento.status === "ATIVO" ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-600"}`}>{evento.status === "ATIVO" ? "Em andamento" : "Concluída"}</span></div>
+                <p className="mt-1 text-slate-600">{evento.narrativa}</p>
+                <p className="mt-2 text-xs text-slate-500">Rodadas {evento.rodada_inicio}–{evento.rodada_fim} · probabilidade aplicada: {percentual(evento.probabilidade_aplicada)}</p>
+              </li>)}
+            </ul>}
           </div>{dados.resultados.length === 0 ? (
             <p className="text-sm text-slate-500">A empresa ainda não tem rodadas fechadas.</p>
           ) : (
