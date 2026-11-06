@@ -1,5 +1,6 @@
 import AtualizacoesOficiais from "../../componentes/AtualizacoesOficiais";
 import DashboardSemanal from "../../componentes/DashboardSemanal";
+import CockpitDecisao from "../../componentes/CockpitDecisao";
 import {tituloPeriodo,consolidarDres} from "../../calendario";
 import type { CalendarioSimulado } from "../../calendario";
 import LinkManual from "../../componentes/LinkManual";
@@ -144,6 +145,7 @@ const ITENS_PAINEL = [
     "simbolo": "▥",
     "grupo": "Resultados e evolução"
   },
+  {id:"cockpit",titulo:"Cockpit de decisão",descricao:"Visão rápida dos indicadores e alertas antes do envio.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   ...AREAS_INDICADORES.map(a => ({id: `resultado-${a.id}`, titulo: a.titulo, descricao: "Consulte os valores da rodada e interprete-os com sua equipe usando o manual.", simbolo: "", grupo: "Resultados e evolução", pai: "resultados"})),
   {id:"demonstrativos",titulo:"DRE e balanço",descricao:"Demonstrativos e resultado da rodada.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {id:"dashboard-semanal",titulo:"Painel semanal",descricao:"Compare indicadores e registre bases observadas por semana.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
@@ -244,7 +246,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   }
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe","atualizacoes"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.id.startsWith("resultado-") ? "6. Indicadores por departamento" : ["evolucao","historico","relatorios","conquistas"].includes(i.id) ? "7. Histórico e evolução" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
+    <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe","atualizacoes"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.id === "cockpit" || i.id.startsWith("resultado-") ? "6. Indicadores por departamento" : ["evolucao","historico","relatorios","conquistas"].includes(i.id) ? "7. Histórico e evolução" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
       <SecaoPainel id="rodada" ativa={secao}>
       {turma.calendario&&<CalendarioSazonal calendario={turma.calendario}/>}
       {painel.eventos_operacionais.length > 0 && <section className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm" aria-label="Ocorrências operacionais desta semana">
@@ -313,7 +315,8 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
         </div>
       </SecaoPainel>
       <SecaoPainel id="dashboard-semanal" ativa={secao}><DashboardSemanal empresaId={empresaId} resultados={resultados} somenteLeitura={!!turma.modo_equipe&&painel.equipe?.lider_id!==sessaoSalva()?.id}/></SecaoPainel>
-      <SecaoPainel id="resultados" ativa={secao}><Cartao titulo="Resultados da empresa"><p>Selecione uma área no submenu lateral. Compare os valores e consulte o manual do aluno para interpretar os indicadores antes de decidir a próxima rodada.</p>{ultimo&&<p className="mt-4 font-semibold">Última rodada concluída: {ultimo.rodada} · Caixa: <ValorMonetario valor={ultimo.caixa_final}/> · Lucro líquido: <ValorMonetario valor={ultimo.dre.lucro_liquido}/></p>}</Cartao></SecaoPainel>
+      <SecaoPainel id="cockpit" ativa={secao}><CockpitDecisao empresaId={empresaId} empresa={empresa} turma={turma} resultados={resultados} decisao={painel.decisao_atual} aoConferir={()=>setSecao("conferencia")} /></SecaoPainel>
+      <SecaoPainel id="resultados" ativa={secao}><Cartao titulo="Resultados da empresa"><p>Comece pelo Cockpit de decisão para uma leitura rápida. Depois, abra uma área no submenu lateral apenas quando precisar aprofundar um indicador ou demonstrativo.</p>{ultimo&&<p className="mt-4 font-semibold">Última rodada concluída: {ultimo.rodada} · Caixa: <ValorMonetario valor={ultimo.caixa_final}/> · Lucro líquido: <ValorMonetario valor={ultimo.dre.lucro_liquido}/></p>}</Cartao></SecaoPainel>
       {AREAS_INDICADORES.map(a=><SecaoPainel key={a.id} id={`resultado-${a.id}`} ativa={secao}><IndicadoresDepartamentais area={a.id} resultado={ultimo}/></SecaoPainel>)}
       <SecaoPainel id="demonstrativos" ativa={secao}>
       <nav className="etapas-curtas" aria-label="Demonstrativos">{["Indicadores","DRE","Comparar mercado","Alertas da rodada","Balanço"].map((t,n)=><button key={t} type="button" aria-pressed={demonstrativoAtivo===n} onClick={()=>setDemonstrativoAtivo(n)}>{t}</button>)}</nav>
