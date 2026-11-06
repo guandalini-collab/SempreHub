@@ -107,7 +107,7 @@ alterados por turma; confira-os novamente a cada ano, porque mudam com o salári
 
 ## Rodando no computador (desenvolvimento)
 
-Pré-requisitos: Python 3.9 ou superior (recomendado 3.11+) e Node.js 18 ou superior.
+Pré-requisitos: Python 3.10 ou superior (recomendado 3.12, igual à produção) e Node.js 18 ou superior.
 
 **Backend**, num terminal:
 
