@@ -17,6 +17,7 @@ export default function InicioProfessor({ abrirTurma, proprietario=false }: { ab
   const [aba,setAba]=useState("turmas");
   const [pagina,setPagina]=useState(0);
   const [busca,setBusca]=useState("");
+  const [excluindoId,setExcluindoId]=useState<number|null>(null);
 
   useEffect(() => {
     api
@@ -32,6 +33,18 @@ export default function InicioProfessor({ abrirTurma, proprietario=false }: { ab
   if (!turmas) return <Carregando />;
 
   const filtradas=turmas.filter(t=>t.nome.toLocaleLowerCase("pt-BR").includes(busca.toLocaleLowerCase("pt-BR")));
+  async function excluirTurma(turma:Turma){
+    const confirmacao=window.prompt(`Esta ação é definitiva e remove decisões, resultados e equipes da turma.\n\nPara excluir, digite exatamente:\n${turma.nome}`);
+    if(confirmacao===null) return;
+    setErro(null);setExcluindoId(turma.id);
+    try{
+      const resposta=await api.delete<{mensagem:string}>(`/api/professor/turmas/${turma.id}`,{confirmacao});
+      setTurmas(lista=>lista?.filter(item=>item.id!==turma.id)??null);
+      setPagina(atual=>Math.min(atual,Math.max(0,Math.ceil((filtradas.length-1)/3)-1)));
+      window.alert(resposta.mensagem);
+    }catch(e){setErro(e instanceof Error?e.message:"Não foi possível excluir a turma.");}
+    finally{setExcluindoId(null);}
+  }
   return (
     <div className="inicio-professor space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -49,11 +62,10 @@ export default function InicioProfessor({ abrirTurma, proprietario=false }: { ab
         <NovaTurma aoCriar={(t) => abrirTurma(t.id)} aoCancelar={turmas.length ? () => setCriando(false) : undefined} />
       )}
 
-      {aba==="turmas"&&!criando&&<><input aria-label="Buscar turma" placeholder="Buscar turma" className={estiloEntrada} value={busca} onChange={e=>{setBusca(e.target.value);setPagina(0);}}/><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {aba==="turmas"&&!criando&&<>{erro&&<Aviso>{erro}</Aviso>}<input aria-label="Buscar turma" placeholder="Buscar turma" className={estiloEntrada} value={busca} onChange={e=>{setBusca(e.target.value);setPagina(0);}}/><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filtradas.slice(pagina*3,pagina*3+3).map((t) => (
-          <button
+          <article
             key={t.id}
-            onClick={() => abrirTurma(t.id)}
             className="rounded-xl bg-white p-5 text-left shadow-sm ring-1 ring-slate-200 transition hover:ring-ouro"
           >
             <div className="flex items-start justify-between gap-2">
@@ -71,8 +83,11 @@ export default function InicioProfessor({ abrirTurma, proprietario=false }: { ab
               {t.quantidade_empresas} empresa(s) · {t.status === "ABERTA" ? `rodada ${t.rodada_atual} de ${t.total_rodadas}` : `${t.total_rodadas} rodadas`}
             </p>
             <p className="mt-1 text-xs text-slate-500">{t.modo_equipe ? "Equipes de 3 a 5 alunos" : "Participação individual"} · {t.modo_jogo === "STARTUP" ? "Startup" : t.modo_jogo === "TRADICIONAL" ? "Empresa tradicional" : "Modelo básico"}{t.cenario === "CRISE" ? " · recuperação" : ""}</p>
-            <span className="mt-4 block rounded-lg bg-blue-700 px-4 py-3 text-center text-sm font-bold text-white">Abrir turma e rodada atual →</span>
-          </button>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <button type="button" onClick={() => abrirTurma(t.id)} className="rounded-lg bg-blue-700 px-4 py-3 text-center text-sm font-bold text-white hover:bg-blue-800">Abrir turma →</button>
+              <Botao type="button" variante="perigo" carregando={excluindoId===t.id} disabled={excluindoId!==null&&excluindoId!==t.id} onClick={() => excluirTurma(t)}>Excluir turma</Botao>
+            </div>
+          </article>
         ))}
       </div>
 

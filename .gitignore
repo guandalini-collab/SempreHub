@@ -30,3 +30,6 @@ build/
 # Ambiente local para exemplos do manual
 /frontend/qa-manual*
 /tmp/
+
+# Materiais de auditoria locais; não fazem parte da aplicação publicada.
+/Materiais locais do SempreHub/

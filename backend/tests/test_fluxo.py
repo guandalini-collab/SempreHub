@@ -156,6 +156,23 @@ def test_professor_nao_ve_turma_de_outro(cliente, professor):
     assert cliente.get(f"/api/professor/turmas/{turma['id']}", headers=outro).status_code == 404
 
 
+def test_professor_exclui_turma_com_confirmacao_e_sem_apagar_conta_aluno(cliente, professor):
+    turma = _criar_turma(cliente, professor)
+    aluno = cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
+    _entrar(cliente, aluno, turma["codigo"], "Empresa Ana")
+
+    # A confirmação protege contra exclusões acidentais.
+    r = cliente.delete(f"/api/professor/turmas/{turma['id']}", headers=professor, json={"confirmacao": "nome errado"})
+    assert r.status_code == 422
+    assert cliente.get(f"/api/professor/turmas/{turma['id']}", headers=professor).status_code == 200
+
+    r = cliente.delete(f"/api/professor/turmas/{turma['id']}", headers=professor, json={"confirmacao": turma["nome"]})
+    assert r.status_code == 200
+    assert cliente.get(f"/api/professor/turmas/{turma['id']}", headers=professor).status_code == 404
+    # A matrícula e a empresa foram removidas, mas a conta pode entrar em outra turma.
+    assert cliente.get("/api/aluno/empresas", headers=aluno).json() == []
+
+
 def test_teto_do_mei_e_desenquadramento(cliente, professor):
     # Mercado grande para estourar o teto do MEI rapidamente
     turma = _criar_turma(cliente, professor, demanda_base_por_empresa=600, produtividade_por_pessoa=400)

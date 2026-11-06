@@ -107,6 +107,8 @@ export const api = {
     requisitar<T>(caminho, { method: "POST", body: JSON.stringify(dados ?? {}) }),
   put: <T,>(caminho: string, dados?: unknown) =>
     requisitar<T>(caminho, { method: "PUT", body: JSON.stringify(dados ?? {}) }),
+  delete: <T,>(caminho: string, dados?: unknown) =>
+    requisitar<T>(caminho, { method: "DELETE", body: JSON.stringify(dados ?? {}) }),
 };
 
 export async function baixarArquivo(caminho: string, nome: string) {

@@ -8,7 +8,7 @@ from typing import Optional
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
-from sqlalchemy import or_
+from sqlalchemy import delete, or_
 from sqlalchemy.orm import Session
 
 from .. import config
@@ -16,7 +16,12 @@ from .. import serializacao as ser
 from ..experiencia import jornada_empresa
 from ..database import get_db
 from ..equipes import bloquear_turma, novo_convite, invalidar_aprovacoes, registrar, dados_equipe, decisao_atual, pendencias_equipe, pendencias_fechamento, verificar_rodada
-from ..models import MatriculaTurma, Decisao, Empresa, MembroEmpresa, Papel, Resultado, StatusTurma, Turma, Usuario
+from ..models import (
+    AcessoAba, AprovacaoDecisao, ConteudoMercado, Decisao, DiagnosticoEstrategico,
+    Empresa, EventoOperacional, EventoRodada, MatriculaTurma, MembroEmpresa,
+    ObservacaoSemanal, Papel, RegistroEquipe, RelatorioEmpresarial, Resultado,
+    StatusTurma, Turma, Usuario,
+)
 from ..motor.eventos import opcoes_evento
 from ..motor.simulacao import processar_rodada
 from ..schemas import AgendaAcademicaEntrada, AlunoTesteEntrada, FecharRodadaEntrada, ParametrosTurma, ProfessorConvidadoEntrada, TurmaEntrada
@@ -105,6 +110,60 @@ def criar_turma(
     db.commit()
     db.refresh(turma)
     return ser.turma(turma, completa=True)
+
+
+class ConfirmacaoExclusaoTurma(BaseModel):
+    """Evita que um clique acidental apague uma turma inteira."""
+
+    confirmacao: str = Field(min_length=1, max_length=120)
+
+
+@router.delete("/turmas/{turma_id}")
+def excluir_turma(
+    turma_id: int,
+    dados: ConfirmacaoExclusaoTurma,
+    db: Session = Depends(get_db),
+    professor: Usuario = Depends(exigir_professor),
+):
+    """Remove uma turma e apenas os registros que pertencem a ela.
+
+    A turma só pode ser excluída pelo seu professor responsável — ou pelo
+    proprietário — e exige a digitação do nome, pois a operação é irreversível.
+    Contas de alunos e professores nunca são removidas.
+    """
+    turma = _turma_do_professor(db, turma_id, professor)
+    if dados.confirmacao.strip() != turma.nome:
+        raise HTTPException(422, "Digite exatamente o nome da turma para confirmar a exclusão.")
+
+    # A ordem respeita as chaves estrangeiras. Não dependemos de cascade no
+    # banco, assim a operação se comporta da mesma forma em PostgreSQL e SQLite.
+    empresa_ids = [empresa.id for empresa in turma.empresas]
+    if empresa_ids:
+        db.execute(delete(AprovacaoDecisao).where(AprovacaoDecisao.empresa_id.in_(empresa_ids)))
+        db.execute(delete(AcessoAba).where(AcessoAba.empresa_id.in_(empresa_ids)))
+        db.execute(delete(ObservacaoSemanal).where(ObservacaoSemanal.empresa_id.in_(empresa_ids)))
+        db.execute(delete(RelatorioEmpresarial).where(RelatorioEmpresarial.empresa_id.in_(empresa_ids)))
+        db.execute(delete(DiagnosticoEstrategico).where(DiagnosticoEstrategico.empresa_id.in_(empresa_ids)))
+        db.execute(delete(EventoOperacional).where(EventoOperacional.empresa_id.in_(empresa_ids)))
+        db.execute(delete(Resultado).where(Resultado.empresa_id.in_(empresa_ids)))
+        db.execute(delete(RegistroEquipe).where(RegistroEquipe.empresa_id.in_(empresa_ids)))
+        db.execute(delete(MembroEmpresa).where(MembroEmpresa.empresa_id.in_(empresa_ids)))
+        db.execute(delete(Decisao).where(Decisao.empresa_id.in_(empresa_ids)))
+        db.execute(delete(Empresa).where(Empresa.id.in_(empresa_ids)))
+
+    # O segundo filtro de membros cobre também eventuais vínculos incompletos
+    # de importações antigas, antes da remoção da turma.
+    db.execute(delete(MembroEmpresa).where(MembroEmpresa.turma_id == turma.id))
+    db.execute(delete(EventoOperacional).where(EventoOperacional.turma_id == turma.id))
+    db.execute(delete(EventoRodada).where(EventoRodada.turma_id == turma.id))
+    edicoes_da_turma = db.query(ConteudoMercado.id).filter(ConteudoMercado.turma_id == turma.id).subquery()
+    db.execute(delete(DiagnosticoEstrategico).where(DiagnosticoEstrategico.edicao_id.in_(edicoes_da_turma)))
+    db.execute(delete(ConteudoMercado).where(ConteudoMercado.turma_id == turma.id))
+    db.execute(delete(MatriculaTurma).where(or_(MatriculaTurma.turma_id == turma.id, MatriculaTurma.autorizada_turma_id == turma.id)))
+    nome = turma.nome
+    db.execute(delete(Turma).where(Turma.id == turma.id))
+    db.commit()
+    return {"id": turma_id, "mensagem": f"Turma '{nome}' excluída."}
 
 
 class CalendarioEntrada(BaseModel):
