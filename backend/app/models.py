@@ -153,6 +153,7 @@ class Turma(Base):
     professor = relationship("Usuario", back_populates="turmas")
     empresas = relationship("Empresa", back_populates="turma", order_by="Empresa.id")
     eventos = relationship("EventoRodada", back_populates="turma", order_by="EventoRodada.rodada")
+    eventos_operacionais = relationship("EventoOperacional", back_populates="turma", order_by="EventoOperacional.rodada_inicio")
 
 
 class Empresa(Base):
@@ -196,6 +197,7 @@ class Empresa(Base):
     resultados = relationship("Resultado", back_populates="empresa", order_by="Resultado.rodada")
     membros = relationship("MembroEmpresa", back_populates="empresa", order_by="MembroEmpresa.id")
     registros_equipe = relationship("RegistroEquipe", back_populates="empresa", order_by="RegistroEquipe.id")
+    eventos_operacionais = relationship("EventoOperacional", back_populates="empresa", order_by="EventoOperacional.rodada_inicio")
 
 
 class Decisao(Base):
@@ -348,6 +350,41 @@ class EventoRodada(Base):
     criado_em = Column(DateTime, default=agora)
 
     turma = relationship("Turma", back_populates="eventos")
+
+
+class EventoOperacional(Base):
+    """Ocorrência individual, automática e auditável de uma empresa.
+
+    Diferentemente dos eventos macroeconômicos da turma, este registro é criado
+    pelo motor para uma empresa específica. A fotografia guarda a probabilidade
+    efetivamente usada e a semente do sorteio para permitir reprodução e
+    auditoria posterior, sem permitir intervenção do professor.
+    """
+
+    __tablename__ = "eventos_operacionais"
+    __table_args__ = (
+        UniqueConstraint("empresa_id", "rodada_inicio", "codigo", name="uq_evento_operacional_empresa_rodada_codigo"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    turma_id = Column(Integer, ForeignKey("turmas.id"), nullable=False, index=True)
+    empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False, index=True)
+    rodada_inicio = Column(Integer, nullable=False, index=True)
+    rodada_fim = Column(Integer, nullable=False)
+    codigo = Column(String(64), nullable=False)
+    departamento = Column(String(32), nullable=False)
+    titulo = Column(String(160), nullable=False)
+    narrativa = Column(String(1200), nullable=False)
+    probabilidade_base = Column(Float, nullable=False)
+    probabilidade_aplicada = Column(Float, nullable=False)
+    semente = Column(String(64), nullable=False)
+    fatores = Column(JSON, nullable=False, default=dict)
+    impacto = Column(JSON, nullable=False, default=dict)
+    status = Column(String(24), nullable=False, default="ATIVO", server_default="ATIVO")
+    criado_em = Column(DateTime, default=agora)
+
+    turma = relationship("Turma", back_populates="eventos_operacionais")
+    empresa = relationship("Empresa", back_populates="eventos_operacionais")
 
 
 class TokenRecuperacao(Base):

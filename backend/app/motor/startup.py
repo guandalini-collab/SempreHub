@@ -134,11 +134,13 @@ def preparar(
     from .calendario import adaptar
     parametros = adaptar(parametros, rodada)
     calendario = parametros.get("_calendario")
+    efeitos_eventos = parametros.get("eventos_operacionais") or {}
     fracao = calendario["fator_mensal"] if calendario else 1
     multiplicador_custo *= calendario["sazonalidade"]["insumos"] if calendario else 1
     estado_inicial = _estado_normalizado(empresa.get("estado_simulacao"))
     estado = deepcopy(estado_inicial)
     inicializar_indicadores(estado)
+    estado["rh"]["moral"] = _limitar(estado["rh"].get("moral", 80.0) + float(efeitos_eventos.get("moral", 0)))
     simulacao = decisao.get("simulacao") or {}
     configuracao = {**_DEFAULTS, **(parametros.get("configuracao_simulacao") or {})}
     alertas = [
@@ -186,7 +188,7 @@ def preparar(
     divida = _soma(divida_inicial, emprestimo, -amortizacao)
     caixa_disponivel = _soma(caixa_disponivel, -amortizacao)
     juros = _dinheiro(
-        _decimal(divida) * _decimal(parametros.get("taxa_juros_mensal", 0.025))
+        _decimal(divida) * _decimal(float(parametros.get("taxa_juros_mensal", 0.025)) + float(efeitos_eventos.get("juros_extra", 0)))
         + _decimal(max(0.0, -caixa_inicial)) * _decimal(parametros.get("taxa_cheque_especial", 0.08)),
     )
 
@@ -206,11 +208,11 @@ def preparar(
     retidos = clientes_iniciais - perdidos
     estado["clientes"] = retidos
     capacidade_nuvem = max(0, int(simulacao.get("capacidade_nuvem", 300)))
-    capacidade = max(0, capacidade_nuvem - retidos)
+    capacidade = max(0, math.floor((capacidade_nuvem - retidos) * float(efeitos_eventos.get("capacidade", 1))))
     preco = float(decisao.get("preco", parametros.get("preco_referencia", 100)))
     if preco <= 0:
         raise ValueError("O preço mensal deve ser positivo.")
-    marketing = _dinheiro(max(0, decisao.get("marketing", 0)))
+    marketing = _dinheiro(max(0, decisao.get("marketing", 0)) * float(efeitos_eventos.get("marketing", 1)))
     from ..custos_campanhas import investimento_efetivo
     verba_midia=investimento_efetivo(decisao)
     digital = min(verba_midia, _dinheiro(max(0, simulacao.get("marketing_digital", 0))))
@@ -232,6 +234,7 @@ def preparar(
         "marketing": marketing, "pd": _dinheiro(decisao.get("pd", 0)),
         "networking": _dinheiro(decisao.get("networking", 0)),
         "juros": juros, "multas": _dinheiro(parametros.get("multas", 0)),
+        "eventos_operacionais": _dinheiro(efeitos_eventos.get("custo", 0)),
         **{chave: rh[chave] for chave in ("folha", "beneficios", "treinamento", "rescisoes")},
     }
     return {
@@ -250,6 +253,7 @@ def preparar(
         "recebimentos_vencidos": recebimentos_vencidos, "pagamentos_vencidos": pagamentos_vencidos,
         "rodada": rodada, "preco": preco, "custos": custos,
         "configuracao": configuracao, "simulacao": simulacao,
+        "efeitos_eventos": deepcopy(efeitos_eventos),
         "capacidade_nuvem": capacidade_nuvem, "clientes_iniciais": clientes_iniciais,
         "clientes_perdidos": perdidos, "clientes_retidos": retidos, "churn": churn,
         "aporte": aporte, "valuation": valuation, "diluicao": diluicao,
@@ -268,6 +272,7 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
     preparo = deepcopy(preparo)
     estado = deepcopy(preparo["estado"])
     simulacao, configuracao = preparo["simulacao"], preparo["configuracao"]
+    efeitos_eventos = preparo.get("efeitos_eventos") or {}
     adquiridos = min(max(0, math.floor(demanda)), preparo["capacidade"])
     clientes = preparo["clientes_retidos"] + adquiridos
     atendidos = min(clientes, preparo["capacidade_nuvem"])
@@ -276,7 +281,7 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
     satisfacao = float(estado["satisfacao"])
     if clientes > 0:
         satisfacao = _limitar(
-            satisfacao + 2 + estado["rh"]["qualificacao"] / 20
+            satisfacao + float(efeitos_eventos.get("satisfacao", 0)) + 2 + estado["rh"]["qualificacao"] / 20
             - max(0, 60 - estado["rh"]["moral"]) / 20
             - nao_atendidos / clientes * 30,
         )
@@ -306,14 +311,20 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
     aliquota = float(configuracao["aliquota_servico"])
     impostos = _dinheiro(_decimal(receita) * _decimal(aliquota))
     royalties = _dinheiro(_decimal(receita) * _decimal(preparo["taxa_royalties"]))
+    proporcao_prazo = _limitar(simulacao.get("vendas_prazo", 0), 0, 1)
+    perda_recebiveis = _dinheiro(
+        _decimal(receita) * _decimal(proporcao_prazo)
+        * _decimal(min(.95, max(0.0, float(efeitos_eventos.get("recebiveis_perda", 0)))))
+    )
     dre = {
         "receita": receita, "impostos": impostos, "cmv": custo_nuvem,
         **deepcopy(preparo["custos"]), "royalties": royalties,
         "refugos": 0.0, "frete": 0.0, "armazenagem": 0.0, "depreciacao": 0.0,
     }
+    dre["eventos_operacionais"] = _soma(dre.get("eventos_operacionais", 0), perda_recebiveis)
     despesas = _soma(*(valor for chave, valor in dre.items() if chave != "receita"))
     dre["lucro_liquido"] = _soma(receita, -despesas)
-    receber_novo = _dinheiro(_decimal(receita) * _decimal(_limitar(simulacao.get("vendas_prazo", 0), 0, 1)))
+    receber_novo = _dinheiro(_decimal(receita) * _decimal(proporcao_prazo) - _decimal(perda_recebiveis))
     pagar_novo = _dinheiro(_decimal(custo_nuvem) * _decimal(_limitar(simulacao.get("compras_prazo", 0), 0, 1)))
     if receber_novo:
         estado["receber"].append({
@@ -326,7 +337,8 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
             "valor": pagar_novo,
         })
     recebimentos = _soma(preparo["recebimentos_vencidos"], receita, -receber_novo)
-    pagamentos = _soma(preparo["pagamentos_vencidos"], despesas, -pagar_novo)
+    # Perda de recebíveis reduz a conta a receber, mas não é uma nova saída de caixa.
+    pagamentos = _soma(preparo["pagamentos_vencidos"], despesas, -perda_recebiveis, -pagar_novo)
     operacional = _soma(recebimentos, -pagamentos)
     financiamento = _soma(preparo["emprestimo"], -preparo["amortizacao"], preparo["aporte"])
     caixa = _soma(preparo["caixa_inicial"], operacional, financiamento)
@@ -354,6 +366,7 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
         "participacao_anterior": preparo["participacao_anterior"],
         "participacao_fundadores": estado["participacao_fundadores"], "diluicao": preparo["diluicao"],
         "amortizacao_obrigatoria": preparo["amortizacao_obrigatoria"],
+        "eventos_operacionais": deepcopy(efeitos_eventos),
     }
     alertas = deepcopy(preparo["alertas"])
     if nao_atendidos:

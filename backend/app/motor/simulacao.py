@@ -260,6 +260,12 @@ def processar_rodada(
         # na aula programada. Sem agenda, preserva o funcionamento manual.
         from ..agenda_academica import aplicar_proxima_janela
         aplicar_proxima_janela(turma)
+        # Ocorrências operacionais pertencem à próxima semana: são criadas
+        # depois de fechar a anterior e ficam indisponíveis para edição humana.
+        if turma.modo_jogo != "LEGADO":
+            from .eventos_operacionais import encerrar_vencidos, gerar_para_rodada
+            encerrar_vencidos(db, turma.id, turma.rodada_atual)
+            gerar_para_rodada(db, turma, empresas, turma.rodada_atual)
 
     db.commit()
     return db.query(EventoRodada).filter_by(turma_id=turma.id, rodada=rodada).one()

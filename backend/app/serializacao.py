@@ -152,13 +152,25 @@ def resultado(r: Resultado) -> Dict[str, Any]:
     }
     if r.detalhes_simulacao:
         extras = r.detalhes_simulacao.get("dre", {})
-        for campo in ("refugos", "frete", "armazenagem", "depreciacao", "beneficios", "treinamento", "manutencao", "comissao_canal"):
+        for campo in ("refugos", "frete", "armazenagem", "depreciacao", "beneficios", "treinamento", "manutencao", "comissao_canal", "eventos_operacionais"):
             dados["dre"][campo] = extras.get(campo, 0)
     return dados
 
 
 def evento(e: EventoRodada) -> Dict[str, Any]:
     return {"rodada": e.rodada, "codigo": e.codigo, "titulo": e.titulo, "narrativa": e.narrativa}
+
+
+def evento_operacional(e) -> Dict[str, Any]:
+    """Leitura segura da ocorrência individual; a semente fica somente no banco."""
+    return {
+        "id": e.id, "codigo": e.codigo, "departamento": e.departamento,
+        "titulo": e.titulo, "narrativa": e.narrativa,
+        "rodada_inicio": e.rodada_inicio, "rodada_fim": e.rodada_fim,
+        "probabilidade_base": e.probabilidade_base,
+        "probabilidade_aplicada": e.probabilidade_aplicada,
+        "impacto": e.impacto or {}, "status": e.status,
+    }
 
 
 def empresa(e: Empresa) -> Dict[str, Any]:

@@ -371,6 +371,7 @@ const LINHAS_DRE: { chave: keyof Dre; rotulo: string }[] = [
   { chave: "beneficios", rotulo: "(−) Benefícios dos funcionários" },
   { chave: "treinamento", rotulo: "(−) Treinamento" },
   { chave: "manutencao", rotulo: "(−) Manutenção preventiva" },
+  { chave: "eventos_operacionais", rotulo: "(−) Ocorrências operacionais" },
   { chave: "comissao_canal", rotulo: "(−) Comissão do canal" },
   { chave: "custos_fixos", rotulo: "(−) Custos fixos (aluguel, energia...)" },
   { chave: "marketing", rotulo: "(−) Marketing" },

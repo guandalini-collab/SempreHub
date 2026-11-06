@@ -230,6 +230,8 @@ def painel(empresa_id: int, db: Session = Depends(get_db), aluno: Usuario = Depe
         "ultima_decisao": ser.decisao(ultima_decisao),
         "resultados": [ser.resultado(r) for r in empresa.resultados],
         "eventos": [ser.evento(e) for e in turma.eventos],
+        "eventos_operacionais": [ser.evento_operacional(e) for e in empresa.eventos_operacionais
+                                  if e.status == "ATIVO" and e.rodada_inicio <= turma.rodada_atual <= e.rodada_fim],
         "mercado": concorrentes,
         "posicao_ranking": posicao,
         "total_empresas": len(turma.empresas),

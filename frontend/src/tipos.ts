@@ -179,6 +179,7 @@ export interface Dre {
   beneficios?: number;
   treinamento?: number;
   manutencao?: number;
+  eventos_operacionais?: number;
   comissao_canal?: number;
   receita: number;
   impostos: number;
@@ -227,6 +228,20 @@ export interface EventoRodada {
   narrativa: string;
 }
 
+export interface EventoOperacional {
+  id: number;
+  codigo: string;
+  departamento: string;
+  titulo: string;
+  narrativa: string;
+  rodada_inicio: number;
+  rodada_fim: number;
+  probabilidade_base: number;
+  probabilidade_aplicada: number;
+  impacto: Record<string, number | boolean>;
+  status: string;
+}
+
 export interface LinhaRanking {
   posicao: number;
   empresa_id: number;
@@ -251,6 +266,7 @@ export interface PainelAluno {
   ultima_decisao: Decisao | null;
   resultados: Resultado[];
   eventos: EventoRodada[];
+  eventos_operacionais: EventoOperacional[];
   mercado: { empresa: string; propria: boolean; preco: number; participacao_mercado: number }[];
   posicao_ranking: number | null;
   total_empresas: number;

@@ -69,6 +69,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     inicializar_indicadores(s)
     cfg = p.get("configuracao_simulacao") or {}
     op = d.get("simulacao") or {}
+    efeitos_eventos = p.get("eventos_operacionais") or {}
     alertas = []
     s.setdefault("versao", 1)
     mp, pa = _estoque(s, "estoque_mp"), _estoque(s, "estoque_pa")
@@ -80,6 +81,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     rh.setdefault("moral", 80.0)
     rh.setdefault("qualificacao", 0.0)
     rh.setdefault("rotatividade_acumulada", 0.0)
+    rh["moral"] = _limitar(rh["moral"] + float(efeitos_eventos.get("moral", 0)))
     s.setdefault("satisfacao", 80.0)
     s.setdefault("clientes", 0)
     s.setdefault("participacao_fundadores", 1.0)
@@ -148,8 +150,15 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
 
     manutencao = _dinheiro(max(0, op.get("manutencao", 0)))
     ativas = [m for m in s["maquinas"] if m["ativacao"] <= rodada]
-    capacidade_maquinas = sum(m["capacidade"] for m in ativas) * fracao
+    capacidade_maquinas = sum(m["capacidade"] for m in ativas) * fracao * float(efeitos_eventos.get("capacidade", 1))
     kpis_oee = oee(s, manutencao, treinamento, funcionarios, ativas, max(0, op.get("producao", 0)), fracao)
+    # Um evento de qualidade é adicional aos defeitos normais do OEE. A taxa
+    # continua limitada à realidade física: nunca inferior a 0,5% nem superior a 100%.
+    if efeitos_eventos.get("qualidade"):
+        kpis_oee["taxa_defeito"] = max(.005, min(1.0, kpis_oee["taxa_defeito"] - float(efeitos_eventos["qualidade"])))
+        kpis_oee["qualidade_oee"] = 1 - kpis_oee["taxa_defeito"]
+        if kpis_oee["oee"] is not None:
+            kpis_oee["oee"] = kpis_oee["disponibilidade"] * kpis_oee["performance"] * kpis_oee["qualidade_oee"]
     capacidades = capacidades_producao(capacidade_maquinas, funcionarios, produtividade, fator_rh, horas_extras, kpis_oee["disponibilidade"], kpis_oee["performance"], 220 * fracao)
     capacidade_produtiva = capacidades["capacidade_produtiva"]
     kpis_rh = enps(s, funcionarios, salario, salario_base, beneficio, horas_extras)
@@ -172,7 +181,16 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     itens=(d.get("plano_comercial") or {}).get("produtos", [])
     if itens:
         from .portfolio import produzir
+        # O portfólio lê a taxa armazenada no estado. A alteração causada por
+        # uma ocorrência vale apenas enquanto ela estiver ativa, portanto não
+        # é gravada como desgaste permanente após o fechamento.
+        indicador = s.setdefault("indicadores_didaticos", {})
+        defeito_normal = indicador.get("taxa_defeito")
+        if efeitos_eventos.get("qualidade"):
+            indicador["taxa_defeito"] = kpis_oee["taxa_defeito"]
         compras, producao_real, refugo, custo_refugo=produzir(s,itens,op,capacidade_produtiva,capacidade_maquinas,multiplicador_custo)
+        if efeitos_eventos.get("qualidade"):
+            indicador["taxa_defeito"] = defeito_normal
         mp,pa=s["estoque_mp"],s["estoque_pa"]
         producao_pedida=max(0,int(op.get("producao",0)))
         boas=producao_real-refugo
@@ -210,14 +228,16 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     sobrecarga_trabalho = max(0, producao_real / capacidade_trabalho - 0.90) if capacidade_trabalho else 0
     rh["moral"] = round(_limitar(rh["moral"] - 10 * sobrecarga_trabalho), 8)
 
-    juros_banco = _produto(divida, p.get("taxa_juros_mensal", 0.025))
+    juros_banco = _produto(divida, p.get("taxa_juros_mensal", 0.025) + float(efeitos_eventos.get("juros_extra", 0)))
     juros_cheque = _produto(max(0, -caixa_inicio), p.get("taxa_cheque_especial", 0.08))
     juros = _soma([juros_banco, juros_cheque])
     if juros_cheque:
         alertas.append("Juros de cheque especial sobre o saldo negativo de abertura.")
     custos_fixos = _dinheiro(p.get("custos_fixos_mensais", 1500))
-    marketing, pd, networking = (_dinheiro(d.get(k, 0)) for k in ("marketing", "pd", "networking"))
+    marketing = _produto(d.get("marketing", 0), float(efeitos_eventos.get("marketing", 1)))
+    pd, networking = (_dinheiro(d.get(k, 0)) for k in ("pd", "networking"))
     multas = _dinheiro(p.get("multas", 0))
+    custos_eventos = _dinheiro(efeitos_eventos.get("custo", 0))
     despesas_pagas = _soma([folha, custo_horas_extras, beneficios, treinamento, rescisoes, manutencao,
                             custos_fixos, marketing, pd, networking, juros, multas])
 
@@ -258,9 +278,11 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         "capacidade": pa["quantidade"], "capacidade_produtiva": capacidade_produtiva,
         "capacidade_maquinas": capacidade_maquinas, "utilizacao_maquinas": utilizacao,
         "atratividade": atratividade, "marca": marca, "qualidade": qualidade,
+        "custos_eventos": custos_eventos,
+        "marketing": marketing,
         "horas_extras": horas_extras, "custo_horas_extras": custo_horas_extras,
         "folha": folha, "juros": juros, "juros_cheque": juros_cheque,
-        "gastos_previstos": _soma([despesas_pagas, depreciacao, custo_refugo]),
+        "gastos_previstos": _soma([despesas_pagas, custos_eventos, depreciacao, custo_refugo]),
         "beneficios": beneficios, "treinamento": treinamento, "rescisoes": rescisoes,
         "manutencao": manutencao, "depreciacao": depreciacao, "custo_refugo": custo_refugo,
         "despesas_pagas": despesas_pagas, "compras_a_vista": compra_a_vista, "compras_mes": compras,
@@ -307,26 +329,33 @@ def apurar(preparo: dict, demanda: float,
     impostos = _dinheiro(impostos)
     modal = op.get("modal", "PADRAO")
     localizacao = estimar_frete(op, cfg)
-    custo_frete = localizacao["frete_unitario"]
+    efeitos_eventos = p.get("eventos_operacionais") or {}
+    custo_frete = localizacao["frete_unitario"] * float(efeitos_eventos.get("frete", 1))
     frete = _produto(vendas, custo_frete)
     armazenagem = _produto(pa["valor"], cfg.get("custo_armazenagem", 0.01))
     royalties = _produto(receita, c["taxa_royalties"])
     comissao_canal = _soma(l["comissao_canal"] for l in linhas) if linhas else _produto(receita, c["taxa_comissao_canal"])
+    # Inadimplência só alcança vendas a prazo; não reduz ficticiamente vendas à vista.
+    perda_recebiveis = _produto(venda_prazo, min(.95, max(0.0, float(efeitos_eventos.get("recebiveis_perda", 0)))))
+    if perda_recebiveis:
+        s["receber"][-1]["valor"] = _soma([s["receber"][-1]["valor"], -perda_recebiveis])
+    custos_eventos = _soma([c.get("custos_eventos", 0), perda_recebiveis])
     dre = {
         "receita": receita, "impostos": impostos, "cmv": cmv, "folha": c["folha"],
         "horas_extras": c["custo_horas_extras"],
         "custos_fixos": _dinheiro(p.get("custos_fixos_mensais", 1500)),
-        "marketing": _dinheiro(d.get("marketing", 0)), "pd": _dinheiro(d.get("pd", 0)),
+        "marketing": c["marketing"], "pd": _dinheiro(d.get("pd", 0)),
         "networking": _dinheiro(d.get("networking", 0)), "rescisoes": c["rescisoes"],
         "royalties": royalties, "juros": c["juros"], "multas": _dinheiro(p.get("multas", 0)),
         "comissao_canal": comissao_canal,
         "refugos": c["custo_refugo"], "frete": frete, "armazenagem": armazenagem,
         "depreciacao": c["depreciacao"], "beneficios": c["beneficios"],
         "treinamento": c["treinamento"], "manutencao": c["manutencao"],
+        "eventos_operacionais": custos_eventos,
     }
     dre["lucro_liquido"] = _soma([receita, -_soma(v for k, v in dre.items() if k != "receita")])
     recebimentos = _soma([c["recebimentos_vencidos"], venda_vista])
-    pagamentos = _soma([c["pagamentos_vencidos"], c["compras_a_vista"], c["despesas_pagas"],
+    pagamentos = _soma([c["pagamentos_vencidos"], c["compras_a_vista"], c["despesas_pagas"], c.get("custos_eventos", 0),
                         impostos, frete, armazenagem, royalties, comissao_canal])
     operacional = _soma([recebimentos, -pagamentos])
     investimento, financiamento = -c["investimento"], _soma([c["emprestimo"], -c["amortizacao"]])
@@ -336,7 +365,7 @@ def apurar(preparo: dict, demanda: float,
     indicadores_entrega = otif(demanda, vendas, modal)
     falhas_transporte = indicadores_entrega["pedidos_com_falha"] - indicadores_entrega["pedidos_nao_atendidos"]
     atraso = falhas_transporte / vendas if vendas else 0
-    s["satisfacao"] = round(_limitar(s["satisfacao"] + (2 - 30 * atraso if vendas else 0)
+    s["satisfacao"] = round(_limitar(s["satisfacao"] + float(efeitos_eventos.get("satisfacao", 0)) + (2 - 30 * atraso if vendas else 0)
                                     - (20 * ruptura / demanda if demanda else 0)), 8)
     if c["kpis"]["oee"] is not None:
         c["alertas"].append(f"OEE simulado: {c['kpis']['oee'] * 100:.2f}%. Manutenção e treinamento alteram disponibilidade, ritmo e defeitos.")
@@ -372,6 +401,7 @@ def apurar(preparo: dict, demanda: float,
                     satisfacao=s["satisfacao"], moral=s["rh"]["moral"], qualificacao=s["rh"]["qualificacao"],
                     amortizacao_obrigatoria=c["amortizacao_obrigatoria"], canal=c["canal"],
                     marketing_digital=c["marketing_digital"], comissao_canal=comissao_canal)
+    operacao["eventos_operacionais"] = deepcopy(p.get("eventos_operacionais") or {})
     detalhes = {"versao_motor": 1, "engine_version": ENGINE_VERSION, "modo": "TRADICIONAL", "configuracao": deepcopy(p),
                 "estado_inicial": deepcopy(c["estado_inicial"]), "estado_final": deepcopy(s),
                 "operacao": operacao, "dfc": dfc, "balanco": balanco}

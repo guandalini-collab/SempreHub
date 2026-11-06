@@ -68,7 +68,7 @@ def motor(turma):
     return startup if turma.modo_jogo == "STARTUP" else tradicional
 
 
-def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0):
+def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0, efeitos_operacionais=None):
     dados = colunas(empresa)
     dados["estado_simulacao"] = dados["estado_simulacao"] or estado_inicial(turma)
     if turma.modo_jogo=="TRADICIONAL":
@@ -85,6 +85,7 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0):
             p["configuracao_simulacao"]["custo_nuvem_cliente"] = decisao.plano_comercial["custo_unitario"]
     p["multa_evento"] = multa
     p["multas"] = multa
+    p["eventos_operacionais"] = deepcopy(efeitos_operacionais or {})
     preparo = motor(turma).preparar(dados, entrada, p, turma.rodada_atual, multiplicador_custo)
     itens=(decisao.plano_comercial or {}).get("produtos", [])
     if itens:
@@ -218,13 +219,21 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
                 c.alertas.append(f"Mais de {limite_empregados} empregado(s): migração do MEI para o Simples Nacional.")
         empresa.networking = _limitar(empresa.networking - 1 + 2 * math.sqrt(max(0, d.networking) / 500))
         multa = ev.MULTA_NOTIFICACAO_FISCAL if evento.contem("NOTIFICACAO_FISCAL") and empresa.networking < ev.NETWORKING_MINIMO_DEFESA_FISCAL else 0
-        p = preparar(empresa, d, turma, multiplicador_custo, multa)
+        from .eventos_operacionais import efeitos_ativos
+        efeitos, ocorrencias = efeitos_ativos(db, empresa.id, rodada)
+        p = preparar(empresa, d, turma, multiplicador_custo * efeitos["cmv"], multa, efeitos)
+        p["ocorrencias_operacionais"] = ocorrencias
+        if ocorrencias:
+            nomes = ", ".join(o.titulo for o in ocorrencias)
+            p["alertas"].append(f"Ocorrências operacionais ativas: {nomes}.")
         p["alertas"].extend(c.alertas)
         if d.automatica:
             p["alertas"].append("Decisão automática: ações pontuais não foram repetidas.")
         decisoes.append(d)
         preparos.append(p)
     demandas, bots = _mercado(preparos, decisoes, turma, rodada, multiplicador_demanda)
+    demandas = [demanda * p["parametros"].get("eventos_operacionais", {}).get("demanda", 1.0)
+                for demanda, p in zip(demandas, preparos)]
     apuracoes = []
     for empresa, p, demanda in zip(empresas, preparos, demandas):
         apuracoes.append(motor(turma).apurar(p, demanda,
@@ -259,6 +268,13 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         detalhes["avaliacao_estrategica"] = deepcopy(preparo["avaliacao_estrategica"])
         detalhes.update(parametros=parametros(turma), decisao=colunas(d), dre=deepcopy(dre),
                         concorrentes_virtuais=deepcopy(bots), evento=evento.codigo, eventos=list(evento.codigos or (evento.codigo,)))
+        detalhes["eventos_operacionais"] = [
+            {"id": o.id, "codigo": o.codigo, "departamento": o.departamento, "titulo": o.titulo,
+             "narrativa": o.narrativa, "rodada_inicio": o.rodada_inicio, "rodada_fim": o.rodada_fim,
+             "probabilidade_base": o.probabilidade_base, "probabilidade_aplicada": o.probabilidade_aplicada,
+             "fatores": deepcopy(o.fatores), "impacto": deepcopy(o.impacto)}
+            for o in preparo.get("ocorrencias_operacionais", [])
+        ]
         from .metricas_semanais import gerar_metricas
         detalhes['metricas_semanais'] = gerar_metricas(a, (calendario or {}).get('dias', 30))
         detalhes['atualizacoes_oficiais'] = deepcopy(fontes_da_rodada)
