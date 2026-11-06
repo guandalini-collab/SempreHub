@@ -1,6 +1,7 @@
 import AtualizacoesOficiais from "../../componentes/AtualizacoesOficiais";
 import DashboardSemanal from "../../componentes/DashboardSemanal";
 import {tituloPeriodo,consolidarDres} from "../../calendario";
+import type { CalendarioSimulado } from "../../calendario";
 import LinkManual from "../../componentes/LinkManual";
 import { createPortal } from "react-dom";
 import { ValorMonetario } from "../../componentes/ui";
@@ -45,6 +46,23 @@ import type { DecisaoSimulacao } from "../../tiposSimulacao";
 const FERRAMENTAS = ["SWOT", "PORTER", "BCG", "PESTEL", "CONCORRENCIA", "SEGMENTACAO"];
 const ANALISES_APRENDIZAGEM = ["5 Forças de Porter", "PESTEL", "Análise de mercado", "SWOT (FOFA)", "Análise financeira", "Segmentação de mercado"];
 const DEPARTAMENTOS = [{id:"decisoes",titulo:"Produtos e marketing"},{id:"pd",titulo:"P&D"},{id:"rh",titulo:"RH"},{id:"estrategia",titulo:"Estratégia"},{id:"financas",titulo:"Finanças"},{id:"producao",titulo:"Produção"},{id:"logistica",titulo:"Logística"}];
+
+function CalendarioSazonal({calendario}:{calendario:CalendarioSimulado}) {
+  const sazonal = calendario.sazonalidade;
+  const eventos = sazonal.detalhes_eventos ?? [];
+  const proximos = calendario.proximos_eventos ?? [];
+  return <section className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 text-sm" aria-label="Cenário sazonal da rodada">
+    <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <strong className="text-marinho">{tituloPeriodo(calendario)}</strong>
+      <span className="rounded-full bg-white px-2 py-1 text-xs font-semibold text-corporativo">Procura estimada: {sazonal.demanda.toFixed(2)}×</span>
+    </div>
+    <p className="mt-2 text-slate-700">{sazonal.setor ? <>Setor: <strong>{sazonal.setor}</strong>. </> : <>Perfil de referência: <strong>{sazonal.perfil.toLowerCase()}</strong>. </>}A sazonalidade ajusta a procura do mercado nesta semana; não garante vendas.</p>
+    {eventos.length > 0 ? <div className="mt-3 grid gap-2 md:grid-cols-2">{eventos.map(evento=><div key={evento.nome + "-" + evento.fase} className="rounded-lg border border-blue-100 bg-white px-3 py-2"><p className="font-semibold text-marinho">{evento.fase === "pós-evento" ? "Após " : ""}{evento.nome} · {evento.impacto_demanda >= 0 ? "+" : ""}{(evento.impacto_demanda * 100).toFixed(1)}% na procura-base</p><p className="mt-1 text-xs text-slate-600">{evento.orientacao}</p></div>)}</div> : <p className="mt-3 text-slate-600">Não há pico sazonal aplicável nesta semana. Mantenha a decisão baseada no mercado e na capacidade da empresa.</p>}
+    {proximos.length > 0 && <p className="mt-3 text-xs text-slate-600">Próximos marcos do setor: {proximos.map(e=>e.nome + " (" + new Date(e.data + "T12:00:00").toLocaleDateString("pt-BR") + ")").join(" · ")}.</p>}
+    <p className="mt-2 text-xs text-slate-500">Calendário civil brasileiro · estimativa didática do modelo. Confira também as fontes oficiais e as notícias da rodada.</p>
+  </section>;
+}
+
 const ITENS_PAINEL = [
   {id:"departamentos",titulo:"Departamentos",descricao:"Planeje as decisões de cada departamento.",simbolo:"",grupo:"Decisões da rodada"},
   {id: "manuais", titulo: "Manuais", descricao: "Consulte ou baixe os manuais em PDF.", simbolo: "", grupo: "Manuais"},
@@ -228,7 +246,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   return (
     <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe","atualizacoes"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.id.startsWith("resultado-") ? "6. Indicadores por departamento" : ["evolucao","historico","relatorios","conquistas"].includes(i.id) ? "7. Histórico e evolução" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
       <SecaoPainel id="rodada" ativa={secao}>
-      {turma.calendario&&<div className="rounded-lg border border-slate-200 bg-white p-3 text-sm"><strong>{tituloPeriodo(turma.calendario)}</strong><p>{turma.calendario.sazonalidade.eventos.join(' · ')||'Sem data sazonal ativa'} · procura estimada: {turma.calendario.sazonalidade.demanda.toFixed(2)}×. Planeje produção, equipe, estoque, caixa e entregas. Fatores didáticos; não são previsões reais.</p></div>}
+      {turma.calendario&&<CalendarioSazonal calendario={turma.calendario}/>}
 
         <div className="inicio-rodada">
           <p className="text-sm text-slate-600">{encerrada ? "Consulte o desempenho final da empresa." : painel.decisao_atual?.enviada_em ? "Decisão enviada. As escolhas permanecem disponíveis em modo leitura." : "Consulte o mercado, planeje os departamentos e confira a decisão completa antes de enviar."}</p>

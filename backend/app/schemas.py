@@ -49,6 +49,9 @@ class ConfiguracaoSimulacao(BaseModel):
     calendario_automatico: bool = True
     rodada_inicio_calendario: int = Field(1, ge=1, le=60)
     perfil_sazonal: Literal["NEUTRO", "VAREJO", "ALIMENTACAO", "SERVICOS"] = "NEUTRO"
+    # Definido pela edição de mercado publicada; é usado somente nas próximas
+    # rodadas para relacionar a sazonalidade ao segmento escolhido pela turma.
+    setor_mercado: Optional[str] = Field(None, min_length=3, max_length=120)
 
     capacidade_maquina: int = Field(240, ge=1, le=100_000)
     preco_maquina: float = Field(12000.0, gt=0, le=10_000_000)

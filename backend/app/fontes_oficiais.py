@@ -1,8 +1,16 @@
-"""Fontes primárias: lista institucional explícita, sem portais comerciais."""
+"""Fontes institucionais permitidas, sem portais comerciais ou agregadores."""
 from urllib.parse import urlsplit
 
-DOMINIOS = ('gov.br', 'leg.br', 'ibge.gov.br', 'ipea.gov.br', 'bcb.gov.br',
-            'fiocruz.br', 'fgv.br', 'usp.br', 'unicamp.br', 'ufrj.br')
+# A pesquisa do simulador só pode recorrer a fontes primárias governamentais,
+# entidades setoriais e institutos de pesquisa reconhecidos. A lista explícita
+# evita que a busca encontre blogs, varejistas ou páginas de opinião.
+DOMINIOS = (
+    'gov.br', 'leg.br', 'dados.gov.br',
+    'ibge.gov.br', 'ipea.gov.br', 'ipeadata.gov.br', 'bcb.gov.br',
+    'inmet.gov.br', 'inpi.gov.br', 'fiocruz.br', 'fgv.br', 'fipe.org.br',
+    'cni.com.br', 'cnc.org.br', 'anbima.com.br', 'anfavea.com.br',
+    'seade.gov.br', 'usp.br', 'unicamp.br', 'ufrj.br',
+)
 
 
 def fonte_oficial(url):

@@ -19,6 +19,26 @@ from .inteligencia_mercado import gerar_json
 
 INTERVALO = timedelta(hours=6)
 RETRY_FALHA = timedelta(minutes=15)
+SETORES = (
+    'Eletrônicos e Tecnologia', 'Alimentos e Bebidas', 'Vestuário e Moda',
+    'Cosméticos e Beleza', 'Móveis e Decoração', 'Automotivo',
+    'Esportes e Fitness', 'Saúde e Bem-estar', 'Educação e Cursos',
+    'Pet Care', 'Construção e Materiais', 'Entretenimento e Mídia',
+)
+DEPARTAMENTOS = (
+    'Produtos e marketing', 'P&D', 'Recursos humanos', 'Estratégia',
+    'Finanças', 'Produção', 'Logística',
+)
+
+
+class ImpactoOficial(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    departamento: Literal[
+        'Produtos e marketing', 'P&D', 'Recursos humanos', 'Estratégia',
+        'Finanças', 'Produção', 'Logística',
+    ]
+    efeito: str = Field(min_length=20, max_length=500)
+    como_interpretar: str = Field(min_length=20, max_length=500)
 
 
 class ItemOficial(BaseModel):
@@ -34,6 +54,12 @@ class ItemOficial(BaseModel):
     vigencia_fim: date | None
     condicoes: str | None=Field(default=None,max_length=500)
     trecho: str=Field(min_length=30,max_length=400)
+    # A competência é o mês/ano a que o dado se refere; ela não substitui a
+    # data de publicação e evita que o aluno trate uma série defasada como fato
+    # do dia.
+    competencia: str | None = Field(default=None, max_length=80)
+    setores_afetados: list[str] = Field(default_factory=list, max_length=13)
+    impactos: list[ImpactoOficial] = Field(default_factory=list, max_length=7)
 
     @model_validator(mode='after')
     def validar(self):
@@ -41,6 +67,8 @@ class ItemOficial(BaseModel):
             raise ValueError('Somente fontes oficiais são aceitas.')
         if self.vigencia_inicio and self.vigencia_fim and self.vigencia_fim<self.vigencia_inicio:
             raise ValueError('Vigência inválida.')
+        if any(setor not in SETORES and setor != 'Todos os setores' for setor in self.setores_afetados):
+            raise ValueError('Setor não reconhecido.')
         return self
 
 
@@ -127,7 +155,12 @@ def prompt_atualizacao(tentativa):
         'Use somente uma página HTML oficial pública, acessível sem login e que contenha o trecho literalmente; '
         'não use PDF, página de busca, página inicial, arquivos baixáveis ou URL redirecionada. '
         'Não invente cotações unitárias de produtos ausentes de pesquisa oficial. '
-        'A notícia não autoriza recalcular demonstrativos nem alterar parâmetros de uma turma em andamento.')
+        'Para cada item, informe competencia (mês e ano a que o dado se refere, quando disponível), '
+        'setores_afetados usando somente os setores fornecidos ou "Todos os setores" e impactos. '
+        'Cada impacto deve associar um departamento, explicar o possível efeito e como o aluno deve interpretar '
+        'a informação antes de decidir. Use linguagem condicional: dado externo não garante resultado. '
+        'A notícia não autoriza recalcular demonstrativos nem alterar parâmetros de uma turma em andamento. '
+        f'Setores permitidos: {", ".join(SETORES)}. Departamentos permitidos: {", ".join(DEPARTAMENTOS)}.')
     if tentativa:
         instrucao+=' A tentativa anterior trouxe fonte sem prova literal verificável. Pesquise novamente em páginas HTML oficiais diferentes e inclua somente itens cuja URL e trecho sejam verificáveis.'
     return instrucao
@@ -167,6 +200,12 @@ def indicador_selic_bcb():
         vigencia_inicio=None, vigencia_fim=None,
         condicoes='Indicador informativo oficial; não recalcula resultados ou contratos de rodadas já concluídas.',
         trecho=f"Resposta oficial da API SGS 432: data {registro['data']}; valor {registro['valor']}.",
+        competencia=referencia.strftime('%m/%Y'), setores_afetados=['Todos os setores'],
+        impactos=[ImpactoOficial(
+            departamento='Finanças',
+            efeito='A taxa de juros é uma referência para crédito, custo financeiro e disponibilidade de caixa.',
+            como_interpretar='Compare o custo do financiamento e a folga de caixa antes de ampliar gastos ou recorrer a crédito.',
+        )],
     )
     return item.model_dump(mode='json')
 
@@ -225,12 +264,24 @@ def atualizar(forcar=False):
         return False
 
 
-def consultar(db):
+def consultar(db, setor=None):
     b=db.query(BoletimOficial).order_by(BoletimOficial.id.desc()).first()
     c=db.get(ConsultaOficial,1)
+    itens=b.dados['itens'] if b else []
+    setor_sem_item_especifico=False
+    if setor:
+        filtrados=[item for item in itens if not item.get('setores_afetados') or 'Todos os setores' in item['setores_afetados'] or setor in item['setores_afetados']]
+        # Uma fonte nacional continua útil para a tomada de decisão. Nunca
+        # devolvemos uma consulta vazia só porque nenhum item foi marcado com
+        # o setor da turma; informamos a limitação e preservamos o boletim.
+        if filtrados:
+            itens=filtrados
+        elif itens:
+            setor_sem_item_especifico=True
     return {'habilitado':habilitado(),'estado':c.estado if c else 'PENDENTE',
             'erro':c.erro if c else None,'id':b.id if b else None,
             'consultado_em':b.consultado_em.isoformat()+'Z' if b else None,
             'consulta_vencida':not b or agora()-b.consultado_em>INTERVALO,
-            'intervalo_horas':6,'itens':b.dados['itens'] if b else [],
+            'intervalo_horas':6,'itens':itens, 'setor':setor,
+            'setor_sem_item_especifico':setor_sem_item_especifico,
             'escopo':'Boletim oficial. Aplicações tributárias usam regras versionadas do motor; normas com condições ou sem suporte são sinalizadas, não executadas pela IA.'}

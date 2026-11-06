@@ -15,6 +15,8 @@ interface Artigo {
     titulo: string;
     texto: string;
     data: string;
+    competencia?: string | null;
+    impactos?: {departamento:string;tipo:"ATENCAO"|"OPORTUNIDADE"|"RISCO";efeito:string;pergunta_decisao:string}[];
     fontes: Fonte[];
 }
 interface Produto {
@@ -87,10 +89,11 @@ const canais = ["VAREJO", "ECOMMERCE", "MARKETPLACE", "ATACADO", "FRANQUIA", "DI
 function Fontes({ fontes }: {
     fontes: Fonte[];
 }) { return <ul className="mt-2 text-xs text-slate-500">{fontes.map(f => <li key={f.url}><a href={f.url} target="_blank" rel="noreferrer" className="underline">{f.titulo}</a></li>)}</ul>; }
+function ImpactosDecisao({impactos}:{impactos?:Artigo["impactos"]}) { if(!impactos?.length)return null; return <details className="mt-3 rounded-lg bg-cyan-50 p-3"><summary className="cursor-pointer text-sm font-semibold text-corporativo">Impactos possíveis e pontos de decisão</summary><div className="mt-3 grid gap-3 sm:grid-cols-2">{impactos.map((impacto,n)=><section key={`${impacto.departamento}-${n}`} className="rounded border border-cyan-200 bg-white p-3 text-sm"><p className="font-semibold">{impacto.departamento} · {impacto.tipo}</p><p className="mt-1">{impacto.efeito}</p><p className="mt-2 text-slate-600">Pergunta para a equipe: {impacto.pergunta_decisao}</p></section>)}</div></details>; }
 function Artigos({ itens, mostrarFontes = true }: {
     mostrarFontes?: boolean;
     itens: Artigo[];
-}) { return <div className="grid gap-3 md:grid-cols-2">{itens.map((a, i) => <article key={i} className="rounded border p-3"><h4 className="font-bold">{a.titulo}</h4><p className="text-xs">{a.data}</p><p className="mt-2 whitespace-pre-wrap text-sm">{a.texto}</p>{mostrarFontes&&<Fontes fontes={a.fontes}/>}</article>)}</div>; }
+}) { return <div className="grid gap-3 md:grid-cols-2">{itens.map((a, i) => <article key={i} className="rounded border p-3"><h4 className="font-bold">{a.titulo}</h4><p className="text-xs">{a.data}{a.competencia&&` · Competência: ${a.competencia}`}</p><p className="mt-2 whitespace-pre-wrap text-sm">{a.texto}</p><ImpactosDecisao impactos={a.impactos}/>{mostrarFontes&&<Fontes fontes={a.fontes}/>}</article>)}</div>; }
 export function MercadoPublicado({ empresaId, rodada, visao = "mercado" }: {
     visao?: "mercado" | "relatorios";
     empresaId: number;
@@ -117,7 +120,7 @@ export function MercadoPublicado({ empresaId, rodada, visao = "mercado" }: {
     const relatorio=relatorios[relatorioSelecionado];
     return <Cartao titulo={visao === "mercado" ? "Notícias e análises do mercado" : "Relatório preparado pelo sistema"}>
       {erro && <p role="alert">{erro}</p>}
-      {visao === "mercado" && <>{!edicao?<p>O sistema ainda não disponibilizou uma edição de mercado.</p>:<><div className="grid gap-3 sm:grid-cols-2"><label className="text-sm">Edição<select className={estiloEntrada} value={edicao.id} onChange={e=>{setEdicaoSelecionada(Number(e.target.value));setArtigoSelecionado(0);}}>{edicoes.map(e=><option key={e.id} value={e.id}>Rodada {e.rodada} · {e.dados.setor}</option>)}</select></label><label className="text-sm">Leitura<select className={estiloEntrada} value={artigoSelecionado} onChange={e=>setArtigoSelecionado(Number(e.target.value))}>{artigos.map((a,n)=><option key={n} value={n}>{a.titulo}</option>)}</select></label></div>{artigo && <article className="mt-4"><h3 className="font-bold">{artigo.titulo}</h3><p className="text-xs text-slate-500">{artigo.data}</p><LeituraPaginada key={`${edicao.id}-${artigoSelecionado}`} texto={artigo.texto}/><details><summary>Fontes da leitura</summary><Fontes fontes={artigo.fontes}/></details></article>}</>}</>}
+      {visao === "mercado" && <>{!edicao?<p>O sistema ainda não disponibilizou uma edição de mercado.</p>:<><div className="grid gap-3 sm:grid-cols-2"><label className="text-sm">Edição<select className={estiloEntrada} value={edicao.id} onChange={e=>{setEdicaoSelecionada(Number(e.target.value));setArtigoSelecionado(0);}}>{edicoes.map(e=><option key={e.id} value={e.id}>Rodada {e.rodada} · {e.dados.setor}</option>)}</select></label><label className="text-sm">Leitura<select className={estiloEntrada} value={artigoSelecionado} onChange={e=>setArtigoSelecionado(Number(e.target.value))}>{artigos.map((a,n)=><option key={n} value={n}>{a.titulo}</option>)}</select></label></div>{artigo && <article className="mt-4"><h3 className="font-bold">{artigo.titulo}</h3><p className="text-xs text-slate-500">{artigo.data}{artigo.competencia&&` · Competência: ${artigo.competencia}`}</p><LeituraPaginada key={`${edicao.id}-${artigoSelecionado}`} texto={artigo.texto}/><ImpactosDecisao impactos={artigo.impactos}/><details><summary>Fontes da leitura</summary><Fontes fontes={artigo.fontes}/></details></article>}</>}</>}
       {visao === "relatorios" && <>{!relatorios.length?<p>Os relatórios estarão disponíveis após o encerramento da rodada e sua disponibilização pelo sistema.</p>:<><label>Rodada do relatório<select className={estiloEntrada} value={relatorioSelecionado} onChange={e=>setRelatorioSelecionado(Number(e.target.value))}>{relatorios.map((r,n)=><option key={r.rodada} value={n}>Rodada {r.rodada}</option>)}</select></label>{relatorio && <LeituraPaginada key={relatorio.rodada} texto={relatorio.texto}/>}</>}</>}
     </Cartao>;
 }

@@ -34,6 +34,26 @@ def test_sazonalidade_por_perfil_e_antecipacao():
     assert periodo(cfg('2026-12-19','SERVICOS'),1)['sazonalidade']['demanda']<natal['sazonalidade']['demanda']
 
 
+def test_sazonalidade_setorial_e_eventos_moveis():
+    eletronicos = periodo({
+        **cfg('2026-11-19', 'NEUTRO'),
+        'setor_mercado': 'Eletrônicos e Tecnologia',
+    }, 1)
+    educacao = periodo({
+        **cfg('2027-01-21', 'NEUTRO'),
+        'setor_mercado': 'Educação e Cursos',
+    }, 1)
+    neutro = periodo(cfg('2026-11-19', 'NEUTRO'), 1)
+
+    assert eletronicos['sazonalidade']['setor'] == 'Eletrônicos e Tecnologia'
+    assert 'Black Friday' in eletronicos['sazonalidade']['eventos']
+    assert eletronicos['sazonalidade']['demanda'] > 1
+    assert any(e['nome'] == 'Natal' for e in eletronicos['proximos_eventos'])
+    assert 'Volta às aulas' in educacao['sazonalidade']['eventos']
+    assert educacao['sazonalidade']['demanda'] > 1
+    assert neutro['sazonalidade']['demanda'] == 1
+
+
 def test_taxa_composta_e_proporcionalidade_sem_mutacao():
     p={'taxa_juros_mensal':.08,'custos_fixos_mensais':3100,'configuracao_simulacao':cfg('2026-10-01')}
     original=deepcopy(p);a=adaptar(p,1)
@@ -93,7 +113,7 @@ def test_fluxo_http_tres_semanas_preserva_snapshots(cliente,professor,modo):
         painel=cliente.get(f'/api/aluno/empresas/{eid}',headers=aluno).json()
         atual=painel['resultados'][-1]
         assert atual['detalhes_simulacao']['calendario']['inicio']==(inicio+timedelta(days=7*(r-1))).isoformat()
-        assert atual['detalhes_simulacao']['engine_version']=='3.1.0-auto-calendar-projected-mei'
+        assert atual['detalhes_simulacao']['engine_version']=='3.2.0-seasonal-sector-calendar'
         if primeiro is None: primeiro=deepcopy(atual)
         assert painel['resultados'][0]==primeiro
         assert painel['turma']['calendario']['inicio']==(inicio+timedelta(days=7*r)).isoformat()

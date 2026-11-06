@@ -49,7 +49,7 @@ endobj
 <<
 /Next 7 0 R
 /Count 4
-/Dest [ 73 0 R /Fit ]
+/Dest [ 79 0 R /Fit ]
 /First 290 0 R
 /Last 293 0 R
 /Parent 2 0 R
@@ -60,7 +60,7 @@ endobj
 7 0 obj
 <<
 /Next 8 0 R
-/Dest [ 85 0 R /Fit ]
+/Dest [ 91 0 R /Fit ]
 /Parent 2 0 R
 /Prev 6 0 R
 /Title (3 Cockpit do estudante)
@@ -69,7 +69,7 @@ endobj
 8 0 obj
 <<
 /Next 9 0 R
-/Dest [ 95 0 R /Fit ]
+/Dest [ 91 0 R /Fit ]
 /Parent 2 0 R
 /Prev 7 0 R
 /Title (4 Navega\347\343o\072 escolha \340 esquerda\054 trabalhe \340 direita)
@@ -313,7 +313,7 @@ endobj
 31 0 obj
 <<
 /Count 52
-/Kids [ 32 0 R 29 0 R 39 0 R 41 0 R 158 0 R 43 0 R 53 0 R 264 0 R 57 0 R 266 0 R 61 0 R 69 0 R 73 0 R 81 0 R 85 0 R 95 0 R 268 0 R 99 0 R 106 0 R 111 0 R 116 0 R 121 0 R 126 0 R 131 0 R 135 0 R 140 0 R 146 0 R 152 0 R 271 0 R 160 0 R 170 0 R 176 0 R 182 0 R 186 0 R 192 0 R 198 0 R 273 0 R 202 0 R 206 0 R 210 0 R 275 0 R 214 0 R 220 0 R 226 0 R 230 0 R 234 0 R 238 0 R 242 0 R 248 0 R 254 0 R 260 0 R 277 0 R ]
+/Kids [ 32 0 R 29 0 R 39 0 R 41 0 R 158 0 R 43 0 R 53 0 R 264 0 R 57 0 R 266 0 R 61 0 R 67 0 R 73 0 R 79 0 R 83 0 R 91 0 R 268 0 R 99 0 R 106 0 R 111 0 R 116 0 R 121 0 R 126 0 R 131 0 R 135 0 R 140 0 R 146 0 R 152 0 R 271 0 R 160 0 R 170 0 R 176 0 R 182 0 R 186 0 R 192 0 R 198 0 R 273 0 R 202 0 R 206 0 R 210 0 R 275 0 R 214 0 R 220 0 R 226 0 R 230 0 R 234 0 R 238 0 R 242 0 R 248 0 R 254 0 R 260 0 R 277 0 R ]
 /Type /Pages
 >>
 endobj
@@ -355,9 +355,9 @@ endobj
 34 0 obj
 <<
 /F1 35 0 R
-/F1-0 437 0 R
+/F1-0 446 0 R
 /F2 36 0 R
-/F2-0 438 0 R
+/F2-0 447 0 R
 /F3 37 0 R
 >>
 endobj
@@ -436,7 +436,7 @@ endobj
 endobj
 41 0 obj
 <<
-/Annots [ 42 0 R 45 0 R 46 0 R 47 0 R 48 0 R 49 0 R 50 0 R 51 0 R 52 0 R 55 0 R 56 0 R 59 0 R 60 0 R 63 0 R 64 0 R 65 0 R 66 0 R 67 0 R 68 0 R 71 0 R 72 0 R 75 0 R 76 0 R 77 0 R 78 0 R 79 0 R 80 0 R 83 0 R 84 0 R 87 0 R 88 0 R 89 0 R 90 0 R 91 0 R 92 0 R 93 0 R 94 0 R 97 0 R 98 0 R 102 0 R 103 0 R 104 0 R 105 0 R 109 0 R 110 0 R 114 0 R 115 0 R 119 0 R 120 0 R 124 0 R 125 0 R 129 0 R 130 0 R 133 0 R 134 0 R 138 0 R 139 0 R 142 0 R 143 0 R 144 0 R 145 0 R 148 0 R 149 0 R 150 0 R 151 0 R 154 0 R 155 0 R 156 0 R ]
+/Annots [ 42 0 R 45 0 R 46 0 R 47 0 R 48 0 R 49 0 R 50 0 R 51 0 R 52 0 R 55 0 R 56 0 R 59 0 R 60 0 R 63 0 R 64 0 R 65 0 R 66 0 R 69 0 R 70 0 R 71 0 R 72 0 R 75 0 R 76 0 R 77 0 R 78 0 R 81 0 R 82 0 R 85 0 R 86 0 R 87 0 R 88 0 R 89 0 R 90 0 R 93 0 R 94 0 R 95 0 R 96 0 R 97 0 R 98 0 R 102 0 R 103 0 R 104 0 R 105 0 R 109 0 R 110 0 R 114 0 R 115 0 R 119 0 R 120 0 R 124 0 R 125 0 R 129 0 R 130 0 R 133 0 R 134 0 R 138 0 R 139 0 R 142 0 R 143 0 R 144 0 R 145 0 R 148 0 R 149 0 R 150 0 R 151 0 R 154 0 R 155 0 R 156 0 R ]
 /Contents 157 0 R
 /MediaBox [ 0 0 595.2756 841.8898 ]
 /Parent 31 0 R
@@ -747,7 +747,7 @@ endobj
 /Border [ 0 0 0 ]
 /Contents ()
 /Dest [ 61 0 R /Fit ]
-/Rect [ 107.0394 564.4504 329.7954 578.8504 ]
+/Rect [ 107.0394 564.4504 371.8314 578.8504 ]
 /Subtype /Link
 /Type /Annot
 >>
@@ -756,7 +756,7 @@ endobj
 <<
 /Border [ 0 0 0 ]
 /Contents ()
-/Dest [ 61 0 R /Fit ]
+/Dest [ 67 0 R /Fit ]
 /Rect [ 519.2387 547.8504 532.5827 560.8504 ]
 /Subtype /Link
 /Type /Annot
@@ -764,27 +764,7 @@ endobj
 endobj
 67 0 obj
 <<
-/Border [ 0 0 0 ]
-/Contents ()
-/Dest [ 61 0 R /Fit ]
-/Rect [ 107.0394 545.4504 315.8154 559.8504 ]
-/Subtype /Link
-/Type /Annot
->>
-endobj
-68 0 obj
-<<
-/Border [ 0 0 0 ]
-/Contents ()
-/Dest [ 69 0 R /Fit ]
-/Rect [ 519.2387 528.8504 532.5827 541.8504 ]
-/Subtype /Link
-/Type /Annot
->>
-endobj
-69 0 obj
-<<
-/Contents 70 0 R
+/Contents 68 0 R
 /MediaBox [ 0 0 595.2756 841.8898 ]
 /Parent 31 0 R
 /Resources <<
@@ -811,14 +791,34 @@ endobj
 /Type /Page
 >>
 endobj
-70 0 obj
+68 0 obj
 [ 354 0 R 355 0 R ]
+endobj
+69 0 obj
+<<
+/Border [ 0 0 0 ]
+/Contents ()
+/Dest [ 67 0 R /Fit ]
+/Rect [ 107.0394 545.4504 315.8154 559.8504 ]
+/Subtype /Link
+/Type /Annot
+>>
+endobj
+70 0 obj
+<<
+/Border [ 0 0 0 ]
+/Contents ()
+/Dest [ 67 0 R /Fit ]
+/Rect [ 519.2387 528.8504 532.5827 541.8504 ]
+/Subtype /Link
+/Type /Annot
+>>
 endobj
 71 0 obj
 <<
 /Border [ 0 0 0 ]
 /Contents ()
-/Dest [ 69 0 R /Fit ]
+/Dest [ 67 0 R /Fit ]
 /Rect [ 107.0394 526.4504 350.4954 540.8504 ]
 /Subtype /Link
 /Type /Annot
@@ -900,7 +900,7 @@ endobj
 <<
 /Border [ 0 0 0 ]
 /Contents ()
-/Dest [ 73 0 R /Fit ]
+/Dest [ 79 0 R /Fit ]
 /Rect [ 519.2387 471.8504 532.5827 484.8504 ]
 /Subtype /Link
 /Type /Annot
@@ -908,27 +908,7 @@ endobj
 endobj
 79 0 obj
 <<
-/Border [ 0 0 0 ]
-/Contents ()
-/Dest [ 73 0 R /Fit ]
-/Rect [ 91.03937 469.4504 362.4914 483.8504 ]
-/Subtype /Link
-/Type /Annot
->>
-endobj
-80 0 obj
-<<
-/Border [ 0 0 0 ]
-/Contents ()
-/Dest [ 81 0 R /Fit ]
-/Rect [ 519.2387 452.8504 532.5827 465.8504 ]
-/Subtype /Link
-/Type /Annot
->>
-endobj
-81 0 obj
-<<
-/Contents 82 0 R
+/Contents 80 0 R
 /MediaBox [ 0 0 595.2756 841.8898 ]
 /Parent 31 0 R
 /Resources <<
@@ -940,23 +920,23 @@ endobj
 >>
 /Pattern <<
 /P10 329 0 R
-/P10-0 439 0 R
+/P10-0 437 0 R
 /P11 330 0 R
-/P11-0 440 0 R
+/P11-0 438 0 R
 /P12 331 0 R
-/P12-0 441 0 R
+/P12-0 439 0 R
 /P4 323 0 R
-/P4-0 442 0 R
+/P4-0 440 0 R
 /P5 324 0 R
-/P5-0 443 0 R
+/P5-0 441 0 R
 /P6 325 0 R
-/P6-0 444 0 R
+/P6-0 442 0 R
 /P7 326 0 R
-/P7-0 445 0 R
+/P7-0 443 0 R
 /P8 327 0 R
-/P8-0 446 0 R
+/P8-0 444 0 R
 /P9 328 0 R
-/P9-0 447 0 R
+/P9-0 445 0 R
 >>
 >>
 /Rotate 0
@@ -965,32 +945,32 @@ endobj
 /Type /Page
 >>
 endobj
-82 0 obj
+80 0 obj
 [ 448 0 R 449 0 R ]
+endobj
+81 0 obj
+<<
+/Border [ 0 0 0 ]
+/Contents ()
+/Dest [ 79 0 R /Fit ]
+/Rect [ 91.03937 469.4504 362.4914 483.8504 ]
+/Subtype /Link
+/Type /Annot
+>>
+endobj
+82 0 obj
+<<
+/Border [ 0 0 0 ]
+/Contents ()
+/Dest [ 83 0 R /Fit ]
+/Rect [ 519.2387 452.8504 532.5827 465.8504 ]
+/Subtype /Link
+/Type /Annot
+>>
 endobj
 83 0 obj
 <<
-/Border [ 0 0 0 ]
-/Contents ()
-/Dest [ 81 0 R /Fit ]
-/Rect [ 107.0394 450.4504 278.4714 464.8504 ]
-/Subtype /Link
-/Type /Annot
->>
-endobj
-84 0 obj
-<<
-/Border [ 0 0 0 ]
-/Contents ()
-/Dest [ 85 0 R /Fit ]
-/Rect [ 519.2387 433.8504 532.5827 446.8504 ]
-/Subtype /Link
-/Type /Annot
->>
-endobj
-85 0 obj
-<<
-/Contents 86 0 R
+/Contents 84 0 R
 /MediaBox [ 0 0 595.2756 841.8898 ]
 /Parent 31 0 R
 /Resources <<
@@ -1017,14 +997,34 @@ endobj
 /Type /Page
 >>
 endobj
-86 0 obj
+84 0 obj
 [ 360 0 R 361 0 R ]
+endobj
+85 0 obj
+<<
+/Border [ 0 0 0 ]
+/Contents ()
+/Dest [ 83 0 R /Fit ]
+/Rect [ 107.0394 450.4504 278.4714 464.8504 ]
+/Subtype /Link
+/Type /Annot
+>>
+endobj
+86 0 obj
+<<
+/Border [ 0 0 0 ]
+/Contents ()
+/Dest [ 83 0 R /Fit ]
+/Rect [ 519.2387 433.8504 532.5827 446.8504 ]
+/Subtype /Link
+/Type /Annot
+>>
 endobj
 87 0 obj
 <<
 /Border [ 0 0 0 ]
 /Contents ()
-/Dest [ 85 0 R /Fit ]
+/Dest [ 83 0 R /Fit ]
 /Rect [ 107.0394 431.4504 266.4474 445.8504 ]
 /Subtype /Link
 /Type /Annot
@@ -1034,7 +1034,7 @@ endobj
 <<
 /Border [ 0 0 0 ]
 /Contents ()
-/Dest [ 85 0 R /Fit ]
+/Dest [ 83 0 R /Fit ]
 /Rect [ 519.2387 414.8504 532.5827 427.8504 ]
 /Subtype /Link
 /Type /Annot
@@ -1044,7 +1044,7 @@ endobj
 <<
 /Border [ 0 0 0 ]
 /Contents ()
-/Dest [ 85 0 R /Fit ]
+/Dest [ 83 0 R /Fit ]
 /Rect [ 107.0394 412.4504 365.8314 426.8504 ]
 /Subtype /Link
 /Type /Annot
@@ -1054,7 +1054,7 @@ endobj
 <<
 /Border [ 0 0 0 ]
 /Contents ()
-/Dest [ 85 0 R /Fit ]
+/Dest [ 91 0 R /Fit ]
 /Rect [ 519.2387 395.8504 532.5827 408.8504 ]
 /Subtype /Link
 /Type /Annot
@@ -1062,47 +1062,7 @@ endobj
 endobj
 91 0 obj
 <<
-/Border [ 0 0 0 ]
-/Contents ()
-/Dest [ 85 0 R /Fit ]
-/Rect [ 107.0394 393.4504 278.4354 407.8504 ]
-/Subtype /Link
-/Type /Annot
->>
-endobj
-92 0 obj
-<<
-/Border [ 0 0 0 ]
-/Contents ()
-/Dest [ 85 0 R /Fit ]
-/Rect [ 519.2387 376.8504 532.5827 389.8504 ]
-/Subtype /Link
-/Type /Annot
->>
-endobj
-93 0 obj
-<<
-/Border [ 0 0 0 ]
-/Contents ()
-/Dest [ 85 0 R /Fit ]
-/Rect [ 91.03937 374.4504 213.7754 388.8504 ]
-/Subtype /Link
-/Type /Annot
->>
-endobj
-94 0 obj
-<<
-/Border [ 0 0 0 ]
-/Contents ()
-/Dest [ 95 0 R /Fit ]
-/Rect [ 519.2387 357.8504 532.5827 370.8504 ]
-/Subtype /Link
-/Type /Annot
->>
-endobj
-95 0 obj
-<<
-/Contents 96 0 R
+/Contents 92 0 R
 /MediaBox [ 0 0 595.2756 841.8898 ]
 /Parent 31 0 R
 /Resources <<
@@ -1129,14 +1089,54 @@ endobj
 /Type /Page
 >>
 endobj
-96 0 obj
+92 0 obj
 [ 362 0 R 363 0 R ]
+endobj
+93 0 obj
+<<
+/Border [ 0 0 0 ]
+/Contents ()
+/Dest [ 91 0 R /Fit ]
+/Rect [ 107.0394 393.4504 278.4354 407.8504 ]
+/Subtype /Link
+/Type /Annot
+>>
+endobj
+94 0 obj
+<<
+/Border [ 0 0 0 ]
+/Contents ()
+/Dest [ 91 0 R /Fit ]
+/Rect [ 519.2387 376.8504 532.5827 389.8504 ]
+/Subtype /Link
+/Type /Annot
+>>
+endobj
+95 0 obj
+<<
+/Border [ 0 0 0 ]
+/Contents ()
+/Dest [ 91 0 R /Fit ]
+/Rect [ 91.03937 374.4504 213.7754 388.8504 ]
+/Subtype /Link
+/Type /Annot
+>>
+endobj
+96 0 obj
+<<
+/Border [ 0 0 0 ]
+/Contents ()
+/Dest [ 91 0 R /Fit ]
+/Rect [ 519.2387 357.8504 532.5827 370.8504 ]
+/Subtype /Link
+/Type /Annot
+>>
 endobj
 97 0 obj
 <<
 /Border [ 0 0 0 ]
 /Contents ()
-/Dest [ 95 0 R /Fit ]
+/Dest [ 91 0 R /Fit ]
 /Rect [ 91.03937 355.4504 369.1874 369.8504 ]
 /Subtype /Link
 /Type /Annot
@@ -3537,13 +3537,13 @@ endobj
 /Dest [ 61 0 R /Fit ]
 /Parent 5 0 R
 /Prev 284 0 R
-/Title (1\0567 Perfis sazonais\072 Estimativa do Modelo)
+/Title (1\0567 Sazonalidade por setor\072 Estimativa do Modelo)
 >>
 endobj
 286 0 obj
 <<
 /Next 287 0 R
-/Dest [ 61 0 R /Fit ]
+/Dest [ 67 0 R /Fit ]
 /Parent 5 0 R
 /Prev 285 0 R
 /Title (1\0568 Consequ\352ncias nos departamentos)
@@ -3552,7 +3552,7 @@ endobj
 287 0 obj
 <<
 /Next 288 0 R
-/Dest [ 69 0 R /Fit ]
+/Dest [ 67 0 R /Fit ]
 /Parent 5 0 R
 /Prev 286 0 R
 /Title (1\0569 Valores de refer\352ncia e valores da rodada)
@@ -3578,7 +3578,7 @@ endobj
 290 0 obj
 <<
 /Next 291 0 R
-/Dest [ 81 0 R /Fit ]
+/Dest [ 83 0 R /Fit ]
 /Parent 6 0 R
 /Title (2\0561 O s\355mbolo\072 a rede de gest\343o)
 >>
@@ -3587,7 +3587,7 @@ endobj
 <<
 /Next 292 0 R
 /Prev 290 0 R
-/Dest [ 85 0 R /Fit ]
+/Dest [ 83 0 R /Fit ]
 /Parent 6 0 R
 /Title (2\0562 As cores e seu significado)
 >>
@@ -3595,7 +3595,7 @@ endobj
 292 0 obj
 <<
 /Next 293 0 R
-/Dest [ 85 0 R /Fit ]
+/Dest [ 83 0 R /Fit ]
 /Parent 6 0 R
 /Prev 291 0 R
 /Title (2\0563 A tipografia\072 identidade corporativa acess\355vel)
@@ -3603,7 +3603,7 @@ endobj
 endobj
 293 0 obj
 <<
-/Dest [ 85 0 R /Fit ]
+/Dest [ 91 0 R /Fit ]
 /Parent 6 0 R
 /Prev 292 0 R
 /Title (2\0564 Como ler a marca na pr\341tica)
@@ -3839,11 +3839,11 @@ endobj
 321 0 obj
 <<
 /Author (Professor Guandalini)
-/CreationDate (D\07220261104195319\05503\04700\047)
+/CreationDate (D\07220261106104732\05503\04700\047)
 /Creator (\050unspecified\051)
 /Keywords ()
-/ModDate (D\07220261104195319\05503\04700\047)
-/Producer (ReportLab PDF Library \055 \050opensource\051)
+/ModDate (D\07220261106104732\05503\04700\047)
+/Producer (ReportLab PDF Library \055 www\056reportlab\056com)
 /Subject (\050unspecified\051)
 /Title (SempreHub \055 Manual do aluno)
 /Trapped /False
@@ -5738,7 +5738,7 @@ endstream
 endobj
 338 0 obj
 <<
-/Length 9133
+/Length 9128
 >>
 stream
 q
@@ -5819,14 +5819,14 @@ Q
 q
 1 0 0 1 0 497 cm
 q
-BT 1 0 0 1 248.0553 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 10) Tj T* ET
-BT 1 0 0 1 16 1 Tm 13 TL /F1 12 Tf 0 0 0 rg (1.7 Perfis sazonais: Estimativa do Modelo) Tj  T* ET
+BT 1 0 0 1 288.0873 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  . 10) Tj T* ET
+BT 1 0 0 1 16 1 Tm 13 TL /F1 12 Tf 0 0 0 rg (1.7 Sazonalidade por setor: Estimativa do Modelo) Tj  T* ET
 Q
 Q
 q
 1 0 0 1 0 478 cm
 q
-BT 1 0 0 1 228.0393 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 10) Tj T* ET
+BT 1 0 0 1 228.0393 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 11) Tj T* ET
 BT 1 0 0 1 16 1 Tm 13 TL /F1 12 Tf 0 0 0 rg (1.8 Consequ\352ncias nos departamentos) Tj  T* ET
 Q
 Q
@@ -5854,14 +5854,14 @@ Q
 q
 1 0 0 1 0 402 cm
 q
-BT 1 0 0 1 278.0793 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 12) Tj T* ET
+BT 1 0 0 1 278.0793 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 13) Tj T* ET
 BT 1 0 0 1 0 1 Tm 13 TL /F1 12 Tf 0 0 0 rg (2 A hist\363ria e o conceito da logomarca SempreHub) Tj  T* ET
 Q
 Q
 q
 1 0 0 1 0 383 cm
 q
-BT 1 0 0 1 188.0073 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 13) Tj T* ET
+BT 1 0 0 1 188.0073 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 14) Tj T* ET
 BT 1 0 0 1 16 1 Tm 13 TL /F1 12 Tf 0 0 0 rg (2.1 O s\355mbolo: a rede de gest\343o) Tj  T* ET
 Q
 Q
@@ -5882,14 +5882,14 @@ Q
 q
 1 0 0 1 0 326 cm
 q
-BT 1 0 0 1 188.0073 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 14) Tj T* ET
+BT 1 0 0 1 188.0073 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 15) Tj T* ET
 BT 1 0 0 1 16 1 Tm 13 TL /F1 12 Tf 0 0 0 rg (2.4 Como ler a marca na pr\341tica) Tj  T* ET
 Q
 Q
 q
 1 0 0 1 0 307 cm
 q
-BT 1 0 0 1 127.9593 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 14) Tj T* ET
+BT 1 0 0 1 127.9593 1 Tm /F1 12 Tf 14.4 TL 0 0 0 rg ( .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 15) Tj T* ET
 BT 1 0 0 1 0 1 Tm 13 TL /F1 12 Tf 0 0 0 rg (3 Cockpit do estudante) Tj  T* ET
 Q
 Q
@@ -10389,7 +10389,7 @@ endstream
 endobj
 352 0 obj
 <<
-/Length 4523
+/Length 4382
 >>
 stream
 q
@@ -10427,98 +10427,34 @@ q
 1 0 0 1 91.03937 564.8504 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (1.7 Perfis sazonais: Estimativa do Modelo) Tj T* ET
+BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (1.7 Sazonalidade por setor: Estimativa do Modelo) Tj T* ET
 Q
 Q
 q
 1 0 0 1 91.03937 426.8504 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 114 Tm /F1 12 Tf 18 TL .167276 Tw (O perfil configurado da turma determina a sazonalidade. Neutro mant\351m o fator de) Tj T* 0 Tw 2.871931 Tw (procura em 1. Varejo tem maior sensibilidade; Alimenta\347\343o responde mais ao) Tj T* 0 Tw 1.273392 Tw (Natal e pouco \340s outras datas; Servi\347os tem sensibilidade pequena. Estes perfis) Tj T* 0 Tw 6.010758 Tw (s\343o simplifica\347\365es did\341ticas, n\343o classifica\347\365es universais nem estat\355sticas) Tj T* 0 Tw .607937 Tw (comprovadas. O perfil deve corresponder \340 proposta do neg\363cio. O modelo inicial) Tj T* 0 Tw 3.275131 Tw (contempla Dia das Crian\347as, Black Friday \(\372ltima sexta-feira de novembro\) e) Tj T* 0 Tw (Natal; outras datas e diferen\347as regionais n\343o est\343o modeladas nesta edi\347\343o.) Tj T* ET
+BT 1 0 0 1 0 114 Tm /F1 12 Tf 18 TL 2.058276 Tw (O calend\341rio usa datas do calend\341rio civil brasileiro e identifica Volta \340s aulas,) Tj T* 0 Tw 1.471531 Tw (Carnaval, Semana do Consumidor, P\341scoa, Dia das M\343es, Dia dos Namorados,) Tj T* 0 Tw 3.117276 Tw (Dia dos Pais, Dia das Crian\347as, Black Friday, Natal e Ano-Novo. Carnaval e) Tj T* 0 Tw 1.572236 Tw (P\341scoa s\343o calculados para cada ano; Dia das M\343es e Dia dos Pais seguem o) Tj T* 0 Tw 2.30887 Tw (segundo domingo de maio e de agosto; Black Friday \351 a \372ltima sexta-feira de) Tj T* 0 Tw 4.20487 Tw (novembro. A tela mostra a data, a fase de prepara\347\343o ou p\363s-evento e a) Tj T* 0 Tw (orienta\347\343o da semana.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 292.8504 cm
+1 0 0 1 91.03937 256.8504 cm
 q
-0 0 0 rg
-BT 1 0 0 1 0 114 Tm /F1 12 Tf 18 TL 4.737931 Tw (A procura cresce progressivamente nos 42 dias anteriores \340s datas: picos) Tj T* 0 Tw 1.199131 Tw (adicionais de refer\352ncia de 40%, 45% e 60%, respectivamente, ponderados pelo) Tj T* 0 Tw .522236 Tw (perfil e pelos dias da semana. Durante sete dias ap\363s a data, h\341 redu\347\343o did\341tica) Tj T* 0 Tw .142522 Tw (de 12% ponderada pelo perfil. Os efeitos ativos s\343o somados e a procura tem piso) Tj T* 0 Tw .046522 Tw (de 50% da base. Insumos recebem adicional de 8% da parcela positiva do fator de) Tj T* 0 Tw 2.667276 Tw (procura; fretes, 20% dessa parcela. A interface identifica os eventos e o fator) Tj T* 0 Tw (aplicado. N\343o h\341 n\372meros aleat\363rios na sazonalidade.) Tj T* ET
+BT 1 0 0 1 0 150 Tm 1.643331 Tw 18 TL /F1 12 Tf 0 0 0 rg (Depois que o professor publica o setor da turma, o motor aplica pesos pr\363prios) Tj T* 0 Tw .667276 Tw (para o setor escolhido - por exemplo, Eletr\364nicos e Tecnologia tende a responder) Tj T* 0 Tw 2.003379 Tw (mais a Black Friday e Natal; Educa\347\343o e Cursos \340 volta \340s aulas; Alimentos e) Tj T* 0 Tw 1.113276 Tw (Bebidas, Vestu\341rio e Moda, Cosm\351ticos e Beleza, Pet Care e os demais setores) Tj T* 0 Tw 2.184301 Tw (possuem combina\347\365es pr\363prias. Antes da publica\347\343o, o perfil geral da turma \351) Tj T* 0 Tw .666276 Tw (apenas uma alternativa de continuidade: Neutro mant\351m o fator de procura em 1;) Tj T* 0 Tw 2.672367 Tw (Varejo, Alimenta\347\343o e Servi\347os usam sensibilidades amplas. Esses pesos s\343o) Tj T* 0 Tw 3.337531 Tw /F2 12 Tf (Estimativas do Modelo) Tj /F1 12 Tf (: n\343o s\343o previs\343o de vendas, estat\355stica oficial nem) Tj T* 0 Tw (garantia de resultado.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 262.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (1.8 Consequ\352ncias nos departamentos) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 238.8504 cm
+1 0 0 1 91.03937 122.8504 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Tabela 3 - Consequ\352ncias nos departamentos) Tj T* ET
+BT 1 0 0 1 0 114 Tm /F1 12 Tf 18 TL .049177 Tw (O efeito come\347a na prepara\347\343o para a data e pode ter uma pequena normaliza\347\343o) Tj T* 0 Tw .85121 Tw (posterior. Os eventos ativos s\343o combinados de forma determin\355stica e a procura) Tj T* 0 Tw -0.052724 Tw (fica limitada a uma faixa segura do modelo. Em neg\363cios tradicionais, uma procura) Tj T* 0 Tw 1.445276 Tw (maior tamb\351m pode elevar a necessidade projetada de insumos e a press\343o de) Tj T* 0 Tw 5.401531 Tw (frete. Em Startups, a sazonalidade influencia a procura e o planejamento) Tj T* 0 Tw .393276 Tw (comercial, sem criar custo f\355sico autom\341tico de insumos ou frete. N\343o h\341 n\372meros) Tj T* 0 Tw (aleat\363rios nessa regra.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 100.8504 cm
-q
-.011765 .290196 .65098 rg
-n 0 126 453.5433 -26 re f*
-1 1 1 rg
-n 0 100 453.5433 -50 re f*
-.94902 .94902 .94902 rg
-n 0 50 453.5433 -50 re f*
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-q
-1 0 0 1 6 107 cm
-q
-1 1 1 rg
-BT 1 0 0 1 0 2 Tm /F2 10 Tf 12 TL (\301rea) Tj T* ET
-Q
-Q
-q
-1 0 0 1 232.7717 107 cm
-q
-1 1 1 rg
-BT 1 0 0 1 0 2 Tm /F2 10 Tf 12 TL (O que avaliar na semana) Tj T* ET
-Q
-Q
-q
-1 0 0 1 6 81 cm
+1 0 0 1 91.03937 78.85039 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Marketing) Tj T* ET
-Q
-Q
-q
-1 0 0 1 232.7717 57 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 26 Tm /F1 10 Tf 12 TL (Pre\347o, p\372blico, campanha e posicionamento) Tj T* (antes do pico; a campanha n\343o garante) Tj T* (convers\343o.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 6 31 cm
-q
-BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (Produ\347\343o e P) Tj (&) Tj (D) Tj T* ET
-Q
-Q
-q
-1 0 0 1 232.7717 7 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 26 Tm /F1 10 Tf 12 TL (Capacidade proporcional ao per\355odo,) Tj T* (mat\351ria-prima, refugo, qualidade e) Tj T* (investimentos antecipados.) Tj T* ET
-Q
-Q
-q
-1 J
-1 j
-0 0 0 RG
-.7 w
-n 0 126 m 453.5433 126 l S
-.6 w
-n 0 100 m 453.5433 100 l S
-Q
+BT 1 0 0 1 0 24 Tm /F1 12 Tf 18 TL 2.333276 Tw (Use a indica\347\343o como pergunta de gest\343o, e n\343o como ordem autom\341tica: h\341) Tj T* 0 Tw 4.813701 Tw (capacidade, estoque, caixa, pessoas, campanha e log\355stica para atender a) Tj T* 0 Tw ET
 Q
 Q
  
@@ -11007,7 +10943,7 @@ endstream
 endobj
 354 0 obj
 <<
-/Length 5053
+/Length 5147
 >>
 stream
 q
@@ -11028,10 +10964,35 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (11) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 598.8504 cm
+1 0 0 1 91.03937 696.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 42 Tm /F1 12 Tf 18 TL -0.095528 Tw (oportunidade? Contrata\347\365es, compras, produ\347\343o e investimentos continuam sendo) Tj T* 0 Tw .072367 Tw (decis\365es da equipe. Pre\347o, concorr\352ncia, disponibilidade e qualidade ainda podem) Tj T* 0 Tw (reduzir o resultado mesmo em uma data favor\341vel.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 666.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (1.8 Consequ\352ncias nos departamentos) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 642.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Tabela 3 - Consequ\352ncias nos departamentos) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 378.8504 cm
 q
 .011765 .290196 .65098 rg
-n 0 152 453.5433 -26 re f*
+n 0 252 453.5433 -26 re f*
+1 1 1 rg
+n 0 226 453.5433 -50 re f*
+.94902 .94902 .94902 rg
+n 0 176 453.5433 -50 re f*
 1 1 1 rg
 n 0 126 453.5433 -50 re f*
 .94902 .94902 .94902 rg
@@ -11041,17 +11002,44 @@ n 0 38 453.5433 -38 re f*
 0 0 0 rg
 BT /F1 10 Tf 12 TL ET
 q
-1 0 0 1 6 133 cm
+1 0 0 1 6 233 cm
 q
 1 1 1 rg
 BT 1 0 0 1 0 2 Tm /F2 10 Tf 12 TL (\301rea) Tj T* ET
 Q
 Q
 q
-1 0 0 1 232.7717 133 cm
+1 0 0 1 232.7717 233 cm
 q
 1 1 1 rg
 BT 1 0 0 1 0 2 Tm /F2 10 Tf 12 TL (O que avaliar na semana) Tj T* ET
+Q
+Q
+q
+1 0 0 1 6 207 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Marketing) Tj T* ET
+Q
+Q
+q
+1 0 0 1 232.7717 183 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 26 Tm /F1 10 Tf 12 TL (Pre\347o, p\372blico, campanha e posicionamento) Tj T* (antes do pico; a campanha n\343o garante) Tj T* (convers\343o.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 6 157 cm
+q
+BT 1 0 0 1 0 2 Tm 12 TL /F1 10 Tf 0 0 0 rg (Produ\347\343o e P) Tj (&) Tj (D) Tj T* ET
+Q
+Q
+q
+1 0 0 1 232.7717 133 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 26 Tm /F1 10 Tf 12 TL (Capacidade proporcional ao per\355odo,) Tj T* (mat\351ria-prima, refugo, qualidade e) Tj T* (investimentos antecipados.) Tj T* ET
 Q
 Q
 q
@@ -11101,50 +11089,43 @@ q
 1 j
 0 0 0 RG
 .7 w
-n 0 152 m 453.5433 152 l S
+n 0 252 m 453.5433 252 l S
 .6 w
-n 0 126 m 453.5433 126 l S
+n 0 226 m 453.5433 226 l S
 .7 w
 n 0 0 m 453.5433 0 l S
 Q
 Q
 Q
 q
-1 0 0 1 91.03937 592.8504 cm
+1 0 0 1 91.03937 372.8504 cm
 Q
 q
-1 0 0 1 91.03937 580.8504 cm
+1 0 0 1 91.03937 360.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Fonte: SempreHub, acervo do Professor Guandalini \(2026\).) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 550.8504 cm
+1 0 0 1 91.03937 330.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (1.9 Valores de refer\352ncia e valores da rodada) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 340.8504 cm
+1 0 0 1 91.03937 120.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 186 Tm /F1 12 Tf 18 TL 4.521701 Tw (Sal\341rio e benef\355cio por funcion\341rio continuam sendo refer\352ncias mensais; a) Tj T* 0 Tw 2.817701 Tw (despesa semanal \351 proporcional aos dias. Custos fixos, capacidade industrial,) Tj T* 0 Tw 7.43533 Tw (produtividade, armazenagem, deprecia\347\343o, DAS de refer\352ncia e servi\347os) Tj T* 0 Tw .304664 Tw (recorrentes da Startup tamb\351m s\343o proporcionais. Para cada dia usa-se 1 dividido) Tj T* 0 Tw 3.067531 Tw (pela quantidade de dias daquele m\352s. Uma semana inteiramente em outubro) Tj T* 0 Tw -0.152053 Tw (corresponde a 7/31 do valor mensal; uma semana entre fevereiro e mar\347o soma as) Tj T* 0 Tw .137131 Tw (fra\347\365es dos dois meses. Juros e crescimento usam taxas equivalentes compostas;) Tj T* 0 Tw .517701 Tw (churn usa sobreviv\352ncia equivalente. Quantidades de produ\347\343o, compras e novas) Tj T* 0 Tw 8.755913 Tw (contrata\347\365es s\343o escolhas da semana, n\343o valores mensais divididos) Tj T* 0 Tw 2.224551 Tw (automaticamente. Investimentos, rescis\365es, treinamento e pagamentos pontuais) Tj T* 0 Tw (n\343o s\343o divididos outra vez.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 206.8504 cm
+1 0 0 1 91.03937 76.85039 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 114 Tm /F1 12 Tf 18 TL 2.970846 Tw (A capacidade da nuvem representa clientes simult\342neos e n\343o \351 dividida por) Tj T* 0 Tw 2.672367 Tw (quatro. Mensalidades e custos recorrentes por cliente s\343o proporcionais; MRR) Tj T* 0 Tw .221276 Tw (continua sendo a receita mensal equivalente, enquanto a DRE mostra a receita do) Tj T* 0 Tw 2.388276 Tw (per\355odo. O alvo mensal did\341tico de manuten\347\343o de R$ 1.000 \351 proporcional \340) Tj T* 0 Tw 2.221701 Tw (semana; aus\352ncia de manuten\347\343o acumula desgaste proporcional ao tempo. A) Tj T* 0 Tw 1.041701 Tw (refer\352ncia salarial usada no eNPS permanece mensal, evitando comparar sal\341rio) Tj T* 0 Tw (semanal com sal\341rio mensal.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 72.85039 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 114 Tm /F1 12 Tf 18 TL 2.246482 Tw (Prazos de compra e venda s\343o expressos em semanas nas turmas semanais.) Tj T* 0 Tw -0.048669 Tw (PMR e PMP usam sete dias, com saldos originados na pr\363pria rodada; no hist\363rico) Tj T* 0 Tw .112276 Tw (mensal mant\352m a conven\347\343o de 30 dias. Para classifica\347\343o did\341tica, o curto prazo) Tj T* 0 Tw 1.153392 Tw (semanal abrange 52 rodadas \(364 dias\). As compet\352ncias fiscais anuais usam o) Tj T* 0 Tw .045665 Tw (ano de encerramento da semana; uma semana que cruza o ano \351 atribu\355da a esse) Tj T* 0 Tw -0.065669 Tw (ano para os controles anuais simplificados. Isso n\343o representa apura\347\343o tribut\341ria) Tj T* 0 Tw (legal.) Tj T* ET
+BT 1 0 0 1 0 24 Tm /F1 12 Tf 18 TL 2.970846 Tw (A capacidade da nuvem representa clientes simult\342neos e n\343o \351 dividida por) Tj T* 0 Tw 2.672367 Tw (quatro. Mensalidades e custos recorrentes por cliente s\343o proporcionais; MRR) Tj T* 0 Tw ET
 Q
 Q
  
@@ -11633,7 +11614,7 @@ endstream
 endobj
 356 0 obj
 <<
-/Length 3966
+/Length 4154
 >>
 stream
 q
@@ -11654,57 +11635,49 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (12) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 732.8504 cm
+1 0 0 1 91.03937 660.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 78 Tm /F1 12 Tf 18 TL .221276 Tw (continua sendo a receita mensal equivalente, enquanto a DRE mostra a receita do) Tj T* 0 Tw 2.388276 Tw (per\355odo. O alvo mensal did\341tico de manuten\347\343o de R$ 1.000 \351 proporcional \340) Tj T* 0 Tw 2.221701 Tw (semana; aus\352ncia de manuten\347\343o acumula desgaste proporcional ao tempo. A) Tj T* 0 Tw 1.041701 Tw (refer\352ncia salarial usada no eNPS permanece mensal, evitando comparar sal\341rio) Tj T* 0 Tw (semanal com sal\341rio mensal.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 526.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 114 Tm /F1 12 Tf 18 TL 2.246482 Tw (Prazos de compra e venda s\343o expressos em semanas nas turmas semanais.) Tj T* 0 Tw -0.048669 Tw (PMR e PMP usam sete dias, com saldos originados na pr\363pria rodada; no hist\363rico) Tj T* 0 Tw .112276 Tw (mensal mant\352m a conven\347\343o de 30 dias. Para classifica\347\343o did\341tica, o curto prazo) Tj T* 0 Tw 1.153392 Tw (semanal abrange 52 rodadas \(364 dias\). As compet\352ncias fiscais anuais usam o) Tj T* 0 Tw .045665 Tw (ano de encerramento da semana; uma semana que cruza o ano \351 atribu\355da a esse) Tj T* 0 Tw -0.065669 Tw (ano para os controles anuais simplificados. Isso n\343o representa apura\347\343o tribut\341ria) Tj T* 0 Tw (legal.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 496.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (1.10 DRE e balan\347o s\343o consultas diferentes) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 594.8504 cm
+1 0 0 1 91.03937 358.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 114 Tm /F1 12 Tf 18 TL 3.836276 Tw (A aba DRE abre o demonstrativo completo da rodada. As vis\365es mensal e) Tj T* 0 Tw 3.784367 Tw (trimestral consolidam somente semanas registradas com datas: cada linha \351) Tj T* 0 Tw 6.337531 Tw (rateada por dia em centavos, sem duplicar uma semana que atravessa) Tj T* 0 Tw 2.586413 Tw (compet\352ncias. Per\355odos ainda incompletos s\343o apresentados como parciais. O) Tj T* 0 Tw 1.94887 Tw (balan\347o \351 uma fotografia patrimonial no fim da rodada e n\343o deve ser somado) Tj T* 0 Tw .001531 Tw (entre semanas. Aportes e empr\351stimos continuam fora da receita; cheque especial) Tj T* 0 Tw (\351 passivo, e o caixa assinado permanece no fluxo e no cabe\347alho.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 564.8504 cm
+1 0 0 1 91.03937 328.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (1.11 Hist\363rico mensal preservado) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 354.8504 cm
+1 0 0 1 91.03937 118.8504 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 186 Tm /F1 12 Tf 18 TL 2.758913 Tw (Turmas anteriores migram automaticamente para semanas na primeira rodada) Tj T* 0 Tw 3.537931 Tw (aberta sem decis\365es salvas. Uma rodada mensal j\341 planejada mant\351m suas) Tj T* 0 Tw 3.068731 Tw (regras at\351 o fechamento. Os resultados anteriores n\343o s\343o recalculados nem) Tj T* 0 Tw 3.090846 Tw (redistribu\355dos por datas inventadas. A ativa\347\343o \351 prospectiva e n\343o pode ser) Tj T* 0 Tw 4.084913 Tw (reposicionada. Obriga\347\365es futuras sem datas absolutas herdadas do modelo) Tj T* 0 Tw .332276 Tw (mensal s\343o convertidas pela conven\347\343o de 30 dias por m\352s, arredondando para a) Tj T* 0 Tw 6.252413 Tw (semana de vencimento seguinte; essa aproxima\347\343o n\343o altera snapshots) Tj T* 0 Tw .228551 Tw (passados. Resultados novos registram a vers\343o 3.1.0-auto-calendar-projected-mei) Tj T* 0 Tw 5.855034 Tw (e o calend\341rio usado. Exemplos mensais neste manual continuam sendo) Tj T* 0 Tw 1.154482 Tw (refer\352ncias mensais ou descri\347\365es do hist\363rico, e n\343o uma cobran\347a integral por) Tj T* 0 Tw (semana.) Tj T* ET
+BT 1 0 0 1 0 186 Tm /F1 12 Tf 18 TL 2.758913 Tw (Turmas anteriores migram automaticamente para semanas na primeira rodada) Tj T* 0 Tw 3.537931 Tw (aberta sem decis\365es salvas. Uma rodada mensal j\341 planejada mant\351m suas) Tj T* 0 Tw 3.068731 Tw (regras at\351 o fechamento. Os resultados anteriores n\343o s\343o recalculados nem) Tj T* 0 Tw 3.090846 Tw (redistribu\355dos por datas inventadas. A ativa\347\343o \351 prospectiva e n\343o pode ser) Tj T* 0 Tw 4.084913 Tw (reposicionada. Obriga\347\365es futuras sem datas absolutas herdadas do modelo) Tj T* 0 Tw .332276 Tw (mensal s\343o convertidas pela conven\347\343o de 30 dias por m\352s, arredondando para a) Tj T* 0 Tw 6.252413 Tw (semana de vencimento seguinte; essa aproxima\347\343o n\343o altera snapshots) Tj T* 0 Tw .206101 Tw (passados. Resultados novos registram a vers\343o do motor e o calend\341rio usado - a) Tj T* 0 Tw 4.575901 Tw (edi\347\343o sazonal por setor \351 identificada como 3.2.0-seasonal-sector-calendar.) Tj T* 0 Tw 5.422913 Tw (Exemplos mensais neste manual continuam sendo refer\352ncias mensais ou) Tj T* 0 Tw (descri\347\365es do hist\363rico, e n\343o uma cobran\347a integral por semana.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 346.8504 cm
-Q
-q
-1 0 0 1 91.03937 334.8504 cm
-Q
-q
-1 0 0 1 91.03937 316.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (2 A hist\363ria e o conceito da logomarca SempreHub) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 226.8504 cm
-q
-BT 1 0 0 1 0 60 Tm .281276 Tw 18 TL /F2 12 Tf 0 0 0 rg (Autoria e cria\347\343o: Professor Guandalini.) Tj /F1 12 Tf ( O nome, a marca e a identidade visual) Tj T* 0 Tw 1.871131 Tw (do SempreHub foram idealizados e criados pelo Professor Guandalini. A marca) Tj T* 0 Tw 1.801531 Tw (aproxima o ambiente corporativo da conex\343o das redes modernas e representa) Tj T* 0 Tw -0.000869 Tw (uma metodologia de aprendizagem integrada, voltada ao Ensino M\351dio e Superior.) Tj T* 0 Tw ET
-Q
-Q
-q
-1 0 0 1 91.03937 146.8504 cm
-q
-BT 1 0 0 1 0 60 Tm .835913 Tw 18 TL /F2 12 Tf 0 0 0 rg (SEMPRE) Tj /F1 12 Tf ( expressa const\342ncia, aprendizado cont\355nuo e resili\352ncia. Empreender \351) Tj T* 0 Tw 1.517755 Tw (um ciclo de tentativas, an\341lise de resultados, ajustes e evolu\347\343o. ) Tj /F2 12 Tf (HUB) Tj /F1 12 Tf ( identifica) Tj T* 0 Tw .444367 Tw (um centro conector: estudantes, departamentos, gest\343o e mercado competitivo se) Tj T* 0 Tw (encontram em um mesmo ecossistema.) Tj T* ET
-Q
+1 0 0 1 91.03937 110.8504 cm
 Q
  
 
@@ -12191,561 +12164,14 @@ Q
 endstream
 endobj
 358 0 obj
-<<
-/Length 2355
->>
-stream
-q
-1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
-q
-.011765 .290196 .65098 rg
-BT /F1 8 Tf 9.6 TL ET
-BT 1 0 0 1 479.4387 773.8898 Tm (Manual do aluno) Tj T* ET
-.039216 .678431 .74902 RG
-.5 w
-n 85.03937 768.8898 m 538.5827 768.8898 l S
-BT /F1 8 Tf 9.6 TL ET
-.011765 .290196 .65098 rg
-BT 1 0 0 1 85.03937 35 Tm (Conceito e marca: Professor Guandalini) Tj T* ET
-BT 1 0 0 1 451.5747 35 Tm (SempreHub | Edi\347\343o 4.0) Tj T* ET
-0 0 0 rg
-BT /F1 10 Tf 12 TL ET
-BT 1 0 0 1 527.4627 785.1969 Tm (13) Tj T* ET
-Q
-q
-1 0 0 1 91.03937 726.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 14 Tm /F1 10 Tf 12 TL (Figura 1 - Anatomia da logomarca SempreHub: departamentos, conex\365es, tipografia e n\372cleos) Tj T* (centrais) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 389.811 cm
-Q
-q
-1 0 0 1 91.03937 381.811 cm
-Q
-q
-1 0 0 1 91.03937 369.811 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Fonte: Professor Guandalini \(2026\). Diagrama explicativo sobre a logomarca oficial.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 339.811 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (2.1 O s\355mbolo: a rede de gest\343o) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 255.811 cm
-q
-BT 1 0 0 1 0 60 Tm 2.004301 Tw 18 TL /F1 12 Tf 0 0 0 rg (Os n\363s perif\351ricos, em azul e ciano, representam os seis departamentos vitais:) Tj T* 0 Tw 3.05533 Tw (Pesquisa e Desenvolvimento \(P) Tj (&) Tj (D\), Produ\347\343o, Log\355stica, Marketing, Recursos) Tj T* 0 Tw .129028 Tw (Humanos \(RH\) e Finan\347as. Eles mostram uma empresa cujas \341reas trabalham em) Tj T* 0 Tw (conjunto.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 175.811 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 60 Tm /F1 12 Tf 18 TL 3.261701 Tw (As linhas conectoras representam a interdepend\352ncia das decis\365es. Alterar o) Tj T* 0 Tw 3.879573 Tw (pre\347o no Marketing pode mudar a demanda e o faturamento nas Finan\347as.) Tj T* 0 Tw 2.970846 Tw (Aumentar a Produ\347\343o modifica a necessidade de materiais, de pessoas e de) Tj T* 0 Tw (capacidade log\355stica. Nenhuma decis\343o \351 isolada.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 113.811 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 42 Tm /F1 12 Tf 18 TL .388276 Tw (Os dois n\372cleos em Laranja Ouro representam a tomada de decis\343o do estudante) Tj T* 0 Tw .221276 Tw (e a resposta do mercado simulado. Sua posi\347\343o central destaca que cada escolha) Tj T* 0 Tw (encontra consequ\352ncias na din\342mica da empresa e da concorr\352ncia.) Tj T* ET
-Q
-Q
- 
-
-Q
-
-endstream
+null
 endobj
 359 0 obj
-<<
-/Length 16619
->>
-stream
-q
-0.16666667 0.0 0.0 0.16666667 85.0393701 772.889764 cm
-0.0 0.0 450 131.039993 re
-W
-n
-0.23999999 0 0 -0.23999999 0 131.039993 cm
-q
-3.125 0 0 3.125 0 0 cm
-1 1 1 RG
-1 1 1 rg
-/G3 gs
-0 0 600 175 re
-f
-Q
-q
-0 0 1875 545.84961 re
-W*
-n
-q
-3.125 0 0 3.125 0 0 cm
-1 1 1 RG
-1 1 1 rg
-/G3 gs
-0 0 600 175 re
-f
-Q
-Q
-q
-0 0 1875 543.75 re
-W*
-n
-q
-0.058895569 0 0 0.058895569 62.931812 -347.53445 cm
-1 1 1 RG
-1 1 1 rg
-/G3 gs
--2400.3601 16231.1201 m
-30599.781 16231.1201 l
-31134.641 16231.1201 31572.242 15793.5205 31572.242 15258.6602 c
-31572.242 6072.6797 l
-31572.242 5537.8198 31134.643 5100.2197 30599.781 5100.2197 c
--2400.3594 5100.2197 l
--2935.2192 5100.2197 -3372.8193 5537.8198 -3372.8193 6072.6797 c
--3372.8193 15258.6602 l
--3372.8193 15793.5205 -2935.2192 16231.1201 -2400.3594 16231.1201 c
--2400.3601 16231.1201 l
-h
-f*
-/Pattern CS
-/Pattern cs
-/P4 SCN
-/P4 scn
-3912.6899 6177.25 m
-3718.45 6354.1699 3644.72 6606.6899 3720.3198 6864.6001 c
-3787.2798 7092.9902 3979.8599 7247.3701 4203.9399 7321.9102 c
-4232.0601 7346.9199 4213.0098 7410.0303 4212.8999 7442.0703 c
-4211.6001 8159.8604 l
-4296.3701 8163.9502 4362.1299 8163.1401 4455.0103 8177.8901 c
-4459.1104 7326.8799 l
-4706.9702 7276.75 4904.6602 7096.6997 4982.8003 6854.0898 c
-6872.7104 7011.0801 l
-6890.2007 7123.0801 6920.9004 7231.4199 6972.4404 7340.4302 c
-6972.4404 7340.4302 5683.2803 8215.46 5167.2705 8577.0205 c
-5161.1704 8597.8701 l
-5216.9805 8670.2305 5267.8804 8745.54 5313.8906 8823.9004 c
-5340.2705 8821.0703 l
-7091.4307 7605.9004 l
-7153.5508 7588.2202 7261.2905 7662.0205 7259.4604 7728.0605 c
-6956.8105 8608.1406 6649.0405 9490.1211 6336.1704 10373.9307 c
-6141.3306 10365.7109 5981.9404 10426.041 5820.6206 10520.8604 c
-5603.1304 10320.5908 5389.2407 10114.71 5178.9106 9903.25 c
-5137.4307 9889.8096 l
-5069.8306 9957.5098 5007.5708 10028.7695 4950.7007 10103.5996 c
-5160.8906 10317.6592 5377.4209 10528.0596 5600.2705 10734.75 c
-5612.5806 10778.3604 l
-5571.7705 10871.8105 5546.1606 10969.3799 5535.7808 11071.2002 c
-5227.2109 11115.54 3353.9207 11419.6699 y
-3377.2808 11499.96 3382.3206 11576.1299 3388.8105 11660.2295 c
-3388.8105 11660.2295 5346.1704 11409.0898 5556.0703 11376.6699 c
-5616.0103 11375.3604 5624.7905 11399.5596 5622.8501 11460.4199 c
-5531.7603 11545.54 3573.4602 13518.8701 3348.3501 13743.9102 c
-3205.26 13667.3604 3054.1001 13630.9199 2894.9202 13634.6602 c
-2669.7502 12833 l
-2666.0403 12819.0703 2658.7002 12805.9805 2644.9502 12800.0195 c
-2622.4001 12790.21 2408.5901 12860.0293 2372.3501 12885.3193 c
-2443.9702 13165.6396 2518.23 13446.0596 2595.1301 13726.5195 c
-2455.0103 13818.2793 2350.6902 13936.0693 2286.4902 14091.6797 c
-875.73022 13839.8301 l
-858.87024 13711.0303 817.84021 13595.0703 752.65021 13492.0303 c
-984.7002 13233.0205 1219.72021 12974.6104 1457.81018 12716.8701 c
-1470.16016 12675.1699 l
-1462.75012 12654.5 1279.94019 12493.7002 1260.72021 12492.2197 c
-1252.53027 12491.5898 1244.00024 12495.6797 1235.35022 12501.1494 c
-1000.47021 12758.5293 765.17023 13013.2695 529.48022 13265.2998 c
-432.29022 13198.9795 319.89023 13171.9902 205.59021 13154.5596 c
-205.59021 13154.5596 128.620209 12694.8594 -25.329788 11775.4795 c
-137.750214 11692.0098 254.74022 11573.5898 353.34021 11420.5498 c
-938.7702 11545.29 l
-976.24023 11550.2998 983.75018 11538.4199 1000.61023 11509.4502 c
-1008.62024 11495.6201 1057.2002 11292.6299 1054.13025 11281.3105 c
-1016.45026 11254.6406 l
-421.53027 11106.6211 l
-398.00027 10929.5615 331.92029 10774.6514 223.34027 10641.8311 c
-345.93027 10461.001 1175.94019 9236.1514 y
-1204.03015 9221.1211 l
-1402.46021 9263.1807 l
-1436.19019 9250.1611 1446.31018 9257.5303 1432.80017 9285.3604 c
-1731.6802 10568.6602 l
-1763.1401 10601.0498 l
-1776.8701 10603.9795 2020.2802 10529.1895 2028.5001 10517.79 c
-2037.5302 10505.2705 2035.4901 10488.2705 2031.2501 10474.0801 c
-1735.6301 9220.5898 l
-1875.6401 9131.2402 1988.2501 9017.6396 2073.4802 8879.8496 c
-2094.0103 8896.5996 2115.1401 8893.2197 2136.9502 8869.7598 c
-2245.9902 8887.6797 3134.8501 9120.5801 y
-3197.4001 8890.2197 l
-2116.4102 8606.7998 l
-2114.4702 8354.6299 1995.9402 8114.46 1782.4802 7977.0195 c
-1459.68018 7769.1597 1020.12024 7906.2197 848.74023 8256.4492 c
-718.81024 8521.8789 767.99023 8820.4395 978.74023 9040.7793 c
--17.929749 10506.6797 l
--392.74976 10343.7295 -811.28973 10539 -938.03973 10925.3193 c
--1004.57971 11128.1689 -955.85974 11338.249 -829.48975 11511.459 c
--711.58972 11673.0693 -522.8197 11777.9893 -308.29974 11781.9395 c
--70.809738 13233.6191 l
--168.87973 13271.5391 -249.87975 13314.9688 -321.80975 13389.0195 c
--607.69977 13683.1592 -582.96973 14167 -247.47975 14409.4297 c
--68.299759 14538.8994 148.48024 14576.7793 372.60028 14505.5195 c
-544.72028 14450.8096 704.25024 14307.5098 786.65027 14110.4492 c
-2274.1104 14371.8193 l
-2294.6704 14585.5693 2408.2703 14777.0195 2562.0103 14886.4492 c
-2755.1902 15023.999 2994.4102 15050.249 3198.9502 14962.8994 c
-3592.0503 14795.0098 3736.6902 14341.9795 3516.1301 13975.0195 c
-5852.1201 11631.3691 l
-6113.6299 11814.4287 6445.8101 11807.1289 6680.5801 11603.1094 c
-6853.8701 11452.5791 6947.8799 11259.1191 6929.29 11030.8691 c
-6912.4302 10823.1592 6800.4199 10616.249 6586.0698 10505.0889 c
-7542.3799 7770.3989 l
-7958.5898 7827.8589 8330.21 7605.9287 8482.1504 7230.749 c
-8669.9307 6766.9893 8397.5508 6227.0991 7899.8506 6117.0293 c
-7447.1704 6016.9492 6999.3506 6307.7095 6901.0308 6759.3691 c
-5009.1206 6610.3193 l
-4990.6006 6353.4595 4825.4307 6142.2593 4615.2104 6054.6992 c
-4528.0703 6018.4292 4439.9106 6000.8594 4353.7705 6000.8594 c
-4192.8306 6000.8594 4039.0906 6062.1792 3912.6904 6177.2495 c
-3912.6899 6177.25 l
-h
-f*
-/Pattern CS
-/Pattern cs
-/P5 SCN
-/P5 scn
-3034.02 7406.7202 m
-2086.22 8052.4805 l
-2000.84 8109.2705 l
-2051.5 8175.8403 2096.2 8235.1104 2118.5 8315.8604 c
-2602.72 7994.6904 l
-3034.27 7702.2402 l
-3485.8301 7390.2104 l
-3825.4502 7155.5405 l
-3774.5801 7095.0405 3728.0403 7038.3506 3704.8003 6950.5806 c
-3034.0203 7406.7207 l
-3034.02 7406.7202 l
-h
-f*
-/Pattern CS
-/Pattern cs
-/P6 SCN
-/P6 scn
-3768.97 8722.1904 m
-3446.3501 9002.4004 3391.5701 9461.6807 3659.71 9804.1904 c
-2994.9399 10545.3506 l
-2615.8398 10977.3203 l
-2358.3799 10841.75 2070.9399 10821.0801 1818.1399 10948.4707 c
-1500.67993 11108.4111 1297.0498 11421.751 1331.58984 11779.3604 c
-1357.90979 12051.8105 1519.36987 12291.9805 1728.8899 12417.9307 c
-1976.2198 12566.6211 2276.0498 12583.0605 2531.8799 12461.7109 c
-2779.46 12344.3008 2943.8899 12124.6309 2998.0798 11901.1807 c
-3067.2197 11616.0605 2999.3098 11352.7803 2822.4998 11143.4805 c
-2890.9397 11035.8809 2979.0598 10961.1709 3059.6396 10869.4805 c
-3598.7896 10256 l
-3843.9995 9972.0098 l
-4181.3296 10180.54 4615.8096 10142.3994 4875.4194 9849.21 c
-5162.7896 9524.6504 5147.4795 9050.9805 4849.7695 8754.7197 c
-4695.3296 8601.0498 4495.2695 8523.54 4294.0098 8523.5098 c
-4108.4399 8523.5098 3921.8999 8589.3701 3768.9697 8722.1895 c
-3768.97 8722.1904 l
-h
-f*
-/Pattern CS
-/Pattern cs
-/P7 SCN
-/P7 scn
-1464.47998 9294.8496 m
-1454.39001 9294.8496 1444.66003 9293.7598 1434.66992 9293.3398 c
-1731.6799 10568.6602 l
-1763.1399 10601.0498 l
-1776.8699 10603.9795 2020.2799 10529.1895 2028.4999 10517.79 c
-2037.5299 10505.2705 2035.4899 10488.2705 2031.2499 10474.0801 c
-1739.3999 9236.6504 l
-1652.57996 9274.0107 1559.05994 9294.8506 1464.47986 9294.8506 c
-1464.47998 9294.8496 l
-h
-f*
-/Pattern CS
-/Pattern cs
-/P8 SCN
-/P8 scn
-5167.27 8577.0195 m
-5161.1699 8597.8691 l
-5216.98 8670.2295 5267.8799 8745.5391 5313.8901 8823.8994 c
-5340.27 8821.0693 l
-7091.4302 7605.8994 l
-7103.4204 7602.4692 7117.1802 7602.5396 7131.4702 7605.2593 c
-7054.1704 7536.9292 6988.8403 7455.1494 6938.5 7363.4692 c
-6732.0898 7503.6592 5633.8198 8250.1396 5167.27 8577.0195 c
-h
-f*
-/Pattern CS
-/Pattern cs
-/P9 SCN
-/P9 scn
-3353.9199 11419.6699 m
-3377.28 11499.96 3382.3198 11576.1299 3388.8098 11660.2295 c
-3388.8098 11660.2295 5346.1699 11409.0898 5556.0698 11376.6699 c
-5573.2798 11376.3096 5585.9097 11378.29 5595.6099 11382.3799 c
-5550.9897 11289.9502 5523.6797 11187.3994 5518.8896 11079.7695 c
-5518.7798 11077.6895 5519.0298 11075.6797 5518.9595 11073.6299 c
-5165.1597 11125.6299 3353.9194 11419.6699 y
-3353.9199 11419.6699 l
-h
-f*
-/Pattern CS
-/Pattern cs
-/P10 SCN
-/P10 scn
-4950.7002 10103.5996 m
-5160.8901 10317.6592 5377.4204 10528.0596 5600.27 10734.75 c
-5602.7402 10743.5 l
-5648.5703 10663.1699 5711.6401 10592.9697 5784.6304 10534.9404 c
-5787.3506 10521.9209 5790.6704 10509.04 5794.5103 10496.2402 c
-5586.0503 10303.6201 5380.7705 10106.1699 5178.9102 9903.25 c
-5137.4302 9889.8096 l
-5069.8301 9957.5098 5007.5703 10028.7695 4950.7002 10103.5996 c
-h
-f*
-/Pattern CS
-/Pattern cs
-/P11 SCN
-/P11 scn
-4340.7798 7361.0298 m
-4298.3799 7361.0298 4257.46 7356.6196 4217.5596 7349.6699 c
-4222.8496 7379.1997 4212.9697 7418.7798 4212.8994 7442.0698 c
-4211.5996 8159.8599 l
-4296.3696 8163.9497 4362.1294 8163.1396 4455.0098 8177.8896 c
-4459 7349.4995 l
-4420.02 7356.5493 4380.54 7361.0293 4340.7798 7361.0293 c
-4340.7798 7361.0298 l
-h
-f*
-/Pattern CS
-/Pattern cs
-/P12 SCN
-/P12 scn
-2122.0601 8871.9805 m
-2124.4202 8872.3008 2126.79 8872.5801 2129.1899 8872.9307 c
-2130.4199 8873.1104 2131.6499 8873.251 2132.8899 8873.3906 c
-2134.23 8872.1602 2135.6099 8871.2402 2136.95 8869.7607 c
-2245.99 8887.6807 3134.8501 9120.5811 y
-3197.4001 8890.2207 l
-2184.8901 8624.791 l
-2181.4001 8711.9912 2158.78 8795.1807 2122.0601 8871.9814 c
-2122.0601 8871.9805 l
-h
-f*
-0.0039 0.2314 0.6157 RG
-0.0039 0.2314 0.6157 rg
-10473.7998 11277.3604 m
-10457.5801 11152.2305 10395.9102 11017.96 10303.2402 10926.9805 c
-10000.0205 10629.2002 9538.2402 10632.8301 9212.7705 10467.0303 c
-9045.9004 10382.0801 8987.7305 10154.8906 9116.2109 10005.5898 c
-9257.6006 9841.3398 9513.6113 9838.3096 9688.4512 9955.6396 c
-9780.4209 10017.3799 9826.3916 10113.2598 9842.9014 10225.5098 c
-10458.7109 10227.5596 l
-10427.2412 9937.3291 10316.0107 9703.0098 10065.7813 9563.9492 c
-9594.0117 9301.7295 8837.7617 9370.4189 8538.9209 9837.7393 c
-8390.4404 10069.9395 8381.4805 10390.0098 8527.8506 10624.3291 c
-8644.1904 10810.5986 8836.001 10919.2188 9038.9502 10975.6992 c
-9576.2002 11125.1992 l
-9689.0498 11156.5996 9799.0498 11217.0693 9844.5898 11332.1094 c
-9871.0098 11398.8896 9871.3701 11495.7998 9843.5703 11565.0098 c
-9752.3008 11792.3096 9410.6006 11802.9199 9203.0605 11691.0596 c
-9101.251 11636.1699 9055.9902 11528.25 9030.5205 11417.6592 c
-8412.4502 11417.6592 l
-8427.4502 11548.3994 8457.5703 11675.6396 8529.4697 11785.499 c
-8811.9395 12217.1592 9484.1895 12302.6992 9936.4492 12134.5391 c
-10298.999 11999.6992 10524.8896 11671.2695 10473.7988 11277.3594 c
-10473.7998 11277.3604 l
-h
-f
-11332.4199 10898.4004 m
-11361.8701 10740.2207 11476.8398 10615.9707 11615.1299 10566.8604 c
-11770.04 10511.8604 11941.6602 10540.6201 12060.3398 10652.8301 c
-12126.9395 10715.8398 12167.1895 10792.1504 12184.3701 10898.8301 c
-11332.4199 10898.4004 l
-h
-12793.4102 11261.5908 m
-12792.5605 11251.4609 12790.3398 11239.791 12790.9102 11228.3604 c
-12803.6797 10969.4902 12760.5703 10703.7402 12597.0898 10495.46 c
-12542.8994 10426.4199 12476.1895 10354.1699 12403.8701 10302.4199 c
-12129.6602 10106.2402 11774.1299 10078.5801 11453.8398 10160.46 c
-11282.04 10204.3799 11153.1699 10292.4404 11031.0703 10411.3896 c
-10672.5508 10760.71 10618.75 11346.2197 10901.46 11772.4795 c
-10954.7998 11852.9092 11032.3799 11919.1992 11104.0596 11989.1895 c
-11170.6299 12054.1699 11259.9893 12079.7793 11340.25 12123.209 c
-11468.2695 12192.459 11613.5498 12202.5488 11759.0996 12207.5586 c
-12178.7998 12222.0586 12594.7998 11979.9082 12735.4492 11578.8389 c
-12114.4189 11578.5889 l
-12001.2793 11804.5488 11656.7285 11804.8984 11461.0391 11646.8584 c
-11351.3291 11558.2383 11235.1895 11304.3086 11354.499 11298.0283 c
-11531.9492 11288.748 l
-12217.749 11288.1182 l
-12217.749 11287.5186 l
-12778.209 11287.5186 l
-12783.8086 11286.5586 12787.5889 11285.3584 12788.999 11283.8486 c
-12791.5791 11281.1289 12792.8486 11277.5986 12793.4092 11273.5088 c
-12793.4092 11261.5889 l
-12793.4102 11261.5908 l
-h
-f
-21444.59 10898.4004 m
-21474.051 10740.2207 21589.02 10615.9707 21727.311 10566.8604 c
-21882.211 10511.8604 22053.84 10540.6201 22172.48 10652.8301 c
-22239.121 10715.8398 22279.371 10792.1504 22296.551 10898.8301 c
-21444.59 10898.4004 l
-h
-22905.59 11261.5908 m
-22904.74 11251.4609 22902.52 11239.791 22903.08 11228.3604 c
-22915.85 10969.4902 22872.74 10703.7402 22709.27 10495.46 c
-22655.08 10426.4199 22588.369 10354.1699 22516.049 10302.4199 c
-22241.838 10106.2402 21886.309 10078.5801 21566.02 10160.46 c
-21394.219 10204.3799 21265.35 10292.4404 21143.25 10411.3896 c
-20784.721 10760.71 20730.92 11346.2197 21013.641 11772.4795 c
-21066.98 11852.9092 21144.561 11919.1992 21216.24 11989.1895 c
-21282.811 12054.1699 21372.17 12079.7793 21452.43 12123.209 c
-21580.449 12192.459 21725.719 12202.5488 21871.279 12207.5586 c
-22290.979 12222.0586 22706.969 11979.9082 22847.629 11578.8389 c
-22226.6 11578.5889 l
-22113.459 11804.5488 21768.9 11804.8984 21573.219 11646.8584 c
-21463.498 11558.2383 21347.369 11304.3086 21466.68 11298.0283 c
-21644.129 11288.748 l
-22329.93 11288.1182 l
-22329.93 11287.5186 l
-22890.379 11287.5186 l
-22895.988 11286.5586 22899.77 11285.3584 22901.18 11283.8486 c
-22903.75 11281.1289 22905.02 11277.5986 22905.59 11273.5088 c
-22905.59 11261.5889 l
-22905.59 11261.5908 l
-h
-f
-16566.1797 11037.9697 m
-16566.1797 12209.3701 l
-15972.8799 12209.3701 l
-15972.8799 11129.2305 l
-15972.8799 10798.3604 15824.54 10646.2109 15584.9297 10646.2109 c
-15318.7197 10646.2109 15132.3896 10817.3809 15132.3896 11182.4707 c
-15132.3896 12209.3711 l
-14539.0498 12209.3711 l
-14539.0498 11129.2314 l
-14539.0498 10798.3613 14398.3301 10646.2119 14151.1396 10646.2119 c
-13888.6992 10646.2119 13702.3301 10817.3818 13702.3301 11182.4717 c
-13702.3301 12209.3721 l
-13109.0303 12209.3721 l
-13109.0303 10163.1924 l
-13675.7305 10163.1924 l
-13675.7305 10399.0225 l
-13827.8506 10224.042 14056.0303 10132.7822 14318.4609 10132.7822 c
-14603.7109 10132.7822 14847.1309 10243.0918 14991.6309 10467.4619 c
-15155.1807 10258.292 15421.4209 10132.7822 15729.501 10132.7822 c
-16216.3008 10132.7822 16566.1816 10414.2227 16566.1816 11037.9727 c
-16566.1797 11037.9697 l
-h
-f
-18607.449 11186.2803 m
-18607.449 10832.5898 18383.08 10619.6201 18086.43 10619.6201 c
-17789.75 10619.6201 17565.379 10832.5898 17565.379 11186.2803 c
-17565.379 11539.9805 17789.748 11752.9502 18086.43 11752.9502 c
-18383.08 11752.9502 18607.449 11539.9805 18607.449 11186.2803 c
-h
-19208.369 11186.2803 m
-19208.369 11829.04 18763.408 12239.7803 18189.09 12239.7803 c
-17934.279 12239.7803 17725.119 12159.9102 17572.959 11992.5605 c
-17572.959 12947.2109 l
-16979.658 12947.2109 l
-16979.658 10163.1914 l
-17546.357 10163.1914 l
-17546.357 10399.0215 l
-17694.668 10220.2412 17915.258 10132.7813 18189.088 10132.7813 c
-18763.408 10132.7813 19208.367 10543.5615 19208.367 11186.2813 c
-19208.369 11186.2803 l
-h
-f
-20755.689 10132.79 m
-20755.689 10680.4404 l
-20706.27 10676.6709 20668.24 10672.8604 20622.59 10672.8604 c
-20295.529 10672.8604 20078.709 10851.6104 20078.709 11243.3301 c
-20078.709 12209.3496 l
-19485.408 12209.3496 l
-19485.408 10163.1992 l
-20052.107 10163.1992 l
-20052.107 10433.249 l
-20196.607 10235.4795 20440.018 10132.7891 20755.688 10132.7891 c
-20755.689 10132.79 l
-h
-f
-0.0235 0.6627 0.749 RG
-0.0235 0.6627 0.749 rg
-25663.289 9547.0801 m
-25663.289 12209.3496 l
-25047.17 12209.3496 l
-25047.17 11117.8203 l
-23837.74 11117.8203 l
-23837.74 12209.3496 l
-23221.609 12209.3496 l
-23221.609 9547.0801 l
-23837.74 9547.0801 l
-23837.74 10596.7998 l
-25047.17 10596.7998 l
-25047.17 9547.0801 l
-25663.289 9547.0801 l
-h
-f
-28050.051 10163.2002 m
-28050.051 12209.3506 l
-27487.16 12209.3506 l
-27487.16 11965.9609 l
-27331.27 12144.7207 27103.061 12239.791 26852.061 12239.791 c
-26338.59 12239.791 25977.271 11950.7607 25977.271 11319.3906 c
-25977.271 10163.2012 l
-26570.611 10163.2012 l
-26570.611 11231.9414 l
-26570.611 11574.2412 26722.73 11726.3613 26985.162 11726.3613 c
-27258.992 11726.3613 27456.752 11551.3809 27456.752 11174.8613 c
-27456.752 10163.2012 l
-28050.053 10163.2012 l
-28050.051 10163.2002 l
-h
-f
-30065.85 11186.2803 m
-30065.85 10832.5898 29841.48 10619.6201 29544.83 10619.6201 c
-29248.141 10619.6201 29023.74 10832.5898 29023.74 11186.2803 c
-29023.74 11539.9805 29248.141 11752.9502 29544.83 11752.9502 c
-29841.48 11752.9502 30065.85 11539.9805 30065.85 11186.2803 c
-h
-30666.77 11186.2803 m
-30666.77 11829.04 30221.779 12239.7803 29647.49 12239.7803 c
-29373.66 12239.7803 29153.07 12152.3301 29004.76 11973.54 c
-29004.76 12209.3701 l
-28438.061 12209.3701 l
-28438.061 9387.3604 l
-29031.361 9387.3604 l
-29031.361 10380.0107 l
-29183.521 10212.6504 29392.682 10132.7803 29647.492 10132.7803 c
-30221.781 10132.7803 30666.771 10543.5605 30666.771 11186.2803 c
-30666.77 11186.2803 l
-h
-f
-Q
-Q
-Q
-
-endstream
+null
 endobj
 360 0 obj
 <<
-/Length 4472
+/Length 4214
 >>
 stream
 q
@@ -12769,91 +12195,73 @@ q
 1 0 0 1 91.03937 732.8504 cm
 q
 0 0 0 rg
+BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (2.1 O s\355mbolo: a rede de gest\343o) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 648.8504 cm
+q
+BT 1 0 0 1 0 60 Tm 2.004301 Tw 18 TL /F1 12 Tf 0 0 0 rg (Os n\363s perif\351ricos, em azul e ciano, representam os seis departamentos vitais:) Tj T* 0 Tw 3.05533 Tw (Pesquisa e Desenvolvimento \(P) Tj (&) Tj (D\), Produ\347\343o, Log\355stica, Marketing, Recursos) Tj T* 0 Tw .129028 Tw (Humanos \(RH\) e Finan\347as. Eles mostram uma empresa cujas \341reas trabalham em) Tj T* 0 Tw (conjunto.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 568.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 60 Tm /F1 12 Tf 18 TL 3.261701 Tw (As linhas conectoras representam a interdepend\352ncia das decis\365es. Alterar o) Tj T* 0 Tw 3.879573 Tw (pre\347o no Marketing pode mudar a demanda e o faturamento nas Finan\347as.) Tj T* 0 Tw 2.970846 Tw (Aumentar a Produ\347\343o modifica a necessidade de materiais, de pessoas e de) Tj T* 0 Tw (capacidade log\355stica. Nenhuma decis\343o \351 isolada.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 506.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 42 Tm /F1 12 Tf 18 TL .388276 Tw (Os dois n\372cleos em Laranja Ouro representam a tomada de decis\343o do estudante) Tj T* 0 Tw .221276 Tw (e a resposta do mercado simulado. Sua posi\347\343o central destaca que cada escolha) Tj T* 0 Tw (encontra consequ\352ncias na din\342mica da empresa e da concorr\352ncia.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 476.8504 cm
+q
+0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (2.2 As cores e seu significado) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 666.8504 cm
+1 0 0 1 91.03937 410.8504 cm
 q
 BT 1 0 0 1 0 42 Tm 1.275931 Tw 18 TL /F2 12 Tf 0 0 0 rg (Azul Royal \(#034AA6\) e Azul M\351dio \(#0762D9\): rigor acad\352mico.) Tj /F1 12 Tf ( Associam a) Tj T* 0 Tw 1.398331 Tw (identidade ao ambiente corporativo, \340 credibilidade e \340 seriedade pedag\363gica. A) Tj T* 0 Tw (inten\347\343o visual \351 comunicar confian\347a e valorizar a aprendizagem empresarial.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 604.8504 cm
+1 0 0 1 91.03937 348.8504 cm
 q
 BT 1 0 0 1 0 42 Tm -0.138299 Tw 18 TL /F2 12 Tf 0 0 0 rg (Ciano/Turquesa \(#0AADBF\): inova\347\343o e fluidez.) Tj /F1 12 Tf ( Relaciona a marca \340 tecnologia) Tj T* 0 Tw .387276 Tw (e \340 navega\347\343o intuitiva. Aproxima o universo da gest\343o de estudantes iniciantes e) Tj T* 0 Tw (refor\347a uma experi\352ncia leve, organizada e acess\355vel.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 542.8504 cm
+1 0 0 1 91.03937 286.8504 cm
 q
 BT 1 0 0 1 0 42 Tm 3.471931 Tw 18 TL /F2 12 Tf 0 0 0 rg (Laranja Ouro \(#D9851E\): n\372cleo de decis\343o e gera\347\343o de valor.) Tj /F1 12 Tf ( Destaca) Tj T* 0 Tw 1.456664 Tw (criatividade, iniciativa e competitividade. Na rede, orienta o olhar para os pontos) Tj T* 0 Tw (centrais onde as decis\365es e suas consequ\352ncias se conectam.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 480.8504 cm
+1 0 0 1 91.03937 224.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 42 Tm /F1 12 Tf 18 TL .000301 Tw (Na logomarca, os gradientes conectam as tonalidades azuis, cianas e douradas. O) Tj T* 0 Tw -0.155746 Tw (fundo branco valoriza o contraste da rede e do nome e organiza uma apresenta\347\343o) Tj T* 0 Tw (limpa para os conte\372dos do manual.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 450.8504 cm
+1 0 0 1 91.03937 194.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (2.3 A tipografia: identidade corporativa acess\355vel) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 366.8504 cm
+1 0 0 1 91.03937 110.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 60 Tm /F1 12 Tf 18 TL .939931 Tw (A escrita sem serifas, com formas modernas e suaves, expressa democratiza\347\343o) Tj T* 0 Tw 3.407034 Tw (do conhecimento. O SempreHub foi concebido para estudantes de diferentes) Tj T* 0 Tw 2.002119 Tw (\341reas, como Sa\372de, Humanas e Exatas. A organiza\347\343o visual ajuda a localizar) Tj T* 0 Tw (decis\365es e compreender rela\347\365es entre departamentos.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 336.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (2.4 Como ler a marca na pr\341tica) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 234.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 78 Tm /F1 12 Tf 18 TL .390276 Tw (Ao observar a rede, lembre-se de verificar as consequ\352ncias de cada escolha nas) Tj T* 0 Tw 3.870331 Tw (outras \341reas. A marca traduz o prop\363sito pedag\363gico do simulador: discutir,) Tj T* 0 Tw 2.671034 Tw (decidir, acompanhar resultados e aprender com os ajustes. Uma interpreta\347\343o) Tj T* 0 Tw -0.072966 Tw (correta das ferramentas pode apoiar decis\365es melhores; resultados dependem das) Tj T* 0 Tw (escolhas da equipe e do mercado simulado.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 226.8504 cm
-Q
-q
-1 0 0 1 91.03937 214.8504 cm
-Q
-q
-1 0 0 1 91.03937 196.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (3 Cockpit do estudante) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 124.8504 cm
-q
-BT 1 0 0 1 0 42 Tm .478522 Tw 18 TL /F1 12 Tf 0 0 0 rg (Comece na ) Tj /F2 12 Tf (Vis\343o Geral / Mesa do CEO) Tj /F1 12 Tf (: confira nome da empresa, m\352s, caixa e) Tj T* 0 Tw .667531 Tw (pend\352ncias. No menu lateral, escolha um departamento; as decis\365es aparecem \340) Tj T* 0 Tw (direita.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 98.85039 cm
-q
-BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (1. ) Tj /F2 12 Tf (P) Tj (&) Tj (D:) Tj /F1 12 Tf ( defina o investimento em tecnologia e melhoria dos produtos.) Tj T* 12 0 Td ET
-Q
-Q
-q
-1 0 0 1 91.03937 72.85039 cm
-q
-BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (2. ) Tj /F2 12 Tf (Produ\347\343o:) Tj /F1 12 Tf ( planeje capacidade, fabrica\347\343o, m\341quinas e manuten\347\343o.) Tj T* 12 0 Td ET
 Q
 Q
  
@@ -13342,7 +12750,7 @@ endstream
 endobj
 362 0 obj
 <<
-/Length 3881
+/Length 4648
 >>
 stream
 q
@@ -13365,85 +12773,103 @@ Q
 q
 1 0 0 1 91.03937 732.8504 cm
 q
+0 0 0 rg
+BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (2.4 Como ler a marca na pr\341tica) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 630.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 78 Tm /F1 12 Tf 18 TL .390276 Tw (Ao observar a rede, lembre-se de verificar as consequ\352ncias de cada escolha nas) Tj T* 0 Tw 3.870331 Tw (outras \341reas. A marca traduz o prop\363sito pedag\363gico do simulador: discutir,) Tj T* 0 Tw 2.671034 Tw (decidir, acompanhar resultados e aprender com os ajustes. Uma interpreta\347\343o) Tj T* 0 Tw -0.072966 Tw (correta das ferramentas pode apoiar decis\365es melhores; resultados dependem das) Tj T* 0 Tw (escolhas da equipe e do mercado simulado.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 622.8504 cm
+Q
+q
+1 0 0 1 91.03937 610.8504 cm
+Q
+q
+1 0 0 1 91.03937 592.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (3 Cockpit do estudante) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 520.8504 cm
+q
+BT 1 0 0 1 0 42 Tm .478522 Tw 18 TL /F1 12 Tf 0 0 0 rg (Comece na ) Tj /F2 12 Tf (Vis\343o Geral / Mesa do CEO) Tj /F1 12 Tf (: confira nome da empresa, m\352s, caixa e) Tj T* 0 Tw .667531 Tw (pend\352ncias. No menu lateral, escolha um departamento; as decis\365es aparecem \340) Tj T* 0 Tw (direita.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 494.8504 cm
+q
+BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (1. ) Tj /F2 12 Tf (P) Tj (&) Tj (D:) Tj /F1 12 Tf ( defina o investimento em tecnologia e melhoria dos produtos.) Tj T* 12 0 Td ET
+Q
+Q
+q
+1 0 0 1 91.03937 468.8504 cm
+q
+BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (2. ) Tj /F2 12 Tf (Produ\347\343o:) Tj /F1 12 Tf ( planeje capacidade, fabrica\347\343o, m\341quinas e manuten\347\343o.) Tj T* 12 0 Td ET
+Q
+Q
+q
+1 0 0 1 91.03937 442.8504 cm
+q
 BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (3. ) Tj /F2 12 Tf (Log\355stica:) Tj /F1 12 Tf ( escolha a modalidade de entrega nos modelos aplic\341veis.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 706.8504 cm
+1 0 0 1 91.03937 416.8504 cm
 q
 BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (4. ) Tj /F2 12 Tf (Marketing:) Tj /F1 12 Tf ( planeje produtos, pre\347os, campanhas e canais.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 680.8504 cm
+1 0 0 1 91.03937 390.8504 cm
 q
 BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (5. ) Tj /F2 12 Tf (RH:) Tj /F1 12 Tf ( decida contrata\347\365es, demiss\365es, horas extras e remunera\347\343o.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 654.8504 cm
+1 0 0 1 91.03937 364.8504 cm
 q
 BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (6. ) Tj /F2 12 Tf (Finan\347as:) Tj /F1 12 Tf ( avalie cr\351dito, pagamentos, caixa e capital de giro.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 538.8504 cm
+1 0 0 1 91.03937 248.8504 cm
 q
 BT 1 0 0 1 0 96 Tm 1.076731 Tw 18 TL /F1 12 Tf 0 0 0 rg (Os campos num\351ricos permitem digitar valores e mostram os limites dispon\355veis.) Tj T* 0 Tw 2.469931 Tw (As decis\365es ficam reunidas em Departamentos, com subabas para cada \341rea.) Tj T* 0 Tw .204331 Tw (A\347\365es opcionais podem permanecer em zero. Confira o checklist; salve rascunhos) Tj T* 0 Tw 1.212301 Tw (enquanto estiver discutindo. Ao enviar, confirme no modal: depois do envio final,) Tj T* 0 Tw 2.952276 Tw (os valores ficam vis\355veis em ) Tj /F2 12 Tf (modo de leitura) Tj /F1 12 Tf (, sem altera\347\365es at\351 o pr\363xima) Tj T* 0 Tw (rodada.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 530.8504 cm
+1 0 0 1 91.03937 240.8504 cm
 Q
 q
-1 0 0 1 91.03937 518.8504 cm
+1 0 0 1 91.03937 228.8504 cm
 Q
 q
-1 0 0 1 91.03937 500.8504 cm
+1 0 0 1 91.03937 210.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (4 Navega\347\343o: escolha \340 esquerda, trabalhe \340 direita) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 392.8504 cm
+1 0 0 1 91.03937 102.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 78 Tm /F1 12 Tf 18 TL 2.889276 Tw (O menu lateral \351 o ponto de partida. Suas categorias e submenus aparecem) Tj T* 0 Tw 1.941028 Tw (abertos inicialmente. Voc\352 pode recolher uma categoria para organizar a tela e) Tj T* 0 Tw 1.599931 Tw (abri-la novamente quando precisar. O submenu selecionado fica destacado, e o) Tj T* 0 Tw 3.213028 Tw (conte\372do aparece no painel \340 direita. Em telas estreitas, o menu permanece) Tj T* 0 Tw (dispon\355vel acima do conte\372do e possui rolagem pr\363pria.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 366.8504 cm
+1 0 0 1 91.03937 76.85039 cm
 q
 0 0 0 rg
 BT 1 0 0 1 12 6 Tm /F1 12 Tf 18 TL -12 0 Td (1. Localize no menu o assunto desejado.) Tj T* 12 0 Td ET
-Q
-Q
-q
-1 0 0 1 91.03937 322.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 12 24 Tm /F1 12 Tf 18 TL -12 0 Td (2. Clique uma vez no submenu. N\343o \351 necess\341rio abrir outra janela para tomar) Tj T* 12 0 Td (decis\365es.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 296.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 12 6 Tm /F1 12 Tf 18 TL -12 0 Td (3. Confira o t\355tulo do painel \340 direita antes de alterar qualquer valor.) Tj T* 12 0 Td ET
-Q
-Q
-q
-1 0 0 1 91.03937 270.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 12 6 Tm /F1 12 Tf 18 TL -12 0 Td (4. Ao terminar, salve o rascunho, avance ou envie conforme a etapa.) Tj T* 12 0 Td ET
-Q
-Q
-q
-1 0 0 1 91.03937 226.8504 cm
-q
-BT 1 0 0 1 12 24 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (5. Para estudar, abra ) Tj /F2 12 Tf (Manuais - baixar PDF) Tj /F1 12 Tf (. Use ) Tj /F2 12 Tf (Visualizar) Tj /F1 12 Tf ( para consultar ou) Tj T* 12 0 Td /F2 12 Tf (Baixar PDF) Tj /F1 12 Tf ( para guardar uma c\363pia.) Tj T* ET
 Q
 Q
  
@@ -13932,7 +13358,7 @@ endstream
 endobj
 364 0 obj
 <<
-/Length 2211
+/Length 2447
 >>
 stream
 q
@@ -13953,44 +13379,61 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (16) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 738.8504 cm
+1 0 0 1 91.03937 714.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 12 24 Tm /F1 12 Tf 18 TL -12 0 Td (2. Clique uma vez no submenu. N\343o \351 necess\341rio abrir outra janela para tomar) Tj T* 12 0 Td (decis\365es.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 688.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 12 6 Tm /F1 12 Tf 18 TL -12 0 Td (3. Confira o t\355tulo do painel \340 direita antes de alterar qualquer valor.) Tj T* 12 0 Td ET
+Q
+Q
+q
+1 0 0 1 91.03937 662.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 12 6 Tm /F1 12 Tf 18 TL -12 0 Td (4. Ao terminar, salve o rascunho, avance ou envie conforme a etapa.) Tj T* 12 0 Td ET
+Q
+Q
+q
+1 0 0 1 91.03937 618.8504 cm
+q
+BT 1 0 0 1 12 24 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (5. Para estudar, abra ) Tj /F2 12 Tf (Manuais - baixar PDF) Tj /F1 12 Tf (. Use ) Tj /F2 12 Tf (Visualizar) Tj /F1 12 Tf ( para consultar ou) Tj T* 12 0 Td /F2 12 Tf (Baixar PDF) Tj /F1 12 Tf ( para guardar uma c\363pia.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 598.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Figura 2 - Menu lateral e painel de trabalho da SempreHub) Tj T* ET
 Q
 Q
 q
-1 0 0 1 93.41102 336.8504 cm
+1 0 0 1 93.41102 196.8504 cm
 q
 436.8 0 0 390 0 0 cm
 /FormXob.c4956a3a8543c2cb7858643096be19a4 Do
 Q
 Q
 q
-1 0 0 1 91.03937 330.8504 cm
+1 0 0 1 91.03937 190.8504 cm
 Q
 q
-1 0 0 1 91.03937 318.8504 cm
+1 0 0 1 91.03937 178.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Fonte: SempreHub, acervo do Professor Guandalini \(2026\). Tela com dados ilustrativos.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 198.8504 cm
+1 0 0 1 91.03937 94.85039 cm
 q
-BT 1 0 0 1 0 96 Tm .79121 Tw 18 TL /F1 12 Tf 0 0 0 rg (Os campos de decis\343o mostram pend\352ncias, como ) Tj /F2 12 Tf (Falta tomar esta decis\343o) Tj /F1 12 Tf ( ou) Tj T* 0 Tw 1.269931 Tw /F2 12 Tf (Falta confirmar esta decis\343o) Tj /F1 12 Tf (. Eles n\343o substituem este manual. A confirma\347\343o) Tj T* 0 Tw 1.692254 Tw (de uma \341rea significa que a equipe conferiu todos os seus campos, incluindo a) Tj T* 0 Tw 1.169276 Tw (decis\343o de manter em zero a\347\365es opcionais. Um aviso de campo vazio continua) Tj T* 0 Tw 1.002276 Tw (pendente mesmo depois de marcar a revis\343o. Os estados do menu referem-se \340) Tj T* 0 Tw (\372ltima vers\343o salva; valores ainda n\343o salvos precisam ser registrados.) Tj T* ET
+BT 1 0 0 1 0 60 Tm .79121 Tw 18 TL /F1 12 Tf 0 0 0 rg (Os campos de decis\343o mostram pend\352ncias, como ) Tj /F2 12 Tf (Falta tomar esta decis\343o) Tj /F1 12 Tf ( ou) Tj T* 0 Tw 1.269931 Tw /F2 12 Tf (Falta confirmar esta decis\343o) Tj /F1 12 Tf (. Eles n\343o substituem este manual. A confirma\347\343o) Tj T* 0 Tw 1.692254 Tw (de uma \341rea significa que a equipe conferiu todos os seus campos, incluindo a) Tj T* 0 Tw 1.169276 Tw (decis\343o de manter em zero a\347\365es opcionais. Um aviso de campo vazio continua) Tj T* 0 Tw ET
 Q
-Q
-q
-1 0 0 1 91.03937 118.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 60 Tm /F1 12 Tf 18 TL 9.340367 Tw (Aprenda a interpretar o mercado, discutir decis\365es e observar suas) Tj T* 0 Tw .445701 Tw (consequ\352ncias. Cada nova rodada semanal representa sete dias; turmas mensais) Tj T* 0 Tw 5.860367 Tw (hist\363ricas preservam sua periodicidade. As imagens mostram as telas do) Tj T* 0 Tw (programa com nomes e situa\347\365es ilustrativos.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 110.8504 cm
 Q
  
 
@@ -14478,7 +13921,7 @@ endstream
 endobj
 366 0 obj
 <<
-/Length 3929
+/Length 4270
 >>
 stream
 q
@@ -14499,115 +13942,117 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (17) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 738.8504 cm
+1 0 0 1 91.03937 714.8504 cm
+q
+BT 1 0 0 1 0 24 Tm 1.002276 Tw 18 TL /F1 12 Tf 0 0 0 rg (pendente mesmo depois de marcar a revis\343o. Os estados do menu referem-se \340) Tj T* 0 Tw (\372ltima vers\343o salva; valores ainda n\343o salvos precisam ser registrados.) Tj T* ET
+Q
 Q
 q
-1 0 0 1 91.03937 720.8504 cm
+1 0 0 1 91.03937 634.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 60 Tm /F1 12 Tf 18 TL 9.340367 Tw (Aprenda a interpretar o mercado, discutir decis\365es e observar suas) Tj T* 0 Tw .445701 Tw (consequ\352ncias. Cada nova rodada semanal representa sete dias; turmas mensais) Tj T* 0 Tw 5.860367 Tw (hist\363ricas preservam sua periodicidade. As imagens mostram as telas do) Tj T* 0 Tw (programa com nomes e situa\347\365es ilustrativos.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 626.8504 cm
+Q
+q
+1 0 0 1 91.03937 614.8504 cm
+Q
+q
+1 0 0 1 91.03937 596.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (5 Entre na turma indicada pelo professor) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 684.8504 cm
+1 0 0 1 91.03937 560.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 12 6 Tm /F1 12 Tf 18 TL -12 0 Td (1. Crie sua conta de aluno e entre no SempreHub.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 658.8504 cm
+1 0 0 1 91.03937 534.8504 cm
 q
 BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (2. Na tela inicial, consulte ) Tj /F2 12 Tf (Turmas dispon\355veis) Tj /F1 12 Tf (.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 614.8504 cm
+1 0 0 1 91.03937 490.8504 cm
 q
 BT 1 0 0 1 12 24 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (3. Clique no ) Tj /F2 12 Tf (nome da turma) Tj /F1 12 Tf ( indicado pelo professor. O nome \351 livre: n\343o existe) Tj T* 12 0 Td (formato obrigat\363rio nem significado autom\341tico.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 570.8504 cm
+1 0 0 1 91.03937 446.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 12 24 Tm /F1 12 Tf 18 TL -12 0 Td (4. Depois do ingresso, seu v\355nculo fica registrado nessa turma. Voc\352 n\343o pode) Tj T* 12 0 Td (entrar em outra sem autoriza\347\343o do professor.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 550.8504 cm
+1 0 0 1 91.03937 426.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Figura 3 - Sele\347\343o pelo nome da turma) Tj T* ET
 Q
 Q
 q
-1 0 0 1 85.03937 467.7727 cm
+1 0 0 1 85.03937 343.7727 cm
 q
 453.5433 0 0 71.07768 0 0 cm
 /FormXob.ee02d3a4944a9dad94ac98fa97ddc017 Do
 Q
 Q
 q
-1 0 0 1 91.03937 461.7727 cm
+1 0 0 1 91.03937 337.7727 cm
 Q
 q
-1 0 0 1 91.03937 449.7727 cm
+1 0 0 1 91.03937 325.7727 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Fonte: SempreHub, acervo do Professor Guandalini \(2026\). Tela com dados ilustrativos.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 383.7727 cm
+1 0 0 1 91.03937 259.7727 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 42 Tm /F1 12 Tf 18 TL .334276 Tw (O professor pode deixar apenas uma turma dispon\355vel ou ocultar outras. Ocultar o) Tj T* 0 Tw 4.366119 Tw (ingresso n\343o retira o acesso dos alunos j\341 vinculados. Se nenhuma turma) Tj T* 0 Tw (aparecer, procure o professor; n\343o crie outra conta para contornar a matr\355cula.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 375.7727 cm
+1 0 0 1 91.03937 251.7727 cm
 Q
 q
-1 0 0 1 91.03937 363.7727 cm
+1 0 0 1 91.03937 239.7727 cm
 Q
 q
-1 0 0 1 91.03937 345.7727 cm
+1 0 0 1 91.03937 221.7727 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (6 Forme uma equipe por afinidade) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 273.7727 cm
+1 0 0 1 91.03937 149.7727 cm
 q
 BT 1 0 0 1 0 42 Tm .065755 Tw 18 TL /F1 12 Tf 0 0 0 rg (Na sua turma, consulte ) Tj /F2 12 Tf (Colegas dispon\355veis) Tj /F1 12 Tf ( e ) Tj /F2 12 Tf (Equipes da turma) Tj /F1 12 Tf (. Converse com) Tj T* 0 Tw .813665 Tw (os colegas para decidir com quem trabalhar. Uma equipe tem ) Tj /F2 12 Tf (no m\355nimo 3 e no) Tj T* 0 Tw (m\341ximo 5 integrantes) Tj /F1 12 Tf (.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 247.7727 cm
+1 0 0 1 91.03937 123.7727 cm
 q
 BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (1. Para participar de uma equipe com vaga, clique em ) Tj /F2 12 Tf (Entrar nesta equipe) Tj /F1 12 Tf (.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 203.7727 cm
+1 0 0 1 91.03937 79.77271 cm
 q
 BT 1 0 0 1 12 24 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (2. Para come\347ar um grupo, clique em ) Tj /F2 12 Tf (Criar uma nova equipe) Tj /F1 12 Tf ( e informe o nome) Tj T* 12 0 Td (da empresa, seu perfil empreendedor e o regime inicial.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 159.7727 cm
-q
-0 0 0 rg
-BT 1 0 0 1 12 24 Tm /F1 12 Tf 18 TL -12 0 Td (3. Os colegas entram na mesma equipe pela pr\363pria conta. N\343o \351 necess\341rio) Tj T* 12 0 Td (compartilhar senha ou convite.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 133.7727 cm
-q
-0 0 0 rg
-BT 1 0 0 1 12 6 Tm /F1 12 Tf 18 TL -12 0 Td (4. Criar a empresa n\343o torna voc\352 automaticamente o l\355der.) Tj T* 12 0 Td ET
 Q
 Q
  
@@ -15096,7 +14541,7 @@ endstream
 endobj
 368 0 obj
 <<
-/Length 3471
+/Length 3497
 >>
 stream
 q
@@ -15117,73 +14562,80 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (18) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 738.8504 cm
+1 0 0 1 91.03937 714.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 12 24 Tm /F1 12 Tf 18 TL -12 0 Td (3. Os colegas entram na mesma equipe pela pr\363pria conta. N\343o \351 necess\341rio) Tj T* 12 0 Td (compartilhar senha ou convite.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 688.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 12 6 Tm /F1 12 Tf 18 TL -12 0 Td (4. Criar a empresa n\343o torna voc\352 automaticamente o l\355der.) Tj T* 12 0 Td ET
+Q
+Q
+q
+1 0 0 1 91.03937 668.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Figura 4 - Colegas e equipes dispon\355veis) Tj T* ET
 Q
 Q
 q
-1 0 0 1 85.03937 533.0791 cm
+1 0 0 1 85.03937 463.0791 cm
 q
 453.5433 0 0 193.7713 0 0 cm
 /FormXob.383501f83ca205a5e7f16e768f5db60c Do
 Q
 Q
 q
-1 0 0 1 91.03937 527.0791 cm
+1 0 0 1 91.03937 457.0791 cm
 Q
 q
-1 0 0 1 91.03937 515.0791 cm
+1 0 0 1 91.03937 445.0791 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Fonte: SempreHub, acervo do Professor Guandalini \(2026\). Tela com dados ilustrativos.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 395.0791 cm
+1 0 0 1 91.03937 325.0791 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 96 Tm /F1 12 Tf 18 TL 3.737131 Tw (O professor perguntar\341 em sala se todos conseguiram entrar. Depois dessa) Tj T* 0 Tw 2.223034 Tw (confer\352ncia, ele poder\341 acionar a distribui\347\343o aleat\363ria dos alunos cadastrados) Tj T* 0 Tw .409177 Tw (que ainda estejam sem equipe. O programa usa apenas vagas em equipes que j\341) Tj T* 0 Tw 1.891276 Tw (tenham pelo menos tr\352s integrantes e respeita o m\341ximo de cinco. Se faltarem) Tj T* 0 Tw .392276 Tw (vagas, a distribui\347\343o n\343o ocorre parcialmente: a turma precisa se organizar com o) Tj T* 0 Tw (professor.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 351.0791 cm
+1 0 0 1 91.03937 281.0791 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 24 Tm /F1 12 Tf 18 TL .849028 Tw (O professor n\343o precisa informar a quantidade de alunos. Inclus\365es manuais s\343o) Tj T* 0 Tw (exce\347\365es para resolver impedimentos e ficam registradas com justificativa.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 343.0791 cm
+1 0 0 1 91.03937 273.0791 cm
 Q
 q
-1 0 0 1 91.03937 331.0791 cm
+1 0 0 1 91.03937 261.0791 cm
 Q
 q
-1 0 0 1 91.03937 313.0791 cm
+1 0 0 1 91.03937 243.0791 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (7 Escolha o l\355der e entenda as responsabilidades) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 223.0791 cm
+1 0 0 1 91.03937 153.0791 cm
 q
 BT 1 0 0 1 0 60 Tm 4.30721 Tw 18 TL /F1 12 Tf 0 0 0 rg (Com tr\352s a cinco integrantes, abra ) Tj /F2 12 Tf (Minha empresa e equipe) Tj /F1 12 Tf (. Cada aluno) Tj T* 0 Tw 1.759937 Tw (seleciona um integrante e clica em ) Tj /F2 12 Tf (Registrar minha escolha) Tj /F1 12 Tf (. O candidato que) Tj T* 0 Tw 1.503276 Tw (receber mais da metade das escolhas da equipe ser\341 o l\355der inicial. Conversem) Tj T* 0 Tw (antes de registrar as escolhas.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 143.0791 cm
+1 0 0 1 91.03937 73.07909 cm
 q
 BT 1 0 0 1 0 60 Tm 1.778276 Tw 18 TL /F2 12 Tf 0 0 0 rg (Somente o l\355der registra, altera, salva e envia as decis\365es da empresa.) Tj /F1 12 Tf ( Os) Tj T* 0 Tw 2.584913 Tw (outros integrantes t\352m acesso de visualiza\347\343o aos diagn\363sticos, planejamento,) Tj T* 0 Tw 3.137131 Tw (resultados e hist\363rico. Todos participam da discuss\343o; n\343o \351 necess\341ria uma) Tj T* 0 Tw (confirma\347\343o de envio por cada aluno.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 81.07909 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 42 Tm /F1 12 Tf 18 TL 2.093379 Tw (O quadro da equipe destaca o l\355der atual e a regra de transfer\352ncia. A equipe) Tj T* 0 Tw .919913 Tw (combina como organizar as responsabilidades de marketing, finan\347as, opera\347\365es) Tj T* 0 Tw (e pessoas. A lideran\347a define quem envia, n\343o quem pode contribuir.) Tj T* ET
 Q
 Q
  
@@ -15672,7 +15124,7 @@ endstream
 endobj
 370 0 obj
 <<
-/Length 2523
+/Length 2909
 >>
 stream
 q
@@ -15693,63 +15145,70 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (19) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 732.8504 cm
+1 0 0 1 91.03937 696.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 42 Tm /F1 12 Tf 18 TL 2.093379 Tw (O quadro da equipe destaca o l\355der atual e a regra de transfer\352ncia. A equipe) Tj T* 0 Tw .919913 Tw (combina como organizar as responsabilidades de marketing, finan\347as, opera\347\365es) Tj T* 0 Tw (e pessoas. A lideran\347a define quem envia, n\343o quem pode contribuir.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 666.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (7.1 Como transferir a lideran\347a) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 702.8504 cm
+1 0 0 1 91.03937 636.8504 cm
 q
 BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (1. O l\355der atual abre ) Tj /F2 12 Tf (Minha empresa e equipe) Tj /F1 12 Tf (.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 676.8504 cm
+1 0 0 1 91.03937 610.8504 cm
 q
 BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (2. Em ) Tj /F2 12 Tf (Transferir lideran\347a) Tj /F1 12 Tf (, seleciona outro integrante da pr\363pria equipe.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 650.8504 cm
+1 0 0 1 91.03937 584.8504 cm
 q
 BT 1 0 0 1 12 6 Tm -12 0 Td 18 TL /F1 12 Tf 0 0 0 rg (3. Clica em ) Tj /F2 12 Tf (Transferir lideran\347a para a pr\363xima rodada) Tj /F1 12 Tf (.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 624.8504 cm
+1 0 0 1 91.03937 558.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 12 6 Tm /F1 12 Tf 18 TL -12 0 Td (4. Confere o aviso com o pr\363ximo l\355der e a rodada em que ele assumir\341.) Tj T* 12 0 Td ET
 Q
 Q
 q
-1 0 0 1 91.03937 604.8504 cm
+1 0 0 1 91.03937 538.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Figura 5 - Selecione o pr\363ximo l\355der e confirme a transfer\352ncia) Tj T* ET
 Q
 Q
 q
-1 0 0 1 85.03937 295.0776 cm
+1 0 0 1 85.03937 229.0776 cm
 q
 453.5433 0 0 297.7728 0 0 cm
 /FormXob.421572491c0530b8587050c79d8f80a0 Do
 Q
 Q
 q
-1 0 0 1 91.03937 289.0776 cm
+1 0 0 1 91.03937 223.0776 cm
 Q
 q
-1 0 0 1 91.03937 277.0776 cm
+1 0 0 1 91.03937 211.0776 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Fonte: SempreHub, acervo do Professor Guandalini \(2026\). Tela com dados ilustrativos.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 175.0776 cm
+1 0 0 1 91.03937 109.0776 cm
 q
 BT 1 0 0 1 0 78 Tm 2.463947 Tw 18 TL /F2 12 Tf 0 0 0 rg (A troca s\363 vale na pr\363xima rodada.) Tj /F1 12 Tf ( Durante a rodada atual, o l\355der anterior) Tj T* 0 Tw -0.10313 Tw (continua respons\341vel por salvar e enviar. Depois que o professor fecha a rodada, o) Tj T* 0 Tw 3.191034 Tw (programa efetiva a transfer\352ncia e atualiza as permiss\365es. Uma transfer\352ncia) Tj T* 0 Tw 3.031937 Tw (programada n\343o pode ser substitu\355da por outra na mesma rodada. Na \372ltima) Tj T* 0 Tw (rodada n\343o existe uma pr\363xima rodada para transferir.) Tj T* ET
 Q
@@ -35133,24 +34592,6 @@ endobj
 endobj
 437 0 obj
 <<
-/BaseFont /Helvetica
-/Encoding /WinAnsiEncoding
-/Name /F1
-/Subtype /Type1
-/Type /Font
->>
-endobj
-438 0 obj
-<<
-/BaseFont /Helvetica-Bold
-/Encoding /WinAnsiEncoding
-/Name /F2
-/Subtype /Type1
-/Type /Font
->>
-endobj
-439 0 obj
-<<
 /Type /Pattern
 /PatternType 2
 /Matrix [ 0.014134936 0 0 -0.014134936 15.1036348 214.44826 ]
@@ -35169,7 +34610,7 @@ endobj
 >>
 >>
 endobj
-440 0 obj
+438 0 obj
 <<
 /Type /Pattern
 /PatternType 2
@@ -35189,7 +34630,7 @@ endobj
 >>
 >>
 endobj
-441 0 obj
+439 0 obj
 <<
 /Type /Pattern
 /PatternType 2
@@ -35209,7 +34650,7 @@ endobj
 >>
 >>
 endobj
-442 0 obj
+440 0 obj
 <<
 /Type /Pattern
 /PatternType 2
@@ -35253,7 +34694,7 @@ endobj
 >>
 >>
 endobj
-443 0 obj
+441 0 obj
 <<
 /Type /Pattern
 /PatternType 2
@@ -35297,7 +34738,7 @@ endobj
 >>
 >>
 endobj
-444 0 obj
+442 0 obj
 <<
 /Type /Pattern
 /PatternType 2
@@ -35317,7 +34758,7 @@ endobj
 >>
 >>
 endobj
-445 0 obj
+443 0 obj
 <<
 /Type /Pattern
 /PatternType 2
@@ -35337,7 +34778,7 @@ endobj
 >>
 >>
 endobj
-446 0 obj
+444 0 obj
 <<
 /Type /Pattern
 /PatternType 2
@@ -35357,7 +34798,7 @@ endobj
 >>
 >>
 endobj
-447 0 obj
+445 0 obj
 <<
 /Type /Pattern
 /PatternType 2
@@ -35377,9 +34818,27 @@ endobj
 >>
 >>
 endobj
+446 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+447 0 obj
+<<
+/BaseFont /Helvetica-Bold
+/Encoding /WinAnsiEncoding
+/Name /F2
+/Subtype /Type1
+/Type /Font
+>>
+endobj
 448 0 obj
 <<
-/Length 18981
+/Length 18776
 >>
 stream
 q
@@ -35401,56 +34860,50 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (13) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 726.8504 cm
+1 0 0 1 91.03937 738.8504 cm
+Q
+q
+1 0 0 1 91.03937 720.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (2 A hist\363ria e o conceito da logomarca SempreHub) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 630.8504 cm
+q
+BT 1 0 0 1 0 60 Tm .281276 Tw 18 TL /F2 12 Tf 0 0 0 rg (Autoria e cria\347\343o: Professor Guandalini.) Tj /F1 12 Tf ( O nome, a marca e a identidade visual) Tj T* 0 Tw 1.871131 Tw (do SempreHub foram idealizados e criados pelo Professor Guandalini. A marca) Tj T* 0 Tw 1.801531 Tw (aproxima o ambiente corporativo da conex\343o das redes modernas e representa) Tj T* 0 Tw -0.000869 Tw (uma metodologia de aprendizagem integrada, voltada ao Ensino M\351dio e Superior.) Tj T* 0 Tw ET
+Q
+Q
+q
+1 0 0 1 91.03937 550.8504 cm
+q
+BT 1 0 0 1 0 60 Tm .835913 Tw 18 TL /F2 12 Tf 0 0 0 rg (SEMPRE) Tj /F1 12 Tf ( expressa const\342ncia, aprendizado cont\355nuo e resili\352ncia. Empreender \351) Tj T* 0 Tw 1.517755 Tw (um ciclo de tentativas, an\341lise de resultados, ajustes e evolu\347\343o. ) Tj /F2 12 Tf (HUB) Tj /F1 12 Tf ( identifica) Tj T* 0 Tw .444367 Tw (um centro conector: estudantes, departamentos, gest\343o e mercado competitivo se) Tj T* 0 Tw (encontram em um mesmo ecossistema.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 518.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 14 Tm /F1 10 Tf 12 TL (Figura 1 - Anatomia da logomarca SempreHub: departamentos, conex\365es, tipografia e n\372cleos) Tj T* (centrais) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 389.811 cm
+1 0 0 1 91.03937 181.811 cm
 Q
 q
-1 0 0 1 91.03937 381.811 cm
+1 0 0 1 91.03937 173.811 cm
 Q
 q
-1 0 0 1 91.03937 369.811 cm
+1 0 0 1 91.03937 161.811 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 2 Tm /F1 10 Tf 12 TL (Fonte: Professor Guandalini \(2026\). Diagrama explicativo sobre a logomarca oficial.) Tj T* ET
 Q
 Q
-q
-1 0 0 1 91.03937 339.811 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (2.1 O s\355mbolo: a rede de gest\343o) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 255.811 cm
-q
-BT 1 0 0 1 0 60 Tm 2.004301 Tw 18 TL /F1 12 Tf 0 0 0 rg (Os n\363s perif\351ricos, em azul e ciano, representam os seis departamentos vitais:) Tj T* 0 Tw 3.05533 Tw (Pesquisa e Desenvolvimento \(P) Tj (&) Tj (D\), Produ\347\343o, Log\355stica, Marketing, Recursos) Tj T* 0 Tw .129028 Tw (Humanos \(RH\) e Finan\347as. Eles mostram uma empresa cujas \341reas trabalham em) Tj T* 0 Tw (conjunto.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 175.811 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 60 Tm /F1 12 Tf 18 TL 3.261701 Tw (As linhas conectoras representam a interdepend\352ncia das decis\365es. Alterar o) Tj T* 0 Tw 3.879573 Tw (pre\347o no Marketing pode mudar a demanda e o faturamento nas Finan\347as.) Tj T* 0 Tw 2.970846 Tw (Aumentar a Produ\347\343o modifica a necessidade de materiais, de pessoas e de) Tj T* 0 Tw (capacidade log\355stica. Nenhuma decis\343o \351 isolada.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 113.811 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 42 Tm /F1 12 Tf 18 TL .388276 Tw (Os dois n\372cleos em Laranja Ouro representam a tomada de decis\343o do estudante) Tj T* 0 Tw .221276 Tw (e a resposta do mercado simulado. Sua posi\347\343o central destaca que cada escolha) Tj T* 0 Tw (encontra consequ\352ncias na din\342mica da empresa e da concorr\352ncia.) Tj T* ET
-Q
-Q
  
 
 Q
-
 q
 0.16666667 0.0 0.0 0.16666667 85.0393701 772.889764 cm
 0.0 0.0 450 131.039993 re
@@ -35922,7 +35375,6 @@ Q
 Q
 Q
 
-
 Q
 
 endstream
@@ -35933,7 +35385,7 @@ endobj
 >>
 stream
 q
-0.75590551 0.0 0.0 0.75590551 91.0393701 389.811024 cm
+0.75590551 0.0 0.0 0.75590551 91.0393701 181.811024 cm
 0.0 0.0 600 430 re
 W
 n
@@ -36743,9 +36195,9 @@ xref
 0002298388 00000 n 
 0002298537 00000 n 
 0002298686 00000 n 
-0002298835 00000 n 
-0002298984 00000 n 
-0002299342 00000 n 
+0002299044 00000 n 
+0002299080 00000 n 
+0002299229 00000 n 
 0002299378 00000 n 
 0002299527 00000 n 
 0002299676 00000 n 
@@ -36755,23 +36207,23 @@ xref
 0002300368 00000 n 
 0002300517 00000 n 
 0002300666 00000 n 
-0002300815 00000 n 
-0002300964 00000 n 
-0002301465 00000 n 
+0002301167 00000 n 
+0002301203 00000 n 
+0002301352 00000 n 
 0002301501 00000 n 
-0002301650 00000 n 
-0002301799 00000 n 
-0002302157 00000 n 
+0002301859 00000 n 
+0002301895 00000 n 
+0002302044 00000 n 
 0002302193 00000 n 
 0002302342 00000 n 
 0002302491 00000 n 
 0002302640 00000 n 
 0002302789 00000 n 
-0002302938 00000 n 
-0002303087 00000 n 
-0002303236 00000 n 
-0002303385 00000 n 
-0002303743 00000 n 
+0002303147 00000 n 
+0002303183 00000 n 
+0002303332 00000 n 
+0002303481 00000 n 
+0002303630 00000 n 
 0002303779 00000 n 
 0002303928 00000 n 
 0002304077 00000 n 
@@ -36961,177 +36413,177 @@ xref
 0003413385 00000 n 
 0003413534 00000 n 
 0003413670 00000 n 
-0003413814 00000 n 
-0003413952 00000 n 
-0003414100 00000 n 
-0003414249 00000 n 
-0003414370 00000 n 
-0003414496 00000 n 
-0003414626 00000 n 
-0003414782 00000 n 
-0003414902 00000 n 
-0003415010 00000 n 
-0003415108 00000 n 
-0003415228 00000 n 
-0003415354 00000 n 
-0003415488 00000 n 
-0003415618 00000 n 
-0003415751 00000 n 
-0003415902 00000 n 
-0003416016 00000 n 
-0003416143 00000 n 
-0003416270 00000 n 
-0003416404 00000 n 
-0003416527 00000 n 
-0003416648 00000 n 
-0003416753 00000 n 
-0003416901 00000 n 
-0003417075 00000 n 
-0003417238 00000 n 
-0003417412 00000 n 
-0003417568 00000 n 
-0003417717 00000 n 
-0003417837 00000 n 
-0003417973 00000 n 
-0003418108 00000 n 
-0003418252 00000 n 
-0003418412 00000 n 
-0003418554 00000 n 
-0003418896 00000 n 
-0003418937 00000 n 
-0003419717 00000 n 
-0003420497 00000 n 
-0003420853 00000 n 
-0003421206 00000 n 
-0003421557 00000 n 
-0003421910 00000 n 
-0003422260 00000 n 
-0003422609 00000 n 
-0003422959 00000 n 
-0003424224 00000 n 
-0003440898 00000 n 
-0003443339 00000 n 
-0003460013 00000 n 
-0003464515 00000 n 
-0003481189 00000 n 
-0003490376 00000 n 
-0003507050 00000 n 
-0003515579 00000 n 
-0003532253 00000 n 
-0003536565 00000 n 
-0003553239 00000 n 
-0003558405 00000 n 
-0003575079 00000 n 
-0003580404 00000 n 
-0003597078 00000 n 
-0003601772 00000 n 
-0003618446 00000 n 
-0003623136 00000 n 
-0003639810 00000 n 
-0003644387 00000 n 
-0003661061 00000 n 
-0003666168 00000 n 
-0003682842 00000 n 
-0003686862 00000 n 
-0003703536 00000 n 
-0003705945 00000 n 
-0003722619 00000 n 
-0003727145 00000 n 
-0003743819 00000 n 
-0003747754 00000 n 
-0003764428 00000 n 
-0003766693 00000 n 
-0003783367 00000 n 
-0003787350 00000 n 
-0003804024 00000 n 
-0003807549 00000 n 
-0003824223 00000 n 
-0003826800 00000 n 
-0003843474 00000 n 
-0003847074 00000 n 
-0003863748 00000 n 
-0003868626 00000 n 
-0003885300 00000 n 
-0003887772 00000 n 
-0003904446 00000 n 
-0003908572 00000 n 
-0003925246 00000 n 
-0003927921 00000 n 
-0003944595 00000 n 
-0003948876 00000 n 
-0003965550 00000 n 
-0003969946 00000 n 
-0003986620 00000 n 
-0003991148 00000 n 
-0004007822 00000 n 
-0004012467 00000 n 
-0004029141 00000 n 
-0004033567 00000 n 
-0004050241 00000 n 
-0004054542 00000 n 
-0004071216 00000 n 
-0004075837 00000 n 
-0004092511 00000 n 
-0004096872 00000 n 
-0004113546 00000 n 
-0004118059 00000 n 
-0004134733 00000 n 
-0004139064 00000 n 
-0004155738 00000 n 
-0004160080 00000 n 
-0004176754 00000 n 
-0004181424 00000 n 
-0004198098 00000 n 
-0004202415 00000 n 
-0004219089 00000 n 
-0004223525 00000 n 
-0004240199 00000 n 
-0004244708 00000 n 
-0004261382 00000 n 
-0004265324 00000 n 
-0004281998 00000 n 
-0004286371 00000 n 
-0004303045 00000 n 
-0004307500 00000 n 
-0004324174 00000 n 
-0004328616 00000 n 
-0004345290 00000 n 
-0004349711 00000 n 
-0004366385 00000 n 
-0004370784 00000 n 
-0004387458 00000 n 
-0004391814 00000 n 
-0004408488 00000 n 
-0004413021 00000 n 
-0004429695 00000 n 
-0004434252 00000 n 
-0004450926 00000 n 
-0004455531 00000 n 
-0004472205 00000 n 
-0004477334 00000 n 
-0004494008 00000 n 
-0004498808 00000 n 
-0004515482 00000 n 
-0004515523 00000 n 
-0004515632 00000 n 
-0004515746 00000 n 
-0004516096 00000 n 
-0004516445 00000 n 
-0004516795 00000 n 
-0004517575 00000 n 
-0004518355 00000 n 
-0004518711 00000 n 
-0004519064 00000 n 
-0004519415 00000 n 
-0004519768 00000 n 
-0004538804 00000 n 
+0003413821 00000 n 
+0003413959 00000 n 
+0003414107 00000 n 
+0003414256 00000 n 
+0003414377 00000 n 
+0003414503 00000 n 
+0003414633 00000 n 
+0003414789 00000 n 
+0003414909 00000 n 
+0003415017 00000 n 
+0003415115 00000 n 
+0003415235 00000 n 
+0003415361 00000 n 
+0003415495 00000 n 
+0003415625 00000 n 
+0003415758 00000 n 
+0003415909 00000 n 
+0003416023 00000 n 
+0003416150 00000 n 
+0003416277 00000 n 
+0003416411 00000 n 
+0003416534 00000 n 
+0003416655 00000 n 
+0003416760 00000 n 
+0003416908 00000 n 
+0003417082 00000 n 
+0003417245 00000 n 
+0003417419 00000 n 
+0003417575 00000 n 
+0003417724 00000 n 
+0003417844 00000 n 
+0003417980 00000 n 
+0003418115 00000 n 
+0003418259 00000 n 
+0003418419 00000 n 
+0003418561 00000 n 
+0003418908 00000 n 
+0003418949 00000 n 
+0003419729 00000 n 
+0003420509 00000 n 
+0003420865 00000 n 
+0003421218 00000 n 
+0003421569 00000 n 
+0003421922 00000 n 
+0003422272 00000 n 
+0003422621 00000 n 
+0003422971 00000 n 
+0003424236 00000 n 
+0003440910 00000 n 
+0003443351 00000 n 
+0003460025 00000 n 
+0003464527 00000 n 
+0003481201 00000 n 
+0003490383 00000 n 
+0003507057 00000 n 
+0003515586 00000 n 
+0003532260 00000 n 
+0003536572 00000 n 
+0003553246 00000 n 
+0003558412 00000 n 
+0003575086 00000 n 
+0003580411 00000 n 
+0003597085 00000 n 
+0003601779 00000 n 
+0003618453 00000 n 
+0003623143 00000 n 
+0003639817 00000 n 
+0003644253 00000 n 
+0003660927 00000 n 
+0003666128 00000 n 
+0003682802 00000 n 
+0003687010 00000 n 
+0003703684 00000 n 
+0003703706 00000 n 
+0003703728 00000 n 
+0003707996 00000 n 
+0003724670 00000 n 
+0003729372 00000 n 
+0003746046 00000 n 
+0003748547 00000 n 
+0003765221 00000 n 
+0003769545 00000 n 
+0003786219 00000 n 
+0003789770 00000 n 
+0003806444 00000 n 
+0003809407 00000 n 
+0003826081 00000 n 
+0003829681 00000 n 
+0003846355 00000 n 
+0003851233 00000 n 
+0003867907 00000 n 
+0003870379 00000 n 
+0003887053 00000 n 
+0003891179 00000 n 
+0003907853 00000 n 
+0003910528 00000 n 
+0003927202 00000 n 
+0003931483 00000 n 
+0003948157 00000 n 
+0003952553 00000 n 
+0003969227 00000 n 
+0003973755 00000 n 
+0003990429 00000 n 
+0003995074 00000 n 
+0004011748 00000 n 
+0004016174 00000 n 
+0004032848 00000 n 
+0004037149 00000 n 
+0004053823 00000 n 
+0004058444 00000 n 
+0004075118 00000 n 
+0004079479 00000 n 
+0004096153 00000 n 
+0004100666 00000 n 
+0004117340 00000 n 
+0004121671 00000 n 
+0004138345 00000 n 
+0004142687 00000 n 
+0004159361 00000 n 
+0004164031 00000 n 
+0004180705 00000 n 
+0004185022 00000 n 
+0004201696 00000 n 
+0004206132 00000 n 
+0004222806 00000 n 
+0004227315 00000 n 
+0004243989 00000 n 
+0004247931 00000 n 
+0004264605 00000 n 
+0004268978 00000 n 
+0004285652 00000 n 
+0004290107 00000 n 
+0004306781 00000 n 
+0004311223 00000 n 
+0004327897 00000 n 
+0004332318 00000 n 
+0004348992 00000 n 
+0004353391 00000 n 
+0004370065 00000 n 
+0004374421 00000 n 
+0004391095 00000 n 
+0004395628 00000 n 
+0004412302 00000 n 
+0004416859 00000 n 
+0004433533 00000 n 
+0004438138 00000 n 
+0004454812 00000 n 
+0004459941 00000 n 
+0004476615 00000 n 
+0004481415 00000 n 
+0004498089 00000 n 
+0004498130 00000 n 
+0004498480 00000 n 
+0004498829 00000 n 
+0004499179 00000 n 
+0004499959 00000 n 
+0004500739 00000 n 
+0004501095 00000 n 
+0004501448 00000 n 
+0004501799 00000 n 
+0004502152 00000 n 
+0004502261 00000 n 
+0004502375 00000 n 
+0004521206 00000 n 
 trailer
 <<
 /Size 450
 /Root 1 0 R
 /Info 321 0 R
-/ID [ (1\230\343\256\2069w\300S9 \302\311mB\264) (1\230\343\256\2069w\300S9 \302\311mB\264) ]
+/ID [ <4c1a75553d31bebef0db78bf6eb81000> <4c1a75553d31bebef0db78bf6eb81000> ]
 >>
 startxref
-4558940
+4541342
 %%EOF

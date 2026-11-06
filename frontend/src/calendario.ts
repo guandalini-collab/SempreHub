@@ -2,8 +2,8 @@ export interface CalendarioSimulado {
   periodicidade: 'SEMANAL'; inicio: string; fim: string; dias: number; fator_mensal: number;
   semana_iso: number; ano_iso: number; ano_fiscal: number;
   meses: {data:string;peso_mensal:number}[];
-  sazonalidade:{estado:string;perfil:string;eventos:string[];demanda:number;insumos:number;frete:number};
-  proximos_eventos:{nome:string;data:string}[];
+  sazonalidade:{estado:string;perfil:string;setor?:string|null;eventos:string[];demanda:number;insumos:number;frete:number;detalhes_eventos?:{nome:string;data:string;fase:string;impacto_demanda:number;orientacao:string;fonte:string}[]};
+  proximos_eventos:{nome:string;data:string;impacto?:string;peso_setorial?:number}[];
 }
 export const dataCurta=(v:string)=>new Date(v+'T12:00:00').toLocaleDateString('pt-BR');
 export const tituloPeriodo=(c?:CalendarioSimulado|null)=>c?`Semana ${c.semana_iso}/${c.ano_iso} · ${dataCurta(c.inicio)} a ${dataCurta(c.fim)}`:'Calendário mensal';

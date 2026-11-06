@@ -10,6 +10,7 @@ export interface ConfiguracaoMotor {
   data_inicio_simulada?: string | null;
   rodada_inicio_calendario?: number;
   perfil_sazonal?: "NEUTRO" | "VAREJO" | "ALIMENTACAO" | "SERVICOS";
+  setor_mercado?: string | null;
   capacidade_maquina: number;
   preco_maquina: number;
   vida_util_maquina: number;

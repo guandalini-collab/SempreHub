@@ -11,6 +11,7 @@ from ..models import ConteudoMercado, RelatorioEmpresarial, Usuario, StatusTurma
 from ..seguranca import exigir_professor, exigir_aluno
 from ..inteligencia_mercado import gerar_json
 from ..evidencias_mercado import validar_evidencias
+from ..schemas import ConfiguracaoSimulacao
 from .. import serializacao as ser
 from ..relatorios import _rodada
 from .professor import _turma_do_professor
@@ -30,11 +31,25 @@ class Fonte(BaseModel):
     titulo: str = Field(min_length=1, max_length=500)
     url: str = Field(max_length=2000)
 
+
+class ImpactoDecisao(BaseModel):
+    """Leitura pedagógica de um fato de mercado, sem transformar hipótese em ordem."""
+    departamento: Literal[
+        "Produtos e marketing", "P&D", "Recursos humanos", "Estratégia",
+        "Finanças", "Produção", "Logística",
+    ]
+    tipo: Literal["ATENCAO", "OPORTUNIDADE", "RISCO"]
+    efeito: str = Field(min_length=20, max_length=500)
+    pergunta_decisao: str = Field(min_length=20, max_length=500)
+
+
 class Artigo(BaseModel):
     titulo: str = Field(min_length=3, max_length=300)
     texto: str = Field(min_length=20, max_length=12000)
     data: str = Field(min_length=4, max_length=40)
     fontes: list[Fonte] = Field(min_length=1, max_length=10)
+    competencia: str | None = Field(default=None, max_length=80)
+    impactos: list[ImpactoDecisao] = Field(default_factory=list, max_length=7)
 
 class EvidenciaCusto(BaseModel):
     url: str = Field(max_length=2000)
@@ -115,7 +130,7 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     turma=_turma_do_professor(db,turma_id,usuario)
     rodada=turma.rodada_atual
     if turma.status != StatusTurma.ABERTA: raise HTTPException(409,"Turma encerrada.")
-    instrucoes='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,natureza,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. Cada produto deve incluir natureza FISICO ou SERVICO_DIGITAL conforme o modo de operação. O setor informado não determina o modelo da empresa. No modo tradicional descreva o custo por unidade de matéria-prima/kit de montagem documentado, identificando a base e sem atribuir custos industriais não documentados. Notícias e análises devem contextualizar o setor e o modo informado separadamente. id deve ser texto, custo_unitario deve ser número em BRL, sem símbolos ou separadores locais. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; identifique preços varejistas como preco_varejo para projeção didática, nunca como custo industrial documentado. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores. Cada produto deve incluir evidencia_custo: {url,trecho}, com um trecho literal da página que contenha o nome exato do produto e seu preço em R$; use esse mesmo nome no campo nome. Não use estatísticas setoriais como fonte de preço. Não derive o preço documentado de médias ou faturamentos; a projeção didática pertence ao backend. A data dos artigos deve ser a data de publicação documentada (AAAA-MM-DD ou AAAA-MM), nunca a data atual da consulta. Para produtos sem data de publicação, indique explicitamente Consulta em AAAA-MM-DD com a data_consulta fornecida. Não atribua datas de atualização da página à publicação do artigo.'''
+    instrucoes='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,competencia,impactos:[{departamento,tipo,efeito,pergunta_decisao}],fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,natureza,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. Cada produto deve incluir natureza FISICO ou SERVICO_DIGITAL conforme o modo de operação. O setor informado não determina o modelo da empresa. No modo tradicional descreva o custo por unidade de matéria-prima/kit de montagem documentado, identificando a base e sem atribuir custos industriais não documentados. Notícias e análises devem contextualizar o setor e o modo informado separadamente. Para CADA notícia e análise, indique a competência mês/ano a que o dado se refere, quando disponível, e até sete impactos práticos. Cada impacto deve relacionar um departamento a um possível efeito e formular uma pergunta que ajude a equipe a decidir; não dê respostas prontas nem trate hipótese como certeza. Departamentos permitidos: Produtos e marketing, P&D, Recursos humanos, Estratégia, Finanças, Produção e Logística. id deve ser texto, custo_unitario deve ser número em BRL, sem símbolos ou separadores locais. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; identifique preços varejistas como preco_varejo para projeção didática, nunca como custo industrial documentado. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores. Cada produto deve incluir evidencia_custo: {url,trecho}, com um trecho literal da página que contenha o nome exato do produto e seu preço em R$; use esse mesmo nome no campo nome. Não use estatísticas setoriais como fonte de preço. Não derive o preço documentado de médias ou faturamentos; a projeção didática pertence ao backend. A data dos artigos deve ser a data de publicação documentada (AAAA-MM-DD ou AAAA-MM), nunca a data atual da consulta. Para produtos sem data de publicação, indique explicitamente Consulta em AAAA-MM-DD com a data_consulta fornecida. Não atribua datas de atualização da página à publicação do artigo.'''
     instrucoes += " Para cada produto informe tipo_documento: custo_aquisicao ou preco_varejo. Se encontrar apenas preço varejista, informe esse preço original em custo_unitario e tipo_documento=preco_varejo; o backend projetará o custo com fator 0,60. Não calcule esse desconto na resposta. Se não houver evidência verificável, o backend aplicará custo padrão da turma, identificado como estimativa. Não afirme que estimativas são preços comprovados."
     schema = Edicao.model_json_schema()
     schema["$defs"]["Produto"]["properties"]["natureza"] = {"type": "string", "enum": ["FISICO", "SERVICO_DIGITAL"]}
@@ -168,6 +183,11 @@ def publicar(turma_id:int,edicao_id:int, db:Session=Depends(get_db), usuario:Usu
     validar_coerencia(dados,turma,exigir_natureza=True)
     validar_evidencias(dados, turma)
     e.dados=dados.model_dump()
+    # A partir da próxima apuração, o motor sabe qual segmento deve receber os
+    # efeitos sazonais. Resultados já fechados continuam apenas com seu snapshot.
+    configuracao = ConfiguracaoSimulacao.model_validate(turma.configuracao_simulacao or {})
+    configuracao.setor_mercado = dados.setor
+    turma.configuracao_simulacao = configuracao.model_dump()
     e.publicado=True;db.commit();return serializar(e)
 
 @router.get("/api/aluno/empresas/{empresa_id}/mercado-real")

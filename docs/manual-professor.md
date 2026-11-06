@@ -100,11 +100,15 @@ As metas são referências de comparação escolhidas pela equipe para uma seman
 
 Se a simulação começa em 15 de outubro, o Dia das Crianças já passou. O Natal está aproximadamente dez semanas à frente. A equipe deve avaliar a procura esperada, a capacidade e o estoque antes de contratar, comprar ou anunciar. Comprar máquina em uma semana só libera sua capacidade na rodada seguinte. Aumento esperado de procura não garante vendas nem obriga investimento: preços, concorrentes, disponibilidade e decisões da equipe continuam afetando o resultado.
 
-### Perfis sazonais: Estimativa do Modelo
+### Sazonalidade por setor: Estimativa do Modelo
 
-O perfil configurado da turma determina a sazonalidade. Neutro mantém o fator de procura em 1. Varejo tem maior sensibilidade; Alimentação responde mais ao Natal e pouco às outras datas; Serviços tem sensibilidade pequena. Estes perfis são simplificações didáticas, não classificações universais nem estatísticas comprovadas. O perfil deve corresponder à proposta do negócio. O modelo inicial contempla Dia das Crianças, Black Friday (última sexta-feira de novembro) e Natal; outras datas e diferenças regionais não estão modeladas nesta edição.
+O calendário usa datas do calendário civil brasileiro e identifica Volta às aulas, Carnaval, Semana do Consumidor, Páscoa, Dia das Mães, Dia dos Namorados, Dia dos Pais, Dia das Crianças, Black Friday, Natal e Ano-Novo. Carnaval e Páscoa são calculados para cada ano; Dia das Mães e Dia dos Pais seguem o segundo domingo de maio e de agosto; Black Friday é a última sexta-feira de novembro. A tela mostra a data, a fase de preparação ou pós-evento e a orientação da semana.
 
-A procura cresce progressivamente nos 42 dias anteriores às datas: picos adicionais de referência de 40%, 45% e 60%, respectivamente, ponderados pelo perfil e pelos dias da semana. Durante sete dias após a data, há redução didática de 12% ponderada pelo perfil. Os efeitos ativos são somados e a procura tem piso de 50% da base. Insumos recebem adicional de 8% da parcela positiva do fator de procura; fretes, 20% dessa parcela. A interface identifica os eventos e o fator aplicado. Não há números aleatórios na sazonalidade.
+Depois que o professor publica o setor da turma, o motor aplica pesos próprios para o setor escolhido — por exemplo, Eletrônicos e Tecnologia tende a responder mais a Black Friday e Natal; Educação e Cursos à volta às aulas; Alimentos e Bebidas, Vestuário e Moda, Cosméticos e Beleza, Pet Care e os demais setores possuem combinações próprias. Antes da publicação, o perfil geral da turma é apenas uma alternativa de continuidade: Neutro mantém o fator de procura em 1; Varejo, Alimentação e Serviços usam sensibilidades amplas. Esses pesos são **Estimativas do Modelo**: não são previsão de vendas, estatística oficial nem garantia de resultado.
+
+O efeito começa na preparação para a data e pode ter uma pequena normalização posterior. Os eventos ativos são combinados de forma determinística e a procura fica limitada a uma faixa segura do modelo. Em negócios tradicionais, uma procura maior também pode elevar a necessidade projetada de insumos e a pressão de frete. Em Startups, a sazonalidade influencia a procura e o planejamento comercial, sem criar custo físico automático de insumos ou frete. Não há números aleatórios nessa regra.
+
+Oriente a leitura como pergunta de gestão, e não como ordem automática: há capacidade, estoque, caixa, pessoas, campanha e logística para atender a oportunidade? Contratações, compras, produção e investimentos continuam sendo decisões da equipe. Preço, concorrência, disponibilidade e qualidade ainda podem reduzir o resultado mesmo em uma data favorável.
 
 ### Consequências nos departamentos
 
@@ -130,7 +134,7 @@ A aba DRE abre o demonstrativo completo da rodada. As visões mensal e trimestra
 
 ### Histórico mensal preservado
 
-Turmas anteriores migram automaticamente para semanas na primeira rodada aberta sem decisões salvas. Uma rodada mensal já planejada mantém suas regras até o fechamento. Os resultados anteriores não são recalculados nem redistribuídos por datas inventadas. A ativação é prospectiva e não pode ser reposicionada. Obrigações futuras sem datas absolutas herdadas do modelo mensal são convertidas pela convenção de 30 dias por mês, arredondando para a semana de vencimento seguinte; essa aproximação não altera snapshots passados. Resultados novos registram a versão 3.1.0-auto-calendar-projected-mei e o calendário usado. Exemplos mensais neste manual continuam sendo referências mensais ou descrições do histórico, e não uma cobrança integral por semana.
+Turmas anteriores migram automaticamente para semanas na primeira rodada aberta sem decisões salvas. Uma rodada mensal já planejada mantém suas regras até o fechamento. Os resultados anteriores não são recalculados nem redistribuídos por datas inventadas. A ativação é prospectiva e não pode ser reposicionada. Obrigações futuras sem datas absolutas herdadas do modelo mensal são convertidas pela convenção de 30 dias por mês, arredondando para a semana de vencimento seguinte; essa aproximação não altera snapshots passados. Resultados novos registram a versão do motor e o calendário usado — a edição sazonal por setor é identificada como `3.2.0-seasonal-sector-calendar`. Exemplos mensais neste manual continuam sendo referências mensais ou descrições do histórico, e não uma cobrança integral por semana.
 
 ## A história e o conceito da logomarca SempreHub
 
