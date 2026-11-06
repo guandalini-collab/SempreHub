@@ -4,8 +4,8 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision = "0015_eventos_operacionais"
-down_revision = "0014_proprietario_agenda_academica"
+revision = "0015_eventos"
+down_revision = "0014_prop_agenda"
 branch_labels = depends_on = None
 
 

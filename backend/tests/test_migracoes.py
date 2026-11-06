@@ -27,7 +27,7 @@ from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
 
 
-_HEAD = "0014_proprietario_agenda_academica"
+_HEAD = "0015_eventos"
 
 
 @pytest.fixture()

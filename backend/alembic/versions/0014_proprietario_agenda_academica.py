@@ -4,7 +4,10 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision = "0014_proprietario_agenda_academica"
+# Alembic criou a tabela alembic_version como VARCHAR(32) nas versões
+# anteriores. A revisão precisa caber nela para que a atualização funcione em
+# bancos já existentes, inclusive o de produção.
+revision = "0014_prop_agenda"
 down_revision = "0013_boletins_oficiais"
 branch_labels = depends_on = None
 
