@@ -17,7 +17,7 @@ def iniciar_calendario(db, turma):
     if db.query(Decisao).join(Empresa).filter(Empresa.turma_id == turma.id, Decisao.rodada == turma.rodada_atual).first():
         return False
     cfg.update(periodicidade='SEMANAL', data_inicio_simulada=datetime.now(ZoneInfo('America/Sao_Paulo')).date().isoformat(),
-               rodada_inicio_calendario=turma.rodada_atual, calendario_automatico=True, cenario_mei_plp186=True,
+               rodada_inicio_calendario=turma.rodada_atual, calendario_automatico=True,
                perfil_sazonal=cfg.get('perfil_sazonal', 'NEUTRO'))
     for empresa in turma.empresas:
         estado = deepcopy(empresa.estado_simulacao or {})

@@ -11,7 +11,14 @@ from .tributos import calcular_imposto, aliquota_efetiva_simples, TOLERANCIA_TET
 
 
 def config(turma):
-    return ConfiguracaoSimulacao.model_validate(turma.configuracao_simulacao or {}).model_dump()
+    dados = deepcopy(turma.configuracao_simulacao or {})
+    # Metadados normativos são preenchidos pelo serviço de fontes oficiais e
+    # não fazem parte do formulário de parâmetros do professor.
+    confirmacoes_normativas = dados.pop("confirmacoes_normativas", {})
+    configuracao = ConfiguracaoSimulacao.model_validate(dados).model_dump()
+    if confirmacoes_normativas:
+        configuracao["confirmacoes_normativas"] = confirmacoes_normativas
+    return configuracao
 
 
 def estado_inicial(turma):
@@ -151,7 +158,7 @@ def _tributar(empresa, turma, receita, cmv, alertas):
     if regime == RegimeTributario.MEI:
         empresa.das_mei_pago_ano += impostos
         from .regras_mei import regras_mei
-        teto = regras_mei(turma)["teto_anual"]
+        teto = regras_mei(turma, turma.rodada_atual)["teto_anual"]
         if acumulado > teto * (1 + TOLERANCIA_TETO_MEI):
             impostos += max(0, acumulado * aliquota_efetiva_simples(acumulado) - empresa.das_mei_pago_ano)
             empresa.regime_tributario = RegimeTributario.SIMPLES_NACIONAL
@@ -213,7 +220,7 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         if turma.modo_jogo == "TRADICIONAL":
             _aplicar_mudanca_regime(empresa, d, turma, c)
             from .regras_mei import regras_mei
-            limite_empregados = regras_mei(turma)["limite_empregados"]
+            limite_empregados = regras_mei(turma, rodada)["limite_empregados"]
             if empresa.regime_tributario == RegimeTributario.MEI and empresa.funcionarios + d.contratar - d.demitir > limite_empregados:
                 empresa.regime_tributario = RegimeTributario.SIMPLES_NACIONAL
                 c.alertas.append(f"Mais de {limite_empregados} empregado(s): migração do MEI para o Simples Nacional.")

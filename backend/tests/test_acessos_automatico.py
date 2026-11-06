@@ -25,16 +25,20 @@ def test_auto_data_fixa_e_acessos_com_autorizacao(cliente, professor):
     assert cliente.get(f"/api/professor/turmas/{t['id']}/acessos",headers=p2).status_code==404
 
 
-def test_mei_projetado_separado_da_regra_vigente():
-    t=SimpleNamespace(configuracao_simulacao={'periodicidade':'SEMANAL','data_inicio_simulada':'2026-12-31','cenario_mei_plp186':True,'atividade_rural':True},rodada_atual=1,teto_mei_anual=81000)
+def test_mei_versionado_exige_confirmacao_da_vigencia_condicionada():
+    t=SimpleNamespace(configuracao_simulacao={'periodicidade':'SEMANAL','data_inicio_simulada':'2026-12-31','atividade_rural':True},rodada_atual=1,teto_mei_anual=81000)
     assert regras_mei(t)['teto_anual']==81000
-    assert regras_mei(t,2)['teto_anual']==110000
+    assert regras_mei(t,2)['teto_anual']==81000
     assert regras_mei(t,2)['limite_empregados']==2
     t.configuracao_simulacao['atividade_rural']=False
     assert regras_mei(t,2)['limite_empregados']==1
-    assert 'aplicação condicionada' in regras_mei(t,2)['estado']
+    assert 'condição orçamentária' in regras_mei(t,2)['estado']
     assert regras_mei(t,2)['norma']=='Lei Complementar 238/2026'
+    t.configuracao_simulacao['confirmacoes_normativas']={'LC238-2027-ORCAMENTO':True}
+    assert regras_mei(t,2)['teto_anual']==110000
     t.configuracao_simulacao['data_inicio_simulada']='2028-01-01'
+    assert regras_mei(t)['teto_anual']==81000
+    t.configuracao_simulacao['confirmacoes_normativas']={'LC238-2028-ORCAMENTO':True}
     assert regras_mei(t)['teto_anual']==140000
-    t.configuracao_simulacao['cenario_mei_plp186']=False
+    t.configuracao_simulacao['confirmacoes_normativas']={}
     assert regras_mei(t)['teto_anual']==81000

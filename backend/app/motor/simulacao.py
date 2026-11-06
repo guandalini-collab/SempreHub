@@ -340,11 +340,16 @@ def _aplicar_mudanca_regime(empresa: Empresa, decisao: Decisao, turma: Turma, c:
     if not pedido or pedido == empresa.regime_tributario:
         return
     if pedido == RegimeTributario.MEI:
+        from .regras_mei import regras_mei
+        regra = regras_mei(turma, turma.rodada_atual)
         funcionarios_previstos = empresa.funcionarios + decisao.contratar - decisao.demitir
-        if funcionarios_previstos > MAX_FUNCIONARIOS_MEI:
-            c.alertas.append("Mudança para MEI recusada: o MEI pode ter no máximo 1 empregado.")
+        if funcionarios_previstos > regra["limite_empregados"]:
+            c.alertas.append(
+                f"Mudança para MEI recusada: o enquadramento desta empresa permite no máximo "
+                f"{regra['limite_empregados']} empregado(s)."
+            )
             return
-        if empresa.faturamento_ano > turma.teto_mei_anual:
+        if empresa.faturamento_ano > regra["teto_anual"]:
             c.alertas.append("Mudança para MEI recusada: o faturamento do ano já passou do teto do MEI.")
             return
     empresa.regime_tributario = pedido
@@ -358,13 +363,13 @@ def _aplicar_pessoal(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calcu
     c.rescisoes = demitidos * turma.salario_base
     if demitidos:
         c.alertas.append(f"{demitidos} desligamento(s): verbas rescisórias equivalentes a um salário cada.")
-    if (
-        empresa.regime_tributario == RegimeTributario.MEI
-        and empresa.funcionarios > MAX_FUNCIONARIOS_MEI
-    ):
+    from .regras_mei import regras_mei
+    limite_empregados = regras_mei(turma, turma.rodada_atual)["limite_empregados"]
+    if empresa.regime_tributario == RegimeTributario.MEI and empresa.funcionarios > limite_empregados:
         empresa.regime_tributario = RegimeTributario.SIMPLES_NACIONAL
         c.alertas.append(
-            "Desenquadramento do MEI: a empresa passou a ter mais de 1 empregado e agora está no Simples Nacional."
+            "Desenquadramento do MEI: a empresa ultrapassou o limite de empregados aplicável "
+            "e agora está no Simples Nacional."
         )
 
 

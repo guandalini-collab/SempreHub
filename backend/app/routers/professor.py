@@ -100,7 +100,7 @@ def criar_turma(
     if turma.modo_jogo != "LEGADO" and (turma.configuracao_simulacao or {}).get("periodicidade") == "SEMANAL":
         from datetime import datetime
         from zoneinfo import ZoneInfo
-        turma.configuracao_simulacao = {**turma.configuracao_simulacao, "data_inicio_simulada": datetime.now(ZoneInfo("America/Sao_Paulo")).date().isoformat(), "cenario_mei_plp186": True}
+        turma.configuracao_simulacao = {**turma.configuracao_simulacao, "data_inicio_simulada": datetime.now(ZoneInfo("America/Sao_Paulo")).date().isoformat()}
     db.add(turma)
     db.commit()
     db.refresh(turma)
