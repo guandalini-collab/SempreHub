@@ -187,8 +187,9 @@ def preparar(
     amortizacao = _soma(amortizacao, obrigatoria)
     divida = _soma(divida_inicial, emprestimo, -amortizacao)
     caixa_disponivel = _soma(caixa_disponivel, -amortizacao)
+    from .eventos_operacionais import juros_evento_periodo
     juros = _dinheiro(
-        _decimal(divida) * _decimal(float(parametros.get("taxa_juros_mensal", 0.025)) + float(efeitos_eventos.get("juros_extra", 0)))
+        _decimal(divida) * _decimal(float(parametros.get("taxa_juros_mensal", 0.025)) + juros_evento_periodo(efeitos_eventos, fracao))
         + _decimal(max(0.0, -caixa_inicial)) * _decimal(parametros.get("taxa_cheque_especial", 0.08)),
     )
 

@@ -228,7 +228,11 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     sobrecarga_trabalho = max(0, producao_real / capacidade_trabalho - 0.90) if capacidade_trabalho else 0
     rh["moral"] = round(_limitar(rh["moral"] - 10 * sobrecarga_trabalho), 8)
 
-    juros_banco = _produto(divida, p.get("taxa_juros_mensal", 0.025) + float(efeitos_eventos.get("juros_extra", 0)))
+    from .eventos_operacionais import juros_evento_periodo
+    juros_banco = _produto(
+        divida,
+        p.get("taxa_juros_mensal", 0.025) + juros_evento_periodo(efeitos_eventos, fracao),
+    )
     juros_cheque = _produto(max(0, -caixa_inicio), p.get("taxa_cheque_especial", 0.08))
     juros = _soma([juros_banco, juros_cheque])
     if juros_cheque:

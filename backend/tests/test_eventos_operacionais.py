@@ -1,5 +1,6 @@
 """Regressões do motor de ocorrências individuais e auditáveis."""
 
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -56,3 +57,9 @@ def test_sorteio_operacional_e_reprodutivel_sem_duplicar_na_mesma_semana(monkeyp
     finally:
         db.close()
         Base.metadata.drop_all(engine)
+
+
+def test_juros_de_evento_mensal_sao_convertidos_para_semana():
+    semanal = eventos.juros_evento_periodo({"juros_extra_mensal": 0.02}, 7 / 30)
+    assert semanal == pytest.approx((1.02) ** (7 / 30) - 1)
+    assert semanal < 0.02

@@ -85,6 +85,16 @@ def _probabilidade(base: float, risco: float = 1.0, prevencao: float = 1.0) -> f
     return max(0.0, min(0.90, base * risco * prevencao))
 
 
+def juros_evento_periodo(efeitos: dict[str, Any], fracao_mensal: float) -> float:
+    """Converte o acréscimo mensal de juros do evento para a duração da rodada.
+
+    Os parâmetros publicados de crédito são mensais. Em uma rodada semanal,
+    portanto, uma alta de 2% ao mês não pode ser cobrada quatro vezes.
+    """
+    mensal = max(0.0, float(efeitos.get("juros_extra_mensal", 0.0)))
+    return (1 + mensal) ** max(0.0, float(fracao_mensal)) - 1
+
+
 @dataclass(frozen=True)
 class RegraEvento:
     codigo: str
@@ -160,10 +170,10 @@ EVENTOS: tuple[RegraEvento, ...] = (
         lambda porte: {"demanda": .75, "custo": 0.0}),
     RegraEvento(
         "VENDAS_PEDIDO_GRANDE", "Vendas", "Pedido corporativo de grande porte",
-        "Surgiu uma oportunidade comercial que amplia receita futura, mas pressiona capital de giro.", .03, (12, 12), False,
+        "Surgiu uma oportunidade comercial que amplia a demanda potencial e exige preparação de estoque e capital de giro.", .03, (12, 12), False,
         lambda f: True,
         lambda f: _sim("oportunidade comercial", .03, f),
-        lambda porte: {"demanda": 1.20, "recebimento_atrasado": True, "custo": round(2_000 * porte, 2)}),
+        lambda porte: {"demanda": 1.20, "custo": round(2_000 * porte, 2)}),
     RegraEvento(
         "MARKETING_CPC_ALTO", "Marketing", "Alta no custo de aquisição",
         "O canal pago ficou mais concorrido e o custo de aquisição aumentou temporariamente.", .04, (2, 2), False,
@@ -187,22 +197,20 @@ EVENTOS: tuple[RegraEvento, ...] = (
         "As condições de crédito pioraram e elevaram o custo financeiro temporariamente.", .04, (8, 12), False,
         lambda f: True,
         lambda f: _sim("mercado de crédito", .04, f),
-        lambda porte: {"juros_extra": .02, "custo": 0.0}),
+        lambda porte: {"juros_extra_mensal": .02, "custo": 0.0}),
 )
 
 
 def _consolidar(ocorrencias: list[EventoOperacional]) -> dict[str, Any]:
     efeito: dict[str, Any] = {"capacidade": 1.0, "demanda": 1.0, "cmv": 1.0, "frete": 1.0, "marketing": 1.0,
                               "moral": 0.0, "satisfacao": 0.0, "qualidade": 0.0, "custo": 0.0,
-                              "juros_extra": 0.0, "recebiveis_perda": 0.0, "recebimento_atrasado": False}
+                              "juros_extra_mensal": 0.0, "recebiveis_perda": 0.0}
     for ocorrencia in ocorrencias:
         for chave, valor in (ocorrencia.impacto or {}).items():
             if chave in {"capacidade", "demanda", "cmv", "frete", "marketing"}:
                 efeito[chave] *= float(valor)
-            elif chave in {"moral", "satisfacao", "qualidade", "custo", "juros_extra", "recebiveis_perda"}:
+            elif chave in {"moral", "satisfacao", "qualidade", "custo", "juros_extra_mensal", "recebiveis_perda"}:
                 efeito[chave] += float(valor)
-            elif chave == "recebimento_atrasado":
-                efeito[chave] = efeito[chave] or bool(valor)
     return efeito
 
 
