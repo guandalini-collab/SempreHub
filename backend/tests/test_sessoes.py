@@ -113,7 +113,9 @@ def test_redefinicao_pelo_professor_preserva_jogo_entre_rodadas(cliente, profess
     resposta = cliente.put(
         f"{caminho_empresa}/decisao",
         headers=aluno,
-        json=completar_decisao({"preco": 95, "contratar": 1, "emprestimo": 10000, "marketing": 500}),
+        # Sem catálogo publicado, marketing deliberadamente fica em zero:
+        # campanhas não podem gerar demanda sem produto comercializável.
+        json=completar_decisao({"preco": 95, "contratar": 1, "emprestimo": 10000}),
     )
     assert resposta.status_code == 200
     assert cliente.post(caminho_fechar, headers=professor, json={"evento": "NENHUM"}).status_code == 200

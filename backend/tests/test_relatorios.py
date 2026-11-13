@@ -99,7 +99,9 @@ def test_relatorio_preserva_assinaturas_de_versoes_anteriores_sem_contar_como_at
         registro = db.query(Decisao).filter_by(empresa_id=equipe["id"], rodada=1).one()
         registro.enviada_em = None
         db.commit()
-    atual = _salvar(cliente, equipe, marketing=100)
+    # A segunda assinatura exercita o histórico de versões sem declarar uma
+    # campanha impossível (marketing exige catálogo e mídia publicados).
+    atual = _salvar(cliente, equipe)
     _aprovar(cliente, equipe, equipe["alunos"][0], atual["versao"])
     assert _fechar(cliente, equipe, professor).status_code == 200
     relatorio = cliente.get(_url(equipe["turma"]["id"]), headers=professor).json()

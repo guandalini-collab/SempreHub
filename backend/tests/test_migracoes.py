@@ -27,7 +27,7 @@ from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
 
 
-_HEAD = "0015_eventos"
+_HEAD = "0016_perfis_tecnicos_decisao"
 
 
 @pytest.fixture()
@@ -87,6 +87,21 @@ def _snapshot(banco):
             for nome, tabela in metadata.tables.items()
             if nome != "alembic_version"
         }
+
+
+def _sem_campos_introduzidos(dados):
+    """Compara o passado sem confundir novas colunas nulas com reescrita.
+
+    Uma migração pode acrescentar colunas, mas nunca atribuir decisões novas às
+    rodadas antigas. Os dois campos só podem aparecer como NULL no histórico.
+    """
+    copia = {nome: [dict(linha) for linha in linhas] for nome, linhas in dados.items()}
+    for decisao in copia.get("decisoes", []):
+        assert decisao.get("contratar_tecnicos") is None
+        assert decisao.get("contratar_especialistas") is None
+        decisao.pop("contratar_tecnicos", None)
+        decisao.pop("contratar_especialistas", None)
+    return copia
 
 
 def _confirmar_head(banco):
@@ -150,7 +165,7 @@ def test_adota_banco_populado_sem_versao_e_continua_a_segunda_rodada(banco_migra
         decisao = cliente.put(
             f"{empresa_url}/decisao",
             headers=aluno,
-            json=completar_decisao({"preco": 95, "contratar": 1, "emprestimo": 12000, "marketing": 500, "pd": 300}),
+            json=completar_decisao({"preco": 95, "contratar": 1, "emprestimo": 12000}),
         )
         assert decisao.status_code == 200
         assert cliente.post(fechar_url, headers=professor, json={"evento": "GREVE_LOGISTICA"}).status_code == 200
@@ -211,7 +226,7 @@ def test_revisao_anterior_e_atualizada_sem_perder_contas(banco_migracoes):
     depois = _snapshot(banco_migracoes)
     for usuario in depois["usuarios"]:
         assert usuario.pop("versao_sessao") == 0
-    assert {nome: depois[nome] for nome in antes} == antes
+    assert {nome: _sem_campos_introduzidos(depois)[nome] for nome in antes} == antes
     assert all(depois[nome] == [] for nome in depois.keys() - antes.keys() - {"matriculas_turma"})
     assert len(depois["matriculas_turma"]) == len(antes["empresas"]) if not antes.get("membros_empresa") else len(depois["matriculas_turma"]) == len(antes["membros_empresa"])
     with Session(banco_migracoes) as sessao:
@@ -284,7 +299,8 @@ def test_migracao_de_equipes_preserva_turma_individual_e_historico_legado(banco_
     novas_colunas = {
         "turmas": {"prazo_rodada": None, "prazo_numero_rodada": None, "abertura_rodada": None, "agenda_academica": None, "visivel_ingresso": True, "formacao_encerrada": False, "modo_equipe": False, "modo_jogo": "LEGADO", "cenario": "ZERO", "configuracao_simulacao": None, "versao_motor": 1},
         "empresas": {"lider_id": None, "proximo_lider_id": None, "votos_lider": {}, "codigo_convite": None, "estado_simulacao": None},
-        "decisoes": {"analise_financeira": "", "versao": 0, "simulacao": None, "plano_comercial": None, "revisao_areas": None},
+        "decisoes": {"analise_financeira": "", "versao": 0, "simulacao": None, "plano_comercial": None, "revisao_areas": None,
+                      "contratar_tecnicos": None, "contratar_especialistas": None},
         "resultados": {"detalhes_simulacao": None},
     }
     for nome, colunas in novas_colunas.items():
@@ -391,7 +407,8 @@ def test_motor_avancado_preserva_equipes_assinaturas_e_rodadas_existentes(banco_
         novas_colunas = {
             "turmas": {"prazo_rodada": None, "prazo_numero_rodada": None, "abertura_rodada": None, "agenda_academica": None, "visivel_ingresso": True, "formacao_encerrada": False, "modo_jogo": "LEGADO", "cenario": "ZERO", "configuracao_simulacao": None, "versao_motor": 1},
             "empresas": {"lider_id": alunos[0], "proximo_lider_id": None, "votos_lider": {}, "estado_simulacao": None},
-            "decisoes": {"analise_financeira": "", "simulacao": None, "plano_comercial": None, "revisao_areas": None},
+            "decisoes": {"analise_financeira": "", "simulacao": None, "plano_comercial": None, "revisao_areas": None,
+                          "contratar_tecnicos": None, "contratar_especialistas": None},
             "resultados": {"detalhes_simulacao": None},
         }
         for nome, colunas in novas_colunas.items():

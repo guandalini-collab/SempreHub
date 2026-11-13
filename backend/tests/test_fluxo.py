@@ -157,16 +157,16 @@ def test_professor_nao_ve_turma_de_outro(cliente, professor):
 
 
 def test_professor_exclui_turma_com_confirmacao_e_sem_apagar_conta_aluno(cliente, professor):
-    turma = _criar_turma(cliente, professor)
+    turma = _criar_turma(cliente, professor, modo_jogo="LEGADO")
     aluno = cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
     _entrar(cliente, aluno, turma["codigo"], "Empresa Ana")
 
     # A confirmação protege contra exclusões acidentais.
-    r = cliente.delete(f"/api/professor/turmas/{turma['id']}", headers=professor, json={"confirmacao": "nome errado"})
+    r = cliente.request("DELETE", f"/api/professor/turmas/{turma['id']}", headers=professor, json={"confirmacao": "nome errado"})
     assert r.status_code == 422
     assert cliente.get(f"/api/professor/turmas/{turma['id']}", headers=professor).status_code == 200
 
-    r = cliente.delete(f"/api/professor/turmas/{turma['id']}", headers=professor, json={"confirmacao": turma["nome"]})
+    r = cliente.request("DELETE", f"/api/professor/turmas/{turma['id']}", headers=professor, json={"confirmacao": turma["nome"]})
     assert r.status_code == 200
     assert cliente.get(f"/api/professor/turmas/{turma['id']}", headers=professor).status_code == 404
     # A matrícula e a empresa foram removidas, mas a conta pode entrar em outra turma.
@@ -224,11 +224,44 @@ def test_notificacao_fiscal_depende_do_networking(cliente, professor):
     assert m2["royalties"] > 0  # franquia paga royalties
 
 
-def test_porter_meio_termo(cliente, professor):
+def test_porter_meio_termo(cliente, professor, monkeypatch):
+    from app.routers import mercado
+    from app.evidencias_mercado import Documento
+    from .test_mercado import edicao
+
+    monkeypatch.setattr(
+        "app.evidencias_mercado.obter_documento",
+        lambda url: Documento('<meta property="article:published_time" content="2026-10-06"><main>Produto de teste R$ 30,00 por unidade ou cliente/mês.</main>'),
+    )
+    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (edicao(), {"https://www.ibge.gov.br/produto"}))
     turma = _criar_turma(cliente, professor)
     aluno = cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
     e = _entrar(cliente, aluno, turma["codigo"], "Ana")
-    cliente.put(f"/api/aluno/empresas/{e}/decisao", headers=aluno, json=completar_decisao({"preco": 80, "marketing": 3000, "pd": 2000}))
+    docente = f"/api/professor/turmas/{turma['id']}/mercado"
+    pesquisa = cliente.post(docente + "/pesquisar", headers=professor, json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+    assert pesquisa.status_code == 200, pesquisa.text
+    eid = pesquisa.json()["id"]
+    assert cliente.post(docente + f"/{eid}/publicar", headers=professor, json={}).status_code == 200
+    plano = {
+        "edicao_id": eid, "produto_id": "produto-1", "estrategia_preco": "COMPETITIVO",
+        "posicionamento": "PRECO", "canais": ["DIRETO"], "cobertura": "LOCAL",
+        "intensidade": "MEDIA", "midias": [{"id": "email", "quantidade": 100}],
+        "produtos": [{
+            "produto_id": "produto-1", "produto_nome": "Produto de teste", "preco": 80,
+            "peso": 1, "revisado": True, "estrategia_preco": "COMPETITIVO",
+            "posicionamento": "PRECO", "canais": ["DIRETO"], "cobertura": "LOCAL",
+            "intensidade": "MEDIA", "midias": [{"id": "email", "quantidade": 100}],
+            "servicos": [{"id": "servico-email", "quantidade": 1}],
+        }],
+    }
+    envio = cliente.put(
+        f"/api/aluno/empresas/{e}/decisao", headers=aluno,
+        json=completar_decisao({
+            "preco": 80, "marketing": 557, "pd": 5000, "plano_comercial": plano,
+            "simulacao": {"producao": 100, "comprar_mp": 100, "pro_labore": 1500, "orcamento_logistico": 10_000},
+        }),
+    )
+    assert envio.status_code == 200, envio.text
     cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "NENHUM"})
     alertas = cliente.get(f"/api/aluno/empresas/{e}", headers=aluno).json()["resultados"][0]["alertas"]
     assert any("meio-termo" in a for a in alertas)

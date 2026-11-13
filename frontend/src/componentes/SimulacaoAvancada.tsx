@@ -4,12 +4,13 @@ import ResultadoProdutos, {type LinhaProduto} from "./ResultadoProdutos";
 import CentroGravidade from "./CentroGravidade";
 import { ControleVisual } from "./Experiencia";
 import React from "react";
+import type { MixProduto } from "./MercadoReal";
 
 import { inteiro, percentual, reais, umDecimal } from "../formatos";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, PreviaSimulacao } from "../tiposSimulacao";
 import { Campo, Cartao, EntradaNumero, Modal, estiloEntrada } from "./ui";
 
-export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, area = "decisoes", rodada, etapaFinanceira, etapaRH = "equipe" }: {
+export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, produtosMix = [], area = "decisoes", rodada, etapaFinanceira, etapaRH = "equipe" }: {
   modo: ModoJogo;
   valores: DecisaoSimulacao;
   aoMudar: (valores: DecisaoSimulacao) => void;
@@ -17,6 +18,7 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
   salarioBase: number;
   marketing: number;
   mixSelecionado?: boolean;
+  produtosMix?: MixProduto[];
   area?: string;
   etapaFinanceira?: string;
   etapaRH?: string;
@@ -34,6 +36,10 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
   const adicionalFrete = Math.round(distancia * taxaKm * 100) / 100;
   const baseFrete = valores.modal === "RAPIDO" ? config.frete_rapido : valores.modal === "ECONOMICO" ? config.frete_economico : config.frete_padrao;
   const mudar = <K extends keyof DecisaoSimulacao>(campo: K, valor: DecisaoSimulacao[K]) => aoMudar({ ...valores, [campo]: valor });
+  const mudarCompraProduto = (produtoId: string, quantidade: number) => {
+    const compras = { ...valores.comprar_insumos_por_produto, [produtoId]: Math.max(0, Math.floor(quantidade)) };
+    aoMudar({ ...valores, comprar_insumos_por_produto: compras, comprar_mp: Object.values(compras).reduce((soma, valor) => soma + valor, 0) });
+  };
   return <div className="space-y-6">
     {area === "producao" && modo === "TRADICIONAL" && <nav aria-label="Etapas de Produção" className="etapas-curtas">{[["volume","Volume e insumos"],["maquinas","Máquinas e manutenção"],["localizacao","Localização"]].map(([id,t])=><button type="button" key={id} aria-pressed={etapaProducao===id} onClick={()=>setEtapaProducao(id)}>{t}</button>)}</nav>}
     {mostrarImpacto && <Modal titulo="Impacto estimado da compra de máquinas" aoFechar={()=>setMostrarImpacto(false)}>        <p className="mb-2 text-sm text-slate-600">Vida útil: {config.vida_util_maquina} meses · compra opcional · ativação na rodada seguinte.</p><dl className="mt-2 grid gap-2 rounded-lg bg-slate-50 p-2 text-sm sm:grid-cols-2"><div><dt>Investimento total</dt><dd className="font-bold"><ValorMonetario valor={valores.comprar_maquinas * config.preco_maquina}/></dd></div><div><dt>Capacidade adicional nominal</dt><dd className="font-bold">{inteiro(valores.comprar_maquinas * config.capacidade_maquina)} un./mês</dd></div><div><dt>Disponível no mês</dt><dd className="font-bold">{rodada + 1}</dd></div><div><dt>Depreciação mensal estimada</dt><dd className="font-bold"><ValorMonetario valor={valores.comprar_maquinas * config.preco_maquina / config.vida_util_maquina}/></dd></div></dl><p className="mt-2 text-xs text-slate-600">A compra reduz o caixa; a depreciação afeta o lucro nos meses de operação.</p></Modal>}
@@ -45,7 +51,7 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
       </Secao>
       <Secao titulo="Produção e investimento" oculto={area !== "producao" || etapaProducao !== "volume"}>
         <Campo rotulo="Produção planejada" ajuda="Unidades a produzir nesta rodada. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><ControleVisual rotulo="producao" moeda={false} inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} limite={10000} /></Campo>
-        <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar nesta rodada. O que não for consumido continua no estoque para as próximas rodadas."><ControleVisual rotulo="comprar mp" moeda={false} inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} limite={10000} /></Campo>
+        {produtosMix.length ? <div className="rounded-xl border border-cyan-200 bg-cyan-50/50 p-4"><h3 className="font-bold text-corporativo">Insumos por linha de produto</h3><p className="mt-1 text-sm text-slate-600">Cada insumo pertence somente ao produto indicado. Comprar material para uma linha não abastece outra.</p><div className="mt-3 grid gap-3 md:grid-cols-2">{produtosMix.map(produto => <Campo key={produto.produto_id} rotulo={`${produto.produto_nome ?? produto.produto_id} · ${produto.insumo_chave ?? "insumo específico"}`} ajuda="Quantidade do insumo exclusivo desta linha."><ControleVisual rotulo={`Comprar insumo para ${produto.produto_nome ?? produto.produto_id}`} moeda={false} inteiro valor={valores.comprar_insumos_por_produto?.[produto.produto_id] ?? 0} aoMudar={(v) => mudarCompraProduto(produto.produto_id, v)} limite={10000} /></Campo>)}</div><p className="mt-2 text-sm font-semibold text-corporativo">Total de insumos: {inteiro(valores.comprar_mp)} un.</p></div> : <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar nesta rodada. O que não for consumido continua no estoque para as próximas rodadas."><ControleVisual rotulo="comprar mp" moeda={false} inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} limite={10000} /></Campo>}
       </Secao>
       <Secao titulo="Máquinas e manutenção" oculto={area !== "producao" || etapaProducao !== "maquinas"}>
 
@@ -55,6 +61,9 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
       </Secao>
       <div hidden={area !== "producao" || etapaProducao !== "localizacao"}><CentroGravidade estudo={valores.centro_gravidade} aoMudar={(estudo) => mudar("centro_gravidade", estudo)} /></div>
       <Secao titulo="Logística e entregas" oculto={area !== "logistica"}>
+        <Campo rotulo="Orçamento de escoamento da semana" ajuda="Reserva financeira para despachar produtos físicos. Sem este orçamento, mercadorias prontas permanecem no estoque e não geram receita nesta semana.">
+          <ControleVisual rotulo="Orçamento logístico" valor={valores.orcamento_logistico} aoMudar={(v) => mudar("orcamento_logistico", v)} limite={1_000_000} />
+        </Campo>
         <Campo rotulo="Entrega" ajuda="O frete é cobrado por unidade vendida. A experiência da entrega afeta a satisfação futura.">
           <div role="radiogroup" aria-label="Transportadora" className="grid gap-3 sm:grid-cols-3">{(["RAPIDO", "PADRAO", "ECONOMICO"] as const).map(modal=><button type="button" key={modal} role="radio" aria-checked={valores.modal===modal} onClick={()=>mudar("modal",modal)} className={`rounded-xl border-2 p-4 text-left transition ${valores.modal===modal ? "border-cyan-500 bg-cyan-50 shadow-[0_0_12px_#0AADBF40]" : "border-slate-200 bg-white hover:border-cyan-300"}`}><span className="block font-bold">{modal === "RAPIDO" ? "Rápida" : modal === "PADRAO" ? "Padrão" : "Econômica"}</span><span className="text-sm"><ValorMonetario valor={modal === "RAPIDO" ? config.frete_rapido : modal === "PADRAO" ? config.frete_padrao : config.frete_economico}/> / unidade</span></button>)}</div>
         </Campo>
@@ -76,6 +85,9 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
       {area === "logistica" && <div className="rounded-xl bg-blue-50 p-5 text-sm"><h3 className="font-bold">Operação digital</h3><p className="mt-2">A entrega deste serviço acontece pela nuvem. Planeje a capacidade de atendimento em Produção e operação.</p></div>}
     </>}
     <Secao titulo="Pessoas e desenvolvimento" oculto={area !== "rh" || etapaRH !== "remuneracao"}>
+      <Campo rotulo="Pró-labore semanal do proprietário" ajuda="Remuneração do proprietário que trabalha na operação. Sem pró-labore, ele não conta como capacidade produtiva ou de atendimento. O fundador contribui no máximo como uma pessoa júnior em jornada regular.">
+        <ControleVisual rotulo="Pró-labore" valor={valores.pro_labore} aoMudar={(v) => mudar("pro_labore", v)} limite={100_000} />
+      </Campo>
       <Campo rotulo="Salário da equipe de funcionários" ajuda={`O padrão da turma é ${reais(salarioBase)} por funcionário. Salários, benefícios e treinamento influenciam moral, qualificação e rotatividade.`}>
         <select className={estiloEntrada} value={valores.salario === null ? "PADRAO" : "PROPRIO"} onChange={(e) => mudar("salario", e.target.value === "PADRAO" ? null : salarioBase)}><option value="PADRAO">Usar salário-base da turma</option><option value="PROPRIO">Definir salário da empresa</option></select>
       </Campo>
@@ -212,7 +224,7 @@ export function RelatorioFinanceiro({ detalhes, somenteBalanco = false }: { deta
 export function PreviaOperacional({ simulacao, modo }: { simulacao: PreviaSimulacao; modo: ModoJogo }) {
   return <div className="mt-3 border-t border-slate-200 pt-3">
     <dl className="grid grid-cols-2 gap-3 text-xs">
-      {modo === "TRADICIONAL" && simulacao.producao != null && <Dado rotulo="Produção preparada" valor={`${inteiro(simulacao.producao)} un.`} />}
+      {modo === "TRADICIONAL" && simulacao.producao != null && <Dado rotulo="Produção viável nesta semana" valor={`${inteiro(simulacao.producao)} un.`} />}
       {simulacao.estado && modo === "TRADICIONAL" && <Dado rotulo="Matéria-prima após preparo" valor={`${inteiro(simulacao.estado.estoque_mp.quantidade)} un.`} />}
       {simulacao.estado && modo === "STARTUP" && <Dado rotulo="Participação após aporte" valor={percentual(simulacao.estado.participacao_fundadores, 1)} />}
     </dl>

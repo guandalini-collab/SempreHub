@@ -8,6 +8,7 @@ Nenhum argumento é modificado e cada rodada conserva seus próprios snapshots.
 from .versionamento import ENGINE_VERSION, inicializar_indicadores
 from .financeiros import reconciliar_financeiros
 from .indicadores import enps
+from .dependencias import atualizar_marca, atualizar_pd, atualizar_pd_por_produto, atrativo_porter
 from copy import deepcopy
 from decimal import Decimal, ROUND_HALF_UP
 import math
@@ -194,6 +195,8 @@ def preparar(
     )
 
     rh = _preparar_rh(empresa, decisao, parametros, estado)
+    pro_labore = _dinheiro(max(0, simulacao.get("pro_labore", 0)))
+    fundador_ativo = pro_labore > 0
     kpis_rh = enps(estado, rh["funcionarios"], estado["rh"].get("salario", parametros.get("salario_base", 2000)), parametros.get("salario_base", 2000), (decisao.get("simulacao") or {}).get("beneficio", 0), (decisao.get("simulacao") or {}).get("horas_extras", 0))
     if rh["rotatividade"]:
         alertas.append(f"Moral baixa: {rh['rotatividade']} funcionário(s) saiu(ram) voluntariamente.")
@@ -209,29 +212,45 @@ def preparar(
     retidos = clientes_iniciais - perdidos
     estado["clientes"] = retidos
     capacidade_nuvem = max(0, int(simulacao.get("capacidade_nuvem", 300)))
-    capacidade = max(0, math.floor((capacidade_nuvem - retidos) * float(efeitos_eventos.get("capacidade", 1))))
+    # A nuvem não substitui suporte, vendas e operação. O fundador só amplia
+    # a capacidade quando há pró-labore explícito.
+    produtividade_pessoa = max(1, int(configuracao.get("capacidade_atendimento_por_pessoa", 120)))
+    capacidade_pessoas = math.floor((rh["funcionarios"] + (1 if fundador_ativo else 0)) * produtividade_pessoa * (0.75 + estado["rh"]["moral"] / 400))
+    capacidade_atendimento = max(0, min(capacidade_nuvem, capacidade_pessoas) * float(efeitos_eventos.get("capacidade", 1)))
+    capacidade = max(0, math.floor(capacidade_atendimento - retidos))
     preco = float(decisao.get("preco", parametros.get("preco_referencia", 100)))
     if preco <= 0:
         raise ValueError("O preço mensal deve ser positivo.")
-    marketing = _dinheiro(max(0, decisao.get("marketing", 0)) * float(efeitos_eventos.get("marketing", 1)))
     from ..custos_campanhas import investimento_efetivo
     verba_midia=investimento_efetivo(decisao)
+    # A veiculação mede o alcance da campanha; criação, produção e demais
+    # serviços obrigatórios continuam sendo despesas reais da semana. Assim a
+    # DRE e o fluxo de caixa registram o orçamento inteiro, sem usar esses
+    # serviços duas vezes para ampliar a marca.
+    marketing = _dinheiro(max(0, decisao.get("marketing", 0)) * float(efeitos_eventos.get("marketing", 1)))
     digital = min(verba_midia, _dinheiro(max(0, simulacao.get("marketing_digital", 0))))
     canal = _nome(simulacao.get("canal", "DIRETO"))
     fator_canal = 1.1 + (digital / verba_midia * 0.1 if verba_midia else 0) if canal == "DIGITAL" else 1.05 if canal == "DISTRIBUIDOR" else 1.0
     posicionamento = _nome(simulacao.get("posicionamento", "CUSTO"))
     fator_diferenciacao = 1 + estado["rh"]["qualificacao"] / 200 if posicionamento == "DIFERENCIACAO" else 1.0
-    atratividade = (
-        (float(parametros.get("preco_referencia", 100)) / preco) ** 1.4
-        * (1 + max(0, float(empresa.get("marca", 0))) + verba_midia / 10000) ** 0.3
-        * (1 + max(0, float(empresa.get("qualidade", 0))) + float(decisao.get("pd", 0)) / 10000) ** 0.25
-        * fator_canal * fator_diferenciacao
+    marca = atualizar_marca(empresa.get("marca", 0), marketing)
+    qualidade, pd_maturado = atualizar_pd(estado, empresa.get("qualidade", 0), decisao.get("pd", 0), rodada, "STARTUP")
+    atratividade = atrativo_porter(marca, qualidade, preco, parametros.get("preco_referencia", 100)) * fator_canal * fator_diferenciacao
+    plano_comercial = deepcopy(decisao.get("plano_comercial"))
+    pd_por_linha = atualizar_pd_por_produto(
+        estado, (plano_comercial or {}).get("produtos", []), decisao.get("pd", 0), rodada, "STARTUP"
     )
+    produto_publicado = bool((plano_comercial or {}).get("produtos"))
+    comercial_ativo = produto_publicado and marketing > 0
+    if not produto_publicado:
+        alertas.append("Aquisição bloqueada: publique e precifique ao menos um produto no mix comercial.")
+    elif marketing <= 0:
+        alertas.append("Aquisição bloqueada: marketing da semana está zerado; não há demanda orgânica automática.")
     taxa_royalties = parametros.get("taxa_royalties")
     if taxa_royalties is None:
         taxa_royalties = 0.05 if _nome(empresa.get("classe_dornelas", "")) == "FRANQUIA" else 0.0
     custos = {
-        "custos_fixos": _dinheiro(parametros.get("custos_fixos_mensais", 1500)),
+        "custos_fixos": _dinheiro(parametros.get("custos_fixos_mensais", 1500)), "pro_labore": pro_labore,
         "marketing": marketing, "pd": _dinheiro(decisao.get("pd", 0)),
         "networking": _dinheiro(decisao.get("networking", 0)),
         "juros": juros, "multas": _dinheiro(parametros.get("multas", 0)),
@@ -241,7 +260,7 @@ def preparar(
     return {
         "calendario": calendario, "fracao":fracao,
         "kpis_rh": kpis_rh, "taxa_cheque_especial": parametros.get("taxa_cheque_especial", 0.08),
-        "plano_comercial": deepcopy(decisao.get("plano_comercial")),
+        "plano_comercial": plano_comercial,
         "capacidade": capacidade, "atratividade": atratividade,
         "estado_inicial": deepcopy(estado_inicial), "estado": estado,
         "funcionarios_inicio": max(0,int(empresa.get("funcionarios",0))),
@@ -255,9 +274,14 @@ def preparar(
         "rodada": rodada, "preco": preco, "custos": custos,
         "configuracao": configuracao, "simulacao": simulacao,
         "efeitos_eventos": deepcopy(efeitos_eventos),
-        "capacidade_nuvem": capacidade_nuvem, "clientes_iniciais": clientes_iniciais,
+        "capacidade_nuvem": capacidade_nuvem, "capacidade_pessoas": capacidade_pessoas,
+        "capacidade_atendimento": capacidade_atendimento, "clientes_iniciais": clientes_iniciais,
         "clientes_perdidos": perdidos, "clientes_retidos": retidos, "churn": churn,
         "aporte": aporte, "valuation": valuation, "diluicao": diluicao,
+        "pro_labore": pro_labore, "fundador_ativo": fundador_ativo,
+        "marca": marca, "qualidade": qualidade, "pd_maturado": pd_maturado,
+        "pd_por_linha": pd_por_linha,
+        "produto_publicado": produto_publicado, "comercial_ativo": comercial_ativo,
         "participacao_anterior": participacao_anterior,
         "taxa_royalties": float(taxa_royalties), "multiplicador_custo": float(multiplicador_custo),
         "balanco_inicial": _balanco(estado_inicial, caixa_inicial, divida_inicial),
@@ -274,9 +298,10 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
     estado = deepcopy(preparo["estado"])
     simulacao, configuracao = preparo["simulacao"], preparo["configuracao"]
     efeitos_eventos = preparo.get("efeitos_eventos") or {}
-    adquiridos = min(max(0, math.floor(demanda)), preparo["capacidade"])
+    demanda_comercial = max(0, math.floor(demanda)) if preparo["comercial_ativo"] else 0
+    adquiridos = min(demanda_comercial, preparo["capacidade"])
     clientes = preparo["clientes_retidos"] + adquiridos
-    atendidos = min(clientes, preparo["capacidade_nuvem"])
+    atendidos = min(clientes, preparo["capacidade_atendimento"])
     nao_atendidos = clientes - atendidos
     estado["clientes"] = clientes
     satisfacao = float(estado["satisfacao"])
@@ -287,7 +312,8 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
             - nao_atendidos / clientes * 30,
         )
     estado["satisfacao"] = satisfacao
-    itens=(preparo.get("plano_comercial") or {}).get("produtos", [])
+    plano_comercial = preparo.get("plano_comercial") or {}
+    itens=plano_comercial.get("produtos", [])
     linhas=[]
     if itens:
         from .portfolio import dividir, atrativos
@@ -295,12 +321,14 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
         if not base: base[itens[0]["produto_id"]]=preparo["clientes_iniciais"]
         atuais=[base.get(p["produto_id"],0) for p in itens]
         retencao=dividir(preparo["clientes_retidos"],atuais)
-        novos=dividir(adquiridos,atrativos(itens,1,1))
+        segmentacao = (plano_comercial.get("analises") or {}).get("segmentacao")
+        novos=dividir(adquiridos,atrativos(itens,1,1, segmentacao=segmentacao))
         finais=[r+n for r,n in zip(retencao,novos)]
         ativos=dividir(atendidos,finais)
         estado["clientes_produtos"]={p["produto_id"]:q for p,q in zip(itens,finais)}
         for item,q,f in zip(itens,ativos,finais):
-            linhas.append({"produto_id":item["produto_id"],"nome":item["produto_nome"],"preco":item["preco"],"custos_campanha":deepcopy(item.get("custos_campanha")),"vendas":q,"clientes_finais":f,"receita":_dinheiro(q*item["preco"]*preparo["fracao"]),"cmv":_dinheiro(q*item["custo_unitario"]*preparo["fracao"]*preparo["multiplicador_custo"])})
+            reducao_custo = preparo.get("pd_por_linha", {}).get(item["produto_id"], {}).get("reducao_custo", 0)
+            linhas.append({"produto_id":item["produto_id"],"nome":item["produto_nome"],"preco":item["preco"],"custos_campanha":deepcopy(item.get("custos_campanha")),"vendas":q,"clientes_finais":f,"receita":_dinheiro(q*item["preco"]*preparo["fracao"]),"cmv":_dinheiro(q*item["custo_unitario"]*(1-reducao_custo)*preparo["fracao"]*preparo["multiplicador_custo"])})
         receita=_soma(*(l["receita"] for l in linhas))
         custo_nuvem=_soma(*(l["cmv"] for l in linhas))
     else:
@@ -361,6 +389,9 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
         "churn": preparo["churn"], "clientes_retidos": preparo["clientes_retidos"],
         "clientes_adquiridos": adquiridos, "clientes_atendidos": atendidos, "clientes_finais": clientes,
         "clientes_nao_atendidos": nao_atendidos, "capacidade_nuvem": preparo["capacidade_nuvem"],
+        "capacidade_pessoas": preparo["capacidade_pessoas"], "capacidade_atendimento": preparo["capacidade_atendimento"],
+        "produto_publicado": preparo["produto_publicado"], "comercial_ativo": preparo["comercial_ativo"],
+        "pro_labore": preparo["pro_labore"], "fundador_ativo": preparo["fundador_ativo"], "pd_maturado": preparo["pd_maturado"],
         "cac": cac, "ltv": ltv, "burn": burn,
         "runway": max(0.0, caixa) / burn if burn > 0 else None,
         "mrr": receita / preparo["fracao"], "aporte": preparo["aporte"], "valuation": preparo["valuation"],
@@ -386,7 +417,8 @@ def apurar(preparo: dict, demanda: float, tributar: Callable) -> dict:
     }
     return {
         "estado": estado, "caixa": caixa, "divida": preparo["divida"],
-        "funcionarios": preparo["funcionarios"], "capacidade": preparo["capacidade_nuvem"],
+        "funcionarios": preparo["funcionarios"], "capacidade": preparo["capacidade_atendimento"],
         "vendas": atendidos, "dre": dre, "aliquota": aliquota,
         "detalhes": detalhes, "alertas": alertas, "satisfacao": satisfacao,
+        "marca": preparo["marca"], "qualidade": preparo["qualidade"],
     }

@@ -23,8 +23,11 @@ def test_quatro_ciclos_autonomos(cliente, professor, modo):
             treinamento=0 if rodada==3 else 300,
             salario=2500, beneficio=0 if rodada==3 else 150,
             capacidade_nuvem=100,
+            pro_labore=1_500 if rodada != 3 else 0,
             modal='ECONOMICO' if rodada==3 else 'RAPIDO')
-        envio=cliente.put(f'/api/aluno/empresas/{eid}/decisao',headers=aluno,json=completar_decisao(dict(rodada=rodada,preco=100,marketing=0 if rodada==3 else 100,contratar=3 if rodada==1 else 2 if rodada==4 else 0,demitir=3 if rodada==3 else 0,simulacao=simulacao)))
+        # O teste valida o ciclo contábil, não uma campanha. Marketing sem um
+        # catálogo publicado precisa continuar zerado pela regra nova.
+        envio=cliente.put(f'/api/aluno/empresas/{eid}/decisao',headers=aluno,json=completar_decisao(dict(rodada=rodada,preco=100,marketing=0,contratar=3 if rodada==1 else 2 if rodada==4 else 0,demitir=3 if rodada==3 else 0,simulacao=simulacao)))
         assert envio.status_code==200,envio.text
         _fechar(cliente, professor, turma, rodada)
         painel = cliente.get(f'/api/aluno/empresas/{eid}', headers=aluno).json()

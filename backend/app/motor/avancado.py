@@ -8,6 +8,7 @@ from ..models import Empresa, Resultado, RegimeTributario, FaseAtual
 from ..schemas import ConfiguracaoSimulacao, DecisaoSimulacao
 from .calendario import adaptar, periodo, VERSAO_SEMANAL
 from .tributos import calcular_imposto, aliquota_efetiva_simples, TOLERANCIA_TETO_MEI
+from .dependencias import atrativo_porter
 
 
 def config(turma):
@@ -94,15 +95,42 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0, efeitos_op
     p["multas"] = multa
     p["eventos_operacionais"] = deepcopy(efeitos_operacionais or {})
     preparo = motor(turma).preparar(dados, entrada, p, turma.rodada_atual, multiplicador_custo)
+    # A mesma parametrização usada pelo motor acompanha a prévia até o
+    # fechamento, inclusive os efeitos de ocorrências operacionais.
+    preparo["parametros"] = deepcopy(p)
     itens=(decisao.plano_comercial or {}).get("produtos", [])
     if itens:
-        from .portfolio import atrativos
+        from .portfolio import atrativos, diagnosticos_segmentacao
+        segmentacao = ((decisao.plano_comercial or {}).get("analises") or {}).get("segmentacao")
         base=(turma.preco_referencia/decisao.preco)**(1.4 if turma.modo_jogo=="STARTUP" else 2)
-        preparo["atratividade"]*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade))/sum(i["peso"] for i in itens)/base
+        preparo["atratividade"]*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade,segmentacao))/sum(i["peso"] for i in itens)/base
+        preparo["diagnosticos_segmentacao"] = diagnosticos_segmentacao(itens, segmentacao)
     from .estrategia import avaliar, mensagens
     avaliacao = avaliar(decisao, turma)
     preparo["avaliacao_estrategica"] = avaliacao
     preparo["alertas"].extend(mensagens(avaliacao))
+    # O cockpit e a validação final usam exatamente a mesma fotografia do
+    # motor: não há regra visual que não exista no fechamento da rodada.
+    from .dependencias import radar_coerencia
+    if turma.modo_jogo == "TRADICIONAL":
+        from .localizacao import estimar_frete
+        frete = estimar_frete(entrada.get("simulacao") or {}, p.get("configuracao_simulacao") or {})["frete_unitario"]
+        capacidade_operacional = preparo.get("capacidade_produtiva", 0)
+    else:
+        frete = 0.0
+        capacidade_operacional = preparo.get("capacidade", 0)
+    preparo["radar"] = radar_coerencia(
+        modo=turma.modo_jogo,
+        decisao=entrada,
+        plano_comercial=entrada.get("plano_comercial"),
+        caixa=preparo.get("caixa_disponivel", dados.get("caixa", 0)),
+        funcionarios=preparo.get("funcionarios", 0),
+        capacidade_operacional=capacidade_operacional,
+        estoque_disponivel=(preparo.get("estado") or {}).get("estoque_pa", {}).get("quantidade", 0),
+        custo_frete_unitario=frete,
+        gastos_previstos=preparo.get("gastos_previstos", 0),
+    )
+    preparo["alertas"].extend(preparo["radar"]["avisos"])
     if decisao.emprestimo > 0:
         preparo["alertas"].append("Crédito bancário tem custo alto: juros mensais reduzem lucro e capital de giro, podem subir com a Selic, e o principal precisa ser devolvido.")
     return preparo
@@ -117,22 +145,31 @@ def prever(empresa, decisao, turma):
         localizacao = estimar_frete(op, cfg)
         custo = ((decisao.plano_comercial or {}).get("custo_unitario", turma.custo_unitario)) * (turma.cmv_multiplicador if turma.cmv_rodadas_restantes > 0 else 1)
         margem = decisao.preco * (1 - (0.05 if empresa.classe_dornelas.value == "FRANQUIA" else 0)) - custo - localizacao["frete_unitario"]
-        producao = calculo.get("producao_planejada", 0)
+        # A prévia deve mostrar aquilo que a empresa conseguirá preparar nesta
+        # semana, e não o teto abstrato da fábrica. A capacidade continua
+        # exposta separadamente para tornar o gargalo visível ao aluno.
+        producao = calculo.get("producao_real", 0)
     else:
         margem = decisao.preco - (decisao.plano_comercial or {}).get("custo_unitario", config(turma)["custo_nuvem_cliente"])
-        producao = calculo.get("clientes_adquiridos", 0)
+        producao = calculo.get("capacidade_atendimento", 0)
     gastos = calculo.get("gastos_previstos", 0)
     return {
         "rodada": turma.rodada_atual, "regime": empresa.regime_tributario.value,
-        "funcionarios": calculo["funcionarios"], "capacidade": calculo["capacidade"],
+        "funcionarios": calculo["funcionarios"],
+        "capacidade": (
+            calculo.get("capacidade_produtiva")
+            or calculo.get("capacidade_atendimento")
+            or calculo.get("capacidade", 0)
+        ),
         "folha": calculo.get("folha", 0), "juros": calculo.get("juros", 0),
         "gastos_previstos": gastos, "margem_unitaria": margem,
         "ponto_equilibrio": gastos / margem if margem > 0 else None,
         "emprestimo_aprovado": calculo.get("emprestimo", 0),
         "amortizacao_aplicada": calculo.get("amortizacao", 0),
         "divida_prevista": empresa.divida + calculo.get("emprestimo", 0) - calculo.get("amortizacao", 0),
-        "caixa_disponivel": empresa.caixa + calculo.get("emprestimo", 0) - calculo.get("amortizacao", 0),
+        "caixa_disponivel": calculo.get("caixa_disponivel", empresa.caixa + calculo.get("emprestimo", 0) - calculo.get("amortizacao", 0)),
         "alertas": calculo.get("alertas", []),
+        "radar": calculo.get("radar", {"bloqueios": [], "avisos": [], "liberado": True}),
         "simulacao": {"estado": deepcopy(calculo.get("estado", {})), "producao": producao,
                        **(localizacao if turma.modo_jogo == "TRADICIONAL" else {}),
                        "avaliacao_estrategica": calculo["avaliacao_estrategica"],
@@ -187,7 +224,7 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
         # Política pública, determinística: não lê as decisões privadas dos alunos.
         preco = turma.preco_referencia * (0.9 + .05 * (i % 5))
         bots.append({"empresa": f"Concorrente virtual {i + 1}", "virtual": True, "preco": preco,
-                     "atratividade": (turma.preco_referencia / preco) ** 2 * (1 + .02 * (rodada - 1)) * forca_concorrente(cfg, i),
+                     "atratividade": atrativo_porter(2.5 + .12 * (i % 4), 2.0 + .08 * (rodada - 1), preco, turma.preco_referencia) * forca_concorrente(cfg, i),
                      "capacidade": temporal["demanda_base_por_empresa"]})
     precos = [d.preco for d in decisoes] + [b["preco"] for b in bots]
     media = sum(precos) / len(precos)
@@ -195,9 +232,11 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     total = (temporal["demanda_base_por_empresa"] * len(preparos)
              * (1 + turma.crescimento_mercado_mensal) ** crescimento_acumulado
              * (turma.preco_referencia / media) ** .8 * multiplicador * (cal["sazonalidade"]["demanda"] if cal else 1))
-    atrativos = [max(.001, p["atratividade"]) for p in preparos] + [b["atratividade"] for b in bots]
+    # Uma empresa sem produto publicado ou sem ativação comercial não disputa
+    # demanda. A fatia que ela deixaria de atender migra para concorrentes.
+    atrativos = [max(.001, p["atratividade"]) if p.get("comercial_ativo") else 0.0 for p in preparos] + [b["atratividade"] for b in bots]
     soma = sum(atrativos)
-    demandas = [total * atr / soma for atr in atrativos]
+    demandas = [total * atr / soma if atr > 0 else 0.0 for atr in atrativos]
     for bot, demanda in zip(bots, demandas[len(preparos):]):
         bot["unidades_vendidas"] = min(bot["capacidade"], demanda)
     # O fator de conversão é aplicado uma única vez depois da disputa.

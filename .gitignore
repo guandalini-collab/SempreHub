@@ -4,6 +4,7 @@ backend/venv/
 venv/
 .venv/
 .venv-validacao/
+backend/.venv312/
 
 # Python
 __pycache__/

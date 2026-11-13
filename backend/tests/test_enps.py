@@ -50,7 +50,7 @@ def test_beneficio_e_custo_preservados_abaixo_do_minimo():
     assert c['kpis']['enps_perfis'][0]['nota']==8
     r=apurar(c,40,sem_tributos)
     assert r['dre']['beneficios']==449.97
-    contabil.TestTradicional().assert_reconciliacao(e,r)
+    contabil.TestTradicional().assert_reconciliacao(r)
 
 
 @pytest.mark.parametrize('quantidade',range(1,51))

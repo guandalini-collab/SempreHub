@@ -88,6 +88,11 @@ def _peso_evento(nome: str, setor: str | None, perfil: str) -> float:
     # Perfil é o fallback das turmas que ainda não têm uma pesquisa de mercado
     # publicada. O perfil neutro preserva o comportamento histórico sem viés.
     if perfil == "VAREJO":
+        # Ano-Novo não produz, para o varejo genérico, a mesma antecipação de
+        # compras de Natal ou Black Friday. Setores em que ele é relevante
+        # (fitness, saúde e alimentação) já possuem pesos próprios acima.
+        if nome == "Ano-Novo":
+            return .10
         return .70 if nome not in {"Carnaval", "Volta às aulas"} else .30
     if perfil == "ALIMENTACAO":
         return PESOS_SETORIAIS["Alimentos e Bebidas"].get(nome, .08)
@@ -128,22 +133,24 @@ def periodo(config, rodada):
     perfil = config.get('perfil_sazonal', 'NEUTRO')
     setor = config.get('setor_mercado')
     eventos_ano = [evento for ano in range(inicio.year - 1, inicio.year + 2) for evento in _eventos_do_ano(ano)]
-    efeitos: dict[tuple[str, str], list[float]] = {}
+    # O mesmo marco existe em anos diferentes dentro da janela de busca. A
+    # data integra a chave para que a semana de 2026 jamais herde o rótulo ou
+    # a data da edição de 2025 do mesmo evento.
+    efeitos: dict[tuple[date, str, str], list[float]] = {}
     for dia in dias:
         for evento in eventos_ano:
             valor, fase = _contribuicao(dia, evento, _peso_evento(evento['nome'], setor, perfil))
             if fase:
-                efeitos.setdefault((evento['nome'], fase), []).append(valor)
+                efeitos.setdefault((evento['data'], evento['nome'], fase), []).append(valor)
 
     detalhes_eventos = []
-    for (nome, fase), valores in efeitos.items():
-        evento = next(e for e in eventos_ano if e['nome'] == nome)
+    for (data_evento, nome, fase), valores in efeitos.items():
         impacto = round(sum(valores) / 7, 4)
         if abs(impacto) < .001:
             continue
         detalhes_eventos.append({
             "nome": nome,
-            "data": evento['data'].isoformat(),
+            "data": data_evento.isoformat(),
             "fase": fase,
             "impacto_demanda": impacto,
             "orientacao": _orientacao(fase),
@@ -168,6 +175,9 @@ def periodo(config, rodada):
         'periodicidade': 'SEMANAL', 'inicio': inicio.isoformat(), 'fim': dias[-1].isoformat(),
         'dias': 7, 'fator_mensal': fator, 'semana_iso': inicio.isocalendar().week,
         'ano_iso': inicio.isocalendar().year, 'ano_fiscal': dias[-1].year,
+        # Encargos e tributos são reconhecidos semanalmente na DRE, mas a
+        # quitação ocorre na semana que encerra o mês civil simulado.
+        'fim_mes': any(dia.day == monthrange(dia.year, dia.month)[1] for dia in dias),
         'meses': [{'data': d.isoformat(), 'peso_mensal': 1 / monthrange(d.year, d.month)[1]} for d in dias],
         'sazonalidade': {
             'estado': 'Estimativa do Modelo', 'perfil': perfil, 'setor': setor,
@@ -180,11 +190,28 @@ def periodo(config, rodada):
     }
 
 
+def proxima_rodada_fechamento_mensal(config, rodada: int) -> int:
+    """Localiza o próximo fechamento mensal sem confundir DRE e fluxo de caixa."""
+    for candidata in range(rodada + 1, rodada + 7):
+        informacao = periodo(config, candidata)
+        if informacao and informacao.get("fim_mes"):
+            return candidata
+    return rodada + 4
+
+
 def adaptar(parametros, rodada):
     p = deepcopy(parametros)
     if '_calendario' in p:
         return p
-    cal = periodo(p.get('configuracao_simulacao') or {}, rodada)
+    configuracao = deepcopy(p.get('configuracao_simulacao') or {})
+    # Turmas anteriores usavam ``vida_util``. A configuração semanal adotou o
+    # nome explícito ``vida_util_maquina``; preservar o alias evita que um
+    # histórico válido deixe de ser processado quando a turma migra de mensal
+    # para semanal.
+    if 'vida_util' in configuracao and 'vida_util_maquina' not in configuracao:
+        configuracao['vida_util_maquina'] = configuracao['vida_util']
+    configuracao.pop('vida_util', None)
+    cal = periodo(configuracao, rodada)
     if not cal:
         return p
     # Startups sofrem a procura sazonal, mas não recebem custos fictícios de
@@ -193,7 +220,7 @@ def adaptar(parametros, rodada):
         cal['sazonalidade']['insumos'] = 1.0
         cal['sazonalidade']['frete'] = 1.0
     from ..schemas import ConfiguracaoSimulacao
-    p['configuracao_simulacao'] = ConfiguracaoSimulacao.model_validate(p.get('configuracao_simulacao') or {}).model_dump()
+    p['configuracao_simulacao'] = ConfiguracaoSimulacao.model_validate(configuracao).model_dump()
     for k, v in {'custos_fixos_mensais': 1500, 'produtividade_por_pessoa': 120, 'demanda_base_por_empresa': 220, 'das_mei_mensal': 82.05, 'taxa_juros_mensal': .025, 'taxa_cheque_especial': .08, 'crescimento_mercado_mensal': .01}.items():
         p.setdefault(k, v)
     p['_calendario'] = cal
@@ -205,7 +232,7 @@ def adaptar(parametros, rodada):
         if k in p:
             p[k] = (1 + p[k]) ** f - 1
     cfg = p['configuracao_simulacao']
-    for k in ('custo_armazenagem', 'custo_nuvem_cliente'):
+    for k in ('custo_armazenagem', 'custo_armazenagem_m3', 'custo_nuvem_cliente'):
         if k in cfg:
             cfg[k] *= f
     if 'churn_base' in cfg:

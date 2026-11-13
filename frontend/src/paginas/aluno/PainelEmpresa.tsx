@@ -46,7 +46,7 @@ import type { DecisaoSimulacao } from "../../tiposSimulacao";
 
 const FERRAMENTAS = ["SWOT", "PORTER", "BCG", "PESTEL", "CONCORRENCIA", "SEGMENTACAO"];
 const ANALISES_APRENDIZAGEM = ["5 Forças de Porter", "PESTEL", "Análise de mercado", "SWOT (FOFA)", "Análise financeira", "Segmentação de mercado"];
-const DEPARTAMENTOS = [{id:"decisoes",titulo:"Produtos e marketing"},{id:"pd",titulo:"P&D"},{id:"rh",titulo:"RH"},{id:"estrategia",titulo:"Estratégia"},{id:"financas",titulo:"Finanças"},{id:"producao",titulo:"Produção"},{id:"logistica",titulo:"Logística"}];
+const DEPARTAMENTOS = [{id:"decisoes",titulo:"Produtos e marketing"},{id:"pd",titulo:"P&D"},{id:"rh",titulo:"RH"},{id:"financas",titulo:"Finanças"},{id:"producao",titulo:"Produção"},{id:"logistica",titulo:"Logística"}];
 
 function CalendarioSazonal({calendario}:{calendario:CalendarioSimulado}) {
   const sazonal = calendario.sazonalidade;
@@ -167,8 +167,8 @@ const ITENS_PAINEL = [
   }
 ];
 
-const AREA_REVISAO: Record<string,string> = {pd: "decisoes", rh: "producao"};
-const AREAS_DECISAO = ["decisoes", "financas", "producao", "logistica"];
+const AREA_REVISAO: Record<string,string> = {};
+const AREAS_DECISAO = ["decisoes", "pd", "rh", "financas", "producao", "logistica"];
 
 const INTERVALO_ATUALIZACAO_MS = 15000;
 
@@ -200,6 +200,9 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   const [demonstrativoAtivo,setDemonstrativoAtivo] = useState(0);
   const [paginaAlertas,setPaginaAlertas] = useState(0);
   const [secao, setSecao] = useState("rodada");
+  // A mesma prévia calculada pelo motor é compartilhada com o Cockpit. Assim,
+  // o aluno não recebe um alerta visual diferente do alerta que vale no envio.
+  const [previsaoCockpit, setPrevisaoCockpit] = useState<PrevisaoDecisao | undefined>();
   const sequenciaCarga = useRef(0);
 
   const carregar = useCallback(async () => {
@@ -228,6 +231,12 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
     return () => { window.clearInterval(intervalo); sequenciaCarga.current += 1; };
   }, [carregar]);
 
+  // Uma simulação pertence somente à empresa e à semana em que foi calculada.
+  // Ao avançar a rodada, o Cockpit volta a aguardar a prévia do novo rascunho.
+  useEffect(() => {
+    setPrevisaoCockpit(undefined);
+  }, [empresaId, painel?.turma.rodada_atual]);
+
   useEffect(()=>{
     if (!painel || painel.empresa.id!==empresaId || document.visibilityState!=="visible") return;
     api.post(`/api/aluno/empresas/${empresaId}/acessos`,{aba:secao}).catch(()=>undefined);
@@ -246,7 +255,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   }
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe","atualizacoes"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.id === "cockpit" || i.id.startsWith("resultado-") ? "6. Indicadores por departamento" : ["evolucao","historico","relatorios","conquistas"].includes(i.id) ? "7. Histórico e evolução" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
+    <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe","atualizacoes"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") || i.id === "cockpit" ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.id.startsWith("resultado-") ? "5. Resultados" : ["evolucao","historico","relatorios","conquistas"].includes(i.id) ? "7. Histórico e evolução" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
       <SecaoPainel id="rodada" ativa={secao}>
       {turma.calendario&&<CalendarioSazonal calendario={turma.calendario}/>}
       {painel.eventos_operacionais.length > 0 && <section className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm" aria-label="Ocorrências operacionais desta semana">
@@ -310,12 +319,12 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
               </p>
             </Cartao>
           ) : (
-            <FormularioDecisao key={empresa.id} painel={painel} area={secao.startsWith("ferramenta-") ? "estrategia" : secao} ferramenta={secao.startsWith("ferramenta-") ? secao.slice(11) : undefined} aoNavegar={id=>setSecao(id==="estrategia"?"ferramenta-SWOT":id)} aoEnviar={carregar} />
+            <FormularioDecisao key={empresa.id} painel={painel} area={secao.startsWith("ferramenta-") ? "estrategia" : secao} ferramenta={secao.startsWith("ferramenta-") ? secao.slice(11) : undefined} aoNavegar={id=>setSecao(id==="estrategia"?"ferramenta-SWOT":id)} aoEnviar={carregar} aoPrever={setPrevisaoCockpit} />
           )}
         </div>
       </SecaoPainel>
       <SecaoPainel id="dashboard-semanal" ativa={secao}><DashboardSemanal empresaId={empresaId} resultados={resultados} somenteLeitura={!!turma.modo_equipe&&painel.equipe?.lider_id!==sessaoSalva()?.id}/></SecaoPainel>
-      <SecaoPainel id="cockpit" ativa={secao}><CockpitDecisao empresaId={empresaId} empresa={empresa} turma={turma} resultados={resultados} decisao={painel.decisao_atual} aoConferir={()=>setSecao("conferencia")} /></SecaoPainel>
+      <SecaoPainel id="cockpit" ativa={secao}><CockpitDecisao empresaId={empresaId} empresa={empresa} turma={turma} resultados={resultados} previsao={previsaoCockpit} aoConferir={()=>setSecao("conferencia")} /></SecaoPainel>
       <SecaoPainel id="resultados" ativa={secao}><Cartao titulo="Resultados da empresa"><p>Comece pelo Cockpit de decisão para uma leitura rápida. Depois, abra uma área no submenu lateral apenas quando precisar aprofundar um indicador ou demonstrativo.</p>{ultimo&&<p className="mt-4 font-semibold">Última rodada concluída: {ultimo.rodada} · Caixa: <ValorMonetario valor={ultimo.caixa_final}/> · Lucro líquido: <ValorMonetario valor={ultimo.dre.lucro_liquido}/></p>}</Cartao></SecaoPainel>
       {AREAS_INDICADORES.map(a=><SecaoPainel key={a.id} id={`resultado-${a.id}`} ativa={secao}><IndicadoresDepartamentais area={a.id} resultado={ultimo}/></SecaoPainel>)}
       <SecaoPainel id="demonstrativos" ativa={secao}>
@@ -410,14 +419,11 @@ function simulacaoInicial(painel: PainelAluno): DecisaoSimulacao | null {
   if (!painel.turma.modo_jogo || painel.turma.modo_jogo === "LEGADO") return null;
   if (painel.decisao_atual?.simulacao) return { ...DECISAO_SIMULACAO_PADRAO, ...painel.decisao_atual.simulacao };
   const ultima = painel.ultima_decisao?.simulacao;
-  if (ultima) return { ...DECISAO_SIMULACAO_PADRAO, ...ultima, comprar_mp: 0, comprar_maquinas: 0, aporte: 0, horas_extras: 0 };
-  if (painel.turma.modo_jogo === "STARTUP") return { ...DECISAO_SIMULACAO_PADRAO };
-  // Sugestão de quantidade inicial; a prévia do servidor calcula o efeito real.
-  const estado = painel.empresa.estado_simulacao;
-  const capacidadePessoas = (painel.empresa.funcionarios + 1) * (painel.turma.parametros?.produtividade_por_pessoa ?? 120);
-  const capacidadeMaquinas = estado?.maquinas.filter((m) => m.ativacao <= painel.turma.rodada_atual).reduce((soma, m) => soma + m.capacidade * m.condicao, 0) ?? 0;
-  const producao = Math.max(0, Math.floor(Math.min(capacidadePessoas, capacidadeMaquinas)));
-  return { ...DECISAO_SIMULACAO_PADRAO, producao, comprar_mp: Math.max(0, producao - (estado?.estoque_mp.quantidade ?? 0)) };
+  if (ultima) return { ...DECISAO_SIMULACAO_PADRAO, ...ultima, comprar_mp: 0, comprar_insumos_por_produto: {}, comprar_maquinas: 0, aporte: 0, horas_extras: 0 };
+  // No início a interface não presume produção. A capacidade é apurada pelo
+  // servidor com RH, pró-labore, produtividade, máquinas, insumos e eventos.
+  // Isso impede que a tela sugira um volume diferente do motor contábil.
+  return { ...DECISAO_SIMULACAO_PADRAO };
 }
 
 function decisaoInicial(painel: PainelAluno): DecisaoEntrada {
@@ -433,6 +439,8 @@ function decisaoInicial(painel: PainelAluno): DecisaoEntrada {
     networking: base?.networking ?? 0,
     // Ações pontuais só reaparecem se forem da própria rodada
     contratar: painel.decisao_atual?.contratar ?? 0,
+    contratar_tecnicos: painel.decisao_atual?.contratar_tecnicos ?? 0,
+    contratar_especialistas: painel.decisao_atual?.contratar_especialistas ?? 0,
     demitir: painel.decisao_atual?.demitir ?? 0,
     emprestimo: painel.decisao_atual?.emprestimo ?? 0,
     amortizacao: painel.decisao_atual?.amortizacao ?? 0,
@@ -442,11 +450,15 @@ function decisaoInicial(painel: PainelAluno): DecisaoEntrada {
 
 function assinaturaArea(d: DecisaoEntrada, area: string) {
   const op = d.simulacao;
-  if (area === "decisoes") return JSON.stringify([d.preco, d.marketing, d.pd, d.networking, d.plano_comercial, op?.posicionamento, op?.canal, op?.marketing_digital, op?.salario, op?.beneficio, op?.treinamento]);
-  if (area === "producao") return JSON.stringify([d.contratar, d.demitir, op?.horas_extras, op?.producao, op?.comprar_mp, op?.comprar_maquinas, op?.manutencao, op?.capacidade_nuvem, op?.centro_gravidade, op?.salario, op?.beneficio, op?.treinamento]);
-  if (area === "logistica") return JSON.stringify([op?.modal, op?.centro_gravidade]);
-  const { revisao_areas, ...valores } = d;
-  return JSON.stringify(valores);
+  const porArea: Record<string, unknown[]> = {
+    decisoes: [d.preco, d.marketing, d.plano_comercial, op?.posicionamento, op?.canal, op?.marketing_digital],
+    pd: [d.pd, d.networking],
+    rh: [d.contratar, d.contratar_tecnicos, d.contratar_especialistas, d.demitir, op?.salario, op?.beneficio, op?.treinamento, op?.horas_extras, op?.pro_labore],
+    financas: [d.emprestimo, d.amortizacao, d.regime_solicitado, op?.vendas_prazo, op?.compras_prazo],
+    producao: [op?.producao, op?.comprar_mp, op?.comprar_insumos_por_produto, op?.comprar_maquinas, op?.manutencao, op?.capacidade_nuvem, op?.centro_gravidade],
+    logistica: [op?.modal, op?.orcamento_logistico],
+  };
+  return JSON.stringify(porArea[area] ?? []);
 }
 function manterRevisoes(antes: DecisaoEntrada, depois: DecisaoEntrada): DecisaoEntrada {
   const revisao = { ...depois.revisao_areas };
@@ -456,12 +468,12 @@ function manterRevisoes(antes: DecisaoEntrada, depois: DecisaoEntrada): DecisaoE
   return { ...depois, revisao_areas: revisao };
 }
 
-function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { ferramenta?: string; painel: PainelAluno; area: string; aoNavegar: (area: string) => void; aoEnviar: () => Promise<PainelAluno | undefined> }) {
+function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar, aoPrever }: { ferramenta?: string; painel: PainelAluno; area: string; aoNavegar: (area: string) => void; aoEnviar: () => Promise<PainelAluno | undefined>; aoPrever: (previsao: PrevisaoDecisao | undefined) => void }) {
   const { empresa, turma } = painel;
   const p = turma.parametros!;
   const [confirmandoEnvio, setConfirmandoEnvio] = useState(false);
   const somenteLeitura = !!painel.decisao_atual?.enviada_em || (turma.modo_equipe && !painel.equipe?.pode_decidir);
-  const sequencia = ["decisoes", "pd", "estrategia", "producao", "rh", "financas", ...(turma.modo_jogo === "TRADICIONAL" ? ["logistica"] : [])];
+  const sequencia = ["decisoes", "pd", "rh", "financas", "producao", ...(turma.modo_jogo === "TRADICIONAL" ? ["logistica"] : [])];
   const proxima = sequencia.includes(area) ? sequencia[sequencia.indexOf(area) + 1] ?? "conferencia" : undefined;
   const versaoServidor = painel.equipe?.versao_decisao ?? painel.decisao_atual?.versao ?? 0;
   const [d, setD] = useState<DecisaoEntrada>(() => decisaoInicial(painel));
@@ -527,17 +539,21 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
             setPrevia({ chave: chavePrevisao, erro: "O sistema avançou a rodada. Aguarde a atualização do painel." });
           } else {
             setPrevia({ chave: chavePrevisao, dados });
+            aoPrever(dados);
           }
         }
       } catch (e) {
-        if (!cancelada) setPrevia({ chave: chavePrevisao, erro: e instanceof Error ? e.message : "Erro ao calcular a prévia." });
+        if (!cancelada) {
+          setPrevia({ chave: chavePrevisao, erro: e instanceof Error ? e.message : "Erro ao calcular a prévia." });
+          aoPrever(undefined);
+        }
       }
     }, 250);
     return () => {
       cancelada = true;
       window.clearTimeout(temporizador);
     };
-  }, [chavePrevisao]);
+  }, [chavePrevisao, aoPrever]);
 
   async function salvar(rascunho: boolean, avancar = false) {
     if (somenteLeitura || carregando || conflito) return;
@@ -580,7 +596,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         )
       }
     >
-      <form id={`form-decisao-${empresa.id}`} onSubmit={e => {e.preventDefault();if(area === "conferencia") setConfirmandoEnvio(true);}} className="formulario-estacao space-y-6">
+      <form id={`form-decisao-${empresa.id}`} onSubmit={e => {e.preventDefault(); if (area === "conferencia" && previsao?.radar?.liberado) setConfirmandoEnvio(true);}} className="formulario-estacao space-y-6">
         {painel.decisao_atual?.enviada_em && <div role="status" className="sticky top-0 z-20 rounded-xl border border-emerald-300 bg-emerald-50 p-4 font-semibold text-emerald-900">🔒 Decisões salvas! Modo de leitura ativado. Aguardando o encerramento do prazo pelo professor. Rodada {turma.rodada_atual} · envio em {new Date(painel.decisao_atual.enviada_em).toLocaleString("pt-BR",{timeZone:"America/Sao_Paulo"})} (Brasília).</div>}
         {somenteLeitura && !painel.decisao_atual?.enviada_em && <Aviso tipo="info">Você está em modo de visualização. Discuta as decisões com o líder, que registra e envia pela equipe.</Aviso>}
         <p className="text-sm text-slate-600">Decisões da equipe · salve ao concluir esta etapa. Envie a rodada após revisar todos os departamentos.</p>
@@ -596,6 +612,14 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
           <div className="resumo-conferencia"><span>Preço <strong>{reais(d.preco)}</strong></span><span>Campanhas <strong>{reais(d.marketing)}</strong></span><span>P&D <strong>{reais(d.pd)}</strong></span><span>Contratações <strong>{d.contratar}</strong></span><span>Demissões <strong>{d.demitir}</strong></span><span>Empréstimo <strong>{reais(d.emprestimo)}</strong></span></div>
           <p className="text-sm">Confira os conjuntos exigidos pelo jogo. Alterações posteriores removem automaticamente as confirmações afetadas.</p>
           <div className="lista-conferencia">{AREAS_DECISAO.filter(id=>id!=="logistica" || turma.modo_jogo==="TRADICIONAL").map(id=><label key={id}><input type="checkbox" disabled={somenteLeitura || carregando} checked={!!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e=>setD(atual=>({...atual,revisao_areas:{...atual.revisao_areas,[id]:e.target.checked}}))}/><span>{id==="decisoes" ? "Comercial, P&D e estratégia" : id==="producao" ? "Produção e recursos humanos" : id==="financas" ? "Finanças" : "Logística"}</span><button type="button" onClick={()=>aoNavegar(id)}>Conferir valores →</button></label>)}</div>
+          {!previsao && !erroPrevisao && <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600" role="status">Validando a integração entre pessoas, caixa, produção, marketing e entrega…</p>}
+          {erroPrevisao && <Aviso tipo="erro">Não foi possível validar a coerência da rodada. Revise a prévia antes de enviar.</Aviso>}
+          {previsao?.radar && <div className={`rounded-lg border p-4 text-sm ${previsao.radar.liberado ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-red-300 bg-red-50 text-red-900"}`}>
+            <p className="font-bold">Radar de conferência</p>
+            {previsao.radar.bloqueios.map(alerta => <p key={alerta} className="mt-1">Envio bloqueado: {alerta}</p>)}
+            {previsao.radar.avisos.map(alerta => <p key={alerta} className="mt-1">Atenção: {alerta}</p>)}
+            {previsao.radar.liberado && !previsao.radar.avisos.length && <p className="mt-1">As seis áreas estão coerentes para o envio desta semana.</p>}
+          </div>}
           {painel.pendencias_envio?.length>0 && <details><summary>Pendências registradas no servidor ({painel.pendencias_envio.length})</summary><ul>{painel.pendencias_envio.map((p,n)=><li key={n}>{p}</li>)}</ul><p>Salve o rascunho para atualizar esta lista.</p></details>}
         </section>}
         <RevisaoCampos.Provider value={!!d.revisao_areas?.[(area === "estrategia" ? "decisoes" : (AREA_REVISAO[area] || area)) as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]}><LeituraDecisao.Provider value={somenteLeitura}><fieldset disabled={carregando} className="space-y-6">
@@ -623,8 +647,14 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
         {area === "rh" && <nav className="etapas-curtas" aria-label="Etapas de RH">{[["equipe","Contratar e demitir"],["remuneracao","Salário e benefícios"],["desenvolvimento","Treinamento e horas extras"]].map(([id,t])=><button type="button" key={id} aria-pressed={etapaRH===id} onClick={()=>setEtapaRH(id)}>{t}</button>)}</nav>}
         <div hidden={area !== "rh" || etapaRH !== "equipe"}>
         <Secao titulo="Funcionários e capacidade de atendimento">
-          <Campo rotulo="Contratar" ajuda={`Salário-base ${reais(p.salario_base)}. A prévia aplica os encargos do regime efetivo.`}>
-            <ControleVisual rotulo="Contratar funcionários" moeda={false} inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} limite={20} />
+          <Campo rotulo="Contratar operários" ajuda={`Salário-base ${reais(p.salario_base)}. Operários atendem linhas populares; a prévia aplica encargos do regime.`}>
+            <ControleVisual rotulo="Contratar operários" moeda={false} inteiro valor={d.contratar} aoMudar={(v) => atualizar("contratar", v)} limite={20} />
+          </Campo>
+          <Campo rotulo="Contratar técnicos" ajuda={`Custo estimado: 1,5× o salário-base (${reais(p.salario_base * 1.5)}). Necessários para linhas técnicas.`}>
+            <ControleVisual rotulo="Contratar técnicos" moeda={false} inteiro valor={d.contratar_tecnicos} aoMudar={(v) => atualizar("contratar_tecnicos", v)} limite={20} />
+          </Campo>
+          <Campo rotulo="Contratar especialistas" ajuda={`Custo estimado: 2,2× o salário-base (${reais(p.salario_base * 2.2)}). Necessários para linhas especializadas; sem competência compatível, o refugo pode chegar a 80%.`}>
+            <ControleVisual rotulo="Contratar especialistas" moeda={false} inteiro valor={d.contratar_especialistas} aoMudar={(v) => atualizar("contratar_especialistas", v)} limite={20} />
           </Campo>
           <Campo rotulo="Demitir" ajuda={`Hoje: ${empresa.funcionarios} funcionário(s). Rescisão custa um salário.`}>
             <ControleVisual rotulo="Demitir funcionários" moeda={false} inteiro valor={d.demitir} aoMudar={(v) => atualizar("demitir", v)} limite={empresa.funcionarios} />
@@ -675,7 +705,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
 
         </div>
         {turma.modo_jogo === "LEGADO" && ["producao", "logistica"].includes(area) && <div className="rounded-xl border-l-4 border-blue-600 bg-blue-50 p-5"><h3 className="font-bold">{area === "producao" ? "Capacidade no modelo básico" : "Logística no modelo básico"}</h3><p className="mt-2 text-sm">{area === "producao" ? "Neste modelo, a capacidade depende da equipe de funcionários. Estoques, máquinas e planejamento de produção são controles do modelo Empresa tradicional." : "Este modelo não possui escolha de frete ou entregas. Esses controles estão disponíveis no modelo Empresa tradicional; no modelo Startup, a operação é digital."}</p><p className="mt-2 text-sm">Confira a capacidade e os gastos previstos na prévia abaixo.</p></div>}
-        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao etapaRH={etapaRH} etapaFinanceira={etapaFinanceira} rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} fatorPeriodo={turma.calendario?.fator_mensal??1} semanal={!!turma.calendario} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} />}
+        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao etapaRH={etapaRH} etapaFinanceira={etapaFinanceira} rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} fatorPeriodo={turma.calendario?.fator_mensal??1} semanal={!!turma.calendario} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} produtosMix={d.plano_comercial?.produtos ?? []} />}
 
         {painelAuxiliar === "previa" && <Modal titulo="Prévia estimada — não é o resultado da rodada" aoFechar={()=>setPainelAuxiliar(null)}><div className="text-sm">
           {!previsao && !erroPrevisao && <p role="status">Calculando prévia…</p>}
@@ -713,6 +743,12 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
                 </p>
               )}
               {previsao.alertas.map((alerta) => <p key={alerta} className="mt-2 text-xs font-semibold text-amber-800">{alerta}</p>)}
+              {previsao.radar && <div className={`mt-3 rounded-lg border p-3 text-xs ${previsao.radar.liberado ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-red-300 bg-red-50 text-red-900"}`}>
+                <p className="font-bold">Radar de conferência</p>
+                {previsao.radar.bloqueios.map((alerta) => <p key={alerta} className="mt-1">Não é possível enviar: {alerta}</p>)}
+                {previsao.radar.avisos.map((alerta) => <p key={alerta} className="mt-1">Atenção: {alerta}</p>)}
+                {previsao.radar.liberado && !previsao.radar.avisos.length && <p className="mt-1">As decisões estão operacionalmente coerentes para esta semana.</p>}
+              </div>}
               {previsao.simulacao && <PreviaOperacional simulacao={previsao.simulacao} modo={turma.modo_jogo} />}
             </>
           )}
@@ -723,7 +759,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar }: { 
 
         {!somenteLeitura && <><p className="text-xs text-slate-600">O rascunho pode ficar incompleto. No envio final, o programa informa as pendências e impede o envio até que sejam resolvidas.</p>
 
-        {destinoAcoes && createPortal(<div className="barra-decisao" aria-label="Ações da decisão"><div className="situacao-rascunho" role={mensagem?.tipo === "erro" ? "alert" : "status"}>{mensagem ? mensagem.texto : alterada ? "Alterações ainda não salvas" : painel.decisao_atual ? `Rascunho completo salvo · versão ${base.versao}` : "Valores iniciais · ainda não salvos"}</div><button type="button" className="consulta-previa" onClick={()=>setPainelAuxiliar("previa")}>Prévia estimada</button><Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho completo</Botao>{area === "conferencia" ? <Botao variante="final" type="submit" form={`form-decisao-${empresa.id}`} carregando={carregando} disabled={conflito}>Enviar decisão final</Botao> : proxima && <Botao type="button" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para {proxima === "conferencia" ? "conferência" : DEPARTAMENTOS.find(x=>x.id===proxima)?.titulo ?? proxima} →</Botao>}</div>, destinoAcoes)}</>}
+        {destinoAcoes && createPortal(<div className="barra-decisao" aria-label="Ações da decisão"><div className="situacao-rascunho" role={mensagem?.tipo === "erro" ? "alert" : "status"}>{mensagem ? mensagem.texto : alterada ? "Alterações ainda não salvas" : painel.decisao_atual ? `Rascunho completo salvo · versão ${base.versao}` : "Valores iniciais · ainda não salvos"}</div><button type="button" className="consulta-previa" onClick={()=>setPainelAuxiliar("previa")}>Prévia estimada</button><Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho completo</Botao>{area === "conferencia" ? <Botao variante="final" type="submit" form={`form-decisao-${empresa.id}`} carregando={carregando} disabled={conflito || !previsao || !!erroPrevisao || previsao.radar?.liberado === false}>Enviar decisão final</Botao> : proxima && <Botao type="button" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para {proxima === "conferencia" ? "conferência" : DEPARTAMENTOS.find(x=>x.id===proxima)?.titulo ?? proxima} →</Botao>}</div>, destinoAcoes)}</>}
       </form>
       {confirmandoEnvio && <Modal titulo="Confirmar decisão final" aoFechar={()=>setConfirmandoEnvio(false)}><p className="text-sm">Confirma o envio de todos os departamentos para a rodada {turma.rodada_atual}? Após enviar, todas as escolhas ficam visíveis em modo de leitura até a próxima rodada. Use o rascunho se ainda precisar alterar algo.</p><div className="mt-6 flex justify-end gap-3"><Botao variante="secundario" onClick={()=>setConfirmandoEnvio(false)}>Voltar e revisar</Botao><Botao variante="final" carregando={carregando} onClick={()=>{setConfirmandoEnvio(false);salvar(false);}}>Confirmar envio final</Botao></div></Modal>}
     </Cartao>

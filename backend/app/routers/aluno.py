@@ -300,6 +300,13 @@ def enviar_decisao(
         motivos = pendencias_envio(empresa, dados)
         if motivos:
             raise HTTPException(422, "Você não pode enviar a decisão final: " + " ".join(motivos))
+        # Bloqueios sistêmicos não são meros avisos de interface: uma decisão
+        # comercial incompatível com capacidade, insumo ou logística não pode
+        # ser confirmada como se fosse um plano executável.
+        from ..motor.avancado import prever
+        radar = prever(empresa, Decisao(**dados.model_dump(exclude={"versao", "rodada", "rascunho"})), empresa.turma).get("radar", {})
+        if radar.get("bloqueios"):
+            raise HTTPException(422, "Decisão não pode ser enviada: " + " ".join(radar["bloqueios"]))
     decisao = (
         db.query(Decisao)
         .filter(Decisao.empresa_id == empresa.id, Decisao.rodada == turma.rodada_atual)
@@ -359,6 +366,10 @@ def aprovar_decisao(
     from .mercado import validar_plano
     validar_plano(db, empresa, entrada)
     _validar_decisao(empresa, entrada)
+    from ..motor.avancado import prever
+    radar = prever(empresa, decisao, empresa.turma).get("radar", {})
+    if radar.get("bloqueios"):
+        raise HTTPException(422, "Decisão não pode ser enviada: " + " ".join(radar["bloqueios"]))
     for campo, valor in entrada.model_dump(exclude={"versao", "rodada", "rascunho"}).items():
         setattr(decisao, campo, valor)
     decisao.enviada_em = agora()

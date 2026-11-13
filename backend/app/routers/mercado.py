@@ -11,6 +11,7 @@ from ..models import ConteudoMercado, RelatorioEmpresarial, Usuario, StatusTurma
 from ..seguranca import exigir_professor, exigir_aluno
 from ..inteligencia_mercado import gerar_json
 from ..evidencias_mercado import validar_evidencias
+from ..catalogo_setorial import SETORES as CATALOGO_SETORIAL, especificacao_produto
 from ..schemas import ConfiguracaoSimulacao
 from .. import serializacao as ser
 from ..relatorios import _rodada
@@ -65,7 +66,9 @@ class Produto(BaseModel):
     unidade: str = Field(min_length=1, max_length=100)
     base_custo: str = Field(min_length=10, max_length=2000)
     data: str = Field(min_length=4, max_length=40)
-    fontes: list[Fonte] = Field(min_length=1, max_length=10)
+    # Produtos estimados pelo modelo podem não ter uma fonte documental direta:
+    # sua origem e fórmula ficam explícitas no próprio catálogo.
+    fontes: list[Fonte] = Field(default_factory=list, max_length=10)
     # Opcional na leitura para preservar catálogos históricos; exigido em novas edições.
     evidencia_custo: EvidenciaCusto | None = None
     tipo_documento: Literal["custo_aquisicao", "preco_varejo"] = "custo_aquisicao"
@@ -73,6 +76,14 @@ class Produto(BaseModel):
     estado_indicador: Literal["Valor Calculado", "Estimativa do Modelo"] | None = None
     formula_aplicada: str | None = Field(default=None, max_length=200)
     alerta_professor: str | None = Field(default=None, max_length=2000)
+    linha_produto: Literal["POPULAR", "INTERMEDIARIA", "PREMIUM"] | None = None
+    qualificacao_minima: Literal["operario", "tecnico", "especialista"] | None = None
+    insumo_chave: str | None = Field(default=None, max_length=120)
+    fator_setup: float | None = Field(default=None, gt=0, le=3)
+    volume_armazenagem_m3: float | None = Field(default=None, ge=0, le=1000)
+    capex_ativacao: float | None = Field(default=None, ge=0, le=10_000_000)
+    midias_recomendadas: list[str] = Field(default_factory=list, max_length=80)
+    fonte_especificacao: str | None = Field(default=None, max_length=400)
 
 class Edicao(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
@@ -98,8 +109,19 @@ def _url_sem_rastreamento(url):
 def validar_fontes(dados, pesquisadas=None):
     from ..fontes_oficiais import fonte_oficial
     urls = []
-    for item in dados.noticias + dados.analises + dados.produtos:
+    for item in dados.noticias + dados.analises:
         for fonte in item.fontes:
+            if not fonte_oficial(fonte.url):
+                raise HTTPException(422, "Use somente fontes governamentais ou institutos oficiais de pesquisa autorizados.")
+            urls.append(fonte.url)
+    for produto in dados.produtos:
+        # A estimativa só é permitida para o preço do produto. Nunca torna
+        # opcionais as fontes de notícias ou de análises de mercado.
+        if not produto.fontes and produto.estado_indicador == "Estimativa do Modelo":
+            continue
+        if not produto.fontes:
+            raise HTTPException(422, "Todo produto documentado precisa informar ao menos uma fonte oficial.")
+        for fonte in produto.fontes:
             if not fonte_oficial(fonte.url):
                 raise HTTPException(422, "Use somente fontes governamentais ou institutos oficiais de pesquisa autorizados.")
             urls.append(fonte.url)
@@ -107,6 +129,48 @@ def validar_fontes(dados, pesquisadas=None):
         raise HTTPException(502, "A pesquisa não confirmou todas as fontes; nenhuma edição foi salva.")
     if len({p.id for p in dados.produtos}) != len(dados.produtos):
         raise HTTPException(422, "Os códigos dos produtos devem ser únicos.")
+
+
+def _completar_produtos_estimados(bruto: dict, turma, pesquisa: Pesquisa) -> None:
+    """Completa somente lacunas de preço do catálogo com parâmetro da turma.
+
+    A ausência de prova de custo não pode impedir que os alunos recebam um
+    catálogo operacional. A edição fica inequívoca: preço estimado, fórmula
+    aplicada e alerta para o professor. Fatos de mercado seguem estritos.
+    """
+    produtos = bruto.get("produtos")
+    if not isinstance(produtos, list):
+        return
+    existentes = {str(item.get("id", "")) for item in produtos if isinstance(item, dict)}
+    categorias = (CATALOGO_SETORIAL.get(pesquisa.setor) or {}).get("categorias", [])
+    hoje = datetime.now(timezone.utc).date().isoformat()
+    while len(produtos) < pesquisa.produtos:
+        indice = len(produtos)
+        base_id = categorias[indice % len(categorias)][0] if categorias else f"estimativa-{indice + 1}"
+        produto_id = base_id
+        sufixo = 2
+        while produto_id in existentes:
+            produto_id = f"{base_id}-{sufixo}"
+            sufixo += 1
+        ficha = especificacao_produto(pesquisa.setor, base_id, indice)
+        natureza = "SERVICO_DIGITAL" if turma.modo_jogo == "STARTUP" else "FISICO"
+        unidade = "cliente/mês" if natureza == "SERVICO_DIGITAL" else "unidade"
+        produtos.append({
+            "natureza": natureza,
+            "id": produto_id,
+            "nome": ficha["nome_referencia"],
+            "descricao": f"Categoria operacional {ficha['nome_referencia']} preparada com custo didático da turma.",
+            "custo_unitario": turma.custo_unitario,
+            "unidade": unidade,
+            "base_custo": f"Estimativa do Modelo: custo padrão da turma de R$ {turma.custo_unitario:.2f}.",
+            "data": f"Consulta em {hoje}",
+            "fontes": [],
+            "tipo_documento": "custo_aquisicao",
+            "estado_indicador": "Estimativa do Modelo",
+            "formula_aplicada": "Custo Padrão da Turma (Fallback por ausência de custo documentado)",
+            "alerta_professor": "Pesquisa sem custo documental verificável; aplicado custo padrão configurado para a turma.",
+        })
+        existentes.add(produto_id)
 
 def validar_coerencia(edicao, turma, pesquisa=None, exigir_natureza=False):
     if edicao.modo_operacao is not None and edicao.modo_operacao != turma.modo_jogo:
@@ -137,14 +201,21 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     schema["$defs"]["Produto"]["required"].extend(["natureza", "tipo_documento"])
     bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"calendario_simulado":ser.turma(turma).get("calendario"),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True,schema)
     if isinstance(bruto, dict):
-        nomes = {"noticias": "notícias", "analises": "análises", "produtos": "produtos com custo documentado"}
+        nomes = {"noticias": "notícias", "analises": "análises"}
         faltas = [f"{nomes[k]}: {len(bruto[k])} de {getattr(dados,k)}" for k in nomes if isinstance(bruto.get(k),list) and len(bruto[k]) < getattr(dados,k)]
         if faltas:
             raise HTTPException(502, "A busca confirmou menos itens que o solicitado (" + "; ".join(faltas) + "). Nenhuma edição foi salva. Tente novamente ou reduza a quantidade.")
+        _completar_produtos_estimados(bruto, turma, dados)
     try: edicao=Edicao.model_validate(bruto)
     except ValidationError as erro:
         campos = sorted({str(e["loc"][0]) for e in erro.errors() if e["loc"]})
         raise HTTPException(502,"A pesquisa retornou campos incompletos em " + ", ".join(campos) + ". Nenhuma edição foi salva. Tente novamente.") from None
+    # A pesquisa confirma fatos e custos; a estrutura operacional do produto
+    # vem do catálogo setorial, portado do Simula Marketing. Isso evita que a
+    # IA invente requisitos de produção ou mídias adequadas.
+    from ..catalogo_setorial import enriquecer_produto
+    edicao.produtos = [Produto.model_validate(enriquecer_produto(edicao.setor, produto.model_dump(), indice))
+                       for indice, produto in enumerate(edicao.produtos)]
     if len(edicao.noticias)!=dados.noticias or len(edicao.analises)!=dados.analises or len(edicao.produtos)!=dados.produtos:
         raise HTTPException(502,"A pesquisa não entregou as quantidades solicitadas.")
     validar_fontes(edicao,fontes)
@@ -160,6 +231,12 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
 @router.put("/api/professor/turmas/{turma_id}/mercado/{edicao_id}")
 def revisar(turma_id:int, edicao_id:int,dados:Edicao, db:Session=Depends(get_db), usuario:Usuario=Depends(exigir_professor)):
     turma=_turma_do_professor(db,turma_id,usuario)
+    # A revisão altera evidências e textos de mercado, mas não pode apagar a
+    # ficha operacional (linha, insumo, qualificação e mídia) que conecta a
+    # decisão comercial aos demais departamentos.
+    from ..catalogo_setorial import enriquecer_produto
+    dados.produtos = [Produto.model_validate(enriquecer_produto(dados.setor, produto.model_dump(), indice))
+                      for indice, produto in enumerate(dados.produtos)]
     validar_fontes(dados)
     validar_coerencia(dados,turma,exigir_natureza=True)
     validar_evidencias(dados, turma)
@@ -270,7 +347,9 @@ def validar_plano(db,empresa,dados,rascunho=False):
         # Nenhum rascunho é executado. A normalização de custos e a validação
         # completa são obrigatórias no envio final, permitindo salvar pendências.
         return
-    catalogados={p["id"]:p for p in e.dados["produtos"]}
+    from ..catalogo_setorial import enriquecer_produto
+    catalogados={p["id"]:enriquecer_produto(e.dados.get("setor", ""), p, indice)
+                 for indice,p in enumerate(e.dados["produtos"])}
     midias={m["id"]:m for m in catalogo()}
     itens=plano.produtos
     if not itens:
@@ -288,6 +367,9 @@ def validar_plano(db,empresa,dados,rascunho=False):
         produto=catalogados[item.produto_id]
         item.custo_unitario=produto["custo_unitario"]
         item.produto_nome=produto["nome"]
+        for chave in ("linha_produto", "qualificacao_minima", "insumo_chave", "fator_setup",
+                      "volume_armazenagem_m3", "capex_ativacao", "midias_recomendadas"):
+            setattr(item, chave, produto.get(chave))
         if len(set(item.canais))!=len(item.canais): raise HTTPException(422,"Canais duplicados no produto.")
         if len({m.id for m in item.midias})!=len(item.midias): raise HTTPException(422,"Mídias duplicadas no produto.")
         if any(m.id not in midias for m in item.midias): raise HTTPException(422,"Mídia inválida.")

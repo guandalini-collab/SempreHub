@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import { percentual, reais } from "../formatos";
-import type { Decisao, Empresa, Resultado, Turma } from "../tipos";
+import type { Empresa, PrevisaoDecisao, Resultado, Turma } from "../tipos";
 import type { ModoJogo } from "../tiposSimulacao";
 
 type BoletimItem = { titulo: string; resumo: string; competencia?: string | null; referencia: string; setores_afetados?: string[] };
@@ -90,8 +90,8 @@ function macroValor(item: BoletimItem | undefined) {
   return encontrado?.[0] ?? item.competencia ?? "Confirmado";
 }
 
-export default function CockpitDecisao({ empresaId, empresa, turma, resultados, decisao, aoConferir }: {
-  empresaId: number; empresa: Empresa; turma: Turma; resultados: Resultado[]; decisao: Decisao | null; aoConferir: () => void;
+export default function CockpitDecisao({ empresaId, empresa, turma, resultados, previsao, aoConferir }: {
+  empresaId: number; empresa: Empresa; turma: Turma; resultados: Resultado[]; previsao?: PrevisaoDecisao; aoConferir: () => void;
 }) {
   const [boletim, setBoletim] = useState<Boletim | null>(null);
   const atual = resultados[resultados.length - 1];
@@ -115,7 +115,6 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
     const liquidezAnterior = numero(anterior, "liquidez_corrente");
     const custoLogistico = dividir((atual.dre.frete ?? 0) + (atual.dre.armazenagem ?? 0), atual.dre.receita);
     const custoLogisticoAnterior = dividir((anterior?.dre.frete ?? 0) + (anterior?.dre.armazenagem ?? 0), anterior?.dre.receita);
-    const crescimento = dividir(atual.dre.receita - (anterior?.dre.receita ?? 0), anterior?.dre.receita);
     const usoNuvem = dividir(numero(atual, "clientes_atendidos"), numero(atual, "capacidade_nuvem"));
     const usoNuvemAnterior = dividir(numero(anterior, "clientes_atendidos"), numero(anterior, "capacidade_nuvem"));
     const refugo = dividir(numero(atual, "refugo"), numero(atual, "producao_real"));
@@ -145,12 +144,6 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
         modo === "STARTUP" ? metrica("Turnover", "Saídas da equipe na semana. Aumentos elevam custo de reposição e perda de conhecimento.", numero(atual, "turnover"), numero(anterior, "turnover"), "numero") : metrica("Horas extras", "Horas extras planejadas por colaborador. Excesso aumenta sobrecarga e custos.", numero(atual, "horas_extras"), numero(anterior, "horas_extras"), "numero"),
         modo === "STARTUP" ? metrica("Receita por colaborador", "Receita semanal dividida pela equipe ativa. Compare com a qualidade e a retenção.", receitaPorFuncionario, receitaPorFuncionarioAnterior, "moeda") : metrica("Custo de treinamento", "Gasto semanal em capacitação. Deve ser interpretado junto com qualificação e produtividade.", atual.dre.treinamento ?? null, anterior?.dre.treinamento ?? null, "moeda"),
       ]},
-      { titulo: "Estratégia", estado: crescimento == null ? "neutro" as Semaforo : crescimento < -0.15 ? "vermelho" as Semaforo : crescimento < 0 ? "amarelo" as Semaforo : "verde" as Semaforo, metricas: [
-        metrica("Crescimento semanal", "Variação da receita em relação à semana anterior. Mostra tendência, não garante causalidade.", crescimento, null, "percentual"),
-        metrica("Posição BCG", "A classificação BCG exige crescimento de mercado e participação relativa por produto; dados ainda não registrados.", null, null, "numero"),
-        metrica("Risco PESTEL", "A análise PESTEL é qualitativa e deve ser registrada pela equipe; não recebe uma nota automática.", null, null, "numero"),
-        modo === "STARTUP" ? metrica("Vantagem digital", "A vantagem competitiva digital exige medida por recurso, canal ou tecnologia, ainda não registrada isoladamente.", null, null, "numero") : metrica("Poder de fornecedores", "Exige a avaliação estruturada das Cinco Forças. Não deve ser deduzido apenas dos custos da semana.", null, null, "numero"),
-      ]},
       { titulo: "Finanças", estado: grauFinancas(atual, empresa), metricas: [
         metrica("Margem líquida", "Lucro ou prejuízo final como proporção da receita da semana.", margem, margemAnterior, "percentual"),
         metrica("Liquidez corrente", "Ativos de curto prazo divididos por obrigações de curto prazo. Quedas reduzem a folga de pagamento.", liquidez, liquidezAnterior, "numero"),
@@ -173,17 +166,14 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
     return cartoes;
   }, [atual, anterior, empresa, modo]);
 
-  const alertas = useMemo(() => {
-    if (!atual) return [] as { nivel: "amarelo" | "vermelho"; texto: string }[];
-    const lista: { nivel: "amarelo" | "vermelho"; texto: string }[] = [];
-    const producaoPlanejada = decisao?.simulacao?.producao ?? 0;
-    const estoquePronto = empresa.estado_simulacao?.estoque_pa.quantidade ?? 0;
-    if (modo === "TRADICIONAL" && atual.demanda > estoquePronto + producaoPlanejada) lista.push({ nivel: "vermelho", texto: "Ruptura de estoque iminente: a demanda da última semana supera o estoque pronto somado à produção planejada." });
-    if ((decisao?.pd ?? 0) > Math.max(0, empresa.caixa) * 0.25) lista.push({ nivel: "amarelo", texto: "Risco de caixa: o investimento em P&D supera 25% do caixa disponível e pode comprometer o capital de giro." });
-    const extras = decisao?.simulacao?.horas_extras ?? 0;
-    if (modo === "TRADICIONAL" && (extras > 10 || (numero(atual, "ruptura") ?? 0) > 0)) lista.push({ nivel: "amarelo", texto: "Gargalo de equipe: horas extras elevadas ou ruptura recente podem reduzir a entrega e aumentar o risco de saídas." });
-    return lista;
-  }, [atual, decisao, empresa, modo]);
+  const radarMotor = useMemo(() => {
+    if (!previsao) return null;
+    return [
+      ...(previsao.radar?.bloqueios ?? []).map((texto) => ({ nivel: "vermelho" as const, texto })),
+      ...(previsao.radar?.avisos ?? []).map((texto) => ({ nivel: "amarelo" as const, texto })),
+      ...previsao.alertas.map((texto) => ({ nivel: "amarelo" as const, texto })),
+    ].filter((alerta, indice, lista) => lista.findIndex((outro) => outro.texto === alerta.texto) === indice);
+  }, [previsao]);
 
   const setor = turma.parametros?.configuracao_simulacao?.setor_mercado ?? turma.configuracao_simulacao?.setor_mercado;
   const selic = boletim?.itens.find((item) => /selic/i.test(`${item.titulo} ${item.resumo}`));
@@ -201,8 +191,8 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
       </section>
       <section className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3" aria-label="Indicadores dos departamentos">{dados.map((cartao) => <CartaoDepartamento key={cartao.titulo} {...cartao} />)}</section>
       <section className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3" aria-label="Radar de conferência">
-        <div className="flex flex-wrap items-center justify-between gap-2"><div><h3 className="font-semibold text-slate-900">Radar de conferência</h3><p className="text-xs text-slate-600">Validação cruzada do rascunho antes do envio definitivo.</p></div><button type="button" className="rounded-lg bg-marinho px-3 py-2 text-sm font-semibold text-white" onClick={aoConferir}>Conferir e enviar →</button></div>
-        {alertas.length === 0 ? <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-900">Nenhum gargalo crítico foi identificado com os dados registrados. Revise também as decisões e o cenário de mercado.</p> : <ul className="mt-3 space-y-2">{alertas.map((alerta) => <li key={alerta.texto} className={`rounded-lg border-l-4 p-2 text-sm ${alerta.nivel === "vermelho" ? "border-red-600 bg-red-50 text-red-900" : "border-amber-500 bg-amber-50 text-amber-900"}`}>{alerta.texto}</li>)}</ul>}
+        <div className="flex flex-wrap items-center justify-between gap-2"><div><h3 className="font-semibold text-slate-900">Radar de conferência</h3><p className="text-xs text-slate-600">{previsao ? "Validação do motor para o rascunho atual." : "Abra uma decisão para calcular a validação do rascunho atual."}</p></div><button type="button" className="rounded-lg bg-marinho px-3 py-2 text-sm font-semibold text-white" onClick={aoConferir}>Conferir e enviar →</button></div>
+        {!previsao ? <p className="mt-3 rounded-lg border border-slate-200 bg-white p-2 text-sm text-slate-700">Preencha ou revise uma decisão para o motor calcular capacidade, estoque, caixa e entrega antes do envio.</p> : radarMotor && radarMotor.length === 0 ? <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-900">O motor não encontrou bloqueios ou alertas para este rascunho. Revise também o cenário de mercado antes de enviar.</p> : <ul className="mt-3 space-y-2">{radarMotor?.map((alerta) => <li key={alerta.texto} className={`rounded-lg border-l-4 p-2 text-sm ${alerta.nivel === "vermelho" ? "border-red-600 bg-red-50 text-red-900" : "border-amber-500 bg-amber-50 text-amber-900"}`}>{alerta.texto}</li>)}</ul>}
       </section>
     </>}
   </section>;

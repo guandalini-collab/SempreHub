@@ -118,6 +118,8 @@ export interface Decisao {
   pd: number;
   networking: number;
   contratar: number;
+  contratar_tecnicos: number;
+  contratar_especialistas: number;
   demitir: number;
   emprestimo: number;
   amortizacao: number;
@@ -168,6 +170,7 @@ export interface PrevisaoDecisao {
   divida_prevista: number;
   caixa_disponivel: number;
   alertas: string[];
+  radar?: { bloqueios: string[]; avisos: string[]; liberado: boolean };
 }
 
 export interface Dre {

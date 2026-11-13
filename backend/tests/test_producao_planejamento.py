@@ -12,6 +12,7 @@ from app.models import Turma
 from app.schemas import DecisaoSimulacao
 from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
+from .test_mercado import edicao, fontes_documentadas
 from .test_avancado_api import _fechar
 
 
@@ -72,14 +73,21 @@ def test_conversao_apenas_turma_de_teste_e_preserva_historico(cliente, professor
         db.execute(text('DROP TABLE semprehub_manutencao_backup'))
 
 
-def test_localizacao_altera_previa_dre_e_preserva_balanco(cliente, professor):
-    turma = _criar_turma(cliente, professor, modo_jogo="TRADICIONAL", total_rodadas=2, demanda_base_por_empresa=40, configuracao_simulacao={"custo_frete_km": .5})
+def test_localizacao_altera_previa_dre_e_preserva_balanco(cliente, professor, monkeypatch):
+    from app.routers import mercado
+    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (edicao(), {"https://www.ibge.gov.br/produto"}))
+    turma = _criar_turma(cliente, professor, modo_jogo="TRADICIONAL", cenario="CRISE", total_rodadas=2, demanda_base_por_empresa=40, configuracao_simulacao={"custo_frete_km": .5})
     aluno = cadastrar(cliente, "Ana", "frete@aluno.iffar.edu.br")
     empresa = _entrar(cliente, aluno, turma["codigo"], "Fábrica")
     base = f"/api/aluno/empresas/{empresa}"
     estudo = {"pontos": [{"nome": "A", "x": 0, "y": 0, "volume": 1}, {"nome": "B", "x": 40, "y": 0, "volume": 3}], "local_x": 0, "local_y": 0}
     revisao = {k: True for k in ("decisoes", "financas", "producao", "logistica")}
-    decisao = {"rodada": 1, "preco": 100, "revisao_areas": revisao, "simulacao": {"comprar_mp": 100, "producao": 100, "centro_gravidade": estudo}}
+    docente = f"/api/professor/turmas/{turma['id']}/mercado"
+    eid = cliente.post(docente + "/pesquisar", headers=professor, json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":1}).json()["id"]
+    assert cliente.post(docente + f"/{eid}/publicar", headers=professor, json={}).status_code == 200
+    plano = {"edicao_id":eid,"produto_id":"produto-1","estrategia_preco":"COMPETITIVO","posicionamento":"PRECO","canais":["DIRETO"],"cobertura":"LOCAL","intensidade":"BAIXA","midias":[{"id":"email","quantidade":100}]}
+    plano["produtos"]=[{**plano,"produto_id":"produto-1","produto_nome":"Produto de teste","preco":100,"peso":1,"revisado":True,"servicos":[{"id":"servico-email","quantidade":1}]}]
+    decisao = {"rodada": 1, "preco": 100, "marketing":557, "revisao_areas": revisao, "plano_comercial":plano, "simulacao": {"comprar_mp": 100, "producao": 100, "pro_labore":1500, "orcamento_logistico":10000, "centro_gravidade": estudo}}
     previa = cliente.post(base + "/previsao", headers=aluno, json=decisao)
     assert previa.status_code == 200, previa.text
     assert previa.json()["simulacao"]["frete_unitario"] == 25

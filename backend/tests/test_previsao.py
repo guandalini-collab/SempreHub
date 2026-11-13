@@ -87,7 +87,9 @@ def test_previa_segunda_rodada_preserva_estado_e_historico(cliente, professor):
     turma = _criar_turma(cliente, professor, total_rodadas=2, caixa_inicial=50000)
     aluno = cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
     empresa_id = _entrar(cliente, aluno, turma["codigo"], "Franquia", regime="SIMPLES_NACIONAL", classe="FRANQUIA")
-    decisao = {"preco": 100, "emprestimo": 5000, "contratar": 1, "marketing": 1000, "pd": 500}
+    # Sem catálogo publicado não há campanha: esta prova cobre previsão,
+    # histórico e financiamento, não ativação comercial.
+    decisao = {"preco": 100, "emprestimo": 5000, "contratar": 1, "marketing": 0, "pd": 500}
     cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=completar_decisao(decisao))
     cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada", headers=professor, json={"evento": "GREVE_LOGISTICA"})
     antes = cliente.get(f"/api/aluno/empresas/{empresa_id}", headers=aluno).json()
@@ -95,12 +97,14 @@ def test_previa_segunda_rodada_preserva_estado_e_historico(cliente, professor):
     primeira = antes["resultados"][0]
     assert antes["empresa"]["caixa"] == primeira["caixa_final"]
     assert antes["empresa"]["divida"] == primeira["divida_final"]
-    decisao2 = {"preco": 100, "amortizacao": 1000, "marketing": 700, "pd": 300}
+    divida_disponivel = antes["empresa"]["divida"]
+    amortizacao = min(1000, divida_disponivel)
+    decisao2 = {"preco": 100, "amortizacao": amortizacao, "marketing": 0, "pd": 300}
     previa = _prever(cliente, aluno, empresa_id, decisao2)
     assert previa["rodada"] == 2
     assert previa["funcionarios"] == 1
-    assert previa["divida_prevista"] == 4000
-    assert previa["caixa_disponivel"] == pytest.approx(primeira["caixa_final"] - 1000)
+    assert previa["divida_prevista"] == pytest.approx(divida_disponivel - amortizacao)
+    assert previa["caixa_disponivel"] == pytest.approx(primeira["caixa_final"] - amortizacao)
     # Greve persiste por dois meses e a franquia paga 5% de royalties.
     assert previa["margem_unitaria"] == pytest.approx(100 * 0.95 - 40 * 1.4)
     assert cliente.get(f"/api/aluno/empresas/{empresa_id}", headers=aluno).json() == antes
@@ -121,7 +125,7 @@ def test_previa_segunda_rodada_preserva_estado_e_historico(cliente, professor):
     assert detalhe["resultados"] == final["resultados"]
     assert [d["rodada"] for d in detalhe["decisoes"]] == [1, 2]
     assert detalhe["decisoes"][0]["emprestimo"] == 5000
-    assert detalhe["decisoes"][1]["amortizacao"] == 1000
+    assert detalhe["decisoes"][1]["amortizacao"] == amortizacao
     assert cliente.post(f"/api/aluno/empresas/{empresa_id}/previsao", headers=aluno, json=decisao2).status_code == 422
 
 

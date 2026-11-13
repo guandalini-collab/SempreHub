@@ -38,7 +38,9 @@ def test_inicializacao_unica_nao_reinicia_desgaste():
     c2=preparar(proxima_empresa(e,r),d,p,2)
     assert c2['kpis']['disponibilidade']==pytest.approx(.9)
     assert c2['kpis']['performance']==pytest.approx(.99)
-    assert c2['estado']['maquinas'][0]['valor_liquido']==r['estado']['maquinas'][0]['valor_liquido']
+    # A preparação da semana seguinte provisiona mais uma depreciação semanal;
+    # o ativo não pode ficar congelado entre semanas.
+    assert c2['estado']['maquinas'][0]['valor_liquido'] < r['estado']['maquinas'][0]['valor_liquido']
 
 
 def test_startup_tag_e_estado_atual_preservado():

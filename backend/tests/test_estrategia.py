@@ -46,7 +46,9 @@ def test_segmentacao_afeta_vendas_e_resultado_preserva_historico(cliente, profes
     if modo == 'STARTUP':
         catalogo['produtos'][0].update(natureza='SERVICO_DIGITAL', unidade='cliente/mês')
     monkeypatch.setattr(mercado, 'gerar_json', lambda *a: (catalogo, {'https://www.ibge.gov.br/produto'}))
-    turma = _criar_turma(cliente, professor, modo_jogo=modo, total_rodadas=2, demanda_base_por_empresa=100)
+    # A comparação começa com uma estrutura instalada; o objetivo é medir a
+    # segmentação, não a defasagem de ativação de uma máquina recém-comprada.
+    turma = _criar_turma(cliente, professor, modo_jogo=modo, cenario='CRISE', total_rodadas=2, demanda_base_por_empresa=100)
     alunos = [cadastrar(cliente, 'Ana', f'estrategia-{modo}-{i}@aluno.iffar.edu.br') for i in range(2)]
     empresas = [_entrar(cliente, aluno, turma['codigo'], f'Empresa {i}') for i, aluno in enumerate(alunos)]
     docente = f"/api/professor/turmas/{turma['id']}"
@@ -55,10 +57,33 @@ def test_segmentacao_afeta_vendas_e_resultado_preserva_historico(cliente, profes
     eid = r.json()['id']
     assert cliente.post(docente + f'/mercado/{eid}/publicar', headers=professor, json={}).status_code == 200
     for i, (aluno, empresa) in enumerate(zip(alunos, empresas)):
-        plano = {'edicao_id': eid, 'produto_id': 'produto-1', 'estrategia_preco': 'COMPETITIVO', 'posicionamento': 'PRECO', 'canais': ['DIRETO'], 'cobertura': 'LOCAL', 'intensidade': 'BAIXA', 'midias': [], 'analises': {'segmentacao': {'preco_maximo': 120 if i == 0 else 30}}}
-        decisao = {'rodada': 1, 'preco': 100, 'plano_comercial': plano}
-        if modo != 'LEGADO':
-            decisao['simulacao'] = {'producao': 200, 'comprar_mp': 200, 'capacidade_nuvem': 300}
+        # A comparação estratégica ocorre com empresas realmente aptas a
+        # vender: produto publicado, campanha compatível e estrutura mínima.
+        # Sem essa cadeia, a demanda é corretamente zero para ambas.
+        plano = {
+            'edicao_id': eid, 'produto_id': 'produto-1',
+            'estrategia_preco': 'COMPETITIVO', 'posicionamento': 'PRECO',
+            'canais': ['DIRETO'], 'cobertura': 'LOCAL', 'intensidade': 'BAIXA',
+            'midias': [{'id': 'email', 'quantidade': 100}],
+            'produtos': [{
+                'produto_id': 'produto-1', 'produto_nome': 'Produto de teste',
+                'preco': 100, 'peso': 1, 'revisado': True,
+                'estrategia_preco': 'COMPETITIVO', 'posicionamento': 'PRECO',
+                'canais': ['DIRETO'], 'cobertura': 'LOCAL', 'intensidade': 'BAIXA',
+                'midias': [{'id': 'email', 'quantidade': 100}],
+                'servicos': [{'id': 'servico-email', 'quantidade': 1}],
+            }],
+            'analises': {'segmentacao': {'preco_maximo': 120 if i == 0 else 30}},
+        }
+        decisao = {'rodada': 1, 'preco': 100, 'marketing': 557, 'plano_comercial': plano}
+        if modo == 'TRADICIONAL':
+            decisao['simulacao'] = {
+                'producao': 200, 'comprar_mp': 200, 'pro_labore': 1500,
+                'orcamento_logistico': 10_000,
+            }
+        elif modo == 'STARTUP':
+            decisao.update(contratar=1)
+            decisao['simulacao'] = {'capacidade_nuvem': 300, 'pro_labore': 1500}
         r = cliente.put(f'/api/aluno/empresas/{empresa}/decisao', headers=aluno, json=completar_decisao(decisao))
         assert r.status_code == 200, r.text
         assert r.json()['plano_comercial']['analises']['segmentacao']['preco_maximo'] == (120 if i == 0 else 30)
@@ -83,7 +108,7 @@ def test_efeito_nao_desaparece_com_uma_unica_empresa():
     from app.motor.simulacao import _dividir_mercado
     turma = SimpleNamespace(configuracao_simulacao={}, demanda_base_por_empresa=100, crescimento_mercado_mensal=0, preco_referencia=100, taxa_juros_mensal=.025)
     d = SimpleNamespace(preco=100, emprestimo=0, plano_comercial={'analises': {'segmentacao': {'preco_maximo': 30}}})
-    p = {'atratividade': 1, 'avaliacao_estrategica': {'fator': .95}}
+    p = {'atratividade': 1, 'comercial_ativo': True, 'avaliacao_estrategica': {'fator': .95}}
     demandas, bots = _mercado([p], [d], turma, 1, 1)
     assert demandas == [95]
     assert bots == []

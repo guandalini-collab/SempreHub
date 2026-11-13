@@ -214,6 +214,12 @@ class Decisao(Base):
     pd = Column(Float, nullable=False, default=0.0)
     networking = Column(Float, nullable=False, default=0.0)
     contratar = Column(Integer, nullable=False, default=0)
+    # Perfis técnicos são decisões próprias: não podem desaparecer entre a
+    # prévia, o salvamento e o fechamento da rodada.
+    # Nulo é reservado às decisões gravadas antes destes campos existirem.
+    # Toda decisão nova recebe 0 no schema de entrada.
+    contratar_tecnicos = Column(Integer, nullable=True)
+    contratar_especialistas = Column(Integer, nullable=True)
     demitir = Column(Integer, nullable=False, default=0)
     emprestimo = Column(Float, nullable=False, default=0.0)
     amortizacao = Column(Float, nullable=False, default=0.0)

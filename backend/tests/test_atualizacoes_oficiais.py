@@ -46,7 +46,17 @@ def test_descarta_apenas_item_sem_prova(monkeypatch):
     invalido['itens'][0]['url']='https://www.ibge.gov.br/documento-movido'
     dados={'itens':[boletim()['itens'][0],invalido['itens'][0]]}
     monkeypatch.setattr(a,'obter_documento',lambda url,somente_oficial:SimpleNamespace(texto=a.normalizar(TEXTO) if url==URL else ''))
-    assert a.validar_itens_confirmados(dados,{URL,'https://www.ibge.gov.br/documento-movido'},date(2026,11,4))==boletim()
+    resultado = a.validar_itens_confirmados(
+        dados, {URL, 'https://www.ibge.gov.br/documento-movido'}, date(2026, 11, 4)
+    )
+    # A validação normaliza o item pela estrutura atual do boletim, incluindo
+    # os campos editoriais novos que não existiam no fixture legado.
+    assert len(resultado['itens']) == 1
+    item = resultado['itens'][0]
+    assert item['titulo'] == boletim()['itens'][0]['titulo']
+    assert item['url'] == URL
+    assert item['competencia'] is None
+    assert item['setores_afetados'] == []
 
 
 def test_execucao_unica_e_falha_preserva_historico(cliente,monkeypatch):

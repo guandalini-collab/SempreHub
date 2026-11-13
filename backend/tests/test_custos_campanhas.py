@@ -8,6 +8,11 @@ from .test_portfolio import preparar
 
 def contratar(d,midias,cotacoes=None):
     item=d['plano_comercial']['produtos'][0]
+    # Estes cenários isolam o custo de uma campanha. O preparador geral cria
+    # duas linhas comercialmente ativas; aqui a segunda fica sem mídia para
+    # que o orçamento auditado corresponda apenas ao formato sob teste.
+    for outro in d['plano_comercial']['produtos'][1:]:
+        outro.update(midias=[],servicos=[],servicos_cotados=[])
     item.update(midias=midias,servicos=[{'id':s['id'],'quantidade':s['quantidade']} for s in necessarios(midias)],servicos_cotados=cotacoes or [])
     d['marketing']=orcamento(midias,item['servicos'],cotacoes)['total']
     return d
@@ -53,7 +58,9 @@ def test_servicos_dre_caixa_snapshot_e_historico(cliente,professor,monkeypatch,m
     assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':2,'evento':'NENHUM'}).status_code==200
     novo=cliente.get(f'/api/aluno/empresas/{empresa}',headers=aluno).json()
     assert novo['resultados'][0]==r
-    assert novo['resultados'][1]['dre']['marketing']==1199
+    # Investimentos pontuais não são repetidos automaticamente na rodada
+    # seguinte; somente escolhas recorrentes explicitamente reenviadas valem.
+    assert novo['resultados'][1]['dre']['marketing']==0
 
 
 def test_dependencias_panfletos_e_jingle(cliente,professor,monkeypatch):

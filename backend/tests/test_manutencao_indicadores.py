@@ -54,9 +54,11 @@ def test_manutencao_despesa_caixa_e_depreciacao_vida_util_separadas():
     r=apurar(preparo,0,sem_tributos)
     assert r['dre']['manutencao']==1000
     assert r['dre']['depreciacao']==500
-    assert r['detalhes']['dfc']['variacao']==-1000
-    assert r['dre']['lucro_liquido']==-1500
-    verificacao_contabil.TestTradicional().assert_reconciliacao(e,r)
+    # A manutenção sai do caixa, mas a folha da equipe existente continua
+    # vencendo mesmo com produção zero. A depreciação afeta a DRE, não o DFC.
+    assert r['detalhes']['dfc']['variacao']==-4400
+    assert r['dre']['lucro_liquido']==-4900
+    verificacao_contabil.TestTradicional().assert_reconciliacao(r)
 
 
 def test_manutencao_nao_gasta_vida_util_duas_vezes():

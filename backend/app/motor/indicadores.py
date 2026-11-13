@@ -39,17 +39,29 @@ def oee(estado, manutencao, treinamento, funcionarios, maquinas, producao, fraca
             'disponibilidade': float(disponibilidade), 'performance': float(performance), 'qualidade_oee': float(qualidade), 'taxa_defeito': float(defeito)}
 
 
-def capacidades_producao(capacidade_nominal, funcionarios, produtividade, fator_rh, horas_extras, disponibilidade, performance, horas_regulares=220):
-    """Horas extras aumentam tempo; disponibilidade e performance reduzem rendimento."""
-    horas = max(0, min(40 * horas_regulares / 220, horas_extras)) if funcionarios > 0 else 0
-    fator_tempo = 1 + horas / horas_regulares
-    trabalho_regular = (1 + funcionarios) * produtividade * fator_rh
-    trabalho_extra = funcionarios * horas / horas_regulares * produtividade * fator_rh
+def capacidades_producao(capacidade_nominal, funcionarios, produtividade, fator_rh, horas_extras,
+                          disponibilidade, performance, horas_regulares=220, fundador_ativo=False):
+    """Capacidade efetiva de Slack, limitada por pessoas e máquinas.
+
+    O proprietário só integra a força de trabalho quando há pró-labore registrado
+    na decisão. Ele contribui no máximo com uma jornada regular; não é uma
+    capacidade invisível que permita produzir sem gestão de pessoas.
+    """
+    funcionarios = max(0, int(funcionarios))
+    horas_regulares = max(1.0, float(horas_regulares))
+    horas = max(0, min(40 * horas_regulares / 220, float(horas_extras))) if funcionarios > 0 else 0
+    pessoas_regulares = funcionarios + (1 if fundador_ativo else 0)
+    horas_pessoas = pessoas_regulares * horas_regulares + funcionarios * horas
+    produtividade_hora = max(0.0, float(produtividade)) / horas_regulares
+    trabalho_regular = pessoas_regulares * horas_regulares * produtividade_hora * fator_rh
+    trabalho_extra = funcionarios * horas * produtividade_hora * fator_rh
+    fator_tempo = 1 + (horas / horas_regulares if funcionarios else 0)
     nominal_periodo = capacidade_nominal * fator_tempo
     disponivel = nominal_periodo * disponibilidade
     efetiva_maquinas = disponivel * performance
     return {'capacidade_nominal': capacidade_nominal, 'horas_regulares_por_pessoa': horas_regulares,
             'fator_tempo_maquinas': fator_tempo, 'capacidade_nominal_periodo': nominal_periodo,
+            'fundador_operante': bool(fundador_ativo), 'horas_trabalho_disponiveis': horas_pessoas,
             'capacidade_trabalho_regular': trabalho_regular, 'capacidade_trabalho_extra': trabalho_extra,
             'capacidade_maquinas_disponivel': disponivel, 'capacidade_maquinas_efetiva': efetiva_maquinas,
             'capacidade_produtiva': min(trabalho_regular + trabalho_extra, efetiva_maquinas)}

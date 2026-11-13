@@ -17,10 +17,23 @@ def preparar(cliente,professor,monkeypatch,modo='TRADICIONAL'):
     url=f"/api/professor/turmas/{turma['id']}"
     r=cliente.post(url+'/mercado/pesquisar',headers=professor,json={'setor':'Eletrônicos e Tecnologia','noticias':1,'analises':1,'produtos':2});assert r.status_code==200,r.text
     eid=r.json()['id'];assert cliente.post(url+f'/mercado/{eid}/publicar',headers=professor,json={}).status_code==200
-    mix={'estrategia_preco':'COMPETITIVO','posicionamento':'PRECO','canais':['DIRETO'],'cobertura':'LOCAL','intensidade':'BAIXA','midias':[]}
-    plano={'edicao_id':eid,'produto_id':'produto-1',**mix,'produtos':[{'produto_id':'produto-1',**mix,'preco':100,'peso':1,'revisado':True},{'produto_id':'produto-2',**mix,'preco':200,'peso':1,'revisado':True}]}
-    decisao={'rodada':1,'preco':1,'marketing':0,'plano_comercial':plano}
-    if modo!='LEGADO':decisao['simulacao']={'producao':100,'comprar_mp':100,'capacidade_nuvem':100}
+    mix={'estrategia_preco':'COMPETITIVO','posicionamento':'PRECO','canais':['DIRETO'],'cobertura':'LOCAL','intensidade':'BAIXA','midias':[{'id':'email','quantidade':100}]}
+    plano={'edicao_id':eid,'produto_id':'produto-1',**mix,'produtos':[{'produto_id':'produto-1',**mix,'preco':100,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]},{'produto_id':'produto-2',**mix,'preco':200,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]}]}
+    # Duas linhas comercializadas exigem duas campanhas auditáveis.
+    decisao={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano}
+    if modo == 'TRADICIONAL':
+        # Empresa física minimamente operante: fundador remunerado, insumo,
+        # capacidade de fábrica já instalada e verba de escoamento.
+        decisao.update(contratar_tecnicos=1)
+        decisao['simulacao']={
+            'producao':100, 'comprar_mp':100, 'pro_labore':1_500,
+            'orcamento_logistico':10_000,
+        }
+    elif modo == 'STARTUP':
+        # A nuvem não substitui atendimento humano; o fundador ativo faz parte
+        # da capacidade inicial do SaaS.
+        decisao.update(contratar=1)
+        decisao['simulacao']={'capacidade_nuvem':300,'pro_labore':1_500}
     return turma,aluno,empresa,url,eid,decisao
 
 

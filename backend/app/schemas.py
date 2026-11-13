@@ -4,7 +4,7 @@ from datetime import date, time
 from math import isclose
 from typing import Annotated, List, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .models import CargoEquipe, ClasseDornelas, Papel, RegimeTributario, TipoEntradaGem
 
@@ -58,6 +58,7 @@ class ConfiguracaoSimulacao(BaseModel):
     vida_util_maquina: int = Field(24, ge=1, le=600)
     custo_frete_km: float = Field(0.1, ge=0, le=1000)
     custo_armazenagem: float = Field(0.01, ge=0, le=1)
+    custo_armazenagem_m3: float = Field(2.0, ge=0, le=100_000)
     frete_rapido: float = Field(15.0, ge=0, le=100_000)
     frete_padrao: float = Field(10.0, ge=0, le=100_000)
     frete_economico: float = Field(5.0, ge=0, le=100_000)
@@ -119,9 +120,14 @@ class DecisaoSimulacao(BaseModel):
     centro_gravidade: Optional[EstudoCentroGravidade] = None
     producao: int = Field(0, ge=0, le=1_000_000)
     comprar_mp: int = Field(0, ge=0, le=1_000_000)
+    # Nas decisões com mix, cada item representa a quantidade do insumo
+    # exclusivo daquele produto. A chave é o produto_id publicado no catálogo.
+    # O campo agregado comprar_mp permanece para turmas/rodadas sem portfólio.
+    comprar_insumos_por_produto: dict[str, int] = Field(default_factory=dict, max_length=10)
     horas_extras: float = Field(0.0, ge=0, le=40, description="Horas opcionais por empregado no mês; premissa didática.")
     comprar_maquinas: int = Field(0, ge=0, le=100)
     manutencao: float = Field(0.0, ge=0, le=10_000_000)
+    pro_labore: float = Field(0.0, ge=0, le=1_000_000, description="Remuneração semanal do proprietário operante.")
     modal: Literal["RAPIDO", "PADRAO", "ECONOMICO"] = "PADRAO"
     salario: Optional[float] = Field(None, ge=0, le=1_000_000)
     beneficio: float = Field(0.0, ge=0, le=1_000_000)
@@ -133,9 +139,17 @@ class DecisaoSimulacao(BaseModel):
     posicionamento: Literal["CUSTO", "DIFERENCIACAO"] = "CUSTO"
     canal: Literal["DIRETO", "DISTRIBUIDOR", "DIGITAL"] = "DIRETO"
     marketing_digital: float = Field(0.0, ge=0, le=10_000_000)
+    orcamento_logistico: float = Field(0.0, ge=0, le=10_000_000, description="Verba semanal de despacho e entregas físicas.")
     capacidade_nuvem: int = Field(300, ge=0, le=1_000_000)
     aporte: float = Field(0.0, ge=0, le=10_000_000)
     valuation: float = Field(100000.0, gt=0, le=1_000_000_000)
+
+    @field_validator("comprar_insumos_por_produto")
+    @classmethod
+    def validar_compras_por_produto(cls, valores):
+        if any(not chave or quantidade < 0 or quantidade > 1_000_000 for chave, quantidade in valores.items()):
+            raise ValueError("As compras por produto devem conter quantidades inteiras não negativas.")
+        return valores
 
 
 class ParametrosTurma(BaseModel):
@@ -310,6 +324,16 @@ class MixProduto(BaseModel):
     midias: list[AlocacaoMidia] = Field(default_factory=list, max_length=80)
     custo_unitario: Optional[float] = Field(None, gt=0, le=1000000)
     produto_nome: Optional[str] = Field(None, max_length=200)
+    # Campos preenchidos exclusivamente pelo servidor a partir da ficha do
+    # catálogo setorial. A equipe escolhe preço, canais e mídia; não pode
+    # rebaixar artificialmente complexidade, insumo ou capex da linha.
+    linha_produto: Optional[Literal["POPULAR", "INTERMEDIARIA", "PREMIUM"]] = None
+    qualificacao_minima: Optional[Literal["operario", "tecnico", "especialista"]] = None
+    insumo_chave: Optional[str] = Field(None, max_length=120)
+    fator_setup: Optional[float] = Field(None, gt=0, le=3)
+    volume_armazenagem_m3: Optional[float] = Field(None, ge=0, le=1000)
+    capex_ativacao: Optional[float] = Field(None, ge=0, le=10_000_000)
+    midias_recomendadas: list[str] = Field(default_factory=list, max_length=80)
 
 
 class PlanoComercial(BaseModel):
@@ -343,6 +367,8 @@ class DecisaoEntrada(BaseModel):
     pd: float = Field(0.0, ge=0, le=10_000_000)
     networking: float = Field(0.0, ge=0, le=10_000_000)
     contratar: int = Field(0, ge=0, le=100)
+    contratar_tecnicos: int = Field(0, ge=0, le=100)
+    contratar_especialistas: int = Field(0, ge=0, le=100)
     demitir: int = Field(0, ge=0, le=100)
     emprestimo: float = Field(0.0, ge=0, le=10_000_000)
     amortizacao: float = Field(0.0, ge=0, le=10_000_000)

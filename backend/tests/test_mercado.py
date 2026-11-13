@@ -103,8 +103,11 @@ def test_custo_catalogo_aplicado_servico_digital(cliente,professor,monkeypatch):
     docente=f"/api/professor/turmas/{turma['id']}/mercado"
     eid=cliente.post(docente+"/pesquisar",headers=professor,json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":1}).json()["id"]
     cliente.post(docente+f"/{eid}/publicar",headers=professor,json={})
-    plano={"edicao_id":eid,"produto_id":"produto-1","estrategia_preco":"VALOR","posicionamento":"INOVACAO","canais":["ECOMMERCE"],"cobertura":"NACIONAL","intensidade":"BAIXA","midias":[]}
-    resposta=cliente.put(f"/api/aluno/empresas/{empresa}/decisao",headers=aluno,json=completar_decisao({"rodada":1,"preco":100,"plano_comercial":plano,"simulacao":{"capacidade_nuvem":300}}))
+    # Serviço digital também precisa de catálogo publicado, campanha compatível
+    # e capacidade humana/operacional; não há demanda orgânica implícita.
+    plano={"edicao_id":eid,"produto_id":"produto-1","estrategia_preco":"VALOR","posicionamento":"INOVACAO","canais":["ECOMMERCE"],"cobertura":"NACIONAL","intensidade":"BAIXA","midias":[{"id":"email","quantidade":100}]}
+    plano["produtos"]=[{**plano,"produto_id":"produto-1","produto_nome":"Produto de teste","preco":100,"peso":1,"revisado":True,"servicos":[{"id":"servico-email","quantidade":1}]}]
+    resposta=cliente.put(f"/api/aluno/empresas/{empresa}/decisao",headers=aluno,json=completar_decisao({"rodada":1,"preco":100,"marketing":557,"contratar":1,"plano_comercial":plano,"simulacao":{"capacidade_nuvem":300,"pro_labore":1500}}))
     assert resposta.status_code==200,resposta.text
     assert resposta.json()["simulacao"]["canal"]=="DIGITAL"
     assert cliente.post(f"/api/professor/turmas/{turma['id']}/fechar-rodada",headers=professor,json={"rodada":1,"evento":"NENHUM"}).status_code==200
@@ -167,7 +170,7 @@ def test_fontes_rastreamento_nao_altera_identidade_da_pagina():
         validar_fontes(dados,{"https://www.ibge.gov.br/produto?sku=diferente"})
 
 
-def test_pesquisa_insuficiente_explica_o_que_faltou(cliente,professor,monkeypatch):
+def test_pesquisa_sem_custo_documentado_cria_catalogo_estimado(cliente,professor,monkeypatch):
     from app.routers import mercado
     bruto=edicao()
     bruto["produtos"]=[]
@@ -175,9 +178,25 @@ def test_pesquisa_insuficiente_explica_o_que_faltou(cliente,professor,monkeypatc
     turma=_criar_turma(cliente,professor)
     base=f"/api/professor/turmas/{turma['id']}/mercado"
     r=cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":3})
-    assert r.status_code==502
-    assert "produtos com custo documentado: 0 de 3" in r.json()["detail"]
-    assert cliente.get(base,headers=professor).json()["edicoes"]==[]
+    assert r.status_code==200, r.text
+    dados=r.json()["dados"]
+    assert len(dados["produtos"]) == 3
+    assert all(p["estado_indicador"] == "Estimativa do Modelo" for p in dados["produtos"])
+    assert all(p["custo_unitario"] > 0 for p in dados["produtos"])
+    assert cliente.post(base + f"/{r.json()['id']}/publicar", headers=professor, json={}).status_code == 200
+
+
+def test_pesquisa_sem_noticia_factual_continua_bloqueada(cliente, professor, monkeypatch):
+    from app.routers import mercado
+    bruto = edicao()
+    bruto["noticias"] = []
+    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (bruto, {"https://www.ibge.gov.br/produto"}))
+    turma = _criar_turma(cliente, professor)
+    base = f"/api/professor/turmas/{turma['id']}/mercado"
+    r = cliente.post(base + "/pesquisar", headers=professor, json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":1})
+    assert r.status_code == 502
+    assert "notícias: 0 de 1" in r.json()["detail"]
+    assert cliente.get(base, headers=professor).json()["edicoes"] == []
 
 
 def test_recusa_produto_fisico_em_startup_e_outro_setor(cliente, professor, monkeypatch):

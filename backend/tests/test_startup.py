@@ -16,7 +16,15 @@ def _entrada(estado=None, simulacao=None):
     decisao = {
         "preco": 100.0, "marketing": 1_000.0, "pd": 0.0, "networking": 0.0,
         "contratar": 0, "demitir": 0, "emprestimo": 0.0, "amortizacao": 0.0,
-        "simulacao": {"capacidade_nuvem": 300, **(simulacao or {})},
+        "plano_comercial": {
+            "custo_unitario": 10.0,
+            "produtos": [{
+                "produto_id": "saas", "produto_nome": "Serviço de teste", "peso": 1,
+                "preco": 100.0, "custo_unitario": 10.0, "canais": ["DIRETO"],
+                "posicionamento": "PRECO", "midias": [],
+            }],
+        },
+        "simulacao": {"capacidade_nuvem": 300, "pro_labore": 1_500.0, **(simulacao or {})},
     }
     parametros = {
         "preco_referencia": 100.0, "salario_base": 2_000.0,
@@ -63,9 +71,21 @@ def test_credito_tem_receita_na_dre_e_caixa_no_vencimento():
     assert r1["estado"]["receber"]
 
     empresa2 = {**empresa, "caixa": r1["caixa"], "estado_simulacao": r1["estado"]}
-    p2 = startup.preparar(empresa2, {**decisao, "simulacao": {"capacidade_nuvem": 300}}, parametros, 2)
-    r2 = startup.apurar(p2, 0, lambda receita, cmv: (0.0, 0.0))
-    assert r2["detalhes"]["dfc"]["recebimentos"] == 2_000
+    # Prazo de recebimento 2 significa duas semanas após a venda da rodada 1:
+    # o título vence na rodada 3, não na rodada 2.
+    decisao_sem_novas_vendas = {**decisao, "marketing": 0, "simulacao": {"capacidade_nuvem": 300}}
+    r2 = startup.apurar(
+        startup.preparar(empresa2, decisao_sem_novas_vendas, parametros, 2),
+        0,
+        lambda receita, cmv: (0.0, 0.0),
+    )
+    empresa3 = {**empresa2, "caixa": r2["caixa"], "estado_simulacao": r2["estado"]}
+    r3 = startup.apurar(
+        startup.preparar(empresa3, decisao_sem_novas_vendas, parametros, 3),
+        0,
+        lambda receita, cmv: (0.0, 0.0),
+    )
+    assert r3["detalhes"]["dfc"]["recebimentos"] == 2_000
 
 
 def test_denominadores_zero_sao_nulos():

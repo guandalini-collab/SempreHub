@@ -16,6 +16,7 @@ export interface ConfiguracaoMotor {
   vida_util_maquina: number;
   custo_frete_km: number;
   custo_armazenagem: number;
+  custo_armazenagem_m3: number;
   frete_rapido: number;
   frete_padrao: number;
   frete_economico: number;
@@ -50,8 +51,10 @@ export interface DecisaoSimulacao {
   centro_gravidade?: EstudoCentroGravidade | null;
   producao: number;
   comprar_mp: number;
+  comprar_insumos_por_produto: Record<string, number>;
   comprar_maquinas: number;
   manutencao: number;
+  pro_labore: number;
   modal: ModalLogistica;
   salario: number | null;
   beneficio: number;
@@ -63,6 +66,7 @@ export interface DecisaoSimulacao {
   posicionamento: Posicionamento;
   canal: CanalVenda;
   marketing_digital: number;
+  orcamento_logistico: number;
   capacidade_nuvem: number;
   aporte: number;
   valuation: number;
@@ -157,6 +161,7 @@ export const CONFIGURACAO_MOTOR_PADRAO: ConfiguracaoMotor = {
   vida_util_maquina: 24,
   custo_frete_km: 0.1,
   custo_armazenagem: 0.01,
+  custo_armazenagem_m3: 2,
   frete_rapido: 15,
   frete_padrao: 10,
   frete_economico: 5,
@@ -177,8 +182,10 @@ export const DECISAO_SIMULACAO_PADRAO: DecisaoSimulacao = {
   horas_extras: 0,
   producao: 0,
   comprar_mp: 0,
+  comprar_insumos_por_produto: {},
   comprar_maquinas: 0,
   manutencao: 0,
+  pro_labore: 0,
   modal: "PADRAO",
   salario: null,
   beneficio: 0,
@@ -190,6 +197,7 @@ export const DECISAO_SIMULACAO_PADRAO: DecisaoSimulacao = {
   posicionamento: "CUSTO",
   canal: "DIRETO",
   marketing_digital: 0,
+  orcamento_logistico: 0,
   capacidade_nuvem: 300,
   aporte: 0,
   valuation: 100000,

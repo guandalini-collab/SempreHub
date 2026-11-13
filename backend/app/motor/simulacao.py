@@ -125,10 +125,14 @@ def decisao_vigente(db: Session, empresa: Empresa, rodada: int, turma: Turma) ->
         empresa_id=empresa.id,
         rodada=rodada,
         preco=anterior.preco if anterior else turma.preco_referencia,
-        marketing=anterior.marketing if anterior else 0.0,
-        pd=anterior.pd if anterior else 0.0,
-        networking=anterior.networking if anterior else 0.0,
+        # Investimentos são decisões semanais. Sem novo envio, cessam; somente
+        # preços e configurações estruturais podem servir de referência.
+        marketing=0.0,
+        pd=0.0,
+        networking=0.0,
         contratar=0,
+        contratar_tecnicos=0,
+        contratar_especialistas=0,
         demitir=0,
         emprestimo=0.0,
         amortizacao=0.0,
@@ -138,7 +142,8 @@ def decisao_vigente(db: Session, empresa: Empresa, rodada: int, turma: Turma) ->
         simulacao=(
             {**(anterior.simulacao if anterior and anterior.simulacao else {}),
              "comprar_mp": 0, "comprar_maquinas": 0, "aporte": 0,
-             "manutencao": 0, "treinamento": 0, "horas_extras": 0}
+             "manutencao": 0, "treinamento": 0, "horas_extras": 0,
+             "orcamento_logistico": 0, "pro_labore": 0}
             if turma.modo_jogo != "LEGADO" else None
         ),
     )
@@ -503,7 +508,8 @@ def _apurar(
     if itens:
         from .portfolio import atrativos
         pesos=atrativos(itens,turma.preco_referencia,turma.custo_unitario,c.empresa.marca,c.empresa.qualidade)
-        linhas=[{"produto_id":p["produto_id"],"nome":p["produto_nome"],"preco":p["preco"],"custos_campanha":deepcopy(p.get("custos_campanha")),"vendas":c.vendas*w/sum(pesos),"receita":c.vendas*w/sum(pesos)*p["preco"],"cmv":c.vendas*w/sum(pesos)*p["custo_unitario"]*multiplicador_cmv} for p,w in zip(itens,pesos)]
+        soma_pesos = sum(pesos) or 1.0
+        linhas=[{"produto_id":p["produto_id"],"nome":p["produto_nome"],"preco":p["preco"],"custos_campanha":deepcopy(p.get("custos_campanha")),"vendas":c.vendas*w/soma_pesos,"receita":c.vendas*w/soma_pesos*p["preco"],"cmv":c.vendas*w/soma_pesos*p["custo_unitario"]*multiplicador_cmv} for p,w in zip(itens,pesos)]
         receita=sum(l["receita"] for l in linhas)
     else:
         linhas=[]

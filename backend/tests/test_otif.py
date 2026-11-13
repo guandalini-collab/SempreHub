@@ -54,4 +54,4 @@ def test_satisfacao_usa_mesmas_falhas_sem_alterar_contabilidade():
     taxa = (op['pedidos_com_falha'] - op['pedidos_nao_atendidos']) / r['vendas']
     esperado = 80 + 2 - 30*taxa - 20*op['ruptura']/100
     assert r['satisfacao'] == pytest.approx(esperado)
-    contabil.TestTradicional().assert_reconciliacao(e,r)
+    contabil.TestTradicional().assert_reconciliacao(r)

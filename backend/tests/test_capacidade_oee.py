@@ -10,10 +10,12 @@ def test_sem_sobrecarga_oculta():
     e,d,p=base();e['funcionarios']=5;p['produtividade_por_pessoa']=1000
     d['simulacao'].update(producao=1000,comprar_mp=1000)
     c=preparar(e,d,p,1)
-    assert c['capacidade_produtiva']==pytest.approx(240*.95*.995)
-    assert c['producao_real']==226
+    # A máquina de referência tem capacidade física de 400 unidades; com
+    # disponibilidade e performance, a capacidade efetiva é limitada a 378,1.
+    assert c['capacidade_produtiva']==pytest.approx(400*.95*.995)
+    assert c['producao_real']==378
     assert c['producao_real']<=c['capacidade_produtiva']
-    r=apurar(c,1000,sem_tributos);contabil.TestTradicional().assert_reconciliacao(e,r)
+    r=apurar(c,1000,sem_tributos);contabil.TestTradicional().assert_reconciliacao(r)
 
 
 def test_horas_extras_aumentam_tempo_sem_performance_acima_de_cem():
@@ -23,17 +25,18 @@ def test_horas_extras_aumentam_tempo_sem_performance_acima_de_cem():
     regular=preparar(e,d,p,1)
     d['simulacao']['horas_extras']=40
     extra=preparar(e,d,p,1)
-    assert regular['producao_real']==240
-    assert extra['producao_real']==283
+    assert regular['producao_real']==400
+    assert extra['producao_real']==472
     assert extra['kpis']['performance']==1
-    assert extra['kpis']['capacidade_nominal_periodo']==pytest.approx(240*(1+40/220))
+    assert extra['kpis']['capacidade_nominal_periodo']==pytest.approx(400*(1+40/220))
     assert extra['custo_horas_extras']>0
     assert extra['utilizacao_maquinas']<=1
 
 
 def test_equipe_e_insumos_limitam_producao():
     c=capacidades_producao(1000,0,120,1,40,1,1)
-    assert c['capacidade_produtiva']==120
+    # Sem trabalhador e sem pró-labore, não há capacidade invisível.
+    assert c['capacidade_produtiva']==0
     assert c['capacidade_trabalho_extra']==0
     assert c['fator_tempo_maquinas']==1
     e,d,p=base();d['simulacao'].update(producao=1000,comprar_mp=10)
@@ -57,7 +60,7 @@ def test_qualidade_esperada_e_observada_preservam_inteiros_e_custos():
     assert c['kpis']['qualidade_observada']==1
     assert c['kpis']['oee']==pytest.approx(.95*.995*.98)
     assert c['kpis']['oee_observado']==pytest.approx(.95*.995)
-    r=apurar(c,100,sem_tributos);contabil.TestTradicional().assert_reconciliacao(e,r)
+    r=apurar(c,100,sem_tributos);contabil.TestTradicional().assert_reconciliacao(r)
 
 
 def test_treinamento_proporcional_teto_e_piso():

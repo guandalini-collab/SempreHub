@@ -49,14 +49,18 @@ def test_sem_deficit_nao_cria_cheque(caixa):
 @pytest.mark.parametrize('preco,status',[(0,'Dados indisponíveis'),(1,'Não se aplica (Margem Negativa)'),(100,'Calculado')])
 def test_ponto_equilibrio_e_ltv(preco,status):
     e,d,p=base();d['preco']=preco
+    # No portfólio, o preço aplicado é o preço da linha, não o antigo campo
+    # agregado. Mantemos ambos sincronizados para testar a fronteira contábil.
+    d['plano_comercial']['produtos'][0]['preco']=preco
     r=apurar(preparar(e,d,p,1),40,sem_tributos)
     assert r['detalhes']['operacao']['ponto_equilibrio_status']==status
     assert r['detalhes']['operacao']['ltv'] is None
-    contabil.TestTradicional().assert_reconciliacao(e,r)
+    contabil.TestTradicional().assert_reconciliacao(r)
 
 
 def test_juros_cobrados_so_na_rodada_seguinte():
-    e,d,p=base();e['caixa']=0;p['custos_fixos_mensais']=5000
+    e,d,p=base();e['caixa']=0;e['funcionarios']=0;p['custos_fixos_mensais']=5000
+    d['marketing']=0
     d['simulacao'].update(producao=0,comprar_mp=0)
     r=apurar(preparar(e,d,p,1),0,sem_tributos)
     assert r['caixa']==-5000 and r['dre']['juros']==0
