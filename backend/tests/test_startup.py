@@ -24,7 +24,7 @@ def _entrada(estado=None, simulacao=None):
                 "posicionamento": "PRECO", "midias": [],
             }],
         },
-        "simulacao": {"capacidade_nuvem": 300, "pro_labore": 1_500.0, **(simulacao or {})},
+        "simulacao": {"capacidade_nuvem": 300, "pro_labore": 2_000.0, **(simulacao or {})},
     }
     parametros = {
         "preco_referencia": 100.0, "salario_base": 2_000.0,

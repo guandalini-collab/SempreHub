@@ -26,14 +26,14 @@ def preparar(cliente,professor,monkeypatch,modo='TRADICIONAL'):
         # capacidade de fábrica já instalada e verba de escoamento.
         decisao.update(contratar_tecnicos=1)
         decisao['simulacao']={
-            'producao':100, 'comprar_mp':100, 'pro_labore':1_500,
+            'producao':100, 'comprar_mp':100, 'pro_labore':2_000,
             'orcamento_logistico':10_000,
         }
     elif modo == 'STARTUP':
         # A nuvem não substitui atendimento humano; o fundador ativo faz parte
         # da capacidade inicial do SaaS.
         decisao.update(contratar=1)
-        decisao['simulacao']={'capacidade_nuvem':300,'pro_labore':1_500}
+        decisao['simulacao']={'capacidade_nuvem':300,'pro_labore':2_000}
     return turma,aluno,empresa,url,eid,decisao
 
 

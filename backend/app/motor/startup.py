@@ -7,7 +7,7 @@ Nenhum argumento é modificado e cada rodada conserva seus próprios snapshots.
 
 from .versionamento import ENGINE_VERSION, inicializar_indicadores
 from .financeiros import reconciliar_financeiros
-from .indicadores import enps
+from .indicadores import enps, dedicacao_fundador
 from .dependencias import atualizar_marca, atualizar_pd, atualizar_pd_por_produto, atrativo_porter
 from copy import deepcopy
 from decimal import Decimal, ROUND_HALF_UP
@@ -196,7 +196,15 @@ def preparar(
 
     rh = _preparar_rh(empresa, decisao, parametros, estado)
     pro_labore = _dinheiro(max(0, simulacao.get("pro_labore", 0)))
-    fundador_ativo = pro_labore > 0
+    # Jornada do fundador proporcional à retirada (dedicação parcial do sócio),
+    # limitada a uma jornada regular. Ver indicadores.dedicacao_fundador.
+    dedicacao = dedicacao_fundador(pro_labore, parametros.get("salario_base", 2000), fracao)
+    fundador_ativo = dedicacao > 0
+    if 0 < dedicacao < 1:
+        alertas.append(
+            f"Pró-labore abaixo do salário de referência: o fundador dedica {dedicacao:.0%} "
+            "de uma jornada à operação."
+        )
     kpis_rh = enps(estado, rh["funcionarios"], estado["rh"].get("salario", parametros.get("salario_base", 2000)), parametros.get("salario_base", 2000), (decisao.get("simulacao") or {}).get("beneficio", 0), (decisao.get("simulacao") or {}).get("horas_extras", 0))
     if rh["rotatividade"]:
         alertas.append(f"Moral baixa: {rh['rotatividade']} funcionário(s) saiu(ram) voluntariamente.")
@@ -213,9 +221,9 @@ def preparar(
     estado["clientes"] = retidos
     capacidade_nuvem = max(0, int(simulacao.get("capacidade_nuvem", 300)))
     # A nuvem não substitui suporte, vendas e operação. O fundador só amplia
-    # a capacidade quando há pró-labore explícito.
+    # a capacidade quando há pró-labore explícito, na proporção da dedicação.
     produtividade_pessoa = max(1, int(configuracao.get("capacidade_atendimento_por_pessoa", 120)))
-    capacidade_pessoas = math.floor((rh["funcionarios"] + (1 if fundador_ativo else 0)) * produtividade_pessoa * (0.75 + estado["rh"]["moral"] / 400))
+    capacidade_pessoas = math.floor((rh["funcionarios"] + dedicacao) * produtividade_pessoa * (0.75 + estado["rh"]["moral"] / 400))
     capacidade_atendimento = max(0, min(capacidade_nuvem, capacidade_pessoas) * float(efeitos_eventos.get("capacidade", 1)))
     capacidade = max(0, math.floor(capacidade_atendimento - retidos))
     preco = float(decisao.get("preco", parametros.get("preco_referencia", 100)))
@@ -278,7 +286,7 @@ def preparar(
         "capacidade_atendimento": capacidade_atendimento, "clientes_iniciais": clientes_iniciais,
         "clientes_perdidos": perdidos, "clientes_retidos": retidos, "churn": churn,
         "aporte": aporte, "valuation": valuation, "diluicao": diluicao,
-        "pro_labore": pro_labore, "fundador_ativo": fundador_ativo,
+        "pro_labore": pro_labore, "fundador_ativo": fundador_ativo, "dedicacao_fundador": dedicacao,
         "marca": marca, "qualidade": qualidade, "pd_maturado": pd_maturado,
         "pd_por_linha": pd_por_linha,
         "produto_publicado": produto_publicado, "comercial_ativo": comercial_ativo,

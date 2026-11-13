@@ -7,7 +7,7 @@ As regras de RH e de capacidade são hipóteses didáticas deste perfil.
 
 from .versionamento import ENGINE_VERSION, inicializar_indicadores
 from .financeiros import reconciliar_financeiros
-from .indicadores import oee, otif, enps, capacidades_producao
+from .indicadores import oee, otif, enps, capacidades_producao, dedicacao_fundador
 from .localizacao import estimar_frete
 from .dependencias import atualizar_marca, atualizar_pd, atualizar_pd_por_produto, atrativo_porter, custo_unitario_com_barganha
 from copy import deepcopy
@@ -280,10 +280,17 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     equivalentes_folha = (composicao["operarios"] + composicao["tecnicos"] * 1.5
                           + composicao["especialistas"] * 2.2)
     folha = _produto(equivalentes_folha, salario * fracao, fatores.get(regime, 1.45))
-    # O proprietário pode executar uma jornada júnior, mas a atividade exige
-    # pró-labore explícito; sem ele não existe fundador implícito na capacidade.
+    # O proprietário pode executar no máximo uma jornada júnior, e a atividade
+    # exige pró-labore explícito. A jornada é proporcional à retirada comparada
+    # ao salário de referência da turma (dedicação parcial do sócio).
     pro_labore = _dinheiro(max(0, op.get("pro_labore", 0)))
-    fundador_ativo = pro_labore > 0
+    dedicacao = dedicacao_fundador(pro_labore, salario_base, fracao)
+    fundador_ativo = dedicacao > 0
+    if 0 < dedicacao < 1:
+        alertas.append(
+            f"Pró-labore abaixo do salário de referência: o fundador dedica {dedicacao:.0%} "
+            "de uma jornada à operação."
+        )
     horas_extras = max(0, min(40 * fracao, op.get("horas_extras", 0))) if funcionarios else 0
     custo_horas_extras = _produto(funcionarios, salario / 220, horas_extras, 1.5, fatores.get(regime, 1.45))
     beneficios = _produto(funcionarios, beneficio * fracao)
@@ -306,7 +313,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
             kpis_oee["oee"] = kpis_oee["disponibilidade"] * kpis_oee["performance"] * kpis_oee["qualidade_oee"]
     capacidades = capacidades_producao(capacidade_maquinas, funcionarios, produtividade, fator_rh, horas_extras,
                                        kpis_oee["disponibilidade"], kpis_oee["performance"], 220 * fracao,
-                                       fundador_ativo=fundador_ativo)
+                                       fundador_ativo=fundador_ativo, dedicacao_fundador=dedicacao)
     capacidade_produtiva = capacidades["capacidade_produtiva"]
     capacidade_trabalho = capacidades["capacidade_trabalho_regular"] + capacidades["capacidade_trabalho_extra"]
     kpis_rh = enps(s, funcionarios, salario, salario_base, beneficio, horas_extras)
@@ -593,7 +600,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         "custos_eventos": custos_eventos,
         "marketing": marketing,
         "horas_extras": horas_extras, "custo_horas_extras": custo_horas_extras,
-        "folha": folha, "pro_labore": pro_labore, "fundador_ativo": fundador_ativo,
+        "folha": folha, "pro_labore": pro_labore, "fundador_ativo": fundador_ativo, "dedicacao_fundador": dedicacao,
         "juros": juros, "juros_cheque": juros_cheque,
         "gastos_previstos": _soma([despesas_pagas, custos_eventos, depreciacao, custo_refugo]),
         "beneficios": beneficios, "treinamento": treinamento, "rescisoes": rescisoes,
