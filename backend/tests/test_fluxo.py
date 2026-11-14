@@ -327,3 +327,19 @@ def test_simulacao_longa_estavel(cliente, professor):
     assert final["turma"]["status"] == "ENCERRADA"
     for linha in final["ranking"]:
         assert linha["patrimonio"] == linha["patrimonio"]  # não é NaN
+
+
+def test_revisao_aceita_as_seis_areas_de_decisao(cliente, professor):
+    # O frontend marca P&D e RH para revisão quando seus campos mudam; o backend
+    # precisa aceitar as seis abas de decisão, ou a prévia e o salvamento falham.
+    from .decisoes import completar_decisao
+    turma = _criar_turma(cliente, professor, modo_jogo="TRADICIONAL")
+    aluno = cadastrar(cliente, "Rita", "revisao-seis@aluno.iffar.edu.br")
+    empresa = _entrar(cliente, aluno, turma["codigo"], "Seis Áreas")
+    revisao = {"decisoes": True, "pd": False, "rh": False, "financas": True, "producao": True, "logistica": True}
+    decisao = completar_decisao({"rodada": 1, "preco": 100, "revisao_areas": revisao,
+                                 "simulacao": {"pro_labore": 200}})
+    base = f"/api/aluno/empresas/{empresa}"
+    assert cliente.post(base + "/previsao", headers=aluno, json=decisao).status_code == 200
+    assert cliente.put(base + "/decisao", headers=aluno, json=decisao).status_code == 200
+    assert cliente.get(base, headers=aluno).json()["decisao_atual"]["revisao_areas"] == revisao

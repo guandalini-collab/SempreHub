@@ -108,7 +108,7 @@ export interface Empresa {
 
 export interface Decisao {
   analise_financeira: string;
-  revisao_areas?: Partial<Record<"decisoes" | "financas" | "producao" | "logistica", boolean>>;
+  revisao_areas?: Partial<Record<"decisoes" | "pd" | "rh" | "financas" | "producao" | "logistica", boolean>>;
   simulacao: DecisaoSimulacao | null;
   plano_comercial?: PlanoComercial | null;
   versao: number;

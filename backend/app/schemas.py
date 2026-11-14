@@ -361,7 +361,7 @@ class DecisaoEntrada(BaseModel):
     rodada: Optional[int] = Field(None, ge=1, le=60)
     rascunho: bool = False
     analise_financeira: str = Field("", max_length=6000)
-    revisao_areas: dict[Literal["decisoes", "financas", "producao", "logistica"], bool] = Field(default_factory=dict)
+    revisao_areas: dict[Literal["decisoes", "pd", "rh", "financas", "producao", "logistica"], bool] = Field(default_factory=dict)
     preco: float = Field(gt=0, le=100000)
     marketing: float = Field(0.0, ge=0, le=10_000_000)
     pd: float = Field(0.0, ge=0, le=10_000_000)
