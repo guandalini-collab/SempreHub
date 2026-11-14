@@ -31,10 +31,6 @@ def fechar_vencidas():
         ids = [t.id for t in db.query(Turma).filter(Turma.status == StatusTurma.ABERTA, Turma.prazo_rodada <= agora(), Turma.prazo_numero_rodada == Turma.rodada_atual).all()]
     for turma_id in ids:
         try:
-            # A rodada seguinte somente é aberta depois da tentativa de
-            # atualização oficial. Uma falha preserva a última edição
-            # confirmada e fica registrada no painel, sem paralisar a turma.
-            atualizar(forcar=True)
             with SessionLocal() as db:
                 turma = bloquear_turma(db, turma_id)
                 if not vencido(turma) or turma.status != StatusTurma.ABERTA:
@@ -44,3 +40,10 @@ def fechar_vencidas():
             preparar_relatorios_automaticos(turma_id, professor_id, rodada)
         except Exception:
             logging.getLogger(__name__).exception("Fechamento automático pendente da turma %s; será repetido sem duplicar rodadas.", turma_id)
+    if ids:
+        # A consulta oficial roda depois dos fechamentos: a rodada usa a última
+        # edição validada, e uma falha da fonte não atrasa nem trava a turma.
+        try:
+            atualizar(forcar=True)
+        except Exception:
+            logging.getLogger(__name__).exception("Consulta oficial pós-fechamento falhou; mantida a última edição validada.")

@@ -406,12 +406,12 @@ def fechar_rodada(
     professor: Usuario = Depends(exigir_professor),
 ):
     turma = _turma_do_professor(db, turma_id, professor)
-    # A consulta ocorre antes de processar a rodada; assim os alunos recebem
-    # a nova etapa somente após uma tentativa atualizada em fontes oficiais.
-    # Se a fonte estiver indisponível, a última edição confirmada é mantida e
-    # o estado PENDENTE deixa isso explícito, em vez de inventar dados.
+    # O fechamento usa a última edição oficial validada. A consulta nova às
+    # fontes oficiais (até dois pedidos à IA com busca na web) rodava aqui,
+    # antes do processamento, e deixava o encerramento em 40–50 s. Ela passa a
+    # rodar em segundo plano, depois da resposta; se falhar, a última edição
+    # confirmada continua valendo e o estado PENDENTE deixa isso explícito.
     from ..atualizacoes_oficiais import atualizar
-    atualizar(forcar=True)
     turma = bloquear_turma(db, turma.id)
     verificar_rodada(dados.rodada, turma, obrigatoria=turma.modo_jogo != "LEGADO")
     pendencias = pendencias_fechamento(db, turma)
@@ -425,6 +425,7 @@ def fechar_rodada(
     db.refresh(turma)
     from .mercado import preparar_relatorios_automaticos
     background_tasks.add_task(preparar_relatorios_automaticos, turma.id, professor.id, evento.rodada, db.get_bind())
+    background_tasks.add_task(atualizar, True)
     return {"evento": ser.evento(evento), "turma": ser.turma(turma, completa=True)}
 
 

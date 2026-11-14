@@ -611,7 +611,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar, aoPr
           <p className="text-sm text-slate-600">Esta conferência inclui todos os departamentos. Investimentos opcionais podem permanecer em zero.</p>
           <div className="resumo-conferencia"><span>Preço <strong>{reais(d.preco)}</strong></span><span>Campanhas <strong>{reais(d.marketing)}</strong></span><span>P&D <strong>{reais(d.pd)}</strong></span><span>Contratações <strong>{d.contratar}</strong></span><span>Demissões <strong>{d.demitir}</strong></span><span>Empréstimo <strong>{reais(d.emprestimo)}</strong></span></div>
           <p className="text-sm">Confira os conjuntos exigidos pelo jogo. Alterações posteriores removem automaticamente as confirmações afetadas.</p>
-          <div className="lista-conferencia">{AREAS_DECISAO.filter(id=>id!=="logistica" || turma.modo_jogo==="TRADICIONAL").map(id=><label key={id}><input type="checkbox" disabled={somenteLeitura || carregando} checked={!!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e=>setD(atual=>({...atual,revisao_areas:{...atual.revisao_areas,[id]:e.target.checked}}))}/><span>{id==="decisoes" ? "Comercial, P&D e estratégia" : id==="producao" ? "Produção e recursos humanos" : id==="financas" ? "Finanças" : "Logística"}</span><button type="button" onClick={()=>aoNavegar(id)}>Conferir valores →</button></label>)}</div>
+          <div className="lista-conferencia">{AREAS_DECISAO.filter(id=>id!=="logistica" || turma.modo_jogo==="TRADICIONAL").map(id=><label key={id}><input type="checkbox" disabled={somenteLeitura || carregando} checked={!!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e=>setD(atual=>({...atual,revisao_areas:{...atual.revisao_areas,[id]:e.target.checked}}))}/><span>{DEPARTAMENTOS.find(dep=>dep.id===id)?.titulo ?? id}</span><button type="button" onClick={()=>aoNavegar(id)}>Conferir valores →</button></label>)}</div>
           {!previsao && !erroPrevisao && <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600" role="status">Validando a integração entre pessoas, caixa, produção, marketing e entrega…</p>}
           {erroPrevisao && <Aviso tipo="erro">Não foi possível validar a coerência da rodada. Revise a prévia antes de enviar.</Aviso>}
           {previsao?.radar && <div className={`rounded-lg border p-4 text-sm ${previsao.radar.liberado ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-red-300 bg-red-50 text-red-900"}`}>
@@ -657,7 +657,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar, aoPr
             <ControleVisual rotulo="Contratar especialistas" moeda={false} inteiro valor={d.contratar_especialistas} aoMudar={(v) => atualizar("contratar_especialistas", v)} limite={20} />
           </Campo>
           <Campo rotulo="Demitir" ajuda={`Hoje: ${empresa.funcionarios} funcionário(s). Rescisão custa um salário.`}>
-            <ControleVisual rotulo="Demitir funcionários" moeda={false} inteiro valor={d.demitir} aoMudar={(v) => atualizar("demitir", v)} limite={empresa.funcionarios} />
+            {empresa.funcionarios > 0 ? <ControleVisual rotulo="Demitir funcionários" moeda={false} inteiro valor={d.demitir} aoMudar={(v) => atualizar("demitir", v)} limite={empresa.funcionarios} /> : <p className="text-sm text-slate-600">A empresa não tem funcionários para desligar.</p>}
           </Campo>
         </Secao>
 

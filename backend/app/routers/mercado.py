@@ -94,6 +94,9 @@ class Edicao(BaseModel):
     noticias: list[Artigo] = Field(max_length=10)
     analises: list[Artigo] = Field(max_length=10)
     produtos: list[Produto] = Field(min_length=1, max_length=10)
+    # Avisos ao professor sobre a pesquisa (ex.: menos notícias confirmadas que
+    # o solicitado). Não são exibidos aos alunos.
+    avisos: list[str] = Field(default_factory=list, max_length=10)
 
 
 def serializar(e):
@@ -203,8 +206,15 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     if isinstance(bruto, dict):
         nomes = {"noticias": "notícias", "analises": "análises"}
         faltas = [f"{nomes[k]}: {len(bruto[k])} de {getattr(dados,k)}" for k in nomes if isinstance(bruto.get(k),list) and len(bruto[k]) < getattr(dados,k)]
-        if faltas:
-            raise HTTPException(502, "A busca confirmou menos itens que o solicitado (" + "; ".join(faltas) + "). Nenhuma edição foi salva. Tente novamente ou reduza a quantidade.")
+        # A busca usa apenas fontes oficiais; notícias setoriais nesses
+        # domínios são raras. Em vez de descartar a edição inteira (inclusive
+        # os produtos), salva-se o que foi confirmado e o professor é avisado
+        # da diferença; nada é completado com conteúdo inventado.
+        for k in nomes:
+            if isinstance(bruto.get(k), list):
+                bruto[k] = bruto[k][:getattr(dados, k)]
+        bruto["avisos"] = ([f"A busca em fontes oficiais confirmou menos itens que o solicitado ({'; '.join(faltas)}). "
+                            "Revise antes de publicar; nenhum item foi completado sem fonte."] if faltas else [])
         _completar_produtos_estimados(bruto, turma, dados)
     try: edicao=Edicao.model_validate(bruto)
     except ValidationError as erro:
@@ -216,7 +226,7 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     from ..catalogo_setorial import enriquecer_produto
     edicao.produtos = [Produto.model_validate(enriquecer_produto(edicao.setor, produto.model_dump(), indice))
                        for indice, produto in enumerate(edicao.produtos)]
-    if len(edicao.noticias)!=dados.noticias or len(edicao.analises)!=dados.analises or len(edicao.produtos)!=dados.produtos:
+    if len(edicao.produtos)!=dados.produtos:
         raise HTTPException(502,"A pesquisa não entregou as quantidades solicitadas.")
     validar_fontes(edicao,fontes)
     validar_coerencia(edicao,turma,dados,exigir_natureza=True)
@@ -335,6 +345,17 @@ def gerar_relatorio(turma_id:int,empresa_id:int,rodada:int,db:Session=Depends(ge
         if existente: return {"texto":existente.texto}
         raise
     return {"texto":texto}
+
+@router.get("/api/professor/turmas/{turma_id}/relatorios-empresariais")
+def relatorios_professor(turma_id:int,db:Session=Depends(get_db),usuario:Usuario=Depends(exigir_professor)):
+    """Relatórios já gravados por empresa e rodada, para o painel docente."""
+    turma=_turma_do_professor(db,turma_id,usuario)
+    ids=[e.id for e in turma.empresas]
+    registros=(db.query(RelatorioEmpresarial).filter(RelatorioEmpresarial.empresa_id.in_(ids))
+               .order_by(RelatorioEmpresarial.rodada.desc()).all()) if ids else []
+    return [{"empresa_id":r.empresa_id,"rodada":r.rodada,"texto":r.texto,
+             "criado_em":r.criado_em.isoformat() if r.criado_em else None} for r in registros]
+
 
 @router.get("/api/aluno/empresas/{empresa_id}/relatorios-empresariais")
 def relatorios(empresa_id:int,db:Session=Depends(get_db),usuario:Usuario=Depends(exigir_aluno)):

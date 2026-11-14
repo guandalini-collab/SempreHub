@@ -148,6 +148,19 @@ def _validar_estritamente(edicao):
         data_confere(produto, permitir_consulta=True)
 
 
+def _alerta_estimativa(motivo: str) -> str:
+    """Alerta ao professor quando o custo cai no padrão da turma.
+
+    As mensagens de validação estrita dizem que a edição não foi salva,
+    o que é verdade só no modo estrito; aqui a edição segue com custo
+    estimado, então a frase de bloqueio é retirada do motivo.
+    """
+    frases = [f.strip() for f in re.split(r"(?<=[.!?])\s+", motivo) if f.strip()]
+    causa = " ".join(f for f in frases if not re.search(r"nenhuma edição|não pode ser salva|não foi salva", f, re.I))
+    return ("Custo documental não comprovado; aplicado o custo padrão da turma (Estimativa do Modelo). "
+            + (f"Motivo: {causa}" if causa else "")).strip()
+
+
 def validar_evidencias(edicao, turma=None):
     """Notícias estritas; custos projetados somente com base numérica explícita."""
     if turma is None:
@@ -176,7 +189,7 @@ def validar_evidencias(edicao, turma=None):
             produto.valor_documentado = None
             produto.estado_indicador = "Estimativa do Modelo"
             produto.formula_aplicada = "Custo Padrão da Turma (Fallback por falha de leitura)"
-            produto.alerta_professor = str(erro.detail)
+            produto.alerta_professor = _alerta_estimativa(str(erro.detail))
             produto.base_custo = f"Estimativa do Modelo: custo padrão da turma de R$ {turma.custo_unitario:.2f}. Fonte não comprovada; não representa custo real documentado."
             produto.data = "Consulta em " + datetime.now(timezone.utc).date().isoformat()
         else:

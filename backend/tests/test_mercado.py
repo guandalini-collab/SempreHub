@@ -183,19 +183,6 @@ def test_pesquisa_sem_custo_documentado_cria_catalogo_estimado(cliente,professor
     assert cliente.post(base + f"/{r.json()['id']}/publicar", headers=professor, json={}).status_code == 200
 
 
-def test_pesquisa_sem_noticia_factual_continua_bloqueada(cliente, professor, monkeypatch):
-    from app.routers import mercado
-    bruto = edicao()
-    bruto["noticias"] = []
-    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (bruto, {"https://www.ibge.gov.br/produto"}))
-    turma = _criar_turma(cliente, professor)
-    base = f"/api/professor/turmas/{turma['id']}/mercado"
-    r = cliente.post(base + "/pesquisar", headers=professor, json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":1})
-    assert r.status_code == 502
-    assert "notícias: 0 de 1" in r.json()["detail"]
-    assert cliente.get(base, headers=professor).json()["edicoes"] == []
-
-
 def test_recusa_produto_fisico_em_startup_e_outro_setor(cliente, professor, monkeypatch):
     from app.routers import mercado
     monkeypatch.setattr(mercado, "gerar_json", lambda *a: (edicao(), {"https://www.ibge.gov.br/produto"}))
@@ -218,3 +205,21 @@ def test_relatorio_com_ia_acrescenta_leituras_e_cai_no_deterministico_se_falhar(
     assert "-R$ 1.500,00" in texto and "Leituras recomendadas" in texto
     sem_falha = {**dados, "unidades_vendidas": 100, "dre": {"receita": 9000, "folha": 1000, "lucro_liquido": 500}}
     assert leituras_recomendadas(sem_falha) == []
+
+
+def test_pesquisa_com_menos_noticias_salva_o_confirmado_e_avisa(cliente, professor, monkeypatch):
+    # Fontes oficiais raramente trazem notícias setoriais; a edição não deve
+    # ser descartada por inteiro. O que foi confirmado é salvo, com aviso ao
+    # professor, e nenhuma notícia é completada sem fonte.
+    from app.routers import mercado
+    dados = edicao()
+    dados["noticias"] = []
+    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (dados, {"https://www.ibge.gov.br/produto"}))
+    turma = _criar_turma(cliente, professor, total_rodadas=2)
+    docente = f"/api/professor/turmas/{turma['id']}/mercado"
+    resposta = cliente.post(docente + "/pesquisar", headers=professor,
+                            json={"setor": "Eletrônicos e Tecnologia", "noticias": 3, "analises": 1, "produtos": 1})
+    assert resposta.status_code == 200, resposta.text
+    salvo = resposta.json()["dados"]
+    assert salvo["noticias"] == [] and len(salvo["analises"]) == 1 and len(salvo["produtos"]) == 1
+    assert "notícias: 0 de 3" in salvo["avisos"][0]
