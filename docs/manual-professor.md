@@ -857,3 +857,5 @@ Nas fontes exibidas, o levantamento de entidade setorial aparece com a marcaçã
 
 Quando a primeira busca não encontra evidência, o sistema faz uma segunda tentativa nos mesmos domínios, com termos mais amplos do setor e as classificações oficiais (divisões da CNAE 2.0, capítulos da NCM e pesquisas do IBGE). Se ainda assim faltarem notícias ou análises, a edição é salva com o que foi confirmado e um aviso informa quantos itens faltaram; nada é completado sem fonte. Se nenhuma evidência for encontrada, nenhuma edição é salva.
 
+Cada notícia e análise continua conferida na página citada: a página precisa abrir e mostrar a data de publicação. Quando uma delas não passa nessa conferência (por exemplo, página inacessível ou arquivo PDF), apenas esse item é retirado e o aviso informa qual foi; o restante da edição é salvo. Na revisão e na publicação, a conferência segue estrita para todos os itens.
+

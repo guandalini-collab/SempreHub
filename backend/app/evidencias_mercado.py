@@ -161,7 +161,34 @@ def _alerta_estimativa(motivo: str) -> str:
             + (f"Motivo: {causa}" if causa else "")).strip()
 
 
-def validar_evidencias(edicao, turma=None):
+def _descartar_artigos_sem_prova(edicao):
+    """Na pesquisa nova, retira só a notícia ou análise que não pôde ser conferida.
+
+    Cada item continua passando pela conferência estrita (página acessível e
+    data de publicação). O item reprovado não é corrigido nem completado: sai
+    da edição, e o professor recebe o aviso antes de revisar e publicar.
+    """
+    descartados = []
+    for campo, rotulo in (("noticias", "notícia"), ("analises", "análise")):
+        mantidos = []
+        for item in getattr(edicao, campo):
+            vazio = {"noticias": [], "analises": [], "produtos": []}
+            try:
+                _validar_estritamente(edicao.model_copy(update={**vazio, campo: [item]}))
+            except FonteInsegura:
+                raise HTTPException(422, "Fonte bloqueada: use somente HTTPS público, sem endereços internos.") from None
+            except HTTPException:
+                descartados.append(f"{rotulo} “{item.titulo[:80]}”")
+            else:
+                mantidos.append(item)
+        setattr(edicao, campo, mantidos)
+    if descartados:
+        aviso = ("Itens retirados porque a página citada não pôde ser conferida (página inacessível, arquivo PDF "
+                 "ou data de publicação não identificada): " + "; ".join(descartados) + ". Nada foi completado sem fonte.")
+        edicao.avisos = (list(edicao.avisos or []) + [aviso])[:10]
+
+
+def validar_evidencias(edicao, turma=None, descartar_artigos=False):
     """Notícias estritas; custos projetados somente com base numérica explícita."""
     if turma is None:
         return _validar_estritamente(edicao)
@@ -171,6 +198,8 @@ def validar_evidencias(edicao, turma=None):
         return turma.custo_unitario
 
     edicao.versao_custos_catalogo = "1.0.0-three-paths"
+    if descartar_artigos:
+        _descartar_artigos_sem_prova(edicao)
     artigos = edicao.model_copy(update={"produtos": []})
     try:
         _validar_estritamente(artigos)

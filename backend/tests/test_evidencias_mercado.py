@@ -124,3 +124,24 @@ def test_fallback_nao_relaxa_artigos_ou_links(fonte, monkeypatch):
     def insegura(url): raise provas.FonteInsegura('Fonte não pública.')
     monkeypatch.setattr(provas, 'obter_documento', insegura)
     with pytest.raises(HTTPException): provas.validar_evidencias(dados, turma)
+
+
+def test_pesquisa_nova_retira_so_o_artigo_sem_prova(monkeypatch):
+    from types import SimpleNamespace
+    boa = '<meta property="article:published_time" content="2026-10-06T12:00:00"><main>Produto de teste R$ 30,00 por unidade ou cliente/mês.</main>'
+    dados = Edicao.model_validate(edicao())
+    url_ruim = 'https://www.ibge.gov.br/arquivo.pdf'
+    dados.noticias[0].fontes[0].url = url_ruim
+    def obter(url):
+        if url == url_ruim: raise ValueError('Documento não disponível como HTML.')
+        return provas.Documento(boa)
+    monkeypatch.setattr(provas, 'obter_documento', obter)
+    turma = SimpleNamespace(custo_unitario=40)
+    # Na revisão e na publicação a conferência continua estrita.
+    with pytest.raises(HTTPException): provas.validar_evidencias(dados.model_copy(deep=True), turma)
+    titulo = dados.noticias[0].titulo
+    analises = len(dados.analises)
+    provas.validar_evidencias(dados, turma, descartar_artigos=True)
+    assert all(n.titulo != titulo for n in dados.noticias)
+    assert len(dados.analises) == analises
+    assert any(titulo[:40] in aviso and 'Nada foi completado' in aviso for aviso in dados.avisos)
