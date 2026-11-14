@@ -1,10 +1,12 @@
 """Pesquisa com fontes rastreáveis; credenciais nunca entram em respostas/logs."""
 from copy import deepcopy
 import json
+import logging
 import os
 import urllib.error
 import urllib.request
 from fastapi import HTTPException
+_log = logging.getLogger("uvicorn.error")
 from .fontes_oficiais import TERMOS_AMPLIACAO, dominios_para, fonte_oficial
 
 
@@ -100,6 +102,9 @@ def gerar_json(instrucoes, dados, pesquisar=False, schema=None, permitir_projeco
         corpo["text"] = {"format": {"type": "json_schema", "name": "edicao_mercado", "strict": True, "schema": _schema_estrito(schema)} if schema else {"type": "json_object"}}
     texto, fontes = _solicitar(corpo, chave)
     if pesquisar:
+        # Diagnóstico: URLs são públicas; a credencial nunca entra no log.
+        _log.warning("pesquisa[%s%s] busca devolveu %d fonte(s): %s", setor or "geral",
+                     " ampliada" if _ampliada else "", len(fontes), sorted(fontes)[:40])
         if any(not fonte_oficial(url, dominios_para(setor)) for url in fontes):
             raise HTTPException(502, 'A pesquisa retornou fonte não oficial; nenhum dado foi aplicado.')
         if not texto or not fontes:

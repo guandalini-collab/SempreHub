@@ -131,6 +131,10 @@ def _remover_fontes_nao_confirmadas(edicao, pesquisadas):
     identificada da turma. Nada é reescrito para parecer comprovado.
     """
     confirmadas = {_chave_url(u) for u in pesquisadas}
+    import logging
+    citadas = sorted({f.url for item in edicao.noticias + edicao.analises + edicao.produtos for f in item.fontes})
+    logging.getLogger("uvicorn.error").warning(
+        "pesquisa: citadas não confirmadas: %s", [u for u in citadas if _chave_url(u) not in confirmadas][:40])
     retirados = []
     for campo, rotulo in (("noticias", "notícia"), ("analises", "análise")):
         mantidos = []

@@ -5,6 +5,7 @@ from html.parser import HTMLParser
 import http.client
 import ipaddress
 import json
+import logging
 import re
 import socket
 import ssl
@@ -12,6 +13,8 @@ import unicodedata
 from urllib.parse import urlsplit, urljoin
 
 from fastapi import HTTPException
+
+_log = logging.getLogger("uvicorn.error")
 
 
 def normalizar(texto):
@@ -118,7 +121,8 @@ def _validar_estritamente(edicao):
                 documentos[url] = obter_documento(url)
             except FonteInsegura:
                 raise
-            except (OSError, ValueError, http.client.HTTPException):
+            except (OSError, ValueError, http.client.HTTPException) as erro:
+                _log.warning("pesquisa: leitura falhou em %s: %s: %s", url, type(erro).__name__, str(erro)[:200])
                 raise HTTPException(422, "Não foi possível conferir o conteúdo de uma fonte. A edição não pode ser salva ou publicada; use uma fonte acessível.") from None
         return documentos[url]
 
@@ -132,6 +136,8 @@ def _validar_estritamente(edicao):
             doc = documento(fonte.url)
             if any(d.startswith(data) for d in doc.datas if re.fullmatch(r"\d{4}-\d{2}-\d{2}", d)):
                 return
+        _log.warning("pesquisa: data %r não confere; datas lidas nas páginas %s: %s", data,
+                     [f.url for f in item.fontes], sorted({d for f in item.fontes for d in documento(f.url).datas})[:10])
         raise HTTPException(422, "A data informada não corresponde à data de publicação das fontes. Nenhuma edição foi salva ou publicada.")
 
     for item in edicao.noticias + edicao.analises:
