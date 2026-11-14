@@ -10,6 +10,7 @@ import { Botao, Cartao, DicaTermo, EntradaNumero, Modal, estiloEntrada } from ".
 interface Fonte {
     titulo: string;
     url: string;
+    natureza?: string;
 }
 interface Artigo {
     titulo: string;
@@ -104,7 +105,7 @@ export interface PlanoComercial {
 const canais = ["VAREJO", "ECOMMERCE", "MARKETPLACE", "ATACADO", "FRANQUIA", "DIRETO"];
 function Fontes({ fontes }: {
     fontes: Fonte[];
-}) { return <ul className="mt-2 text-xs text-slate-500">{fontes.map(f => <li key={f.url}><a href={f.url} target="_blank" rel="noreferrer" className="underline">{f.titulo}</a></li>)}</ul>; }
+}) { return <ul className="mt-2 text-xs text-slate-500">{fontes.map(f => <li key={f.url}><a href={f.url} target="_blank" rel="noreferrer" className="underline">{f.titulo}</a>{f.natureza&&f.natureza!=="governamental ou instituto de pesquisa"&&<span className="ml-1 italic">({f.natureza})</span>}</li>)}</ul>; }
 function ImpactosDecisao({impactos}:{impactos?:Artigo["impactos"]}) { if(!impactos?.length)return null; return <details className="mt-3 rounded-lg bg-cyan-50 p-3"><summary className="cursor-pointer text-sm font-semibold text-corporativo">Impactos possíveis e pontos de decisão</summary><div className="mt-3 grid gap-3 sm:grid-cols-2">{impactos.map((impacto,n)=><section key={`${impacto.departamento}-${n}`} className="rounded border border-cyan-200 bg-white p-3 text-sm"><p className="font-semibold">{impacto.departamento} · {impacto.tipo}</p><p className="mt-1">{impacto.efeito}</p><p className="mt-2 text-slate-600">Pergunta para a equipe: {impacto.pergunta_decisao}</p></section>)}</div></details>; }
 function Artigos({ itens, mostrarFontes = true }: {
     mostrarFontes?: boolean;

@@ -3,7 +3,8 @@ from datetime import datetime, timezone
 from typing import Literal
 from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from pydantic.json_schema import SkipJsonSchema
 from sqlalchemy import update
 from sqlalchemy.orm import Session
 from ..database import get_db
@@ -31,6 +32,15 @@ class Pesquisa(BaseModel):
 class Fonte(BaseModel):
     titulo: str = Field(min_length=1, max_length=500)
     url: str = Field(max_length=2000)
+    # Calculada a partir do domínio, nunca informada pela pesquisa: distingue
+    # estatística oficial de levantamento de entidade setorial.
+    natureza: SkipJsonSchema[str] = ""
+
+    @model_validator(mode="after")
+    def _classificar(self):
+        from ..fontes_oficiais import natureza_fonte
+        self.natureza = natureza_fonte(self.url)
+        return self
 
 
 class ImpactoDecisao(BaseModel):
@@ -115,7 +125,7 @@ def validar_fontes(dados, pesquisadas=None):
     for item in dados.noticias + dados.analises:
         for fonte in item.fontes:
             if not fonte_oficial(fonte.url):
-                raise HTTPException(422, "Use somente fontes governamentais ou institutos oficiais de pesquisa autorizados.")
+                raise HTTPException(422, "Use somente fontes governamentais, institutos oficiais de pesquisa ou entidades setoriais autorizadas.")
             urls.append(fonte.url)
     for produto in dados.produtos:
         # A estimativa só é permitida para o preço do produto. Nunca torna
@@ -126,7 +136,7 @@ def validar_fontes(dados, pesquisadas=None):
             raise HTTPException(422, "Todo produto documentado precisa informar ao menos uma fonte oficial.")
         for fonte in produto.fontes:
             if not fonte_oficial(fonte.url):
-                raise HTTPException(422, "Use somente fontes governamentais ou institutos oficiais de pesquisa autorizados.")
+                raise HTTPException(422, "Use somente fontes governamentais, institutos oficiais de pesquisa ou entidades setoriais autorizadas.")
             urls.append(fonte.url)
     if pesquisadas is not None and any(_url_sem_rastreamento(url) not in {_url_sem_rastreamento(u) for u in pesquisadas} for url in urls):
         raise HTTPException(502, "A pesquisa não confirmou todas as fontes; nenhuma edição foi salva.")
@@ -202,7 +212,7 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     schema = Edicao.model_json_schema()
     schema["$defs"]["Produto"]["properties"]["natureza"] = {"type": "string", "enum": ["FISICO", "SERVICO_DIGITAL"]}
     schema["$defs"]["Produto"]["required"].extend(["natureza", "tipo_documento"])
-    bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"calendario_simulado":ser.turma(turma).get("calendario"),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True,schema)
+    bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"calendario_simulado":ser.turma(turma).get("calendario"),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True,schema,False,dados.setor)
     if isinstance(bruto, dict):
         nomes = {"noticias": "notícias", "analises": "análises"}
         faltas = [f"{nomes[k]}: {len(bruto[k])} de {getattr(dados,k)}" for k in nomes if isinstance(bruto.get(k),list) and len(bruto[k]) < getattr(dados,k)]
@@ -213,7 +223,8 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
         for k in nomes:
             if isinstance(bruto.get(k), list):
                 bruto[k] = bruto[k][:getattr(dados, k)]
-        bruto["avisos"] = ([f"A busca em fontes oficiais confirmou menos itens que o solicitado ({'; '.join(faltas)}). "
+        bruto["avisos"] = ([f"A busca em fontes oficiais e entidades setoriais confirmou menos itens que o solicitado ({'; '.join(faltas)}), "
+                            "mesmo após nova tentativa com termos ampliados. "
                             "Revise antes de publicar; nenhum item foi completado sem fonte."] if faltas else [])
         _completar_produtos_estimados(bruto, turma, dados)
     try: edicao=Edicao.model_validate(bruto)

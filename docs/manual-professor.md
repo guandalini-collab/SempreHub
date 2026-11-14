@@ -831,3 +831,29 @@ A aba Atualizações oficiais está disponível para aluno e professor. O servi�
 | Motor e histórico | A IA não executa código nem substitui alíquotas ou tabelas arbitrariamente. O cálculo usa as regras versionadas que o motor suporta; normas incompatíveis ou condicionais são informadas, não aplicadas silenciosamente. A consulta disponível fica registrada no novo fechamento. O histórico permanece imutável. |
 
 O boletim nacional não substitui recortes locais nem altera contratos. Novas regras exigem suporte no motor; preços sem prova oficial são estimativas identificadas.
+
+### Fontes da pesquisa de mercado por setor
+
+A pesquisa de mercado da rodada (Pesquisar e preparar edição) consulta três grupos de fontes: órgãos públicos e institutos de pesquisa da lista geral; o Sebrae (inclusive o DataSebrae), para todos os setores; e as entidades setoriais do setor escolhido. Uma pesquisa de Pet Care não consulta, por exemplo, as entidades de Eletrônicos.
+
+| Setor | Entidades setoriais consultadas |
+|---|---|
+| Eletrônicos e Tecnologia | Abinee, ABES, Brasscom, Observatório Softex, Cetic.br |
+| Alimentos e Bebidas | ABIA, ABIAD, ABPA, ABIEC, ABIR, ABRABE, ABIC, ABRAS; FAO (organismo internacional) |
+| Vestuário e Moda | ABIT, ABVTex, Abicalçados |
+| Cosméticos e Beleza | ABIHPEC |
+| Móveis e Decoração | Nenhuma até o momento; apenas a lista geral e o Sebrae |
+| Automotivo | Anfavea (lista geral), Abraciclo |
+| Esportes e Fitness | Aliança Bike |
+| Saúde e Bem-estar | Sindusfarma, Anahp, IESS, ABIMO |
+| Educação e Cursos | ABED, ABMES, Todos Pela Educação |
+| Pet Care | Abinpet, Sindan |
+| Construção e Materiais | CBIC, Abrainc, Instituto Aço Brasil |
+| Entretenimento e Mídia | Abragames, SNEL, CBL, Pro-Música Brasil |
+
+Órgãos como Anatel, Anvisa, ANS, Ancine, Inep, Capes, Conab, Senatran, Comex Stat, Novo Caged e Sidra estão cobertos pelo domínio gov.br ou pelo IBGE. Só entram entidades cujo domínio foi conferido em publicações hospedadas no próprio site. Consultorias pagas (Statista, Gartner, IDC, Euromonitor, Mintel, IEMI, Kantar) não são consultadas, porque o sistema precisa abrir a página para confirmar o trecho e a data.
+
+Nas fontes exibidas, o levantamento de entidade setorial aparece com a marcação "fonte não governamental", e o dado da FAO com "organismo internacional". Esses números são da própria entidade, não estatística oficial; vale discutir essa diferença com a turma.
+
+Quando a primeira busca não encontra evidência, o sistema faz uma segunda tentativa nos mesmos domínios, com termos mais amplos do setor e as classificações oficiais (divisões da CNAE 2.0, capítulos da NCM e pesquisas do IBGE). Se ainda assim faltarem notícias ou análises, a edição é salva com o que foi confirmado e um aviso informa quantos itens faltaram; nada é completado sem fonte. Se nenhuma evidência for encontrada, nenhuma edição é salva.
+

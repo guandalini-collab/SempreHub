@@ -923,3 +923,8 @@ A aba Atualizações oficiais está disponível para aluno e professor. O servi�
 | Motor e histórico | A IA não executa código nem substitui alíquotas ou tabelas arbitrariamente. O cálculo usa as regras versionadas que o motor suporta; normas incompatíveis ou condicionais são informadas, não aplicadas silenciosamente. A consulta disponível fica registrada no novo fechamento. O histórico permanece imutável. |
 
 O boletim nacional não substitui dados específicos por UF, município, atividade, produto ou contrato. Mudanças que exigem novos cálculos ou condições ainda não implementadas precisam ser incorporadas ao motor. Parâmetros didáticos, preços de contratos salvos e tabelas históricas não são apresentados como cotações em tempo real. Na ausência de preço unitário comprovado em pesquisa oficial, o catálogo usa a regra de estimativa identificada ou informa a insuficiência de dados.
+
+### Fontes das leituras de mercado
+
+As notícias e análises da edição de mercado vêm de órgãos públicos, institutos de pesquisa, do Sebrae e de entidades setoriais do setor da turma, como associações da indústria e do varejo. Quando o dado vem de uma entidade setorial ou do Sebrae, a fonte aparece com a marcação "fonte não governamental": é um levantamento da própria entidade, não uma estatística oficial. Dados da FAO aparecem como "organismo internacional". Considere essa diferença ao usar o número em uma decisão.
+
