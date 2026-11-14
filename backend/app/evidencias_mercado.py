@@ -28,6 +28,14 @@ class Documento(HTMLParser):
         self.partes, self.datas, self.ignorar, self.jsonld = [], set(), 0, None
         self.feed(html)
         self.texto = normalizar(" ".join(self.partes))
+        # Muitos portais públicos (ex.: Agência de Notícias do IBGE) mostram a
+        # data só no cabeçalho visível, sem metadado. Aceita-se a data
+        # dd/mm/aaaa que aparece no início do texto da página.
+        for achado in re.finditer(r"\b(\d{2})/(\d{2})/(\d{4})\b", self.texto[:3000]):
+            if re.search(r"atualizad[oa]\s*(em)?\s*:?\s*$", self.texto[max(0, achado.start() - 20):achado.start()]):
+                continue  # data de atualização não é data de publicação
+            dia, mes, ano = achado.groups()
+            self.datas.add(f"{ano}-{mes}-{dia}")
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)

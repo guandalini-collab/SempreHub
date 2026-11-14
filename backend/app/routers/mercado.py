@@ -120,7 +120,13 @@ def _url_sem_rastreamento(url):
 
 
 def _chave_url(url):
-    return _url_sem_rastreamento(url).rstrip("/")
+    # "www." e barra final não mudam o documento: a busca e a organização do
+    # resultado às vezes grafam o mesmo endereço de formas diferentes.
+    partes = urlparse(_url_sem_rastreamento(url))
+    host = (partes.hostname or "").lower()
+    host = host[4:] if host.startswith("www.") else host
+    consulta = urlencode([(k, v) for k, v in parse_qsl(partes.query, keep_blank_values=True) if k.lower() != "trk"])
+    return urlunparse(partes._replace(netloc=host, query=consulta)).rstrip("/")
 
 
 def _remover_fontes_nao_confirmadas(edicao, pesquisadas):

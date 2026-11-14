@@ -145,3 +145,14 @@ def test_pesquisa_nova_retira_so_o_artigo_sem_prova(monkeypatch):
     assert all(n.titulo != titulo for n in dados.noticias)
     assert len(dados.analises) == analises
     assert any(titulo[:40] in aviso and 'Nada foi completado' in aviso for aviso in dados.avisos)
+
+
+def test_data_visivel_no_cabecalho_vale_mas_atualizacao_nao():
+    doc = provas.Documento('<main>04/06/2026 09h00 | Atualizado em 05/06/2026 Em abril, vendas no varejo recuam.</main>')
+    assert '2026-06-04' in doc.datas and '2026-06-05' not in doc.datas
+
+
+def test_endereco_com_www_ou_rastreio_e_o_mesmo():
+    from app.routers.mercado import _chave_url
+    assert _chave_url('https://www.exemplo.sebrae.com.br/a') == _chave_url('https://exemplo.sebrae.com.br/a/')
+    assert _chave_url('https://cetic.br/a/?trk=x&utm_source=openai') == _chave_url('https://cetic.br/a')
