@@ -99,13 +99,16 @@ def obter_documento(url, somente_oficial=True):
         )
         try:
             conexao.request("GET", (u.path or "/") + ("?" + u.query if u.query else ""),
-                            headers={"User-Agent": "SempreHub/validacao-fontes", "Accept-Encoding": "identity"})
+                            headers={"User-Agent": "Mozilla/5.0 (compatible; SempreHub/1.0; +https://www.semprehub.com.br)",
+                                     "Accept": "text/html,application/xhtml+xml", "Accept-Language": "pt-BR,pt;q=0.9",
+                                     "Accept-Encoding": "identity"})
             resposta = conexao.getresponse()
             if resposta.status in (301, 302, 303, 307, 308):
                 url = urljoin(url, resposta.getheader("Location", ""))
                 continue
             if resposta.status != 200 or "html" not in resposta.getheader("Content-Type", "").lower():
-                raise ValueError("Documento não disponível como HTML.")
+                raise ValueError(f"Documento não disponível como HTML (HTTP {resposta.status}, "
+                                 f"{resposta.getheader('Content-Type', '')[:60]}).")
             corpo = resposta.read(2_000_001)
             if len(corpo) > 2_000_000 or resposta.getheader("Content-Encoding", "identity") != "identity":
                 raise ValueError("Documento excede os limites de leitura.")
