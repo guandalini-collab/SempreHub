@@ -8,6 +8,7 @@ As regras de RH e de capacidade são hipóteses didáticas deste perfil.
 from .versionamento import ENGINE_VERSION, inicializar_indicadores
 from .financeiros import reconciliar_financeiros
 from .indicadores import oee, otif, enps, capacidades_producao, dedicacao_fundador
+from .tributos import fator_clt, patronal_pro_labore
 from .localizacao import estimar_frete
 from .dependencias import atualizar_marca, atualizar_pd, atualizar_pd_por_produto, atrativo_porter, custo_unitario_com_barganha
 from copy import deepcopy
@@ -276,23 +277,25 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
             "a folha já incide, mas a capacidade produtiva ainda é parcial."
         )
     regime = e.get("regime_tributario", "SIMPLES_NACIONAL")
-    fatores = {"MEI": 1.45, "SIMPLES_NACIONAL": 1.45, "LUCRO_PRESUMIDO": 1.82}
+    fator_encargos = fator_clt(regime)
     equivalentes_folha = (composicao["operarios"] + composicao["tecnicos"] * 1.5
                           + composicao["especialistas"] * 2.2)
-    folha = _produto(equivalentes_folha, salario * fracao, fatores.get(regime, 1.45))
+    folha = _produto(equivalentes_folha, salario * fracao, fator_encargos)
     # O proprietário pode executar no máximo uma jornada júnior, e a atividade
     # exige pró-labore explícito. A jornada é proporcional à retirada comparada
     # ao salário de referência da turma (dedicação parcial do sócio).
     pro_labore = _dinheiro(max(0, op.get("pro_labore", 0)))
     dedicacao = dedicacao_fundador(pro_labore, salario_base, fracao)
     fundador_ativo = dedicacao > 0
+    # Patronal sobre o pró-labore só fora do recolhimento unificado (tributos.PATRONAL_PRO_LABORE).
+    encargos_pro_labore = _produto(pro_labore, patronal_pro_labore(regime))
     if 0 < dedicacao < 1:
         alertas.append(
             f"Pró-labore abaixo do salário de referência: o fundador dedica {dedicacao:.0%} "
             "de uma jornada à operação."
         )
     horas_extras = max(0, min(40 * fracao, op.get("horas_extras", 0))) if funcionarios else 0
-    custo_horas_extras = _produto(funcionarios, salario / 220, horas_extras, 1.5, fatores.get(regime, 1.45))
+    custo_horas_extras = _produto(funcionarios, salario / 220, horas_extras, 1.5, fator_encargos)
     beneficios = _produto(funcionarios, beneficio * fracao)
     rescisoes = _produto(demitidos, salario)
     fator_rh = (0.75 + 0.25 * rh["moral"] / 100 + 0.002 * rh["qualificacao"]) * integracao["fator"]
@@ -547,7 +550,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     networking = _dinheiro(d.get("networking", 0))
     multas = _dinheiro(p.get("multas", 0))
     custos_eventos = _dinheiro(efeitos_eventos.get("custo", 0))
-    despesas_pagas = _soma([folha, custo_horas_extras, beneficios, treinamento, rescisoes, pro_labore, manutencao,
+    despesas_pagas = _soma([folha, custo_horas_extras, beneficios, treinamento, rescisoes, pro_labore, encargos_pro_labore, manutencao,
                             custos_fixos, marketing, pd, networking, juros, multas])
 
     from ..custos_campanhas import investimento_efetivo
@@ -600,7 +603,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         "custos_eventos": custos_eventos,
         "marketing": marketing,
         "horas_extras": horas_extras, "custo_horas_extras": custo_horas_extras,
-        "folha": folha, "pro_labore": pro_labore, "fundador_ativo": fundador_ativo, "dedicacao_fundador": dedicacao,
+        "folha": folha, "pro_labore": pro_labore, "encargos_pro_labore": encargos_pro_labore, "fundador_ativo": fundador_ativo, "dedicacao_fundador": dedicacao,
         "juros": juros, "juros_cheque": juros_cheque,
         "gastos_previstos": _soma([despesas_pagas, custos_eventos, depreciacao, custo_refugo]),
         "beneficios": beneficios, "treinamento": treinamento, "rescisoes": rescisoes,
@@ -694,6 +697,7 @@ def apurar(preparo: dict, demanda: float,
     custos_eventos = _soma([c.get("custos_eventos", 0), perda_recebiveis])
     dre = {
         "receita": receita, "impostos": impostos, "cmv": cmv, "folha": c["folha"], "pro_labore": c["pro_labore"],
+        "encargos_pro_labore": c.get("encargos_pro_labore", 0),
         "horas_extras": c["custo_horas_extras"],
         "custos_fixos": _dinheiro(p.get("custos_fixos_mensais", 1500)),
         "marketing": c["marketing"], "pd": _dinheiro(d.get("pd", 0)),

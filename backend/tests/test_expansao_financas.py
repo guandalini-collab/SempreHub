@@ -7,6 +7,7 @@ from app.schemas import DecisaoSimulacao
 from .test_tradicional import base, sem_tributos
 from .test_fluxo import _criar_turma, _entrar
 from .conftest import cadastrar
+from app.motor.tributos import fator_clt
 
 
 def test_horas_extras_aumentam_capacidade_e_reconciliam_dre_caixa():
@@ -21,10 +22,10 @@ def test_horas_extras_aumentam_capacidade_e_reconciliam_dre_caixa():
     preparo = preparar(empresa, extra, parametros, 1)
     assert preparo["capacidade_produtiva"] > normal["capacidade_produtiva"]
     assert preparo["producao_real"] > normal["producao_real"]
-    assert preparo["custo_horas_extras"] == 870
+    assert preparo["custo_horas_extras"] == pytest.approx(round(2200 / 220 * 40 * 1.5 * fator_clt("SIMPLES_NACIONAL"), 2))
     resultado = apurar(preparo, 280, sem_tributos)
     dre, dfc = resultado["dre"], resultado["detalhes"]["dfc"]
-    assert dre["horas_extras"] == 870
+    assert dre["horas_extras"] == preparo["custo_horas_extras"]
     assert dre["lucro_liquido"] == pytest.approx(dre["receita"] - sum(v for k,v in dre.items() if k not in ("receita", "lucro_liquido")))
     assert dfc["caixa_final"] == pytest.approx(dfc["caixa_inicial"] + dfc["operacional"] + dfc["investimento"] + dfc["financiamento"])
     assert empresa["estado_simulacao"]["maquinas"][0]["capacidade"] == 1000

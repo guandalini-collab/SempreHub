@@ -42,7 +42,7 @@ Não é necessário preencher uma data de início. O calendário assume a data v
 
 ### MEI: cenário projetado para 2027 e 2028
 
-A Lei Complementar nº 238, de 21/10/2026, publicou o cronograma de teto do MEI: R$ 110.000 em 2027 e R$ 140.000 a partir de 2028. Os efeitos têm datas específicas e a ampliação dos limites depende das condições orçamentárias do art. 3º. O cenário didático mantém identificação como Estimativa do Modelo porque não comprova essa condição nem substitui a apuração tributária legal. A regra de até dois empregados é limitada às atividades abrangidas no âmbito rural no modelo; as demais mantêm um. O ano simulado orienta a seleção das regras. Fotografias antigas não são reescritas. Fonte primária: https://legis.senado.gov.br/norma/44276013/publicacao/44280206
+A Lei Complementar nº 238, de 21/10/2026, publicou o cronograma de teto do MEI: R$ 110.000 em 2027 e R$ 140.000 a partir de 2028. Os efeitos têm datas específicas e a ampliação dos limites depende das condições orçamentárias do art. 3º. O cenário didático mantém identificação como Estimativa do Modelo porque não comprova essa condição nem substitui a apuração tributária legal. O limite de até dois empregados vale para todo MEI a partir de 1º/1/2027 (art. 10, II): a nova redação do art. 18-C da LC 123/2006 mantém a estrutura que já aplicava o limite de um empregado a qualquer MEI, e a condição orçamentária do art. 3º alcança apenas os limites de receita. Até 2026, o limite é de um empregado. O ano simulado orienta a seleção das regras. Fotografias antigas não são reescritas. Fonte primária: https://legis.senado.gov.br/norma/44276013/publicacao/44280206
 
 ### Registros de participação
 
@@ -295,6 +295,23 @@ A vida útil contábil padrão de máquinas é **24 meses**, configurável antes
 Novas compras são opcionais a partir do rodada 3, com pagamento no mês da compra e ativação na rodada seguinte. Funcionários, horas extras, insumos e máquinas impõem limites conjuntos à capacidade. Horas extras usam a premissa didática de até 40 horas mensais de referência por funcionário, proporcionais aos dias da semana, adicional de 50%, salário/220 e encargos.
 
 A DRE mostra resultado, a DFC mostra dinheiro, e o balanço mostra ativos e obrigações. A discussão da equipe deve considerar margem, caixa, recebimentos, pagamentos, estoques e capital de giro. Solicitar crédito exibe aviso de custo alto e risco ao lucro e caixa. Em Startup, aporte de investidores não entra como receita comercial e pode diluir os fundadores.
+
+
+### Pró-labore, encargos legais e custo da equipe
+
+**Jornada do fundador.** O fundador só integra a operação quando a equipe registra pró-labore. A fração da jornada que ele dedica é o pró-labore da rodada dividido pelo salário de referência júnior da turma no mesmo período, com limite de uma jornada; abaixo da referência, o resultado avisa a dedicação parcial. O salário de referência é parâmetro didático da turma. Fundamentação: DORNELAS, José. Empreendedorismo: transformando ideias em negócios. 9. ed. São Paulo: Atlas, 2023, cap. 6 (pró-labore como retirada dos sócios, custo fixo e dedicação parcial); SLACK, Nigel; BRANDON-JONES, Alistair; BURGESS, Nicola. Administração da produção. 10. ed. São Paulo: Atlas, 2023, cap. 11 (capacidade medida pelas horas de trabalho disponíveis).
+
+**Custo do empregado CLT.** O motor aplica sobre o salário mensal um fator que segue o método de MARTINS, Eliseu. Contabilidade de custos. 12. ed. Barueri: Atlas, 2025, cap. 11: o custo anual corresponde a 12 salários, 13º e um terço de férias (13,333 salários), acrescido dos encargos legais, e é distribuído pelos 11 meses efetivamente trabalhados.
+
+| Regime | Encargos considerados | Fator |
+|---|---|---|
+| Simples Nacional | FGTS 8% (contribuição patronal incluída no DAS) | 1,3091 |
+| MEI | FGTS 8% e patronal de 3% | 1,3455 |
+| Lucro Presumido | FGTS 8%, patronal 20%, risco de acidente 2% e terceiros 5,8% | 1,6461 |
+
+Bases legais (texto compilado do Planalto, consultado em 14/11/2026): Lei 8.036/1990, art. 15 (FGTS); Lei 8.212/1991, art. 22, I e II (patronal e risco de acidente); LC 123/2006, art. 13, VI e § 3º (patronal no DAS e dispensa de terceiros no Simples) e art. 18-C, § 1º, III (3% do MEI). O grau de risco médio (2%) é parâmetro didático, pois a lei prevê 1%, 2% ou 3% conforme a atividade. Os 5,8% de terceiros seguem o exemplo de Martins; as leis específicas de cada contribuição não foram conferidas nesta revisão. O modelo usa o Anexo I do Simples; o Anexo IV, que recolhe a patronal fora do DAS, não está modelado.
+
+**Encargo sobre o pró-labore.** No Lucro Presumido, a empresa soma 20% de contribuição patronal sobre o pró-labore (Lei 8.212/1991, art. 22, III); a DRE mostra a linha "encargos sobre pró-labore". No Simples e no MEI essa contribuição está no recolhimento unificado (LC 123/2006, art. 13, VI). A contribuição do próprio sócio (11%, após a dedução do art. 30, § 4º, da Lei 8.212/1991) é descontada do pró-labore (Lei 10.666/2003, art. 4º) e não é custo da empresa. O sócio não recebe FGTS, 13º nem férias, por não ser empregado; por isso, mesmo com a mesma retirada, custa menos que um funcionário.
 
 ## 8. Avaliação automática e auditoria
 

@@ -8,6 +8,7 @@ Nenhum argumento é modificado e cada rodada conserva seus próprios snapshots.
 from .versionamento import ENGINE_VERSION, inicializar_indicadores
 from .financeiros import reconciliar_financeiros
 from .indicadores import enps, dedicacao_fundador
+from .tributos import fator_clt, patronal_pro_labore
 from .dependencias import atualizar_marca, atualizar_pd, atualizar_pd_por_produto, atrativo_porter
 from copy import deepcopy
 from decimal import Decimal, ROUND_HALF_UP
@@ -120,8 +121,9 @@ def _preparar_rh(empresa: dict, decisao: dict, parametros: dict, estado: dict) -
     )
     return {
         "funcionarios": funcionarios, "demitidos": demitidos, "rotatividade": sairam,
-        # Encargos simplificados de 45%, independentes do regime comercial antigo.
-        "folha": _dinheiro(_decimal(funcionarios) * _decimal(salario) * _decimal(fracao) * Decimal("1.45")),
+        # Custo do empregado CLT por regime tributário (tributos.FATOR_CLT).
+        "folha": _dinheiro(_decimal(funcionarios) * _decimal(salario) * _decimal(fracao)
+                           * _decimal(fator_clt(empresa.get("regime_tributario", "SIMPLES_NACIONAL")))),
         "beneficios": _dinheiro(_decimal(funcionarios) * _decimal(beneficio) * _decimal(fracao)),
         "treinamento": treinamento, "rescisoes": rescisao,
     }
@@ -259,6 +261,8 @@ def preparar(
         taxa_royalties = 0.05 if _nome(empresa.get("classe_dornelas", "")) == "FRANQUIA" else 0.0
     custos = {
         "custos_fixos": _dinheiro(parametros.get("custos_fixos_mensais", 1500)), "pro_labore": pro_labore,
+        "encargos_pro_labore": _dinheiro(_decimal(pro_labore) * _decimal(patronal_pro_labore(
+            empresa.get("regime_tributario", "SIMPLES_NACIONAL")))),
         "marketing": marketing, "pd": _dinheiro(decisao.get("pd", 0)),
         "networking": _dinheiro(decisao.get("networking", 0)),
         "juros": juros, "multas": _dinheiro(parametros.get("multas", 0)),

@@ -6,6 +6,7 @@ from app.models import Decisao, Empresa, EventoRodada, Resultado
 
 from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
+from app.motor.tributos import fator_clt
 
 
 def _alterar_empresa(empresa_id, **campos):
@@ -72,7 +73,7 @@ def test_previa_regime_e_capacidade_correspondem_ao_fechamento(cliente, professo
     previa = _prever(cliente, aluno, empresa_id, decisao)
     assert previa["regime"] == "SIMPLES_NACIONAL"
     assert previa["funcionarios"] == 2
-    assert previa["folha"] == pytest.approx(5800)
+    assert previa["folha"] == pytest.approx(2 * 2000 * fator_clt("SIMPLES_NACIONAL"))
     assert previa["capacidade"] == pytest.approx(324)
     assert len(previa["alertas"]) == 2
     cliente.put(f"/api/aluno/empresas/{empresa_id}/decisao", headers=aluno, json=completar_decisao(decisao))

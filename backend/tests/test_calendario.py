@@ -7,6 +7,7 @@ from .test_tradicional import base, sem_tributos, proxima_empresa
 from .test_startup import _entrada
 from .test_fluxo import _criar_turma, _entrar
 from .conftest import cadastrar
+from app.motor.tributos import fator_clt
 
 
 def cfg(inicio='2026-10-15',perfil='VAREJO'):
@@ -70,7 +71,7 @@ def test_tres_semanas_industria_conciliam_caixa_estoque_e_patrimonio():
     for semana in range(1,4):
         preparo=tradicional.preparar(e,d,p,semana)
         # A empresa já tinha um trabalhador e contratou mais um para a rodada.
-        assert preparo['folha']==pytest.approx(round(2*2500*1.45*periodo(cfg(),semana)['fator_mensal'],2))
+        assert preparo['folha']==pytest.approx(round(2*2500*fator_clt('SIMPLES_NACIONAL')*periodo(cfg(),semana)['fator_mensal'],2))
         assert preparo['capacidade_maquinas']==pytest.approx(400*periodo(cfg(),semana)['fator_mensal'])
         r=tradicional.apurar(preparo,20,sem_tributos)
         b=r['detalhes']['balanco'];dfc=r['detalhes']['dfc']

@@ -42,7 +42,7 @@ Não é necessário preencher uma data de início. O calendário assume a data v
 
 ### MEI: cenário projetado para 2027 e 2028
 
-A Lei Complementar nº 238, de 21/10/2026, publicou o cronograma de teto do MEI: R$ 110.000 em 2027 e R$ 140.000 a partir de 2028. Os efeitos têm datas específicas e a ampliação dos limites depende das condições orçamentárias do art. 3º. O cenário didático mantém identificação como Estimativa do Modelo porque não comprova essa condição nem substitui a apuração tributária legal. A regra de até dois empregados é limitada às atividades abrangidas no âmbito rural no modelo; as demais mantêm um. O ano simulado orienta a seleção das regras. Fotografias antigas não são reescritas. Fonte primária: https://legis.senado.gov.br/norma/44276013/publicacao/44280206
+A Lei Complementar nº 238, de 21/10/2026, publicou o cronograma de teto do MEI: R$ 110.000 em 2027 e R$ 140.000 a partir de 2028. Os efeitos têm datas específicas e a ampliação dos limites depende das condições orçamentárias do art. 3º. O cenário didático mantém identificação como Estimativa do Modelo porque não comprova essa condição nem substitui a apuração tributária legal. O limite de até dois empregados vale para todo MEI a partir de 1º/1/2027 (art. 10, II): a nova redação do art. 18-C da LC 123/2006 mantém a estrutura que já aplicava o limite de um empregado a qualquer MEI, e a condição orçamentária do art. 3º alcança apenas os limites de receita. Até 2026, o limite é de um empregado. O ano simulado orienta a seleção das regras. Fotografias antigas não são reescritas. Fonte primária: https://legis.senado.gov.br/norma/44276013/publicacao/44280206
 
 ### Registros de participação
 
@@ -461,6 +461,13 @@ No modelo Startup, **capacidade da nuvem** indica quantos clientes a operação 
 
 Nunca escolha aporte ou valuation apenas para aumentar o número mostrado no caixa. Discuta necessidade de capital e participação dos fundadores. O manual explica o conceito; a equipe continua responsável pela decisão.
 
+
+
+### Pró-labore e custo da equipe
+
+O fundador só trabalha na operação se a equipe registrar **pró-labore**, a retirada mensal do sócio. A dedicação dele é proporcional a esse valor comparado ao salário de referência da turma: metade da referência corresponde a meia jornada, e o limite é uma jornada inteira. Pró-labore simbólico não produz nem atende clientes.
+
+Cada funcionário custa mais que o salário: o fator aplicado considera 13º, férias com adicional de um terço e os encargos de cada regime (1,31 no Simples, 1,35 no MEI e 1,65 no Lucro Presumido). No Lucro Presumido, a empresa também paga 20% sobre o pró-labore. O sócio não tem FGTS, 13º nem férias; por isso a comparação entre trabalhar sozinho e contratar exige olhar capacidade, custo e risco juntos. Leituras recomendadas: Dornelas, Empreendedorismo, cap. 6; Martins, Contabilidade de custos, cap. 11; Slack, Brandon-Jones e Burgess, Administração da produção, cap. 11.
 
 ## Interpretar os indicadores para decidir em equipe
 

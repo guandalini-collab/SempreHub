@@ -30,8 +30,10 @@ def test_mei_versionado_exige_confirmacao_da_vigencia_condicionada():
     assert regras_mei(t)['teto_anual']==81000
     assert regras_mei(t,2)['teto_anual']==81000
     assert regras_mei(t,2)['limite_empregados']==2
+    # LC 238/2026: o limite de 2 empregados vale para todo MEI a partir de 2027.
     t.configuracao_simulacao['atividade_rural']=False
-    assert regras_mei(t,2)['limite_empregados']==1
+    assert regras_mei(t,2)['limite_empregados']==2
+    assert regras_mei(t,1)['limite_empregados']==1
     assert 'condição orçamentária' in regras_mei(t,2)['estado']
     assert regras_mei(t,2)['norma']=='Lei Complementar 238/2026'
     t.configuracao_simulacao['confirmacoes_normativas']={'LC238-2027-ORCAMENTO':True}

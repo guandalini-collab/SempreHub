@@ -533,7 +533,8 @@ def _apurar(
     empresa.faturamento_ano += receita
     if empresa.regime_tributario == RegimeTributario.MEI:
         empresa.das_mei_pago_ano += impostos
-        teto = turma.teto_mei_anual
+        from .regras_mei import regras_mei
+        teto = regras_mei(turma, turma.rodada_atual)["teto_anual"]
         if empresa.faturamento_ano > teto * (1 + TOLERANCIA_TETO_MEI):
             retroativo = max(
                 0.0,

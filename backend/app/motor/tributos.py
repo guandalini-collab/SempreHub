@@ -28,13 +28,67 @@ FAIXAS_SIMPLES_ANEXO_I: List[Tuple[float, float, float]] = [
 
 ALIQUOTA_FEDERAL_LUCRO_PRESUMIDO = 0.15 * 0.08 + 0.09 * 0.12 + 0.0065 + 0.03  # 5,93%
 
-# Multiplicador sobre o salário-base que representa encargos trabalhistas (CLT).
-# No Simples Nacional (Anexo I) a contribuição patronal está dentro do DAS, por isso o fator é menor.
-FATOR_CLT = {
-    RegimeTributario.MEI: 1.45,
-    RegimeTributario.SIMPLES_NACIONAL: 1.45,
-    RegimeTributario.LUCRO_PRESUMIDO: 1.82,
+# Multiplicador sobre o salário mensal que representa o custo do empregado CLT.
+#
+# Método (Martins, Contabilidade de custos, 12. ed., 2025, cap. 11, 11.3.3):
+# custo anual = 12 salários + 13º + 1/3 de férias = 13,333 salários, acrescido
+# dos encargos legais que incidem sobre a remuneração; o total é distribuído
+# pelos 11 meses efetivamente trabalhados (um mês do ano é de férias).
+#
+# Encargos legais por regime (texto compilado do Planalto, consultado em 14/11/2026):
+# - FGTS 8% sobre a remuneração do empregado (Lei 8.036/1990, art. 15) em todos.
+# - Simples Nacional: contribuição patronal (Lei 8.212/1991, art. 22) incluída
+#   no DAS (LC 123/2006, art. 13, VI) e dispensa de terceiros (art. 13, § 3º).
+#   Modelo do jogo: Anexo I; o Anexo IV, que recolhe a patronal fora do DAS,
+#   não está modelado.
+# - MEI: patronal de 3% sobre o salário do empregado (LC 123/2006, art. 18-C, § 1º, III).
+# - Lucro Presumido: patronal de 20% (Lei 8.212/1991, art. 22, I), risco de
+#   acidente do trabalho de 2% (art. 22, II, b; grau médio adotado como
+#   parâmetro didático) e terceiros de 5,8% (salário-educação, Sistema S,
+#   Incra e Sebrae, conforme o exemplo de Martins; leis específicas não
+#   conferidas nesta revisão).
+SALARIOS_ANUAIS_COM_PROVISOES = 12 + 1 + 1 / 3
+MESES_TRABALHADOS = 11
+ENCARGOS_SOBRE_REMUNERACAO = {
+    RegimeTributario.MEI: 0.08 + 0.03,
+    RegimeTributario.SIMPLES_NACIONAL: 0.08,
+    RegimeTributario.LUCRO_PRESUMIDO: 0.08 + 0.20 + 0.02 + 0.058,
 }
+
+
+def fator_folha(encargos: float) -> float:
+    return round(SALARIOS_ANUAIS_COM_PROVISOES * (1 + encargos) / MESES_TRABALHADOS, 4)
+
+
+FATOR_CLT = {regime: fator_folha(encargos) for regime, encargos in ENCARGOS_SOBRE_REMUNERACAO.items()}
+
+# Contribuição patronal sobre o pró-labore (remuneração de contribuinte
+# individual): 20% (Lei 8.212/1991, art. 22, III). No Simples Nacional e no
+# MEI ela está incluída no recolhimento unificado (LC 123/2006, art. 13, VI).
+# A contribuição do próprio sócio (11%, após a dedução do art. 30, § 4º) é
+# descontada do pró-labore (Lei 10.666/2003, art. 4º) e não é custo da empresa.
+PATRONAL_PRO_LABORE = {
+    RegimeTributario.MEI: 0.0,
+    RegimeTributario.SIMPLES_NACIONAL: 0.0,
+    RegimeTributario.LUCRO_PRESUMIDO: 0.20,
+}
+
+
+def _regime(regime):
+    if isinstance(regime, RegimeTributario):
+        return regime
+    try:
+        return RegimeTributario(str(regime))
+    except ValueError:
+        return RegimeTributario.SIMPLES_NACIONAL
+
+
+def fator_clt(regime) -> float:
+    return FATOR_CLT[_regime(regime)]
+
+
+def patronal_pro_labore(regime) -> float:
+    return PATRONAL_PRO_LABORE[_regime(regime)]
 
 MAX_FUNCIONARIOS_MEI = 1
 TOLERANCIA_TETO_MEI = 0.20

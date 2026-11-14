@@ -44,10 +44,14 @@ def regras_mei(turma, rodada=None):
         teto = TETOS_CONDICIONADOS[ano]
         aplicacao_confirmada = True
 
-    # A exceção de até dois empregados é exclusivamente para a atividade rural
-    # indicada pela norma; uma empresa comum conserva o limite geral de um.
-    rural_elegivel = bool(cfg.get("atividade_rural")) and ano is not None and ano >= 2027
-    limite_empregados = 2 if rural_elegivel else 1
+    # LC 238/2026, art. 1º, nova redação do art. 18-C da LC 123/2006: "o
+    # empresário individual ou o empreendedor que exerça as atividades [...]
+    # no âmbito rural" pode ter até 2 empregados. A redação anterior usava a
+    # mesma estrutura para o limite de um empregado, aplicado a todo MEI; a
+    # menção rural qualifica apenas o "empreendedor", não o empresário
+    # individual. Vigência: 1º/1/2027 (art. 10, II), sem a condição
+    # orçamentária do art. 3º, que alcança apenas os limites de receita.
+    limite_empregados = 2 if ano is not None and ano >= 2027 else 1
 
     if ano in TETOS_CONDICIONADOS and not aplicacao_confirmada:
         estado = (
@@ -68,7 +72,7 @@ def regras_mei(turma, rodada=None):
         "versao_regra": VERSAO,
         "publicada_em": "2026-10-21",
         "vigencia": (
-            "A regra rural vigora a partir de 2027. Os tetos de R$ 110.000,00 (2027) "
+            "O limite de 2 empregados vigora a partir de 2027. Os tetos de R$ 110.000,00 (2027) "
             "e R$ 140.000,00 (a partir de 2028) dependem da condição orçamentária "
             "prevista na própria lei."
         ),

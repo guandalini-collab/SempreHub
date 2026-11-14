@@ -4,6 +4,7 @@ from app.motor.indicadores import disponibilidade_maquinas
 from app.motor.tradicional import preparar, apurar
 from tests.test_tradicional import base, sem_tributos
 from tests import test_tradicional as verificacao_contabil
+from app.motor.tributos import fator_clt
 
 
 def maquina(capacidade=240, condicao=1):
@@ -56,8 +57,9 @@ def test_manutencao_despesa_caixa_e_depreciacao_vida_util_separadas():
     assert r['dre']['depreciacao']==500
     # A manutenção sai do caixa, mas a folha da equipe existente continua
     # vencendo mesmo com produção zero. A depreciação afeta a DRE, não o DFC.
-    assert r['detalhes']['dfc']['variacao']==-4400
-    assert r['dre']['lucro_liquido']==-4900
+    folha=round(2000*fator_clt('SIMPLES_NACIONAL'),2)
+    assert r['detalhes']['dfc']['variacao']==pytest.approx(-(1500+folha))
+    assert r['dre']['lucro_liquido']==pytest.approx(-(2000+folha))
     verificacao_contabil.TestTradicional().assert_reconciliacao(r)
 
 
