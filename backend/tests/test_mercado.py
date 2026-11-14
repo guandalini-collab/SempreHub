@@ -253,3 +253,16 @@ def test_item_com_fonte_nao_confirmada_sai_e_o_resto_fica(cliente, professor, mo
     edic = r.json()["dados"]
     assert edic["noticias"] == [] and len(edic["analises"]) == 1
     assert any("Notícia sem citação" in aviso for aviso in edic["avisos"])
+
+
+def test_nada_conferido_nao_salva_edicao(cliente, professor, monkeypatch):
+    from app.routers import mercado
+    def falhar(url): raise ValueError("Documento não disponível como HTML.")
+    monkeypatch.setattr("app.evidencias_mercado.obter_documento", falhar)
+    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (edicao(), {"https://www.ibge.gov.br/produto"}))
+    turma = _criar_turma(cliente, professor, total_rodadas=3)
+    base = f"/api/professor/turmas/{turma['id']}/mercado"
+    r = cliente.post(base + "/pesquisar", headers=professor,
+                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+    assert r.status_code == 502 and "página não pôde ser lida" in r.json()["detail"]
+    assert cliente.get(base, headers=professor).json()["edicoes"] == []

@@ -294,6 +294,9 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
     validar_fontes(edicao,fontes)
     validar_coerencia(edicao,turma,dados,exigir_natureza=True)
     validar_evidencias(edicao, turma, descartar_artigos=True)
+    if not edicao.noticias and not edicao.analises and all(p.estado_indicador == "Estimativa do Modelo" and not p.valor_documentado for p in edicao.produtos):
+        motivo = " ".join(edicao.avisos)[:600]
+        raise HTTPException(502, "Nenhum item da pesquisa pôde ser conferido nas páginas citadas; nenhuma edição foi salva. " + motivo)
     edicao.modo_operacao=turma.modo_jogo
     db.refresh(turma)
     if turma.rodada_atual != rodada: raise HTTPException(409,"A rodada avançou durante a pesquisa. Repita para a rodada atual.")

@@ -177,8 +177,9 @@ def _descartar_artigos_sem_prova(edicao):
                 _validar_estritamente(edicao.model_copy(update={**vazio, campo: [item]}))
             except FonteInsegura:
                 raise HTTPException(422, "Fonte bloqueada: use somente HTTPS público, sem endereços internos.") from None
-            except HTTPException:
-                descartados.append(f"{rotulo} “{item.titulo[:80]}”")
+            except HTTPException as erro:
+                motivo = "data de publicação não confere com a página" if "data" in str(erro.detail).lower() else "página não pôde ser lida"
+                descartados.append(f"{rotulo} “{item.titulo[:80]}” ({motivo}; {item.fontes[0].url[:120]})")
             else:
                 mantidos.append(item)
         setattr(edicao, campo, mantidos)
