@@ -238,3 +238,18 @@ def test_produto_incompleto_vira_estimativa_identificada(cliente, professor, mon
     assert edic["produtos"][0]["estado_indicador"] == "Estimativa do Modelo"
     assert any("substituídos" in aviso for aviso in edic["avisos"])
     assert edic["noticias"][0]["fontes"][0]["natureza"] == "governamental ou instituto de pesquisa"
+
+
+def test_item_com_fonte_nao_confirmada_sai_e_o_resto_fica(cliente, professor, monkeypatch):
+    from app.routers import mercado
+    dados = edicao()
+    outra = {"titulo": "Outra", "url": "https://www.ibge.gov.br/nao-citada"}
+    dados["noticias"][0] = {**dados["noticias"][0], "titulo": "Notícia sem citação", "fontes": [outra]}
+    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (dados, {"https://www.ibge.gov.br/produto/"}))
+    turma = _criar_turma(cliente, professor, total_rodadas=3)
+    r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
+                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+    assert r.status_code == 200, r.text
+    edic = r.json()["dados"]
+    assert edic["noticias"] == [] and len(edic["analises"]) == 1
+    assert any("Notícia sem citação" in aviso for aviso in edic["avisos"])

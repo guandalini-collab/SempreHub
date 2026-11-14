@@ -119,6 +119,42 @@ def _url_sem_rastreamento(url):
     return urlunparse(partes._replace(query=consulta, fragment=""))
 
 
+def _chave_url(url):
+    return _url_sem_rastreamento(url).rstrip("/")
+
+
+def _remover_fontes_nao_confirmadas(edicao, pesquisadas):
+    """Na pesquisa nova, descarta só o que cita URL fora das citações da busca.
+
+    Notícia ou análise sem nenhuma fonte confirmada sai da edição; produto
+    perde a fonte não confirmada e, sem prova de custo, cai na estimativa
+    identificada da turma. Nada é reescrito para parecer comprovado.
+    """
+    confirmadas = {_chave_url(u) for u in pesquisadas}
+    retirados = []
+    for campo, rotulo in (("noticias", "notícia"), ("analises", "análise")):
+        mantidos = []
+        for item in getattr(edicao, campo):
+            item.fontes = [f for f in item.fontes if _chave_url(f.url) in confirmadas]
+            if item.fontes:
+                mantidos.append(item)
+            else:
+                retirados.append(f"{rotulo} “{item.titulo[:80]}”")
+        setattr(edicao, campo, mantidos)
+    for produto in edicao.produtos:
+        produto.fontes = [f for f in produto.fontes if _chave_url(f.url) in confirmadas]
+        if produto.evidencia_custo and _chave_url(produto.evidencia_custo.url) not in confirmadas:
+            produto.evidencia_custo = None
+        if not produto.fontes:
+            produto.estado_indicador = "Estimativa do Modelo"
+    if not edicao.noticias and not edicao.analises and not any(p.fontes for p in edicao.produtos):
+        raise HTTPException(502, "A pesquisa não confirmou nenhuma das fontes citadas; nenhuma edição foi salva.")
+    if retirados:
+        edicao.avisos = (list(edicao.avisos or []) + [
+            "Itens retirados porque citavam fonte que a busca não confirmou: " + "; ".join(retirados)
+            + ". Nada foi completado sem fonte."])[:10]
+
+
 def validar_fontes(dados, pesquisadas=None):
     from ..fontes_oficiais import fonte_oficial
     urls = []
@@ -138,7 +174,7 @@ def validar_fontes(dados, pesquisadas=None):
             if not fonte_oficial(fonte.url):
                 raise HTTPException(422, "Use somente fontes governamentais, institutos oficiais de pesquisa ou entidades setoriais autorizadas.")
             urls.append(fonte.url)
-    if pesquisadas is not None and any(_url_sem_rastreamento(url) not in {_url_sem_rastreamento(u) for u in pesquisadas} for url in urls):
+    if pesquisadas is not None and any(_chave_url(url) not in {_chave_url(u) for u in pesquisadas} for url in urls):
         raise HTTPException(502, "A pesquisa não confirmou todas as fontes; nenhuma edição foi salva.")
     if len({p.id for p in dados.produtos}) != len(dados.produtos):
         raise HTTPException(422, "Os códigos dos produtos devem ser únicos.")
@@ -254,6 +290,7 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
                        for indice, produto in enumerate(edicao.produtos)]
     if len(edicao.produtos)!=dados.produtos:
         raise HTTPException(502,"A pesquisa não entregou as quantidades solicitadas.")
+    _remover_fontes_nao_confirmadas(edicao, fontes)
     validar_fontes(edicao,fontes)
     validar_coerencia(edicao,turma,dados,exigir_natureza=True)
     validar_evidencias(edicao, turma, descartar_artigos=True)
