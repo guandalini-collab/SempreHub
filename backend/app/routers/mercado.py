@@ -154,6 +154,21 @@ def _completar_produtos_estimados(bruto: dict, turma, pesquisa: Pesquisa) -> Non
     produtos = bruto.get("produtos")
     if not isinstance(produtos, list):
         return
+    # Produto com campo inválido (por exemplo, custo zero quando a pesquisa
+    # não achou preço) não é corrigido por suposição: sai da lista e a vaga é
+    # preenchida abaixo pela estimativa identificada da turma.
+    validos = []
+    for item in produtos:
+        try:
+            Produto.model_validate(item)
+        except (ValidationError, TypeError, ValueError):
+            continue
+        validos.append(item)
+    if len(validos) < len(produtos):
+        bruto["avisos"] = list(bruto.get("avisos") or []) + [
+            f"{len(produtos) - len(validos)} produto(s) da pesquisa vieram com dados incompletos e foram substituídos "
+            "por categorias do catálogo com custo padrão da turma (Estimativa do Modelo)."]
+        produtos[:] = validos
     existentes = {str(item.get("id", "")) for item in produtos if isinstance(item, dict)}
     categorias = (CATALOGO_SETORIAL.get(pesquisa.setor) or {}).get("categorias", [])
     hoje = datetime.now(timezone.utc).date().isoformat()

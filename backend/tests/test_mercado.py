@@ -223,3 +223,18 @@ def test_pesquisa_com_menos_noticias_salva_o_confirmado_e_avisa(cliente, profess
     salvo = resposta.json()["dados"]
     assert salvo["noticias"] == [] and len(salvo["analises"]) == 1 and len(salvo["produtos"]) == 1
     assert "notícias: 0 de 3" in salvo["avisos"][0]
+
+
+def test_produto_incompleto_vira_estimativa_identificada(cliente, professor, monkeypatch):
+    from app.routers import mercado
+    dados = edicao()
+    dados["produtos"][0]["custo_unitario"] = 0  # pesquisa sem preço encontrado
+    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (dados, {"https://www.ibge.gov.br/produto"}))
+    turma = _criar_turma(cliente, professor, total_rodadas=3)
+    r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
+                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+    assert r.status_code == 200, r.text
+    edic = r.json()["dados"]
+    assert edic["produtos"][0]["estado_indicador"] == "Estimativa do Modelo"
+    assert any("substituídos" in aviso for aviso in edic["avisos"])
+    assert edic["noticias"][0]["fontes"][0]["natureza"] == "governamental ou instituto de pesquisa"
