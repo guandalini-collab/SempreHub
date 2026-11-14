@@ -278,6 +278,11 @@ class TextoRelatorioEmpresarial(BaseModel):
     texto: str = Field(min_length=30, max_length=24000)
 
 
+def _ia_configurada():
+    import os
+    return bool(os.getenv("OPENAI_API_KEY") or os.getenv("SEMPREHUB_OPENAI_API_KEY"))
+
+
 @router.post("/api/professor/turmas/{turma_id}/empresas/{empresa_id}/relatorio-empresarial/{rodada}")
 def gerar_relatorio(turma_id:int,empresa_id:int,rodada:int,db:Session=Depends(get_db),usuario:Usuario=Depends(exigir_professor)):
     turma=_turma_do_professor(db,turma_id,usuario)
@@ -306,9 +311,21 @@ def gerar_relatorio(turma_id:int,empresa_id:int,rodada:int,db:Session=Depends(ge
         for d in [next((x for x in e.decisoes if x.rodada == rodada), None)]
     ]}
     dados["historico"]=[{"rodada":r.rodada,"receita":r.receita,"lucro":r.lucro_liquido,"caixa":r.caixa_final} for r in empresa.resultados if r.rodada<rodada]
-    bruto,_=gerar_json('''Redija um relatório empresarial em português com tom frio, objetivo e profissional. JSON {texto:string}. Use apenas os dados fornecidos, não invente indicadores nem atribua causalidade não comprovada. Inclua resultado comercial, DRE, fluxo de caixa, balanço quando disponível, riscos e comparação histórica. Explique os efeitos de alinhamento estratégico registrados nos alertas e na avaliação da rodada, separando o fator comercial de custos, capacidade e eventos. Não atribua julgamento de qualidade aos textos livres. Discuta decisões sem escolher a próxima decisão pela equipe. Não mencione IA, ferramentas, professor ou avaliações pedagógicas. Não trate plano comercial como executado se os dados não comprovam sua execução. Não exponha dados pessoais. Até 8000 caracteres.''',dados,False,TextoRelatorioEmpresarial.model_json_schema())
-    texto=bruto.get("texto") if isinstance(bruto,dict) else None
-    if not isinstance(texto,str) or not 30<=len(texto)<=24000: raise HTTPException(502,"Relatório inválido.")
+    from ..relatorio_gerencial import leituras_recomendadas, montar_relatorio
+    texto=montar_relatorio(dados)
+    if _ia_configurada():
+        # A narrativa da IA complementa o relatório determinístico; se falhar,
+        # o relatório com DRE, caixa e balanço continua disponível aos alunos.
+        try:
+            bruto,_=gerar_json('''Redija um relatório empresarial em português com tom frio, objetivo e profissional. JSON {texto:string}. Use apenas os dados fornecidos, não invente indicadores nem atribua causalidade não comprovada. Inclua resultado comercial, DRE, fluxo de caixa, balanço quando disponível, riscos e comparação histórica. Explique os efeitos de alinhamento estratégico registrados nos alertas e na avaliação da rodada, separando o fator comercial de custos, capacidade e eventos. Não atribua julgamento de qualidade aos textos livres. Discuta decisões sem escolher a próxima decisão pela equipe. Não mencione IA, ferramentas, professor ou avaliações pedagógicas. Não trate plano comercial como executado se os dados não comprovam sua execução. Não exponha dados pessoais. Até 8000 caracteres.''',dados,False,TextoRelatorioEmpresarial.model_json_schema())
+            texto=bruto.get("texto") if isinstance(bruto,dict) else None
+            if not isinstance(texto,str) or not 30<=len(texto)<=24000: raise HTTPException(502,"Relatório inválido.")
+        except Exception:
+            texto=montar_relatorio(dados)
+        else:
+            leituras=leituras_recomendadas(dados)
+            if leituras:
+                texto=texto+"\n\n"+"\n".join(leituras)
     from sqlalchemy.exc import IntegrityError
     db.add(RelatorioEmpresarial(empresa_id=empresa_id,rodada=rodada,texto=texto))
     try: db.commit()
@@ -322,7 +339,10 @@ def gerar_relatorio(turma_id:int,empresa_id:int,rodada:int,db:Session=Depends(ge
 @router.get("/api/aluno/empresas/{empresa_id}/relatorios-empresariais")
 def relatorios(empresa_id:int,db:Session=Depends(get_db),usuario:Usuario=Depends(exigir_aluno)):
     empresa = _empresa_do_aluno(db,empresa_id,usuario)
-    return [{"rodada":d.rodada,"texto":d.analise_financeira} for d in reversed(empresa.decisoes) if d.rodada < empresa.turma.rodada_atual and d.analise_financeira]
+    # Relatórios gerados no fechamento (RelatorioEmpresarial), apenas de rodadas encerradas.
+    registros=(db.query(RelatorioEmpresarial).filter(RelatorioEmpresarial.empresa_id==empresa.id,
+               RelatorioEmpresarial.rodada<empresa.turma.rodada_atual).order_by(RelatorioEmpresarial.rodada.desc()).all())
+    return [{"rodada":r.rodada,"texto":r.texto} for r in registros]
 
 @router.get("/api/educacao/campanhas")
 def campanhas():
@@ -431,13 +451,16 @@ def validar_plano(db,empresa,dados,rascunho=False):
             raise HTTPException(422,"Análise estratégica inválida.")
 
 
-def preparar_relatorios_automaticos(turma_id, professor_id, rodada):
-    import os
+def preparar_relatorios_automaticos(turma_id, professor_id, rodada, bind=None):
+    """Gera o relatório gerencial de cada empresa logo após o fechamento.
+
+    Não depende da chave da IA: sem ela (ou se a IA falhar), o relatório
+    determinístico com DRE, caixa, balanço e leituras é gravado do mesmo modo.
+    """
     import logging
+    from sqlalchemy.orm import Session as SessaoOrm
     from ..database import SessionLocal
-    if not (os.getenv("OPENAI_API_KEY") or os.getenv("SEMPREHUB_OPENAI_API_KEY")):
-        return
-    with SessionLocal() as db:
+    with (SessaoOrm(bind=bind) if bind is not None else SessionLocal()) as db:
         usuario=db.get(Usuario,professor_id)
         turma=_turma_do_professor(db,turma_id,usuario)
         ids=[e.id for e in turma.empresas]

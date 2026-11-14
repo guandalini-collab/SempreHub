@@ -424,7 +424,7 @@ def fechar_rodada(
         raise HTTPException(422, str(erro))
     db.refresh(turma)
     from .mercado import preparar_relatorios_automaticos
-    background_tasks.add_task(preparar_relatorios_automaticos, turma.id, professor.id, evento.rodada)
+    background_tasks.add_task(preparar_relatorios_automaticos, turma.id, professor.id, evento.rodada, db.get_bind())
     return {"evento": ser.evento(evento), "turma": ser.turma(turma, completa=True)}
 
 

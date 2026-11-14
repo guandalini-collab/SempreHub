@@ -61,7 +61,8 @@ export default function ConfiguracaoSimulacao({
           <select className={estiloEntrada} value={valores.modo_jogo} onChange={(e) => aoMudar({ ...valores, modo_jogo: e.target.value as ConfiguracaoJogo["modo_jogo"], configuracao_simulacao: {...config,periodicidade:e.target.value==="LEGADO"?"MENSAL":config.periodicidade} })}>
             <option value="TRADICIONAL">Empresa tradicional · produção e estoque</option>
             <option value="STARTUP">Startup · clientes e serviço digital</option>
-            <option value="LEGADO">Modelo básico · compatibilidade com turmas anteriores</option>
+            {/* O modelo básico não aplica a cadeia de dependências entre departamentos; fica visível apenas para turmas antigas que já o usam. */}
+            {valores.modo_jogo === "LEGADO" && <option value="LEGADO">Modelo básico · compatibilidade com turmas anteriores</option>}
           </select>
         </Campo>
         {valores.modo_jogo !== "LEGADO" && <Campo rotulo="Situação inicial" ajuda="A história começa no primeiro período e os resultados das rodadas passam a ser registrados a partir daí.">

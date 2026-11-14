@@ -34,7 +34,7 @@ Espero que esta experiência ajude você a transformar conhecimento em análise,
 
 ## Calendário semanal e sazonalidade
 
-Cada rodada semanal representa sete dias consecutivos, a partir da data de início definida automaticamente pelo servidor no horário de Brasília. Os meses seguem o calendário real: não se presume que todo mês tenha quatro semanas. A semana pode atravessar meses, trimestres e anos. O cabeçalho mostra suas datas. O prazo real de entrega às 23:59:59 de Brasília é independente dessas datas simuladas.
+Cada rodada semanal representa sete dias consecutivos, a partir da data de início definida automaticamente pelo servidor no horário de Brasília. Os meses seguem o calendário real: não se presume que todo mês tenha quatro semanas. A semana pode atravessar meses, trimestres e anos. O cabeçalho mostra suas datas. Como a rodada começa na data ativa da turma, os sete dias podem atravessar duas semanas ISO; nesse caso o cabeçalho mostra as duas, por exemplo "Semanas ISO 46–47/2026 · 14/11 a 20/11". O prazo real de entrega às 23:59:59 de Brasília é independente dessas datas simuladas.
 
 ### Início automático e preservação do histórico
 
@@ -361,6 +361,11 @@ A nota automática de zero a dez resume critérios de desempenho definidos pelo 
 **Exemplo de devolutiva:** peça à equipe que explique por que tomou crédito e por que aumentou a produção. Compare justificativa, custo de juros, capacidade e vendas realizadas. Discuta uma alternativa para a rodada seguinte sem preencher a decisão por eles.
 
 Use pesquisa atual, fontes e premissas para revisar os diagnósticos. Um dado confirmado, uma interpretação e uma projeção têm naturezas diferentes. A ausência de fonte não autoriza tratar uma estimativa como fato. A interpretação financeira e a segmentação continuam responsabilidade dos alunos, sem exigência de texto financeiro para envio.
+
+
+### Relatório gerencial automático
+
+Ao encerrar a rodada, o sistema grava para cada empresa um relatório gerencial com resultado comercial, DRE, fluxo de caixa e balanço em seções separadas, e o disponibiliza aos alunos na área de relatórios. O relatório não depende da integração com IA: quando ela está configurada, acrescenta uma narrativa; se estiver indisponível ou falhar, o relatório determinístico é gravado do mesmo modo. Quando um indicador mostra desempenho fraco, o relatório indica a leitura correspondente (obra e capítulo), apenas a partir de um catálogo de obras conferidas no acervo; uma falha sem obra conferida não recebe indicação presumida.
 
 ## 13. Problemas frequentes e respostas de orientação
 

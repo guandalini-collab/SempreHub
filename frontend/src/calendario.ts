@@ -1,12 +1,19 @@
 export interface CalendarioSimulado {
   periodicidade: 'SEMANAL'; inicio: string; fim: string; dias: number; fator_mensal: number;
-  semana_iso: number; ano_iso: number; ano_fiscal: number;
+  semana_iso: number; ano_iso: number; ano_fiscal: number; semana_iso_fim?: number; ano_iso_fim?: number;
   meses: {data:string;peso_mensal:number}[];
   sazonalidade:{estado:string;perfil:string;setor?:string|null;eventos:string[];demanda:number;insumos:number;frete:number;detalhes_eventos?:{nome:string;data:string;fase:string;impacto_demanda:number;orientacao:string;fonte:string}[]};
   proximos_eventos:{nome:string;data:string;impacto?:string;peso_setorial?:number}[];
 }
 export const dataCurta=(v:string)=>new Date(v+'T12:00:00').toLocaleDateString('pt-BR');
-export const tituloPeriodo=(c?:CalendarioSimulado|null)=>c?`Semana ${c.semana_iso}/${c.ano_iso} · ${dataCurta(c.inicio)} a ${dataCurta(c.fim)}`:'Calendário mensal';
+// A rodada dura 7 dias a partir da data ativa da turma; quando o intervalo
+// atravessa duas semanas ISO, o rótulo mostra as duas.
+export const rotuloSemanaIso=(c:Pick<CalendarioSimulado,'semana_iso'|'ano_iso'|'semana_iso_fim'|'ano_iso_fim'>)=>{
+  const fim=c.semana_iso_fim??c.semana_iso, anoFim=c.ano_iso_fim??c.ano_iso;
+  if(fim===c.semana_iso&&anoFim===c.ano_iso) return `Semana ISO ${c.semana_iso}/${c.ano_iso}`;
+  return anoFim===c.ano_iso?`Semanas ISO ${c.semana_iso}–${fim}/${c.ano_iso}`:`Semanas ISO ${c.semana_iso}/${c.ano_iso}–${fim}/${anoFim}`;
+};
+export const tituloPeriodo=(c?:CalendarioSimulado|null)=>c?`${rotuloSemanaIso(c)} · ${dataCurta(c.inicio)} a ${dataCurta(c.fim)}`:'Calendário mensal';
 
 // Rateio por dia em centavos: semanas atravessam meses sem duplicar receitas ou despesas.
 export function consolidarDres(resultados:import('./tipos').Resultado[], tipo:'mes'|'trimestre') {

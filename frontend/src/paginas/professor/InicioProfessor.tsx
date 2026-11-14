@@ -50,7 +50,7 @@ export default function InicioProfessor({ abrirTurma, proprietario=false }: { ab
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-marinho">Minhas turmas</h1>
-          <p className="text-sm text-slate-500">Crie uma turma, divulgue o código e conduza as rodadas.</p>
+          <p className="text-sm text-slate-500">Crie uma turma, informe o nome dela aos alunos e conduza as rodadas.</p>
         </div>
         {!criando && <Botao onClick={() => {setCriando(true);setAba("turmas");}}>Nova turma</Botao>}
       </div>
@@ -78,7 +78,6 @@ export default function InicioProfessor({ abrirTurma, proprietario=false }: { ab
                 {t.status === "ABERTA" ? "Em andamento" : "Encerrada"}
               </span>
             </div>
-            <p className="mt-3 font-mono text-2xl tracking-[0.3em] text-ouro">{t.codigo}</p>
             <p className="mt-2 text-sm text-slate-500">
               {t.quantidade_empresas} empresa(s) · {t.status === "ABERTA" ? `rodada ${t.rodada_atual} de ${t.total_rodadas}` : `${t.total_rodadas} rodadas`}
             </p>

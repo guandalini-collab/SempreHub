@@ -175,6 +175,8 @@ def periodo(config, rodada):
         'periodicidade': 'SEMANAL', 'inicio': inicio.isoformat(), 'fim': dias[-1].isoformat(),
         'dias': 7, 'fator_mensal': fator, 'semana_iso': inicio.isocalendar().week,
         'ano_iso': inicio.isocalendar().year, 'ano_fiscal': dias[-1].year,
+        # A rodada começa na data ativa da turma e pode atravessar duas semanas ISO.
+        'semana_iso_fim': dias[-1].isocalendar().week, 'ano_iso_fim': dias[-1].isocalendar().year,
         # Encargos e tributos são reconhecidos semanalmente na DRE, mas a
         # quitação ocorre na semana que encerra o mês civil simulado.
         'fim_mes': any(dia.day == monthrange(dia.year, dia.month)[1] for dia in dias),

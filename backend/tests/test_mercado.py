@@ -57,18 +57,15 @@ def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch,orig
     assert cliente.put(base+"/decisao",headers=aluno,json=completar_decisao({"preco":60})).status_code==422
     assert cliente.put(base+"/decisao",headers=aluno,json=completar_decisao(decisao)).status_code==200
     caminho=f"/api/professor/turmas/{turma['id']}/empresas/{empresa}/relatorio-empresarial/1"
-    monkeypatch.setattr(mercado,"gerar_json",lambda *a:({"resposta":"Formato incorreto"},set()))
-    assert cliente.post(caminho,headers=professor,json={}).status_code==502
-    def gerar_texto(*args):
-        assert args[2] is False  # O relatório usa registros encerrados, sem pesquisa de catálogo.
-        assert args[3]["properties"]["texto"]["type"] == "string"
-        assert args[3]["additionalProperties"] is False
-        return {"texto":"Relatório empresarial: a rodada registrou vendas e custos conforme os demonstrativos."},set()
-    monkeypatch.setattr(mercado,"gerar_json",gerar_texto)
-    assert cliente.post(caminho,headers=professor,json={}).status_code==200
-    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(_ for _ in ()).throw(AssertionError("Não deve gerar novamente")))
-    assert cliente.post(caminho,headers=professor,json={}).status_code==200
-    assert len(cliente.get(base+"/relatorios-empresariais",headers=aluno).json())==1
+    # O fechamento gera o relatório gerencial sem depender da IA: DRE, caixa e
+    # balanço ficam disponíveis ao aluno logo após o encerramento da rodada.
+    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(_ for _ in ()).throw(AssertionError("Sem chave, não chama a IA")))
+    resposta=cliente.post(caminho,headers=professor,json={})
+    assert resposta.status_code==200
+    texto=resposta.json()["texto"]
+    assert "DRE da rodada" in texto and "Fluxo de caixa" in texto and "Balanço patrimonial" in texto
+    relatorios=cliente.get(base+"/relatorios-empresariais",headers=aluno).json()
+    assert relatorios==[{"rodada":1,"texto":texto}]
 
 
 def test_recusa_fontes_nao_confirmadas(cliente,professor,monkeypatch):
@@ -208,3 +205,16 @@ def test_recusa_produto_fisico_em_startup_e_outro_setor(cliente, professor, monk
     assert cliente.post(base + "/pesquisar", headers=professor, json=pesquisa).status_code == 422
     assert cliente.post(base + "/pesquisar", headers=professor, json={**pesquisa, "setor": "Alimentos e Bebidas"}).status_code == 502
     assert cliente.get(base, headers=professor).json()["edicoes"] == []
+
+
+def test_relatorio_com_ia_acrescenta_leituras_e_cai_no_deterministico_se_falhar(monkeypatch):
+    from app.relatorio_gerencial import leituras_recomendadas, montar_relatorio
+    dados = {"rodada": 2, "demanda": 100, "unidades_vendidas": 40, "preco": 50,
+             "dre": {"receita": 2000, "folha": 3000, "pro_labore": 0, "lucro_liquido": -1500},
+             "dfc": {"variacao": -1500}, "balanco": {"ativo_total": 9000}, "alertas": []}
+    leituras = "\n".join(leituras_recomendadas(dados))
+    assert "Administração da produção" in leituras and "Contabilidade de custos" in leituras
+    texto = montar_relatorio(dados)
+    assert "-R$ 1.500,00" in texto and "Leituras recomendadas" in texto
+    sem_falha = {**dados, "unidades_vendidas": 100, "dre": {"receita": 9000, "folha": 1000, "lucro_liquido": 500}}
+    assert leituras_recomendadas(sem_falha) == []

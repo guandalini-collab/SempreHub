@@ -210,7 +210,7 @@ export default function PainelTurma({ turmaId }: { turmaId: number }) {
         <Cartao titulo="Envios e empresas da turma" className="lg:col-span-3">
           {empresas.length === 0 ? (
             <p className="text-sm text-slate-500">
-              Nenhum aluno entrou ainda. Divulgue o código <strong className="font-mono">{turma.codigo}</strong>.
+              Nenhum aluno entrou ainda. Informe aos alunos o nome da turma, <strong>{turma.nome}</strong>, que aparece na tela de ingresso.
             </p>
           ) : (
             <div className="overflow-x-auto">

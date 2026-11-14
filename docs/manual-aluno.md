@@ -34,7 +34,7 @@ Espero que esta experiência ajude você a transformar conhecimento em análise,
 
 ## Calendário semanal e sazonalidade
 
-Cada rodada semanal representa sete dias consecutivos, a partir da data de início definida automaticamente pelo servidor no horário de Brasília. Os meses seguem o calendário real: não se presume que todo mês tenha quatro semanas. A semana pode atravessar meses, trimestres e anos. O cabeçalho mostra suas datas. O prazo real de entrega às 23:59:59 de Brasília é independente dessas datas simuladas.
+Cada rodada semanal representa sete dias consecutivos, a partir da data de início definida automaticamente pelo servidor no horário de Brasília. Os meses seguem o calendário real: não se presume que todo mês tenha quatro semanas. A semana pode atravessar meses, trimestres e anos. O cabeçalho mostra suas datas. Como a rodada começa na data ativa da turma, os sete dias podem atravessar duas semanas ISO; nesse caso o cabeçalho mostra as duas, por exemplo "Semanas ISO 46–47/2026 · 14/11 a 20/11". O prazo real de entrega às 23:59:59 de Brasília é independente dessas datas simuladas.
 
 ### Início automático e preservação do histórico
 
@@ -363,6 +363,11 @@ Decisões, versões, responsáveis pelo envio, transferências, eventos e result
 - **A prévia não calculou:** corrija os valores indicados e tente novamente; o rascunho pode guardar um planejamento ainda incompleto.
 
 Use as referências de GEM e Dornelas para discutir o perfil empreendedor; Porter, SWOT, PESTEL e BCG para interpretar estratégia; e os demonstrativos para avaliar as consequências. O objetivo é aplicar a teoria, justificar escolhas e aprender com os resultados.
+
+
+### Relatório gerencial da rodada
+
+Depois que o professor encerra a rodada, o relatório gerencial da sua empresa aparece automaticamente na área de relatórios, com resultado comercial, DRE, fluxo de caixa e balanço em seções separadas. Quando algum resultado for fraco, o relatório indica uma leitura (livro e capítulo) para estudar o tema antes da próxima decisão.
 
 ## 10. Sua primeira rodada, passo a passo
 

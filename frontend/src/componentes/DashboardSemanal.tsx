@@ -2,6 +2,7 @@ import {useEffect,useRef,useState} from 'react';
 import {api} from '../api';
 import {Cartao,estiloEntrada} from './ui';
 import type {Resultado} from '../tipos';
+import {rotuloSemanaIso} from '../calendario';
 
 type Meta={alvo?:number;alerta?:number};
 type Dado={valor:number|null;estado:string;unidade:string;meta?:Meta&{status:string;direcao:string}};
@@ -40,7 +41,7 @@ export default function DashboardSemanal({empresaId,resultados,turmaId,somenteLe
  const metasArea=itens.filter(([nome])=>dados?.direcoes?.[area]?.[nome]);
  const quantidade=vista==='metas'?metasArea.length:vista==='bases'?atual.campos.length:itens.length;
  const tamanho=vista==='metas'?1:4;
- const titulo=(x:Resultado)=>{const c=x.detalhes_simulacao?.calendario;return c?`Semana ${c.semana_iso}/${c.ano_iso} · ${c.inicio} a ${c.fim} · R${x.rodada}`:`Rodada ${x.rodada} · histórico mensal`};
+ const titulo=(x:Resultado)=>{const c=x.detalhes_simulacao?.calendario;return c?`${rotuloSemanaIso(c)} · ${c.inicio} a ${c.fim} · R${x.rodada}`:`Rodada ${x.rodada} · histórico mensal`};
  function mudarMeta(chave:string,campo:'alvo'|'alerta',valor:string){setMetas(antes=>{const prox={...antes},m={...prox[chave]};if(valor==='')delete m[campo];else m[campo]=Number(valor);if(m.alvo==null&&m.alerta==null)delete prox[chave];else prox[chave]=m;return prox;});}
  return <Cartao titulo="Painel semanal">
   <label>Semana / período registrado<select aria-label="Semana dos indicadores" className={estiloEntrada} value={n??''} onChange={e=>{if(alterado){setMensagem('Salve ou descarte suas alterações antes de trocar a semana.');return;}setRodada(Number(e.target.value));setPagina(0);}} disabled={ocupado}>{resultados.map(x=><option key={x.rodada} value={x.rodada}>{titulo(x)}</option>)}</select></label>
