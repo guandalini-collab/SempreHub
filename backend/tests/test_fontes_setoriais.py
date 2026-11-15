@@ -24,7 +24,10 @@ def test_busca_restrita_ao_setor():
     ('https://www.abia.org.br/x', 'fonte não governamental'),
     ('https://datasebrae.com.br/x', 'fonte não governamental'),
     ('https://www.fao.org/faostat/', 'organismo internacional'),
-    ('https://abia.org.br.evil.com/x', ''),
+    # Domínio que imita uma entidade não recebe a marcação da entidade.
+    ('https://abia.org.br.evil.com/x', 'fonte de mercado (site não oficial)'),
+    ('https://g1.globo.com/economia/x', 'imprensa'),
+    ('https://www.instagram.com/p/x', ''),
 ])
 def test_natureza_da_fonte(url, natureza):
     assert natureza_fonte(url) == natureza

@@ -109,4 +109,54 @@ def natureza_fonte(url):
         return 'organismo internacional'
     if _pertence(host, DOMINIOS_SEBRAE + _TODOS_SETORIAIS):
         return 'fonte não governamental'
+    if _pertence(host, DOMINIOS_IMPRENSA):
+        return 'imprensa'
+    if not _pertence(host, DOMINIOS_BLOQUEADOS):
+        return 'fonte de mercado (site não oficial)'
     return ''
+
+
+# Camadas da pesquisa de mercado. A camada 1 (órgãos públicos, institutos,
+# Sebrae e entidades do setor) é sempre a primeira. As demais só completam as
+# notícias e análises que a anterior não conseguiu confirmar; em todas, o item
+# precisa de página real, aberta pelo sistema, com data de publicação conferida.
+CAMADAS = (1, 2, 3)
+
+# Camada 2: imprensa de acesso aberto (sem muro de assinatura, para que a
+# página possa ser aberta e conferida).
+DOMINIOS_IMPRENSA = (
+    'agenciabrasil.ebc.com.br', 'g1.globo.com', 'cnnbrasil.com.br', 'exame.com',
+    'infomoney.com.br', 'mercadoeconsumo.com.br', 'ecommercebrasil.com.br',
+)
+
+# Camada 3: web aberta, exceto redes sociais, vídeos, fóruns, lojas,
+# marketplaces e encurtadores, que não são fonte de informação de mercado.
+DOMINIOS_BLOQUEADOS = (
+    'facebook.com', 'instagram.com', 'x.com', 'twitter.com', 'tiktok.com', 'youtube.com', 'youtu.be',
+    'linkedin.com', 'reddit.com', 'pinterest.com', 'threads.net', 'kwai.com', 'whatsapp.com', 't.me',
+    'quora.com', 'medium.com', 'blogspot.com', 'wordpress.com',
+    'mercadolivre.com.br', 'amazon.com.br', 'amazon.com', 'shopee.com.br', 'magazineluiza.com.br',
+    'magalu.com.br', 'aliexpress.com', 'americanas.com.br', 'casasbahia.com.br', 'temu.com', 'shein.com',
+    'olx.com.br', 'submarino.com.br', 'kabum.com.br',
+    'bit.ly', 'tinyurl.com', 'encurtador.com.br', 'cutt.ly',
+)
+
+
+def fonte_da_camada(url, camada, setor=None):
+    """Indica se o endereço pode ser citado na camada informada."""
+    try:
+        host = _host(url)
+    except ValueError:
+        return False
+    if not host or _pertence(host, DOMINIOS_BLOQUEADOS):
+        return False
+    if camada == 1:
+        return _pertence(host, dominios_para(setor))
+    if camada == 2:
+        return _pertence(host, DOMINIOS_IMPRENSA)
+    return camada == 3
+
+
+def fonte_permitida(url):
+    """Fonte aceitável em alguma camada (usada na revisão e na publicação)."""
+    return fonte_oficial(url) or fonte_da_camada(url, 2) or fonte_da_camada(url, 3)

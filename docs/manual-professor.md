@@ -855,7 +855,30 @@ A pesquisa de mercado da rodada (Pesquisar e preparar edição) consulta três g
 
 Nas fontes exibidas, o levantamento de entidade setorial aparece com a marcação "fonte não governamental", e o dado da FAO com "organismo internacional". Esses números são da própria entidade, não estatística oficial; vale discutir essa diferença com a turma.
 
-Quando a primeira busca não encontra evidência, o sistema faz uma segunda tentativa nos mesmos domínios, com termos mais amplos do setor e as classificações oficiais (divisões da CNAE 2.0, capítulos da NCM e pesquisas do IBGE). Se ainda assim faltarem notícias ou análises, a edição é salva com o que foi confirmado e um aviso informa quantos itens faltaram; nada é completado sem fonte. Se nenhuma evidência for encontrada, nenhuma edição é salva.
+Quando a primeira busca não encontra evidência, o sistema faz uma segunda tentativa nos mesmos domínios, com termos mais amplos do setor e as classificações oficiais (divisões da CNAE 2.0, capítulos da NCM e pesquisas do IBGE).
+
+### Camadas de fontes
+
+Para que a edição não fique sem informação setorial, a pesquisa trabalha em três camadas. A camada seguinte só é consultada se a anterior não completar as notícias e análises pedidas, e busca apenas o que faltou.
+
+| Camada | Onde busca | Marcação exibida |
+|---|---|---|
+| 1 | Órgãos públicos, institutos de pesquisa, Sebrae e entidades do setor | "fonte não governamental" para entidades e Sebrae; sem marcação para dado oficial |
+| 2 | Imprensa de acesso aberto: Agência Brasil, g1, CNN Brasil, Exame, InfoMoney, Mercado & Consumo e E-Commerce Brasil | "imprensa" |
+| 3 | Web aberta, exceto redes sociais, vídeos, fóruns, lojas, marketplaces e encurtadores de link | "fonte de mercado (site não oficial)" |
+
+Em todas as camadas, cada item precisa de página real, aberta pelo sistema, com data de publicação conferida; nada é escrito sem fonte. Se ainda faltarem itens depois das três camadas, a edição é salva com o que foi confirmado e um aviso informa quantos faltaram. Se nenhuma evidência for encontrada, nenhuma edição é salva. Com as três camadas, a pesquisa pode levar de 3 a 5 minutos.
+
+A diferença entre dado oficial, reportagem e site não oficial é um bom ponto de discussão com a turma: o número de uma reportagem ou de um portal especializado pode ser útil, mas tem outro grau de confiabilidade.
+
+### Pesquisa automática antes da abertura
+
+Depois que a turma tiver uma primeira edição publicada (que define o setor e o tipo de comércio), as edições seguintes são pesquisadas automaticamente, com 3 notícias, 2 análises e 3 produtos.
+
+- Turma com calendário acadêmico: a pesquisa da rodada começa 2 horas antes da abertura. Se falhar, há nova tentativa a cada 30 minutos, no máximo 3, e nenhuma começa depois de 30 minutos antes da abertura; assim, a edição fica pronta com pelo menos 20 minutos de antecedência. Ela aparece em Revisar e publicar, onde pode ser editada, e é publicada sozinha quando a rodada abre. Na publicação automática, item cuja página não abrir naquele momento é retirado com aviso, e o restante é publicado.
+- Turma sem calendário acadêmico: a pesquisa roda logo após o fechamento da rodada (até 3 tentativas, a cada 10 minutos) e é publicada assim que fica pronta, alguns minutos depois de a rodada abrir. A primeira rodada é sempre preparada pelo professor.
+
+Só a edição criada pela pesquisa automática é publicada sozinha. Se o professor já tiver preparado uma edição para a rodada, a pesquisa automática não é feita; se ele publicar outra edição, a automática não é publicada. A situação de cada pesquisa (agendada, pronta, publicada ou com falha e o motivo) aparece no topo de Nova pesquisa. Se as três tentativas falharem, a rodada abre com as edições anteriores, e o motivo fica registrado nesse painel.
 
 Cada notícia e análise continua conferida na página citada: a página precisa abrir e mostrar a data de publicação. Boletins em PDF são lidos, e vale como data de publicação apenas a data completa impressa na primeira página (por exemplo, "Rio de Janeiro, 11 de novembro de 2026"); a data interna do arquivo não é usada, pois registra a geração do arquivo, e datas de atualização também não valem. Quando um item não passa nessa conferência (por exemplo, página inacessível ou PDF sem data na primeira página), apenas esse item é retirado e o aviso informa qual foi; o restante da edição é salvo. O mesmo vale para item que cite endereço não confirmado pela busca e para produto com dados incompletos: o item sai, ou o produto passa ao custo padrão da turma (Estimativa do Modelo), sempre com aviso. Na revisão e na publicação, a conferência segue estrita para todos os itens.
 

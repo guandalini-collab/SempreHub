@@ -27,7 +27,7 @@ from .conftest import cadastrar
 from .test_fluxo import _criar_turma, _entrar
 
 
-_HEAD = "0016_perfis_tecnicos_decisao"
+_HEAD = "0017_pesquisas_automaticas"
 
 
 @pytest.fixture()

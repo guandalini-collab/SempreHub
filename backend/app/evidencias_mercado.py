@@ -115,13 +115,23 @@ class FonteInsegura(ValueError):
     pass
 
 
-def obter_documento(url, somente_oficial=True):
-    """HTTPS público, IP fixado na conexão, redirects conferidos e resposta limitada."""
+def obter_documento(url, somente_oficial=None):
+    """HTTPS público, IP fixado na conexão, redirects conferidos e resposta limitada.
+
+    somente_oficial=True exige domínio oficial (boletins oficiais); o padrão
+    (None) aceita as fontes das três camadas da pesquisa de mercado e recusa
+    redes sociais, lojas e encurtadores; False não filtra domínios. Em todos
+    os casos valem as proteções de rede (HTTPS e endereço público).
+    """
     for _ in range(4):
         if somente_oficial:
             from .fontes_oficiais import fonte_oficial
             if not fonte_oficial(url):
                 raise FonteInsegura('Fonte ou redirecionamento não oficial.')
+        elif somente_oficial is None:
+            from .fontes_oficiais import fonte_permitida
+            if not fonte_permitida(url):
+                raise FonteInsegura('Fonte ou redirecionamento não aceito (rede social, loja ou encurtador).')
         u = urlsplit(url)
         if u.scheme != "https" or not u.hostname or u.username or u.password or u.port not in (None, 443):
             raise FonteInsegura("Fonte precisa usar HTTPS público.")

@@ -129,7 +129,7 @@ def _chave_url(url):
     return urlunparse(partes._replace(netloc=host, query=consulta)).rstrip("/")
 
 
-def _remover_fontes_nao_confirmadas(edicao, pesquisadas):
+def _remover_fontes_nao_confirmadas(edicao, pesquisadas, exigir_algo=True):
     """Na pesquisa nova, descarta só o que cita URL fora das citações da busca.
 
     Notícia ou análise sem nenhuma fonte confirmada sai da edição; produto
@@ -157,7 +157,7 @@ def _remover_fontes_nao_confirmadas(edicao, pesquisadas):
             produto.evidencia_custo = None
         if not produto.fontes:
             produto.estado_indicador = "Estimativa do Modelo"
-    if not edicao.noticias and not edicao.analises and not any(p.fontes for p in edicao.produtos):
+    if exigir_algo and not edicao.noticias and not edicao.analises and not any(p.fontes for p in edicao.produtos):
         raise HTTPException(502, "A pesquisa não confirmou nenhuma das fontes citadas; nenhuma edição foi salva.")
     if retirados:
         edicao.avisos = (list(edicao.avisos or []) + [
@@ -166,12 +166,14 @@ def _remover_fontes_nao_confirmadas(edicao, pesquisadas):
 
 
 def validar_fontes(dados, pesquisadas=None):
-    from ..fontes_oficiais import fonte_oficial
+    # Aceita as três camadas da pesquisa (oficiais e entidades, imprensa e
+    # sites de mercado); redes sociais, lojas e encurtadores são recusados.
+    from ..fontes_oficiais import fonte_permitida as fonte_oficial
     urls = []
     for item in dados.noticias + dados.analises:
         for fonte in item.fontes:
             if not fonte_oficial(fonte.url):
-                raise HTTPException(422, "Use somente fontes governamentais, institutos oficiais de pesquisa ou entidades setoriais autorizadas.")
+                raise HTTPException(422, "Fonte não aceita: redes sociais, vídeos, fóruns, lojas, marketplaces e encurtadores não podem ser citados.")
             urls.append(fonte.url)
     for produto in dados.produtos:
         # A estimativa só é permitida para o preço do produto. Nunca torna
@@ -182,7 +184,7 @@ def validar_fontes(dados, pesquisadas=None):
             raise HTTPException(422, "Todo produto documentado precisa informar ao menos uma fonte oficial.")
         for fonte in produto.fontes:
             if not fonte_oficial(fonte.url):
-                raise HTTPException(422, "Use somente fontes governamentais, institutos oficiais de pesquisa ou entidades setoriais autorizadas.")
+                raise HTTPException(422, "Fonte não aceita: redes sociais, vídeos, fóruns, lojas, marketplaces e encurtadores não podem ser citados.")
             urls.append(fonte.url)
     if pesquisadas is not None and any(_chave_url(url) not in {_chave_url(u) for u in pesquisadas} for url in urls):
         raise HTTPException(502, "A pesquisa não confirmou todas as fontes; nenhuma edição foi salva.")
@@ -246,11 +248,15 @@ def _completar_produtos_estimados(bruto: dict, turma, pesquisa: Pesquisa) -> Non
         })
         existentes.add(produto_id)
 
+class SetorDivergente(HTTPException):
+    """Resposta de outro setor: indica falha do modelo, não falta de fonte."""
+
+
 def validar_coerencia(edicao, turma, pesquisa=None, exigir_natureza=False):
     if edicao.modo_operacao is not None and edicao.modo_operacao != turma.modo_jogo:
         raise HTTPException(422, "A edição de mercado não corresponde ao modelo de operação da turma.")
     if pesquisa and (edicao.setor.strip().casefold() != pesquisa.setor.strip().casefold() or edicao.comercio != pesquisa.comercio):
-        raise HTTPException(502, "A pesquisa retornou outro setor ou tipo de comércio; nenhuma edição foi salva.")
+        raise SetorDivergente(502, "A pesquisa retornou outro setor ou tipo de comércio; nenhuma edição foi salva.")
     esperado = "SERVICO_DIGITAL" if turma.modo_jogo == "STARTUP" else "FISICO"
     for produto in edicao.produtos:
         if (exigir_natureza and produto.natureza is None) or (produto.natureza is not None and produto.natureza != esperado):
@@ -260,33 +266,72 @@ def validar_coerencia(edicao, turma, pesquisa=None, exigir_natureza=False):
 
 @router.get("/api/professor/turmas/{turma_id}/mercado")
 def listar(turma_id:int, db:Session=Depends(get_db), usuario:Usuario=Depends(exigir_professor)):
-    _turma_do_professor(db,turma_id,usuario)
-    return {"setores":SETORES,"edicoes":[serializar(e) for e in db.query(ConteudoMercado).filter_by(turma_id=turma_id).order_by(ConteudoMercado.id.desc()).all()]}
-
-@router.post("/api/professor/turmas/{turma_id}/mercado/pesquisar")
-def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:Usuario=Depends(exigir_professor)):
     turma=_turma_do_professor(db,turma_id,usuario)
-    rodada=turma.rodada_atual
-    if turma.status != StatusTurma.ABERTA: raise HTTPException(409,"Turma encerrada.")
-    instrucoes='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,competencia,impactos:[{departamento,tipo,efeito,pergunta_decisao}],fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,natureza,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. Cada produto deve incluir natureza FISICO ou SERVICO_DIGITAL conforme o modo de operação. O setor informado não determina o modelo da empresa. No modo tradicional descreva o custo por unidade de matéria-prima/kit de montagem documentado, identificando a base e sem atribuir custos industriais não documentados. Notícias e análises devem contextualizar o setor e o modo informado separadamente. Para CADA notícia e análise, indique a competência mês/ano a que o dado se refere, quando disponível, e até sete impactos práticos. Cada impacto deve relacionar um departamento a um possível efeito e formular uma pergunta que ajude a equipe a decidir; não dê respostas prontas nem trate hipótese como certeza. Departamentos permitidos: Produtos e marketing, P&D, Recursos humanos, Estratégia, Finanças, Produção e Logística. id deve ser texto, custo_unitario deve ser número em BRL, sem símbolos ou separadores locais. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; identifique preços varejistas como preco_varejo para projeção didática, nunca como custo industrial documentado. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Para notícias e análises, cite páginas com data de publicação identificável; em boletins PDF, a data de publicação deve estar impressa na primeira página. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores. Cada produto deve incluir evidencia_custo: {url,trecho}, com um trecho literal da página que contenha o nome exato do produto e seu preço em R$; use esse mesmo nome no campo nome. Não use estatísticas setoriais como fonte de preço. Não derive o preço documentado de médias ou faturamentos; a projeção didática pertence ao backend. A data dos artigos deve ser a data de publicação documentada (AAAA-MM-DD ou AAAA-MM), nunca a data atual da consulta. Para produtos sem data de publicação, indique explicitamente Consulta em AAAA-MM-DD com a data_consulta fornecida. Não atribua datas de atualização da página à publicação do artigo.'''
-    instrucoes += " Para cada produto informe tipo_documento: custo_aquisicao ou preco_varejo. Se encontrar apenas preço varejista, informe esse preço original em custo_unitario e tipo_documento=preco_varejo; o backend projetará o custo com fator 0,60. Não calcule esse desconto na resposta. Se não houver evidência verificável, o backend aplicará custo padrão da turma, identificado como estimativa. Não afirme que estimativas são preços comprovados."
-    schema = Edicao.model_json_schema()
-    schema["$defs"]["Produto"]["properties"]["natureza"] = {"type": "string", "enum": ["FISICO", "SERVICO_DIGITAL"]}
-    schema["$defs"]["Produto"]["required"].extend(["natureza", "tipo_documento"])
-    bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"calendario_simulado":ser.turma(turma).get("calendario"),"modo_operacao":turma.modo_jogo,"data_consulta":datetime.now(timezone.utc).date().isoformat()},True,schema,False,dados.setor)
+    return {"setores":SETORES,"edicoes":[serializar(e) for e in db.query(ConteudoMercado).filter_by(turma_id=turma_id).order_by(ConteudoMercado.id.desc()).all()],
+            "pesquisa_automatica":_situacao_automatica(db,turma)}
+
+
+def _situacao_automatica(db, turma):
+    """Situação da pesquisa automática exibida em Preparar rodada."""
+    from ..models import PesquisaAutomatica
+    from ..pesquisa_automatica import _ia_configurada, proxima_execucao
+    def data(valor):
+        return valor.isoformat() + "Z" if valor else None
+    registros = (db.query(PesquisaAutomatica).filter(PesquisaAutomatica.turma_id == turma.id,
+                 PesquisaAutomatica.rodada >= turma.rodada_atual).order_by(PesquisaAutomatica.rodada).all())
+    prevista = proxima_execucao(turma)
+    return {
+        "ativa": _ia_configurada(),
+        "com_agenda": bool(turma.agenda_academica),
+        "prevista": ({"rodada": prevista["rodada"], "inicio": data(prevista["inicio"]), "abertura": data(prevista["abertura"])}
+                     if prevista else None),
+        "registros": [{"rodada": r.rodada, "situacao": r.situacao, "tentativas": r.tentativas, "mensagem": r.mensagem,
+                       "conteudo_id": r.conteudo_id, "proxima_tentativa": data(r.proxima_tentativa),
+                       "atualizado_em": data(r.atualizado_em)} for r in registros],
+    }
+
+INSTRUCOES_PESQUISA='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,competencia,impactos:[{departamento,tipo,efeito,pergunta_decisao}],fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,natureza,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. Cada produto deve incluir natureza FISICO ou SERVICO_DIGITAL conforme o modo de operação. O setor informado não determina o modelo da empresa. No modo tradicional descreva o custo por unidade de matéria-prima/kit de montagem documentado, identificando a base e sem atribuir custos industriais não documentados. Notícias e análises devem contextualizar o setor e o modo informado separadamente. Para CADA notícia e análise, indique a competência mês/ano a que o dado se refere, quando disponível, e até sete impactos práticos. Cada impacto deve relacionar um departamento a um possível efeito e formular uma pergunta que ajude a equipe a decidir; não dê respostas prontas nem trate hipótese como certeza. Departamentos permitidos: Produtos e marketing, P&D, Recursos humanos, Estratégia, Finanças, Produção e Logística. id deve ser texto, custo_unitario deve ser número em BRL, sem símbolos ou separadores locais. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; identifique preços varejistas como preco_varejo para projeção didática, nunca como custo industrial documentado. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Para notícias e análises, cite páginas com data de publicação identificável; em boletins PDF, a data de publicação deve estar impressa na primeira página. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores. Cada produto deve incluir evidencia_custo: {url,trecho}, com um trecho literal da página que contenha o nome exato do produto e seu preço em R$; use esse mesmo nome no campo nome. Não use estatísticas setoriais como fonte de preço. Não derive o preço documentado de médias ou faturamentos; a projeção didática pertence ao backend. A data dos artigos deve ser a data de publicação documentada (AAAA-MM-DD ou AAAA-MM), nunca a data atual da consulta. Para produtos sem data de publicação, indique explicitamente Consulta em AAAA-MM-DD com a data_consulta fornecida. Não atribua datas de atualização da página à publicação do artigo.'''
+INSTRUCOES_PESQUISA += " Para cada produto informe tipo_documento: custo_aquisicao ou preco_varejo. Se encontrar apenas preço varejista, informe esse preço original em custo_unitario e tipo_documento=preco_varejo; o backend projetará o custo com fator 0,60. Não calcule esse desconto na resposta. Se não houver evidência verificável, o backend aplicará custo padrão da turma, identificado como estimativa. Não afirme que estimativas são preços comprovados."
+
+
+INSTRUCOES_COMPLEMENTO = (
+    "Pesquise na web notícias e análises atuais do mercado brasileiro do setor informado, no modo de operação "
+    "informado. Não invente notícias, datas, URLs ou números. Produza no máximo as quantidades solicitadas. JSON: "
+    "{noticias:[{titulo,texto,data,competencia,impactos:[{departamento,tipo,efeito,pergunta_decisao}],fontes:[{titulo,url}]}],"
+    "analises:[mesmo formato]}. Para cada item, indique a competência mês/ano a que o dado se refere, quando disponível, "
+    "e até sete impactos práticos, cada um relacionando um departamento a um possível efeito e a uma pergunta que ajude "
+    "a equipe a decidir, sem respostas prontas. Departamentos permitidos: Produtos e marketing, P&D, Recursos humanos, "
+    "Estratégia, Finanças, Produção e Logística. Notícias são fatos datados; análises distinguem fato de interpretação. "
+    "A data deve ser a data de publicação documentada na página (AAAA-MM-DD ou AAAA-MM), nunca a data da consulta nem a "
+    "de atualização; em PDF, a data impressa na primeira página. Use somente URLs que aparecem nas citações da "
+    "ferramenta. Não repita assuntos ou endereços da lista 'evitar'. Não dê decisões prontas aos alunos e não mencione "
+    "ferramentas de geração. Se não houver evidência suficiente, retorne menos itens."
+)
+
+ROTULO_CAMADA = {1: "fontes oficiais e entidades setoriais", 2: "imprensa", 3: "sites de mercado não oficiais"}
+
+
+class ComplementoArtigos(BaseModel):
+    noticias: list[Artigo] = Field(default_factory=list, max_length=10)
+    analises: list[Artigo] = Field(default_factory=list, max_length=10)
+
+
+def _artigos_conferidos(edicao_base, novos_n, novas_a, fontes, turma):
+    """Confere artigos de uma camada com as mesmas regras da pesquisa principal."""
+    tmp = edicao_base.model_copy(update={"noticias": novos_n, "analises": novas_a, "produtos": [], "avisos": []})
+    _remover_fontes_nao_confirmadas(tmp, fontes, exigir_algo=False)
+    validar_fontes(tmp, fontes)
+    validar_evidencias(tmp, turma, descartar_artigos=True)
+    return tmp
+
+
+def _processar_principal(bruto, fontes, turma, dados):
+    """Camada 1: notícias, análises e catálogo de produtos."""
     if isinstance(bruto, dict):
-        nomes = {"noticias": "notícias", "analises": "análises"}
-        faltas = [f"{nomes[k]}: {len(bruto[k])} de {getattr(dados,k)}" for k in nomes if isinstance(bruto.get(k),list) and len(bruto[k]) < getattr(dados,k)]
-        # A busca usa apenas fontes oficiais; notícias setoriais nesses
-        # domínios são raras. Em vez de descartar a edição inteira (inclusive
-        # os produtos), salva-se o que foi confirmado e o professor é avisado
-        # da diferença; nada é completado com conteúdo inventado.
-        for k in nomes:
+        for k in ("noticias", "analises"):
             if isinstance(bruto.get(k), list):
                 bruto[k] = bruto[k][:getattr(dados, k)]
-        bruto["avisos"] = ([f"A busca em fontes oficiais e entidades setoriais confirmou menos itens que o solicitado ({'; '.join(faltas)}), "
-                            "mesmo após nova tentativa com termos ampliados. "
-                            "Revise antes de publicar; nenhum item foi completado sem fonte."] if faltas else [])
+        bruto["avisos"] = list(bruto.get("avisos") or [])
         _completar_produtos_estimados(bruto, turma, dados)
     try: edicao=Edicao.model_validate(bruto)
     except ValidationError as erro:
@@ -300,19 +345,86 @@ def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:
                        for indice, produto in enumerate(edicao.produtos)]
     if len(edicao.produtos)!=dados.produtos:
         raise HTTPException(502,"A pesquisa não entregou as quantidades solicitadas.")
-    _remover_fontes_nao_confirmadas(edicao, fontes)
+    _remover_fontes_nao_confirmadas(edicao, fontes, exigir_algo=False)
     validar_fontes(edicao,fontes)
     validar_coerencia(edicao,turma,dados,exigir_natureza=True)
     validar_evidencias(edicao, turma, descartar_artigos=True)
+    return edicao
+
+
+def executar_pesquisa(db, turma, dados, rodada, exigir_rodada_atual=True):
+    """Pesquisa a edição de mercado da rodada informada e a salva sem publicar.
+
+    Camada 1 traz notícias, análises e produtos de fontes oficiais e entidades
+    setoriais. Se faltarem notícias ou análises conferidas, a camada 2
+    (imprensa aberta) e depois a camada 3 (sites de mercado) buscam apenas o
+    que faltou. Em todas, cada item precisa de página real com data conferida.
+    Usada pelo botão do professor e pela pesquisa automática.
+    """
+    if turma.status != StatusTurma.ABERTA: raise HTTPException(409,"Turma encerrada.")
+    schema = Edicao.model_json_schema()
+    schema["$defs"]["Produto"]["properties"]["natureza"] = {"type": "string", "enum": ["FISICO", "SERVICO_DIGITAL"]}
+    schema["$defs"]["Produto"]["required"].extend(["natureza", "tipo_documento"])
+    base = {"modo_operacao": turma.modo_jogo, "data_consulta": datetime.now(timezone.utc).date().isoformat()}
+    avisos_camadas = []
+    try:
+        bruto,fontes=gerar_json(INSTRUCOES_PESQUISA,{**dados.model_dump(),"calendario_simulado":ser.turma(turma).get("calendario"),**base},True,schema,False,dados.setor)
+        edicao = _processar_principal(bruto, fontes, turma, dados)
+    except HTTPException as erro:
+        # Falha de busca na camada 1 não impede as demais camadas; o catálogo
+        # fica com o custo padrão da turma, identificado como estimativa.
+        if erro.status_code != 502 or isinstance(erro, SetorDivergente):
+            raise
+        avisos_camadas.append(f"Fontes oficiais e entidades setoriais: {erro.detail}")
+        edicao = _processar_principal({"setor": dados.setor, "comercio": dados.comercio, "noticias": [], "analises": [],
+                                       "produtos": [], "avisos": []}, set(), turma, dados)
+    for camada in (2, 3):
+        faltam_n = dados.noticias - len(edicao.noticias)
+        faltam_a = dados.analises - len(edicao.analises)
+        if faltam_n <= 0 and faltam_a <= 0:
+            break
+        evitar = [a.titulo for a in edicao.noticias + edicao.analises] + [f.url for a in edicao.noticias + edicao.analises for f in a.fontes]
+        try:
+            bruto, fontes = gerar_json(INSTRUCOES_COMPLEMENTO, {"setor": dados.setor, "comercio": dados.comercio,
+                                       "noticias": max(faltam_n, 0), "analises": max(faltam_a, 0), "evitar": evitar[:30], **base},
+                                       True, ComplementoArtigos.model_json_schema(), False, dados.setor, False, camada)
+            complemento = ComplementoArtigos.model_validate(bruto)
+            usados = {a.titulo.casefold() for a in edicao.noticias + edicao.analises} | {_chave_url(f.url) for a in edicao.noticias + edicao.analises for f in a.fontes}
+            novos = lambda itens: [a for a in itens if a.titulo.casefold() not in usados and not any(_chave_url(f.url) in usados for f in a.fontes)]
+            conferidos = _artigos_conferidos(edicao, novos(complemento.noticias)[:max(faltam_n, 0)], novos(complemento.analises)[:max(faltam_a, 0)], fontes, turma)
+        except HTTPException as erro:
+            if erro.status_code != 502:
+                raise
+            avisos_camadas.append(f"Camada {camada} ({ROTULO_CAMADA[camada]}): {erro.detail}")
+            continue
+        except ValidationError:
+            avisos_camadas.append(f"Camada {camada} ({ROTULO_CAMADA[camada]}): resposta incompleta; nenhum item aproveitado.")
+            continue
+        edicao.noticias += conferidos.noticias
+        edicao.analises += conferidos.analises
+        avisos_camadas += [f"Camada {camada} ({ROTULO_CAMADA[camada]}): {a}" for a in conferidos.avisos]
+        if conferidos.noticias or conferidos.analises:
+            avisos_camadas.append(f"Camada {camada} ({ROTULO_CAMADA[camada]}) completou {len(conferidos.noticias)} notícia(s) e {len(conferidos.analises)} análise(s).")
+    faltas = [f"{nome}: {len(getattr(edicao, k))} de {getattr(dados, k)}" for k, nome in (("noticias", "notícias"), ("analises", "análises")) if len(getattr(edicao, k)) < getattr(dados, k)]
+    if faltas:
+        avisos_camadas.append(f"Mesmo após as três camadas de fontes, confirmaram-se menos itens que o solicitado ({'; '.join(faltas)}). Nenhum item foi completado sem fonte.")
+    edicao.avisos = (list(edicao.avisos) + avisos_camadas)[:10]
     if not edicao.noticias and not edicao.analises and all(p.estado_indicador == "Estimativa do Modelo" and not p.valor_documentado for p in edicao.produtos):
-        motivo = " ".join(edicao.avisos)[:600]
+        motivo = " ".join(edicao.avisos)[:900]
         raise HTTPException(502, "Nenhum item da pesquisa pôde ser conferido nas páginas citadas; nenhuma edição foi salva. " + motivo)
     edicao.modo_operacao=turma.modo_jogo
     db.refresh(turma)
-    if turma.rodada_atual != rodada: raise HTTPException(409,"A rodada avançou durante a pesquisa. Repita para a rodada atual.")
-    e=ConteudoMercado(turma_id=turma_id,rodada=rodada,dados=edicao.model_dump())
+    if (exigir_rodada_atual and turma.rodada_atual != rodada) or turma.rodada_atual > rodada or turma.status != StatusTurma.ABERTA:
+        raise HTTPException(409,"A rodada avançou durante a pesquisa. Repita para a rodada atual.")
+    e=ConteudoMercado(turma_id=turma.id,rodada=rodada,dados=edicao.model_dump())
     db.add(e);db.commit();db.refresh(e)
-    return serializar(e)
+    return e
+
+
+@router.post("/api/professor/turmas/{turma_id}/mercado/pesquisar")
+def pesquisar(turma_id:int, dados:Pesquisa, db:Session=Depends(get_db), usuario:Usuario=Depends(exigir_professor)):
+    turma=_turma_do_professor(db,turma_id,usuario)
+    return serializar(executar_pesquisa(db, turma, dados, turma.rodada_atual))
 
 @router.put("/api/professor/turmas/{turma_id}/mercado/{edicao_id}")
 def revisar(turma_id:int, edicao_id:int,dados:Edicao, db:Session=Depends(get_db), usuario:Usuario=Depends(exigir_professor)):
@@ -341,17 +453,27 @@ def publicar(turma_id:int,edicao_id:int, db:Session=Depends(get_db), usuario:Usu
     if e.publicado: return serializar(e)
     if e.rodada!=turma.rodada_atual or turma.status!=StatusTurma.ABERTA: raise HTTPException(409,"Só é possível publicar na rodada aberta.")
     if db.query(ConteudoMercado).filter_by(turma_id=turma_id,rodada=e.rodada,publicado=True).first(): raise HTTPException(409,"Esta rodada já tem edição publicada.")
+    publicar_conteudo(db, turma, e)
+    db.commit();return serializar(e)
+
+
+def publicar_conteudo(db, turma, e, descartar=False):
+    """Confere e publica a edição; o chamador confirma a transação.
+
+    descartar=True (publicação automática) retira, com aviso, o item cuja
+    página não abrir nesse momento, em vez de recusar a edição inteira.
+    """
     dados=Edicao.model_validate(e.dados)
     validar_fontes(dados)
     validar_coerencia(dados,turma,exigir_natureza=True)
-    validar_evidencias(dados, turma)
+    validar_evidencias(dados, turma, descartar_artigos=descartar)
     e.dados=dados.model_dump()
     # A partir da próxima apuração, o motor sabe qual segmento deve receber os
     # efeitos sazonais. Resultados já fechados continuam apenas com seu snapshot.
     configuracao = ConfiguracaoSimulacao.model_validate(turma.configuracao_simulacao or {})
     configuracao.setor_mercado = dados.setor
     turma.configuracao_simulacao = configuracao.model_dump()
-    e.publicado=True;db.commit();return serializar(e)
+    e.publicado=True
 
 @router.get("/api/aluno/empresas/{empresa_id}/mercado-real")
 def mercado_aluno(empresa_id:int,db:Session=Depends(get_db),usuario:Usuario=Depends(exigir_aluno)):

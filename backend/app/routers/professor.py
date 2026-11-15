@@ -17,7 +17,7 @@ from ..experiencia import jornada_empresa
 from ..database import get_db
 from ..equipes import bloquear_turma, novo_convite, invalidar_aprovacoes, registrar, dados_equipe, decisao_atual, pendencias_equipe, pendencias_fechamento, verificar_rodada
 from ..models import (
-    AcessoAba, AprovacaoDecisao, ConteudoMercado, Decisao, DiagnosticoEstrategico,
+    AcessoAba, AprovacaoDecisao, ConteudoMercado, Decisao, DiagnosticoEstrategico, PesquisaAutomatica,
     Empresa, EventoOperacional, EventoRodada, MatriculaTurma, MembroEmpresa,
     ObservacaoSemanal, Papel, RegistroEquipe, RelatorioEmpresarial, Resultado,
     StatusTurma, Turma, Usuario,
@@ -156,6 +156,7 @@ def excluir_turma(
     db.execute(delete(MembroEmpresa).where(MembroEmpresa.turma_id == turma.id))
     db.execute(delete(EventoOperacional).where(EventoOperacional.turma_id == turma.id))
     db.execute(delete(EventoRodada).where(EventoRodada.turma_id == turma.id))
+    db.execute(delete(PesquisaAutomatica).where(PesquisaAutomatica.turma_id == turma.id))
     edicoes_da_turma = db.query(ConteudoMercado.id).filter(ConteudoMercado.turma_id == turma.id).subquery()
     db.execute(delete(DiagnosticoEstrategico).where(DiagnosticoEstrategico.edicao_id.in_(edicoes_da_turma)))
     db.execute(delete(ConteudoMercado).where(ConteudoMercado.turma_id == turma.id))

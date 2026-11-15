@@ -89,11 +89,23 @@ async def iniciar_calendario():
             primeira_execucao=False
             await asyncio.sleep(300)
     app.state.atualizacoes = asyncio.create_task(consultar_fontes())
+    from .pesquisa_automatica import executar_ciclo
+    async def pesquisar_mercado():
+        # Laço separado do fechamento de rodadas: a pesquisa leva minutos e
+        # não pode atrasar o encerramento automático.
+        while True:
+            try:
+                await asyncio.to_thread(executar_ciclo)
+            except Exception:
+                import logging
+                logging.getLogger(__name__).exception("Pesquisa automática de mercado pendente; nova tentativa no próximo ciclo.")
+            await asyncio.sleep(60)
+    app.state.pesquisa_mercado = asyncio.create_task(pesquisar_mercado())
 
 @app.on_event("shutdown")
 async def parar_calendario():
     import asyncio
-    for nome in ('calendario','atualizacoes'):
+    for nome in ('calendario','atualizacoes','pesquisa_mercado'):
         tarefa = getattr(app.state, nome, None)
         if tarefa:
             tarefa.cancel()

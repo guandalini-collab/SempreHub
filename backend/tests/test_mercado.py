@@ -266,3 +266,48 @@ def test_nada_conferido_nao_salva_edicao(cliente, professor, monkeypatch):
                      json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
     assert r.status_code == 502 and "página não pôde ser lida" in r.json()["detail"]
     assert cliente.get(base, headers=professor).json()["edicoes"] == []
+
+
+def _artigo(titulo, url, data="2026-10-06"):
+    return {"titulo": titulo, "texto": "Fato de mercado publicado na página citada.", "data": data,
+            "fontes": [{"titulo": titulo, "url": url}]}
+
+
+def test_camadas_completam_noticias_com_imprensa_e_web(cliente, professor, monkeypatch):
+    from fastapi import HTTPException
+    from app.routers import mercado
+    chamadas = []
+    def gerar(instrucoes, dados, pesquisar, schema, projecoes, setor, ampliada=False, camada=1):
+        chamadas.append(camada)
+        if camada == 1:
+            raise HTTPException(502, "A busca não encontrou evidências com fontes confirmadas.")
+        if camada == 2:
+            return {"noticias": [_artigo("Varejo cresce", "https://g1.globo.com/economia/varejo")], "analises": []}, {"https://g1.globo.com/economia/varejo"}
+        return ({"noticias": [], "analises": [_artigo("Tendência do setor", "https://www.portaldosetor.com.br/tendencia"),
+                                               _artigo("Post", "https://www.instagram.com/p/x")]},
+                {"https://www.portaldosetor.com.br/tendencia"})
+    monkeypatch.setattr(mercado, "gerar_json", gerar)
+    turma = _criar_turma(cliente, professor, total_rodadas=3)
+    r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
+                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+    assert r.status_code == 200, r.text
+    edic = r.json()["dados"]
+    assert chamadas == [1, 2, 3]
+    assert edic["noticias"][0]["fontes"][0]["natureza"] == "imprensa"
+    assert [a["titulo"] for a in edic["analises"]] == ["Tendência do setor"]
+    assert edic["analises"][0]["fontes"][0]["natureza"] == "fonte de mercado (site não oficial)"
+    assert edic["produtos"][0]["estado_indicador"] == "Estimativa do Modelo"
+    assert any("Camada 2 (imprensa) completou 1 notícia(s)" in a for a in edic["avisos"])
+
+
+def test_camada_seguinte_so_roda_se_faltar_item(cliente, professor, monkeypatch):
+    from app.routers import mercado
+    chamadas = []
+    def gerar(*a):
+        chamadas.append(a[7] if len(a) > 7 else 1)
+        return edicao(), {"https://www.ibge.gov.br/produto"}
+    monkeypatch.setattr(mercado, "gerar_json", gerar)
+    turma = _criar_turma(cliente, professor, total_rodadas=3)
+    r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
+                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+    assert r.status_code == 200 and chamadas == [1]

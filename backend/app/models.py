@@ -417,6 +417,22 @@ class ConteudoMercado(Base):
     criado_em = Column(DateTime, nullable=False, default=agora)
 
 
+class PesquisaAutomatica(Base):
+    """Situação da pesquisa automática de mercado de cada rodada da turma."""
+    __tablename__ = "pesquisas_automaticas"
+    __table_args__ = (UniqueConstraint("turma_id", "rodada", name="uq_pesquisa_automatica_turma_rodada"),)
+    id = Column(Integer, primary_key=True)
+    turma_id = Column(Integer, ForeignKey("turmas.id"), nullable=False, index=True)
+    rodada = Column(Integer, nullable=False)
+    # EM_ANDAMENTO, PRONTA, PUBLICADA, FALHOU ou IGNORADA.
+    situacao = Column(String(20), nullable=False)
+    tentativas = Column(Integer, nullable=False, default=0)
+    mensagem = Column(String(2000), nullable=True)
+    conteudo_id = Column(Integer, ForeignKey("conteudos_mercado.id"), nullable=True)
+    proxima_tentativa = Column(DateTime, nullable=True)
+    atualizado_em = Column(DateTime, nullable=False, default=agora)
+
+
 class RelatorioEmpresarial(Base):
     __tablename__ = "relatorios_empresariais"
     __table_args__ = (UniqueConstraint("empresa_id", "rodada", name="uq_relatorio_empresarial"),)
