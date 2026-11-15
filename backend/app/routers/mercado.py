@@ -241,7 +241,7 @@ def _completar_produtos_estimados(bruto: dict, turma, pesquisa: Pesquisa) -> Non
             "fontes": [],
             "tipo_documento": "custo_aquisicao",
             "estado_indicador": "Estimativa do Modelo",
-            "formula_aplicada": "Custo Padrão da Turma (Fallback por ausência de custo documentado)",
+            "formula_aplicada": "Custo Padrão da Turma (por ausência de custo documentado)",
             "alerta_professor": "Pesquisa sem custo documental verificável; aplicado custo padrão configurado para a turma.",
         })
         existentes.add(produto_id)

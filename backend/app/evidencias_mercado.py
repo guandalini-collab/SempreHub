@@ -165,8 +165,11 @@ def obter_documento(url, somente_oficial=True):
     raise ValueError("Excesso de redirecionamentos.")
 
 
-def _validar_estritamente(edicao):
-    documentos = {}
+def _validar_estritamente(edicao, documentos=None):
+    # Páginas já abertas nesta operação (pesquisa, revisão ou publicação):
+    # cada endereço é baixado uma única vez, e a falha também é guardada,
+    # para que todas as etapas cheguem ao mesmo resultado.
+    documentos = {} if documentos is None else documentos
     # Falta de prova deve ser informada antes de qualquer consulta externa.
     for produto in edicao.produtos:
         prova = produto.evidencia_custo
@@ -181,7 +184,9 @@ def _validar_estritamente(edicao):
                 raise
             except (OSError, ValueError, http.client.HTTPException) as erro:
                 _log.warning("pesquisa: leitura falhou em %s: %s: %s", url, type(erro).__name__, str(erro)[:200])
-                raise HTTPException(422, "Não foi possível conferir o conteúdo de uma fonte. A edição não pode ser salva ou publicada; use uma fonte acessível.") from None
+                documentos[url] = HTTPException(422, "Não foi possível conferir o conteúdo de uma fonte. A edição não pode ser salva ou publicada; use uma fonte acessível.")
+        if isinstance(documentos[url], HTTPException):
+            raise documentos[url]
         return documentos[url]
 
     def data_confere(item, permitir_consulta=False):
@@ -225,7 +230,7 @@ def _alerta_estimativa(motivo: str) -> str:
             + (f"Motivo: {causa}" if causa else "")).strip()
 
 
-def _descartar_artigos_sem_prova(edicao):
+def _descartar_artigos_sem_prova(edicao, documentos):
     """Na pesquisa nova, retira só a notícia ou análise que não pôde ser conferida.
 
     Cada item continua passando pela conferência estrita (página acessível e
@@ -238,7 +243,7 @@ def _descartar_artigos_sem_prova(edicao):
         for item in getattr(edicao, campo):
             vazio = {"noticias": [], "analises": [], "produtos": []}
             try:
-                _validar_estritamente(edicao.model_copy(update={**vazio, campo: [item]}))
+                _validar_estritamente(edicao.model_copy(update={**vazio, campo: [item]}), documentos)
             except FonteInsegura:
                 raise HTTPException(422, "Fonte bloqueada: use somente HTTPS público, sem endereços internos.") from None
             except HTTPException as erro:
@@ -263,11 +268,12 @@ def validar_evidencias(edicao, turma=None, descartar_artigos=False):
         return turma.custo_unitario
 
     edicao.versao_custos_catalogo = "1.0.0-three-paths"
+    documentos = {}
     if descartar_artigos:
-        _descartar_artigos_sem_prova(edicao)
+        _descartar_artigos_sem_prova(edicao, documentos)
     artigos = edicao.model_copy(update={"produtos": []})
     try:
-        _validar_estritamente(artigos)
+        _validar_estritamente(artigos, documentos)
     except FonteInsegura:
         raise HTTPException(422, "Fonte bloqueada: use somente HTTPS público, sem endereços internos.") from None
     for produto in edicao.produtos:
@@ -275,14 +281,14 @@ def validar_evidencias(edicao, turma=None, descartar_artigos=False):
             # Valida o preço original, evitando aplicar 0,60 novamente na publicação.
             if produto.tipo_documento == "preco_varejo" and produto.valor_documentado is not None:
                 produto.custo_unitario = produto.valor_documentado
-            _validar_estritamente(edicao.model_copy(update={"noticias": [], "analises": [], "produtos": [produto]}))
+            _validar_estritamente(edicao.model_copy(update={"noticias": [], "analises": [], "produtos": [produto]}), documentos)
         except FonteInsegura:
             raise HTTPException(422, "Fonte bloqueada: use somente HTTPS público, sem endereços internos.") from None
         except HTTPException as erro:
             produto.custo_unitario = custo_padrao()
             produto.valor_documentado = None
             produto.estado_indicador = "Estimativa do Modelo"
-            produto.formula_aplicada = "Custo Padrão da Turma (Fallback por falha de leitura)"
+            produto.formula_aplicada = "Custo Padrão da Turma (por falha de leitura da fonte)"
             produto.alerta_professor = _alerta_estimativa(str(erro.detail))
             produto.base_custo = f"Estimativa do Modelo: custo padrão da turma de R$ {turma.custo_unitario:.2f}. Fonte não comprovada; não representa custo real documentado."
             produto.data = "Consulta em " + datetime.now(timezone.utc).date().isoformat()

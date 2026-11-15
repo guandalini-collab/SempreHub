@@ -179,3 +179,24 @@ def test_pdf_usa_data_impressa_na_primeira_pagina():
     doc = provas.DocumentoPDF(_pdf(["Boletim\nRio de Janeiro, 11 de novembro de 2026\nAtualizado em 12/11/2026", "Vendas variam 0,5%"]))
     assert doc.datas == {"2026-11-11"}
     assert "vendas variam 0,5%" in doc.texto
+
+
+def test_cada_pagina_e_baixada_uma_unica_vez(monkeypatch):
+    from types import SimpleNamespace
+    boa = '<meta property="article:published_time" content="2026-10-06T12:00:00"><main>Produto de teste R$ 30,00 por unidade ou cliente/mês.</main>'
+    dados = Edicao.model_validate(edicao())
+    dados.noticias.append(dados.noticias[0].model_copy(deep=True, update={"titulo": "Segunda notícia"}))
+    url_ruim = 'https://www.ibge.gov.br/instavel'
+    dados.noticias.append(dados.noticias[0].model_copy(deep=True, update={"titulo": "Notícia instável"}))
+    dados.noticias[-1].fontes[0].url = url_ruim
+    chamadas = []
+    def obter(url):
+        chamadas.append(url)
+        if url == url_ruim: raise TimeoutError('timed out')
+        return provas.Documento(boa)
+    monkeypatch.setattr(provas, 'obter_documento', obter)
+    provas.validar_evidencias(dados, SimpleNamespace(custo_unitario=40), descartar_artigos=True)
+    # Cada endereço uma única vez: a falha guardada não derruba a etapa final.
+    assert sorted(chamadas) == sorted(set(chamadas))
+    assert [n.titulo for n in dados.noticias][-1] == "Segunda notícia"
+    assert dados.produtos[0].estado_indicador == "Valor Calculado"
