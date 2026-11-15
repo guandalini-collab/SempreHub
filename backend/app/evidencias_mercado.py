@@ -75,6 +75,42 @@ class Documento(HTMLParser):
             self.partes.append(texto)
 
 
+MESES = {"janeiro": 1, "fevereiro": 2, "março": 3, "marco": 3, "abril": 4, "maio": 5, "junho": 6, "julho": 7,
+         "agosto": 8, "setembro": 9, "outubro": 10, "novembro": 11, "dezembro": 12}
+
+
+class DocumentoPDF:
+    """Texto de um PDF público e a data impressa na primeira página.
+
+    Regra: vale como data de publicação somente a data completa (dia, mês e
+    ano) impressa na primeira página, como em "Rio de Janeiro, 11 de novembro
+    de 2026" ou "11/11/2026". A data interna do arquivo não é usada, porque
+    registra a geração do arquivo, não a publicação. Sem data na primeira
+    página, o item não é conferido e sai da pesquisa nova com aviso.
+    """
+
+    def __init__(self, conteudo):
+        from io import BytesIO
+        from pypdf import PdfReader
+        leitor = PdfReader(BytesIO(conteudo))
+        paginas = [(pagina.extract_text() or "") for pagina in leitor.pages[:40]]
+        self.texto = normalizar(" ".join(paginas))
+        self.datas = datas_impressas(normalizar(paginas[0] if paginas else ""))
+
+
+def datas_impressas(texto):
+    datas = set()
+    for achado in re.finditer(r"\b(\d{1,2})º?\s+de\s+([a-zç]+)\s+de\s+(\d{4})\b", texto):
+        dia, mes, ano = achado.groups()
+        if mes in MESES and not re.search(r"atualizad[oa]\s*(em)?\s*:?\s*$", texto[max(0, achado.start() - 20):achado.start()]):
+            datas.add(f"{ano}-{MESES[mes]:02d}-{int(dia):02d}")
+    for achado in re.finditer(r"\b(\d{2})/(\d{2})/(\d{4})\b", texto):
+        if not re.search(r"atualizad[oa]\s*(em)?\s*:?\s*$", texto[max(0, achado.start() - 20):achado.start()]):
+            dia, mes, ano = achado.groups()
+            datas.add(f"{ano}-{mes}-{dia}")
+    return datas
+
+
 class FonteInsegura(ValueError):
     pass
 
@@ -100,13 +136,24 @@ def obter_documento(url, somente_oficial=True):
         try:
             conexao.request("GET", (u.path or "/") + ("?" + u.query if u.query else ""),
                             headers={"User-Agent": "Mozilla/5.0 (compatible; SempreHub/1.0; +https://www.semprehub.com.br)",
-                                     "Accept": "text/html,application/xhtml+xml", "Accept-Language": "pt-BR,pt;q=0.9",
+                                     "Accept": "text/html,application/xhtml+xml,application/pdf", "Accept-Language": "pt-BR,pt;q=0.9",
                                      "Accept-Encoding": "identity"})
             resposta = conexao.getresponse()
             if resposta.status in (301, 302, 303, 307, 308):
                 url = urljoin(url, resposta.getheader("Location", ""))
                 continue
-            if resposta.status != 200 or "html" not in resposta.getheader("Content-Type", "").lower():
+            tipo = resposta.getheader("Content-Type", "").lower()
+            if resposta.status == 200 and "application/pdf" in tipo:
+                corpo = resposta.read(15_000_001)
+                if len(corpo) > 15_000_000 or resposta.getheader("Content-Encoding", "identity") != "identity":
+                    raise ValueError("PDF excede os limites de leitura.")
+                try:
+                    return DocumentoPDF(corpo)
+                except ValueError:
+                    raise
+                except Exception as erro:  # PDF corrompido ou protegido
+                    raise ValueError(f"PDF ilegível: {type(erro).__name__}.") from None
+            if resposta.status != 200 or "html" not in tipo:
                 raise ValueError(f"Documento não disponível como HTML (HTTP {resposta.status}, "
                                  f"{resposta.getheader('Content-Type', '')[:60]}).")
             corpo = resposta.read(2_000_001)
@@ -201,8 +248,8 @@ def _descartar_artigos_sem_prova(edicao):
                 mantidos.append(item)
         setattr(edicao, campo, mantidos)
     if descartados:
-        aviso = ("Itens retirados porque a página citada não pôde ser conferida (página inacessível, arquivo PDF "
-                 "ou data de publicação não identificada): " + "; ".join(descartados) + ". Nada foi completado sem fonte.")
+        aviso = ("Itens retirados porque a página citada não pôde ser conferida (página inacessível, PDF sem data na "
+                 "primeira página ou data de publicação não identificada): " + "; ".join(descartados) + ". Nada foi completado sem fonte.")
         edicao.avisos = (list(edicao.avisos or []) + [aviso])[:10]
 
 

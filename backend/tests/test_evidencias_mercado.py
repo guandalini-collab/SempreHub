@@ -156,3 +156,26 @@ def test_endereco_com_www_ou_rastreio_e_o_mesmo():
     from app.routers.mercado import _chave_url
     assert _chave_url('https://www.exemplo.sebrae.com.br/a') == _chave_url('https://exemplo.sebrae.com.br/a/')
     assert _chave_url('https://cetic.br/a/?trk=x&utm_source=openai') == _chave_url('https://cetic.br/a')
+
+
+def _pdf(paginas):
+    from io import BytesIO
+    from reportlab.pdfgen import canvas
+    saida = BytesIO()
+    c = canvas.Canvas(saida)
+    for texto in paginas:
+        y = 800
+        for linha in texto.split("\n"):
+            c.drawString(50, y, linha); y -= 20
+        c.showPage()
+    c.save()
+    return saida.getvalue()
+
+
+def test_pdf_usa_data_impressa_na_primeira_pagina():
+    doc = provas.DocumentoPDF(_pdf(["Pesquisa Mensal de Comercio", "Rio de Janeiro, 11 de novembro de 2026",
+                                    "Vendas variam 0,5%"][:1] + ["Rio de Janeiro, 11 de novembro de 2026\nVendas variam 0,5%"]))
+    assert doc.datas == set()  # a data está só na segunda página
+    doc = provas.DocumentoPDF(_pdf(["Boletim\nRio de Janeiro, 11 de novembro de 2026\nAtualizado em 12/11/2026", "Vendas variam 0,5%"]))
+    assert doc.datas == {"2026-11-11"}
+    assert "vendas variam 0,5%" in doc.texto

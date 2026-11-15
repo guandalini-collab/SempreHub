@@ -3610,10 +3610,10 @@ endobj
 301 0 obj
 <<
 /Author (Professor Guandalini)
-/CreationDate (D\07220261114185853\05503\04700\047)
+/CreationDate (D\07220261114231443\05503\04700\047)
 /Creator (\050unspecified\051)
 /Keywords ()
-/ModDate (D\07220261114185853\05503\04700\047)
+/ModDate (D\07220261114231443\05503\04700\047)
 /Producer (ReportLab PDF Library \055 \050opensource\051)
 /Subject (\050unspecified\051)
 /Title (SempreHub \055 Manual do professor)
@@ -32700,7 +32700,7 @@ endstream
 endobj
 410 0 obj
 <<
-/Length 2616
+/Length 3080
 >>
 stream
 q
@@ -32734,10 +32734,9 @@ BT 1 0 0 1 0 96 Tm /F1 12 Tf 18 TL 2.364301 Tw (Quando a primeira busca n\343o e
 Q
 Q
 q
-1 0 0 1 91.03937 410.8504 cm
+1 0 0 1 91.03937 338.8504 cm
 q
-0 0 0 rg
-BT 1 0 0 1 0 132 Tm /F1 12 Tf 18 TL -0.155746 Tw (Cada not\355cia e an\341lise continua conferida na p\341gina citada: a p\341gina precisa abrir e) Tj T* 0 Tw 1.756664 Tw (mostrar a data de publica\347\343o. Quando uma delas n\343o passa nessa confer\352ncia) Tj T* 0 Tw .05287 Tw (\(por exemplo, p\341gina inacess\355vel ou arquivo PDF\), apenas esse item \351 retirado e o) Tj T* 0 Tw .71222 Tw (aviso informa qual foi; o restante da edi\347\343o \351 salvo. O mesmo vale para item que) Tj T* 0 Tw .726846 Tw (cite endere\347o n\343o confirmado pela busca e para produto com dados incompletos:) Tj T* 0 Tw .810236 Tw (o item sai, ou o produto passa ao custo padr\343o da turma \(Estimativa do Modelo\),) Tj T* 0 Tw 1.224276 Tw (sempre com aviso. Na revis\343o e na publica\347\343o, a confer\352ncia segue estrita para) Tj T* 0 Tw (todos os itens.) Tj T* ET
+BT 1 0 0 1 0 204 Tm -0.155746 Tw 18 TL /F1 12 Tf 0 0 0 rg (Cada not\355cia e an\341lise continua conferida na p\341gina citada: a p\341gina precisa abrir e) Tj T* 0 Tw 1.763379 Tw (mostrar a data de publica\347\343o. Boletins em PDF s\343o lidos, e vale como data de) Tj T* 0 Tw 2.136331 Tw (publica\347\343o apenas a data completa impressa na primeira p\341gina \(por exemplo,) Tj T* 0 Tw -0.03738 Tw (") Tj (Rio de Janeiro, 11 de novembro de 2026) Tj (") Tj (\); a data interna do arquivo n\343o \351 usada,) Tj T* 0 Tw 2.056276 Tw (pois registra a gera\347\343o do arquivo, e datas de atualiza\347\343o tamb\351m n\343o valem.) Tj T* 0 Tw 1.467931 Tw (Quando um item n\343o passa nessa confer\352ncia \(por exemplo, p\341gina inacess\355vel) Tj T* 0 Tw 2.526236 Tw (ou PDF sem data na primeira p\341gina\), apenas esse item \351 retirado e o aviso) Tj T* 0 Tw 1.33462 Tw (informa qual foi; o restante da edi\347\343o \351 salvo. O mesmo vale para item que cite) Tj T* 0 Tw 1.817755 Tw (endere\347o n\343o confirmado pela busca e para produto com dados incompletos: o) Tj T* 0 Tw 1.642408 Tw (item sai, ou o produto passa ao custo padr\343o da turma \(Estimativa do Modelo\),) Tj T* 0 Tw 1.224276 Tw (sempre com aviso. Na revis\343o e na publica\347\343o, a confer\352ncia segue estrita para) Tj T* 0 Tw (todos os itens.) Tj T* ET
 Q
 Q
  
@@ -35183,28 +35182,28 @@ xref
 0004095275 00000 n 
 0004101182 00000 n 
 0004117856 00000 n 
-0004120526 00000 n 
-0004137200 00000 n 
-0004137241 00000 n 
-0004137591 00000 n 
-0004137940 00000 n 
-0004138290 00000 n 
-0004139070 00000 n 
-0004139850 00000 n 
-0004140206 00000 n 
-0004140559 00000 n 
-0004140910 00000 n 
-0004141263 00000 n 
-0004141372 00000 n 
-0004141486 00000 n 
-0004160709 00000 n 
+0004120990 00000 n 
+0004137664 00000 n 
+0004137705 00000 n 
+0004138055 00000 n 
+0004138404 00000 n 
+0004138754 00000 n 
+0004139534 00000 n 
+0004140314 00000 n 
+0004140670 00000 n 
+0004141023 00000 n 
+0004141374 00000 n 
+0004141727 00000 n 
+0004141836 00000 n 
+0004141950 00000 n 
+0004161173 00000 n 
 trailer
 <<
 /Size 426
 /Root 1 0 R
 /Info 301 0 R
-/ID [ (\371\331\2205\016\260\214\323\335\371\313\373\273\2017\372) (\371\331\2205\016\260\214\323\335\371\313\373\273\2017\372) ]
+/ID [ <30d514d604774083440898d01d9fc32d> <30d514d604774083440898d01d9fc32d> ]
 >>
 startxref
-4180861
+4181325
 %%EOF
