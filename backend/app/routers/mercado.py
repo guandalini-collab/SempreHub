@@ -292,6 +292,7 @@ def _situacao_automatica(db, turma):
 
 INSTRUCOES_PESQUISA='''Pesquise na web dados atuais do mercado brasileiro do setor informado. Não invente notícias, datas, URLs ou custos. Produza exatamente as quantidades solicitadas. JSON: {setor,comercio,noticias:[{titulo,texto,data,competencia,impactos:[{departamento,tipo,efeito,pergunta_decisao}],fontes:[{titulo,url}]}],analises:[mesmo formato],produtos:[{id,nome,descricao,natureza,custo_unitario,unidade,base_custo,data,fontes:[{titulo,url}]}]}. Cada produto deve incluir natureza FISICO ou SERVICO_DIGITAL conforme o modo de operação. O setor informado não determina o modelo da empresa. No modo tradicional descreva o custo por unidade de matéria-prima/kit de montagem documentado, identificando a base e sem atribuir custos industriais não documentados. Notícias e análises devem contextualizar o setor e o modo informado separadamente. Para CADA notícia e análise, indique a competência mês/ano a que o dado se refere, quando disponível, e até sete impactos práticos. Cada impacto deve relacionar um departamento a um possível efeito e formular uma pergunta que ajude a equipe a decidir; não dê respostas prontas nem trate hipótese como certeza. Departamentos permitidos: Produtos e marketing, P&D, Recursos humanos, Estratégia, Finanças, Produção e Logística. id deve ser texto, custo_unitario deve ser número em BRL, sem símbolos ou separadores locais. Use somente URLs que aparecem nas citações da ferramenta. Custo unitário em BRL: preço documentado de aquisição/atacado; identifique preços varejistas como preco_varejo para projeção didática, nunca como custo industrial documentado. Se usar preço público de aquisição, explique isso em base_custo, sem afirmar custo de fabricação. Notícias factuais datadas e análises profissionais com distinção entre fato e interpretação. Para notícias e análises, cite páginas com data de publicação identificável; em boletins PDF, a data de publicação deve estar impressa na primeira página. Não dê decisões prontas aos alunos, não mencione ferramentas de geração. No modo STARTUP, pesquise exclusivamente serviços digitais recorrentes com custo documentado por cliente/mês; nos demais modos, produtos físicos com custo por unidade. Evite marcas específicas quando possível, mas descreva produto comparável à fonte. Se não houver evidência suficiente não fabrique valores. Cada produto deve incluir evidencia_custo: {url,trecho}, com um trecho literal da página que contenha o nome exato do produto e seu preço em R$; use esse mesmo nome no campo nome. Não use estatísticas setoriais como fonte de preço. Não derive o preço documentado de médias ou faturamentos; a projeção didática pertence ao backend. A data dos artigos deve ser a data de publicação documentada (AAAA-MM-DD ou AAAA-MM), nunca a data atual da consulta. Para produtos sem data de publicação, indique explicitamente Consulta em AAAA-MM-DD com a data_consulta fornecida. Não atribua datas de atualização da página à publicação do artigo.'''
 INSTRUCOES_PESQUISA += " Para cada produto informe tipo_documento: custo_aquisicao ou preco_varejo. Se encontrar apenas preço varejista, informe esse preço original em custo_unitario e tipo_documento=preco_varejo; o backend projetará o custo com fator 0,60. Não calcule esse desconto na resposta. Se não houver evidência verificável, o backend aplicará custo padrão da turma, identificado como estimativa. Não afirme que estimativas são preços comprovados."
+INSTRUCOES_PESQUISA += " Não repita notícias, análises ou endereços da lista 'evitar': eles já foram publicados em rodadas anteriores; traga fatos novos."
 
 
 INSTRUCOES_COMPLEMENTO = (
@@ -352,6 +353,26 @@ def _processar_principal(bruto, fontes, turma, dados):
     return edicao
 
 
+def _retirar_repetidas(bruto, ja_publicados, avisos):
+    """Retira notícia ou análise já publicada nas rodadas recentes."""
+    retiradas = []
+    for campo in ("noticias", "analises"):
+        itens = bruto.get(campo)
+        if not isinstance(itens, list):
+            continue
+        mantidos = []
+        for item in itens:
+            titulo = str(item.get("titulo", "")).casefold() if isinstance(item, dict) else ""
+            urls = {_chave_url(f.get("url", "")) for f in (item.get("fontes") or []) if isinstance(f, dict) and f.get("url")} if isinstance(item, dict) else set()
+            if titulo in ja_publicados or urls & ja_publicados:
+                retiradas.append(str(item.get("titulo", ""))[:80])
+            else:
+                mantidos.append(item)
+        bruto[campo] = mantidos
+    if retiradas:
+        avisos.append("Itens retirados por repetirem notícia ou análise publicada nas últimas 4 rodadas: " + "; ".join(f"“{t}”" for t in retiradas) + ".")
+
+
 def executar_pesquisa(db, turma, dados, rodada, exigir_rodada_atual=True):
     """Pesquisa a edição de mercado da rodada informada e a salva sem publicar.
 
@@ -367,8 +388,18 @@ def executar_pesquisa(db, turma, dados, rodada, exigir_rodada_atual=True):
     schema["$defs"]["Produto"]["required"].extend(["natureza", "tipo_documento"])
     base = {"modo_operacao": turma.modo_jogo, "data_consulta": datetime.now(timezone.utc).date().isoformat()}
     avisos_camadas = []
+    # Notícias e análises das edições publicadas nas últimas 4 rodadas: a nova
+    # edição não pode repeti-las (mesmo título ou mesmo endereço).
+    anteriores = [a for e in db.query(ConteudoMercado).filter(ConteudoMercado.turma_id == turma.id, ConteudoMercado.publicado.is_(True),
+                                                               ConteudoMercado.rodada < rodada, ConteudoMercado.rodada >= rodada - 4).all()
+                  for a in (e.dados.get("noticias") or []) + (e.dados.get("analises") or [])]
+    ja_publicados = ({str(a.get("titulo", "")).casefold() for a in anteriores}
+                     | {_chave_url(f.get("url", "")) for a in anteriores for f in (a.get("fontes") or []) if f.get("url")})
+    evitar_anteriores = [str(a.get("titulo", "")) for a in anteriores][:20] + [f.get("url", "") for a in anteriores for f in (a.get("fontes") or [])][:20]
     try:
-        bruto,fontes=gerar_json(INSTRUCOES_PESQUISA,{**dados.model_dump(),"calendario_simulado":ser.turma(turma).get("calendario"),**base},True,schema,False,dados.setor)
+        bruto,fontes=gerar_json(INSTRUCOES_PESQUISA,{**dados.model_dump(),"calendario_simulado":ser.turma(turma).get("calendario"),"evitar":evitar_anteriores,**base},True,schema,False,dados.setor)
+        if isinstance(bruto, dict):
+            _retirar_repetidas(bruto, ja_publicados, avisos_camadas)
         edicao = _processar_principal(bruto, fontes, turma, dados)
     except HTTPException as erro:
         # Falha de busca na camada 1 não impede as demais camadas; o catálogo
@@ -383,13 +414,13 @@ def executar_pesquisa(db, turma, dados, rodada, exigir_rodada_atual=True):
         faltam_a = dados.analises - len(edicao.analises)
         if faltam_n <= 0 and faltam_a <= 0:
             break
-        evitar = [a.titulo for a in edicao.noticias + edicao.analises] + [f.url for a in edicao.noticias + edicao.analises for f in a.fontes]
+        evitar = evitar_anteriores + [a.titulo for a in edicao.noticias + edicao.analises] + [f.url for a in edicao.noticias + edicao.analises for f in a.fontes]
         try:
             bruto, fontes = gerar_json(INSTRUCOES_COMPLEMENTO, {"setor": dados.setor, "comercio": dados.comercio,
                                        "noticias": max(faltam_n, 0), "analises": max(faltam_a, 0), "evitar": evitar[:30], **base},
                                        True, ComplementoArtigos.model_json_schema(), False, dados.setor, False, camada)
             complemento = ComplementoArtigos.model_validate(bruto)
-            usados = {a.titulo.casefold() for a in edicao.noticias + edicao.analises} | {_chave_url(f.url) for a in edicao.noticias + edicao.analises for f in a.fontes}
+            usados = ja_publicados | {a.titulo.casefold() for a in edicao.noticias + edicao.analises} | {_chave_url(f.url) for a in edicao.noticias + edicao.analises for f in a.fontes}
             novos = lambda itens: [a for a in itens if a.titulo.casefold() not in usados and not any(_chave_url(f.url) in usados for f in a.fontes)]
             conferidos = _artigos_conferidos(edicao, novos(complemento.noticias)[:max(faltam_n, 0)], novos(complemento.analises)[:max(faltam_a, 0)], fontes, turma)
         except HTTPException as erro:

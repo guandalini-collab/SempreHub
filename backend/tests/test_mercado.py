@@ -311,3 +311,31 @@ def test_camada_seguinte_so_roda_se_faltar_item(cliente, professor, monkeypatch)
     r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
                      json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
     assert r.status_code == 200 and chamadas == [1]
+
+
+def test_nao_repete_noticia_publicada_nas_ultimas_rodadas(cliente, professor, monkeypatch):
+    from app.database import SessionLocal
+    from app.models import ConteudoMercado, Turma
+    from app.routers import mercado
+    chamadas = []
+    def gerar(*a):
+        chamadas.append(a)
+        camada = a[7] if len(a) > 7 else 1
+        if camada == 1:
+            return edicao(), {"https://www.ibge.gov.br/produto"}
+        novo = {**edicao()["noticias"][0], "titulo": "Fato novo", "fontes": [{"titulo": "Fato novo", "url": "https://g1.globo.com/economia/novo"}]}
+        return {"noticias": [novo], "analises": []}, {"https://g1.globo.com/economia/novo"}
+    monkeypatch.setattr(mercado, "gerar_json", gerar)
+    turma = _criar_turma(cliente, professor, total_rodadas=6)
+    with SessionLocal() as db:
+        t = db.get(Turma, turma["id"]); t.rodada_atual = 3
+        db.add(ConteudoMercado(turma_id=t.id, rodada=2, publicado=True, dados=edicao()))
+        db.commit()
+    r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
+                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+    assert r.status_code == 200, r.text
+    edic = r.json()["dados"]
+    titulo_antigo = edicao()["noticias"][0]["titulo"]
+    assert [n["titulo"] for n in edic["noticias"]] == ["Fato novo"]
+    assert any("repetirem" in a and titulo_antigo[:20] in a for a in edic["avisos"])
+    assert titulo_antigo in chamadas[0][1]["evitar"]
