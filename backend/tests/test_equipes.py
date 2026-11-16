@@ -26,7 +26,14 @@ def _painel(cliente, empresa_id, aluno):
     return resposta.json()
 
 
-def _criar_equipe(cliente, professor, quantidade=3, total_rodadas=3):
+def _encerrar_formacao(cliente, professor, turma_id, esperado=200):
+    resposta = cliente.put(f"/api/professor/turmas/{turma_id}/ingresso", headers=professor,
+                           json={"visivel_ingresso": True, "formacao_encerrada": True})
+    assert resposta.status_code == esperado, resposta.text
+    return resposta
+
+
+def _criar_equipe(cliente, professor, quantidade=3, total_rodadas=3, encerrar=True):
     turma = _criar_turma(cliente, professor, modo_equipe=True, total_rodadas=total_rodadas)
     assert turma["modo_equipe"] is True
     fundador = _aluno(cliente, 0)
@@ -42,9 +49,11 @@ def _criar_equipe(cliente, professor, quantidade=3, total_rodadas=3):
         assert resposta.json()["empresa"]["id"] == empresa_id
         alunos.append(aluno)
     equipe = {"turma": turma, "id": empresa_id, "codigo": codigo, "alunos": alunos}
-    if quantidade >= 3:
+    if quantidade >= 2:
         for aluno in alunos[:quantidade//2+1]:
             assert cliente.post(f"/api/aluno/empresas/{empresa_id}/lider", headers=aluno["headers"], json={"aluno_id": fundador["id"], "rodada": 1}).status_code == 200
+        if encerrar:
+            _encerrar_formacao(cliente, professor, turma["id"])
     return equipe
 
 
@@ -177,17 +186,49 @@ def test_versao_e_rodada_impedem_sobrescrita(cliente, equipe):
     assert _painel(cliente,equipe["id"],lider)==antes
 
 
-def test_minimo_tres_e_maximo_cinco(cliente, professor):
-    equipe=_criar_equipe(cliente,professor,quantidade=2)
+def test_minimo_dois_e_maximo_cinco(cliente, professor):
+    equipe=_criar_equipe(cliente,professor,quantidade=1,encerrar=False)
     aluno=equipe["alunos"][0]
     base=f"/api/aluno/empresas/{equipe['id']}"
+    # Sozinho não escolhe líder nem inicia o jogo.
     assert cliente.post(base+"/lider",headers=aluno["headers"],json={"aluno_id":aluno["id"],"rodada":1}).status_code==422
-    assert _fechar(cliente,equipe,professor).status_code==422
-    for i in (2,3,4):
+    r=_encerrar_formacao(cliente,professor,equipe["turma"]["id"],422)
+    assert "1 integrante(s)" in r.json()["detail"]
+    for i in (1,2,3,4):
         a=_aluno(cliente,i)
         assert cliente.post("/api/aluno/equipes/entrar",headers=a["headers"],json={"empresa_id":equipe["id"]}).status_code==201
     sexto=_aluno(cliente,5)
     assert cliente.post("/api/aluno/equipes/entrar",headers=sexto["headers"],json={"empresa_id":equipe["id"]}).status_code==422
+
+
+def test_dupla_e_equipe_valida(cliente, professor):
+    equipe=_criar_equipe(cliente,professor,quantidade=2)
+    painel=_painel(cliente,equipe["id"],equipe["alunos"][0])
+    assert painel["equipe"]["lider_id"]==equipe["alunos"][0]["id"]
+    assert not any("Reúna" in p for p in painel["equipe"]["pendencias"])
+
+
+def test_formacao_aberta_bloqueia_decisao_e_fechamento(cliente, professor):
+    equipe=_criar_equipe(cliente,professor,quantidade=3,encerrar=False)
+    aluno=equipe["alunos"][0]
+    painel=_painel(cliente,equipe["id"],aluno)
+    r=cliente.put(f"/api/aluno/empresas/{equipe['id']}/decisao",headers=aluno["headers"],
+                  json=completar_decisao({"preco":95,"rascunho":True,"versao":painel["equipe"]["versao_decisao"],"rodada":1}))
+    assert r.status_code==403 and "formação das equipes ainda está aberta" in r.json()["detail"]
+    r=cliente.post(f"/api/professor/turmas/{equipe['turma']['id']}/fechar-rodada",headers=professor,json={"rodada":1,"forcar":True})
+    assert r.status_code==422 and "formação" in r.json()["detail"]
+    _encerrar_formacao(cliente,professor,equipe["turma"]["id"])
+    _salvar(cliente,equipe)
+
+
+def test_aluno_cadastrado_sem_equipe_impede_inicio(cliente, professor):
+    equipe=_criar_equipe(cliente,professor,quantidade=2,encerrar=False)
+    avulso=_aluno(cliente,9)
+    assert cliente.post("/api/aluno/matricula",headers=avulso["headers"],json={"turma_id":equipe["turma"]["id"]}).status_code==200
+    r=_encerrar_formacao(cliente,professor,equipe["turma"]["id"],422)
+    assert "Aluno 9" in r.json()["detail"] and "sem equipe" in r.json()["detail"]
+    assert cliente.post("/api/aluno/equipes/entrar",headers=avulso["headers"],json={"empresa_id":equipe["id"]}).status_code==201
+    _encerrar_formacao(cliente,professor,equipe["turma"]["id"])
 
 
 def test_professor_redefine_senha_de_membro_sem_ser_dono_da_empresa(cliente, professor, equipe):

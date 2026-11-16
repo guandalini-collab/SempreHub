@@ -90,6 +90,21 @@ function macroValor(item: BoletimItem | undefined) {
   return encontrado?.[0] ?? item.competencia ?? "Confirmado";
 }
 
+function SazonalidadeProximoMes({ calendario }: { calendario: NonNullable<Turma["calendario"]> }) {
+  const atual = calendario.sazonalidade, proximo = calendario.proximo_mes!;
+  const mes = (inicio: string) => new Date(inicio + "T12:00:00").toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+  const fator = (v: number) => v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 3 });
+  return <section className="mb-4 rounded-xl border border-slate-200 bg-white p-4 text-sm" aria-label="Sazonalidade">
+    <h3 className="font-bold text-corporativo">Sazonalidade das vendas</h3>
+    {proximo.atividade_pmc ? <>
+      <p className="mt-1">Mês atual ({mes(calendario.inicio)}): fator <strong>{fator(atual.demanda)}</strong> · Próximo mês ({mes(proximo.inicio)}): fator <strong>{fator(proximo.fator)}</strong> ({proximo.variacao >= 0 ? "+" : ""}{percentual(proximo.variacao, 1)} em relação ao mês atual).</p>
+      <p className="mt-1 text-xs text-slate-600">Fator 1,00 = mês médio do ano. Atividade de referência: {proximo.atividade_pmc}. {atual.observacao}</p>
+    </> : <p className="mt-1">{atual.observacao}</p>}
+    {!!atual.eventos?.length && <p className="mt-1 text-xs text-slate-600">Datas do mês (só aviso; o efeito já está no fator): {atual.eventos.join(", ")}.</p>}
+    <p className="mt-1 text-xs text-slate-500">Fonte: {proximo.fonte}. {proximo.estado}.</p>
+  </section>;
+}
+
 export default function CockpitDecisao({ empresaId, empresa, turma, resultados, previsao, aoConferir }: {
   empresaId: number; empresa: Empresa; turma: Turma; resultados: Resultado[]; previsao?: PrevisaoDecisao; aoConferir: () => void;
 }) {
@@ -128,38 +143,38 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
     const cartoes = [
       { titulo: "Produtos e marketing", estado: atual.participacao_mercado > 0 ? "verde" as Semaforo : "amarelo" as Semaforo, metricas: [
         metrica("Participação de mercado", "Parcela das vendas da empresa no mercado simulado. Uma queda reduz poder competitivo.", atual.participacao_mercado, anterior?.participacao_mercado ?? null, "percentual"),
-        metrica("ROI de campanhas", "Comparação didática entre receita semanal e gasto de marketing; não prova causalidade da campanha.", roi, roiAnterior, "numero"),
+        metrica("ROI de campanhas", "Comparação didática entre receita do período e gasto de marketing; não prova causalidade da campanha.", roi, roiAnterior, "numero"),
         modo === "STARTUP" ? metrica("CAC", "Custo de aquisição por cliente. Se aumenta, cada novo cliente consome mais caixa.", numero(atual, "cac"), numero(anterior, "cac"), "moeda") : metrica("Ticket médio", "Receita média por unidade vendida. Quedas podem exigir revisão de preço e mix.", dividir(atual.dre.receita, atual.unidades_vendidas), dividir(anterior?.dre.receita, anterior?.unidades_vendidas), "moeda"),
         modo === "STARTUP" ? metrica("LTV", "Valor econômico estimado do cliente durante o relacionamento. Se fica abaixo do CAC, a aquisição tende a destruir valor.", numero(atual, "ltv"), numero(anterior, "ltv"), "moeda") : metrica("Elasticidade de preço", "Exige série de preço e demanda por produto. O motor ainda não registra base suficiente para calcular com segurança.", null, null, "numero"),
       ]},
       { titulo: "P&D e inovação", estado: investimentoPd == null ? "neutro" as Semaforo : investimentoPd > 0.25 ? "amarelo" as Semaforo : "verde" as Semaforo, metricas: [
         metrica("Qualidade do produto", "Nível de qualidade gerado pelo motor. Ajuda a sustentar demanda e satisfação.", qualidade, qualidadeAnterior, "numero"),
-        metrica("Receita investida", "Parcela da receita semanal aplicada em pesquisa e desenvolvimento.", investimentoPd, investimentoPdAnterior, "percentual"),
+        metrica("Receita investida", "Parcela da receita do período aplicada em pesquisa e desenvolvimento.", investimentoPd, investimentoPdAnterior, "percentual"),
         modo === "TRADICIONAL" ? metrica("Custo unitário", "CMV dividido pelas unidades vendidas. Quedas sustentáveis preservam margem.", custoUnitario, custoUnitarioAnterior, "moeda") : metrica("Adoção de recursos", "Ainda não há registro suficiente de adoção por funcionalidade no motor digital.", null, null, "percentual"),
         modo === "TRADICIONAL" ? metrica("Vida útil do produto", "A vida útil do produto ainda não é registrada separadamente da vida útil das máquinas.", null, null, "semanas") : metrica("Time-to-market", "O motor ainda não registra o tempo entre desenvolvimento e lançamento por recurso.", null, null, "semanas"),
       ]},
       { titulo: "Recursos humanos", estado: grauRh(atual), metricas: [
-        metrica("Produtividade média", "Receita semanal por colaborador. Compare com a evolução da equipe, não isoladamente.", receitaPorFuncionario, receitaPorFuncionarioAnterior, "moeda"),
+        metrica("Produtividade média", "Receita do período por colaborador. Compare com a evolução da equipe, não isoladamente.", receitaPorFuncionario, receitaPorFuncionarioAnterior, "moeda"),
         metrica("Moral da equipe", "Índice de clima calculado pelas decisões de remuneração, benefícios, treinamento e sobrecarga. Escala de 0 a 100.", moral, moralAnterior, "escala"),
-        modo === "STARTUP" ? metrica("Turnover", "Saídas da equipe na semana. Aumentos elevam custo de reposição e perda de conhecimento.", numero(atual, "turnover"), numero(anterior, "turnover"), "numero") : metrica("Horas extras", "Horas extras planejadas por colaborador. Excesso aumenta sobrecarga e custos.", numero(atual, "horas_extras"), numero(anterior, "horas_extras"), "numero"),
-        modo === "STARTUP" ? metrica("Receita por colaborador", "Receita semanal dividida pela equipe ativa. Compare com a qualidade e a retenção.", receitaPorFuncionario, receitaPorFuncionarioAnterior, "moeda") : metrica("Custo de treinamento", "Gasto semanal em capacitação. Deve ser interpretado junto com qualificação e produtividade.", atual.dre.treinamento ?? null, anterior?.dre.treinamento ?? null, "moeda"),
+        modo === "STARTUP" ? metrica("Turnover", "Saídas da equipe no período. Aumentos elevam custo de reposição e perda de conhecimento.", numero(atual, "turnover"), numero(anterior, "turnover"), "numero") : metrica("Horas extras", "Horas extras planejadas por colaborador. Excesso aumenta sobrecarga e custos.", numero(atual, "horas_extras"), numero(anterior, "horas_extras"), "numero"),
+        modo === "STARTUP" ? metrica("Receita por colaborador", "Receita do período dividida pela equipe ativa. Compare com a qualidade e a retenção.", receitaPorFuncionario, receitaPorFuncionarioAnterior, "moeda") : metrica("Custo de treinamento", "Gasto do período em capacitação. Deve ser interpretado junto com qualificação e produtividade.", atual.dre.treinamento ?? null, anterior?.dre.treinamento ?? null, "moeda"),
       ]},
       { titulo: "Finanças", estado: grauFinancas(atual, empresa), metricas: [
-        metrica("Margem líquida", "Lucro ou prejuízo final como proporção da receita da semana.", margem, margemAnterior, "percentual"),
+        metrica("Margem líquida", "Lucro ou prejuízo final como proporção da receita do período.", margem, margemAnterior, "percentual"),
         metrica("Liquidez corrente", "Ativos de curto prazo divididos por obrigações de curto prazo. Quedas reduzem a folga de pagamento.", liquidez, liquidezAnterior, "numero"),
-        modo === "STARTUP" ? metrica("Burn rate", "Queima operacional de caixa por semana. Aumentos reduzem a autonomia financeira.", numero(atual, "burn"), numero(anterior, "burn"), "moeda") : metrica("EBITDA operacional", "Resultado antes de juros, impostos, depreciação e amortização, quando o motor possui todos os dados.", numero(atual, "ebitda"), numero(anterior, "ebitda"), "moeda"),
-        modo === "STARTUP" ? metrica("Runway", "Semanas de caixa disponíveis mantendo a queima operacional atual.", numero(atual, "runway"), numero(anterior, "runway"), "semanas") : metrica("Giro do imobilizado", "Receita semanal em relação ao valor líquido das máquinas. Mede o uso econômico dos ativos físicos.", dividir(atual.dre.receita, atual.detalhes_simulacao?.balanco?.imobilizado ?? null), dividir(anterior?.dre.receita, anterior?.detalhes_simulacao?.balanco?.imobilizado ?? null), "numero"),
+        modo === "STARTUP" ? metrica("Burn rate", "Queima operacional de caixa por período. Aumentos reduzem a autonomia financeira.", numero(atual, "burn"), numero(anterior, "burn"), "moeda") : metrica("EBITDA operacional", "Resultado antes de juros, impostos, depreciação e amortização, quando o motor possui todos os dados.", numero(atual, "ebitda"), numero(anterior, "ebitda"), "moeda"),
+        modo === "STARTUP" ? metrica("Runway", "Semanas de caixa disponíveis mantendo a queima operacional atual.", numero(atual, "runway"), numero(anterior, "runway"), "semanas") : metrica("Giro do imobilizado", "Receita do período em relação ao valor líquido das máquinas. Mede o uso econômico dos ativos físicos.", dividir(atual.dre.receita, atual.detalhes_simulacao?.balanco?.imobilizado ?? null), dividir(anterior?.dre.receita, anterior?.detalhes_simulacao?.balanco?.imobilizado ?? null), "numero"),
       ]},
       { titulo: "Produção e operação", estado: grauOperacao(atual, modo), metricas: [
         metrica("Custo unitário", "CMV por unidade vendida. Uma alta sem reajuste de preço pressiona a margem.", custoUnitario, custoUnitarioAnterior, "moeda"),
         modo === "STARTUP" ? metrica("Uso da nuvem", "Clientes atendidos em relação à capacidade contratada. Próximo do limite aumenta o risco de indisponibilidade.", usoNuvem, usoNuvemAnterior, "percentual") : metrica("Ocupação da fábrica", "Produção realizada em relação à capacidade disponível das máquinas.", numero(atual, "utilizacao_maquinas"), numero(anterior, "utilizacao_maquinas"), "percentual"),
-        modo === "STARTUP" ? metrica("Clientes não atendidos", "Clientes que não puderam ser atendidos por capacidade insuficiente na semana.", numero(atual, "clientes_nao_atendidos"), numero(anterior, "clientes_nao_atendidos"), "numero") : metrica("Refugo", "Percentual da produção que não ficou aproveitável. Aumento gera desperdício e risco de falta de estoque.", refugo, refugoAnterior, "percentual"),
+        modo === "STARTUP" ? metrica("Clientes não atendidos", "Clientes que não puderam ser atendidos por capacidade insuficiente no período.", numero(atual, "clientes_nao_atendidos"), numero(anterior, "clientes_nao_atendidos"), "numero") : metrica("Refugo", "Percentual da produção que não ficou aproveitável. Aumento gera desperdício e risco de falta de estoque.", refugo, refugoAnterior, "percentual"),
         modo === "STARTUP" ? metrica("Custo por usuário", "O custo de servidor por usuário ainda não é lançado isoladamente na DRE do modo digital.", null, null, "moeda") : metrica("OEE", "Disponibilidade, performance e qualidade da operação. Quedas sinalizam perda de eficiência produtiva.", numero(atual, "oee"), numero(anterior, "oee"), "percentual"),
       ]},
       { titulo: "Logística e entregas", estado: grauOperacao(atual, modo), metricas: [
         metrica("Nível de serviço (OTIF)", "Pedidos entregues no prazo e completos. Quedas afetam satisfação e recompra.", numero(atual, "otif"), numero(anterior, "otif"), "percentual"),
-        metrica("Custo logístico / receita", "Frete e armazenagem registrados como parcela da receita semanal.", custoLogistico, custoLogisticoAnterior, "percentual"),
-        modo === "STARTUP" ? metrica("Churn", "Percentual de clientes perdidos na base; alta recorrente reduz receita futura.", numero(atual, "churn"), numero(anterior, "churn"), "percentual") : metrica("Giro de estoque", "CMV semanal em relação ao estoque final de produtos acabados. Interprete junto com risco de ruptura.", giroEstoque, giroEstoqueAnterior, "numero"),
+        metrica("Custo logístico / receita", "Frete e armazenagem registrados como parcela da receita do período.", custoLogistico, custoLogisticoAnterior, "percentual"),
+        modo === "STARTUP" ? metrica("Churn", "Percentual de clientes perdidos na base; alta recorrente reduz receita futura.", numero(atual, "churn"), numero(anterior, "churn"), "percentual") : metrica("Giro de estoque", "CMV do período em relação ao estoque final de produtos acabados. Interprete junto com risco de ruptura.", giroEstoque, giroEstoqueAnterior, "numero"),
         modo === "STARTUP" ? metrica("Ativação digital", "O tempo de ativação por cliente ainda não é registrado separadamente pelo motor.", null, null, "semanas") : metrica("Frete e armazenagem", "Custo logístico registrado na DRE. Altas pressionam preço e margem.", (atual.dre.frete ?? 0) + (atual.dre.armazenagem ?? 0), (anterior?.dre.frete ?? 0) + (anterior?.dre.armazenagem ?? 0), "moeda"),
       ]},
     ];
@@ -181,11 +196,12 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
   const setorItem = boletim?.itens.find((item) => setor && item.setores_afetados?.includes(setor));
 
   return <section aria-label="Cockpit de decisão">
-    <header className="mb-4"><h2 className="text-xl font-bold text-corporativo">Cockpit de decisão</h2><p className="mt-1 text-sm text-slate-600">Leitura da última semana fechada e checagem do rascunho atual antes de enviar.</p></header>
-    {!atual ? <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-sm">O cockpit será preenchido após o fechamento da primeira semana. Enquanto isso, consulte o mercado e prepare as decisões.</div> : <>
+    <header className="mb-4"><h2 className="text-xl font-bold text-corporativo">Cockpit de decisão</h2><p className="mt-1 text-sm text-slate-600">Leitura do último período fechado (mês de operação) e checagem do rascunho atual antes de enviar.</p></header>
+    {turma.calendario?.proximo_mes && <SazonalidadeProximoMes calendario={turma.calendario} />}
+    {!atual ? <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-sm">O cockpit será preenchido após o fechamento da primeira rodada. Enquanto isso, consulte o mercado e prepare as decisões.</div> : <>
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Termômetro macro e caixa">
         <div className="rounded-xl border border-blue-200 bg-blue-50 p-3"><p className="text-xs text-slate-600">Caixa disponível</p><p className="mt-1 text-xl font-bold text-corporativo">{reais(empresa.caixa)}</p><p className="text-xs text-slate-500">{unidade(Math.max(0, empresa.caixa) / Math.max(1, atual.dre.custos_fixos + atual.dre.folha), "semanas")} de custos fixos e folha</p></div>
-        <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-xs text-slate-600">Resultado líquido · última semana</p><p className={`mt-1 text-xl font-bold ${atual.dre.lucro_liquido < 0 ? "valor-negativo" : "text-emerald-700"}`}>{reais(atual.dre.lucro_liquido)}</p><p className="text-xs text-slate-500">{delta(atual.dre.lucro_liquido, anterior?.dre.lucro_liquido ?? null, "moeda")}</p></div>
+        <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-xs text-slate-600">Resultado líquido · último período</p><p className={`mt-1 text-xl font-bold ${atual.dre.lucro_liquido < 0 ? "valor-negativo" : "text-emerald-700"}`}>{reais(atual.dre.lucro_liquido)}</p><p className="text-xs text-slate-500">{delta(atual.dre.lucro_liquido, anterior?.dre.lucro_liquido ?? null, "moeda")}</p></div>
         <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-xs text-slate-600">Selic · fonte oficial</p><p className="mt-1 text-xl font-bold text-slate-800">{macroValor(selic)}</p><p className="truncate text-xs text-slate-500" title={selic?.referencia}>{selic?.competencia ?? selic?.referencia ?? "N/D"}</p></div>
         <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-xs text-slate-600">IPCA / setor · fonte oficial</p><p className="mt-1 text-xl font-bold text-slate-800">{macroValor(ipca ?? setorItem)}</p><p className="truncate text-xs text-slate-500" title={(ipca ?? setorItem)?.titulo}>{(ipca ?? setorItem)?.competencia ?? (ipca ?? setorItem)?.titulo ?? "N/D"}</p></div>
       </section>

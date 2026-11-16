@@ -121,7 +121,67 @@ def _orientacao(fase: str) -> str:
     return "Revise caixa, estoque remanescente e capacidade antes de manter o ritmo do período anterior."
 
 
+def _somar_meses(inicio: date, meses: int) -> date:
+    indice = inicio.year * 12 + inicio.month - 1 + meses
+    return date(indice // 12, indice % 12 + 1, 1)
+
+
+def _periodo_mensal(config, rodada):
+    """Rodada = um mês civil. A procura segue a sazonalidade da PMC/IBGE.
+
+    As datas comemorativas aparecem só como aviso: o efeito delas já está no
+    fator do IBGE e não é somado de novo (evita contar o Natal duas vezes).
+    Insumos e frete não recebem acréscimo sazonal sem fonte.
+    """
+    from .sazonalidade_pmc import ESTADO, FONTE, fator
+    primeira = config.get('rodada_inicio_calendario', 1)
+    if rodada < primeira:
+        return None
+    inicio = _somar_meses(date.fromisoformat(config['data_inicio_simulada']).replace(day=1), rodada - primeira)
+    dias_mes = monthrange(inicio.year, inicio.month)[1]
+    fim = inicio.replace(day=dias_mes)
+    setor = config.get('setor_mercado')
+    edicao = config.get('sazonalidade_pmc')
+    atual = fator(edicao, setor, inicio.month)
+    seguinte = _somar_meses(inicio, 1)
+    proximo = fator(edicao, setor, seguinte.month)
+    eventos_ano = [evento for ano in range(inicio.year - 1, inicio.year + 2) for evento in _eventos_do_ano(ano)]
+    no_mes = [e for e in sorted(eventos_ano, key=lambda e: e['data']) if inicio <= e['data'] <= fim]
+    informativo = "Somente informativo: o efeito na procura já está no fator do IBGE."
+    return {
+        'periodicidade': 'MENSAL_CALENDARIO', 'inicio': inicio.isoformat(), 'fim': fim.isoformat(),
+        'dias': dias_mes, 'fator_mensal': 1.0, 'mes': inicio.month, 'ano': inicio.year,
+        'semana_iso': inicio.isocalendar().week, 'ano_iso': inicio.isocalendar().year,
+        'semana_iso_fim': fim.isocalendar().week, 'ano_iso_fim': fim.isocalendar().year,
+        'ano_fiscal': inicio.year, 'fim_mes': True,
+        'meses': [{'data': (inicio + timedelta(days=i)).isoformat(), 'peso_mensal': 1 / dias_mes} for i in range(dias_mes)],
+        'sazonalidade': {
+            'estado': ESTADO, 'fonte': FONTE, 'setor': setor,
+            'atividade_pmc': atual['atividade'], 'periodo_base': atual.get('periodo'),
+            'observacao': atual['observacao'],
+            'eventos': [e['nome'] for e in no_mes],
+            'detalhes_eventos': [{
+                'nome': e['nome'], 'data': e['data'].isoformat(), 'fase': 'informativo',
+                'impacto_demanda': 0.0, 'orientacao': informativo, 'fonte': 'Calendário civil brasileiro',
+            } for e in no_mes],
+            'demanda': round(atual['fator'], 4), 'insumos': 1.0, 'frete': 1.0,
+        },
+        'proximo_mes': {
+            'inicio': seguinte.isoformat(), 'mes': seguinte.month, 'ano': seguinte.year,
+            'fator': round(proximo['fator'], 4), 'atividade_pmc': proximo['atividade'],
+            'variacao': round(proximo['fator'] / atual['fator'] - 1, 4) if atual['fator'] else 0.0,
+            'fonte': FONTE, 'estado': ESTADO,
+        },
+        'proximos_eventos': [
+            {'nome': e['nome'], 'data': e['data'].isoformat(), 'impacto': informativo}
+            for e in sorted(eventos_ano, key=lambda e: e['data']) if fim < e['data'] <= fim + timedelta(days=90)
+        ][:5],
+    }
+
+
 def periodo(config, rodada):
+    if config.get('periodicidade') == 'MENSAL_CALENDARIO':
+        return _periodo_mensal(config, rodada)
     if config.get('periodicidade', 'MENSAL') != 'SEMANAL':
         return None
     primeira = config.get('rodada_inicio_calendario', 1)

@@ -86,6 +86,12 @@ async def iniciar_calendario():
             except Exception:
                 import logging
                 logging.getLogger(__name__).warning('Serviço de atualização oficial pendente; nova tentativa automática.')
+            try:
+                from .motor.sazonalidade_pmc import ciclo as atualizar_sazonalidade
+                await asyncio.to_thread(atualizar_sazonalidade)
+            except Exception:
+                import logging
+                logging.getLogger(__name__).warning('Sazonalidade do IBGE pendente; mantida a última edição.')
             primeira_execucao=False
             await asyncio.sleep(300)
     app.state.atualizacoes = asyncio.create_task(consultar_fontes())

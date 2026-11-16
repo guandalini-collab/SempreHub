@@ -2,7 +2,7 @@
 from fastapi import HTTPException
 from sqlalchemy import update
 from .models import Empresa, MatriculaTurma, MembroEmpresa, StatusTurma, Turma, Usuario, agora
-from .equipes import bloquear_turma
+from .equipes import MAX_INTEGRANTES, MIN_INTEGRANTES, bloquear_turma
 
 
 def matricular(db, aluno, turma_id):
@@ -44,7 +44,9 @@ def sala(db, turma):
     inscritos = db.query(MatriculaTurma).filter_by(turma_id=turma.id).all()
     ocupados = {e.aluno_id for e in turma.empresas} | {m.aluno_id for e in turma.empresas for m in e.membros}
     return {"turma_id": turma.id, "formacao_encerrada": turma.formacao_encerrada,
+        "minimo_integrantes": MIN_INTEGRANTES, "maximo_integrantes": MAX_INTEGRANTES,
         "disponiveis": [{"aluno_id": m.aluno_id, "nome": m.aluno.nome} for m in inscritos if m.aluno_id not in ocupados],
         "equipes": [{"empresa_id": e.id, "nome": e.nome,
             "membros": [{"aluno_id": m.aluno_id, "nome": m.aluno.nome} for m in e.membros],
-            "vagas": max(0, 5-len(e.membros)), "completa": len(e.membros) == 5} for e in turma.empresas]}
+            "vagas": max(0, MAX_INTEGRANTES-len(e.membros)), "completa": len(e.membros) >= MAX_INTEGRANTES,
+            "valida": MIN_INTEGRANTES <= len(e.membros) <= MAX_INTEGRANTES} for e in turma.empresas]}

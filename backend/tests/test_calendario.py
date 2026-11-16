@@ -94,10 +94,12 @@ def test_ativacao_prospectiva_preserva_historico_e_bloqueia_reposicionamento(cli
     turma=_criar_turma(cliente,professor,modo_jogo='TRADICIONAL')
     aluno=cadastrar(cliente,'Ana','calendario@aluno.iffar.edu.br');_entrar(cliente,aluno,turma['codigo'],'Calendário')
     url=f"/api/professor/turmas/{turma['id']}/calendario"
-    r=cliente.put(url,headers=professor,json={'data_inicio':'2026-10-15','perfil_sazonal':'VAREJO'})
+    r=cliente.put(url,headers=professor,json={'data_inicio':'2026-10-15'})
     assert r.status_code==200,r.text
-    assert r.json()['calendario']['inicio']=='2026-10-15'
-    assert cliente.put(url,headers=professor,json={'data_inicio':'2027-01-01'}).status_code==422
+    # Rodada = mês civil: qualquer dia escolhido vira o primeiro dia do mês.
+    assert r.json()['calendario']['inicio']=='2026-10-01'
+    # Antes da primeira decisão o professor ainda pode trocar o mês.
+    assert cliente.put(url,headers=professor,json={'data_inicio':'2027-01-01'}).json()['calendario']['inicio']=='2027-01-01'
     c=cfg();c['rodada_inicio_calendario']=8
     assert periodo(c,7) is None and periodo(c,8)['inicio']=='2026-10-15'
 
@@ -128,11 +130,12 @@ def test_migracao_depois_de_mes_nao_altera_mes_fechado(cliente,professor):
     _decisao_avancada(cliente,aluno,eid,1);_fechar(cliente,professor,turma,1)
     antigo=cliente.get(f'/api/aluno/empresas/{eid}',headers=aluno).json()['resultados'][0]
     url=f"/api/professor/turmas/{turma['id']}/calendario"
-    assert cliente.put(url,headers=professor,json={'data_inicio':'2026-10-15','perfil_sazonal':'VAREJO'}).status_code==200
+    # Depois do primeiro mês fechado o calendário não é reposicionado.
+    assert cliente.put(url,headers=professor,json={'data_inicio':'2026-10-15'}).status_code==422
     _decisao_avancada(cliente,aluno,eid,2);_fechar(cliente,professor,turma,2)
     painel=cliente.get(f'/api/aluno/empresas/{eid}',headers=aluno).json()
     assert painel['resultados'][0]==antigo
-    assert painel['resultados'][1]['detalhes_simulacao']['calendario']['inicio']=='2026-10-15'
+    assert 'calendario' not in painel['resultados'][1]['detalhes_simulacao']
 
 
 def test_agenda_academica_programa_todas_rodadas_e_bloqueia_antes_da_aula(cliente, professor):
@@ -142,15 +145,20 @@ def test_agenda_academica_programa_todas_rodadas_e_bloqueia_antes_da_aula(client
         headers=professor,
         json={
             'inicio_letivo': '2027-02-01', 'fim_letivo': '2027-04-30',
-            'dia_semana': 0, 'horario_inicio': '19:00:00', 'recessos': ['2027-02-15'],
+            'dia_semana': 0, 'horario_inicio': '19:00:00', 'horario_fim': '20:40:00', 'recessos': ['2027-02-15'],
         },
     )
     assert resposta.status_code == 200, resposta.text
     agenda = resposta.json()['agenda_academica']
     assert [item['rodada'] for item in agenda['rodadas']] == [1, 2, 3]
-    # O recesso pula a semana de 15/02 e alonga a janela anterior.
+    # O recesso pula a semana de 15/02.
     assert agenda['rodadas'][2]['aula'] == '2027-02-22'
     assert resposta.json()['abertura_rodada'].startswith('2027-02-01T22:00:00')
+    # A janela termina no fim da aula (20h40 em Brasília), não na semana seguinte.
+    assert agenda['rodadas'][0]['fecha_em'] == '2027-02-01T23:40:00Z'
+    assert resposta.json()['prazo_rodada'].startswith('2027-02-01T23:40:00')
+    # Mês simulado da rodada 1 = mês da primeira aula de decisão.
+    assert resposta.json()['calendario']['inicio'] == '2027-02-01'
     manual = cliente.put(
         f"/api/professor/turmas/{turma['id']}/prazo", headers=professor,
         json={'data':'2027-02-03','rodada':1},

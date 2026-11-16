@@ -1,5 +1,5 @@
 import csv
-from datetime import date
+from datetime import date, time
 import io
 import json
 import secrets
@@ -15,7 +15,10 @@ from .. import config
 from .. import serializacao as ser
 from ..experiencia import jornada_empresa
 from ..database import get_db
-from ..equipes import bloquear_turma, novo_convite, invalidar_aprovacoes, registrar, dados_equipe, decisao_atual, pendencias_equipe, pendencias_fechamento, verificar_rodada
+from ..equipes import (
+    FAIXA_EQUIPE, MAX_INTEGRANTES, MIN_INTEGRANTES, bloquear_turma, novo_convite, invalidar_aprovacoes, registrar,
+    dados_equipe, decisao_atual, formacao_aberta, pendencias_equipe, pendencias_fechamento, pendencias_formacao, verificar_rodada,
+)
 from ..models import (
     AcessoAba, AprovacaoDecisao, ConteudoMercado, Decisao, DiagnosticoEstrategico, PesquisaAutomatica,
     Empresa, EventoOperacional, EventoRodada, MatriculaTurma, MembroEmpresa,
@@ -106,6 +109,9 @@ def criar_turma(
         from datetime import datetime
         from zoneinfo import ZoneInfo
         turma.configuracao_simulacao = {**turma.configuracao_simulacao, "data_inicio_simulada": datetime.now(ZoneInfo("America/Sao_Paulo")).date().isoformat()}
+    if (turma.configuracao_simulacao or {}).get("periodicidade") == "MENSAL_CALENDARIO" and not turma.configuracao_simulacao.get("sazonalidade_pmc"):
+        from ..motor.sazonalidade_pmc import edicao_vigente
+        turma.configuracao_simulacao = {**turma.configuracao_simulacao, "sazonalidade_pmc": edicao_vigente(db)}
     db.add(turma)
     db.commit()
     db.refresh(turma)
@@ -169,40 +175,25 @@ def excluir_turma(
 
 class CalendarioEntrada(BaseModel):
     data_inicio: date
-    perfil_sazonal: str = "NEUTRO"
 
 
 @router.put("/turmas/{turma_id}/calendario")
 def definir_calendario(turma_id: int, dados: CalendarioEntrada, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    """O professor escolhe o mês da rodada 1 (padrão: mês real de início)."""
     turma = _turma_do_professor(db, turma_id, professor)
     turma = bloquear_turma(db, turma.id)
     if turma.modo_jogo == "LEGADO":
-        raise HTTPException(422, "O calendário semanal requer o modelo Tradicional ou Startup.")
-    if dados.perfil_sazonal not in {"NEUTRO","VAREJO","ALIMENTACAO","SERVICOS"}:
-        raise HTTPException(422, "Perfil sazonal inválido.")
+        raise HTTPException(422, "O calendário mensal requer o modelo Tradicional ou Startup.")
     if (turma.configuracao_simulacao or {}).get("periodicidade") == "SEMANAL":
-        raise HTTPException(422, "O calendário semanal já foi definido e não pode ser reposicionado.")
+        raise HTTPException(422, "Esta turma usa o calendário semanal anterior, que não pode ser reposicionado.")
+    if turma.rodada_atual != 1:
+        raise HTTPException(422, "O mês inicial só pode ser escolhido antes do fechamento da primeira rodada.")
     if db.query(Decisao).join(Empresa).filter(Empresa.turma_id==turma.id, Decisao.rodada==turma.rodada_atual).first():
-        raise HTTPException(422, "Defina o calendário antes de salvar decisões da rodada atual.")
-    from ..motor.avancado import config
-    from math import ceil
-    from copy import deepcopy
-    cfg = config(turma)
-    cfg.update(periodicidade="SEMANAL", data_inicio_simulada=dados.data_inicio.isoformat(),
-               rodada_inicio_calendario=turma.rodada_atual, perfil_sazonal=dados.perfil_sazonal)
-    # Só obrigações FUTURAS da cópia de estado; snapshots antigos são imutáveis.
-    for empresa in turma.empresas:
-        estado = deepcopy(empresa.estado_simulacao or {})
-        converter = lambda r: turma.rodada_atual+ceil(max(0,r-turma.rodada_atual)*30/7)
-        for nome in ("receber","pagar"):
-            for titulo in estado.get(nome,[]):
-                titulo['vencimento'] = converter(titulo['vencimento'])
-        if estado.get('vencimento_divida') is not None:
-            estado['vencimento_divida'] = converter(estado['vencimento_divida'])
-        for maquina in estado.get('maquinas',[]):
-            maquina['ativacao'] = converter(maquina['ativacao'])
-        empresa.estado_simulacao = estado
-    turma.configuracao_simulacao = cfg
+        raise HTTPException(422, "Defina o mês inicial antes de salvar decisões da rodada atual.")
+    from ..calendario_automatico import configurar_mes
+    configurar_mes(db, turma, dados.data_inicio)
+    # Mês escolhido pelo professor: a agenda e o encerramento não o alteram.
+    turma.configuracao_simulacao = {**turma.configuracao_simulacao, "calendario_automatico": False}
     db.commit()
     return ser.turma(turma, completa=True)
 
@@ -221,30 +212,12 @@ def programar_agenda_academica(
         raise HTTPException(422, "A simulação já foi encerrada.")
     if db.query(Decisao).join(Empresa).filter(Empresa.turma_id == turma.id, Decisao.rodada == turma.rodada_atual).first():
         raise HTTPException(422, "Programe o calendário antes de salvar decisões da rodada atual.")
-    from ..agenda_academica import aplicar_proxima_janela, criar_agenda, descricao
-    rodadas = criar_agenda(dados, turma.rodada_atual, turma.total_rodadas)
-    turma.agenda_academica = {
-        "inicio_letivo": dados.inicio_letivo.isoformat(),
-        "fim_letivo": dados.fim_letivo.isoformat(),
-        "dia_semana": dados.dia_semana,
-        "dia_descricao": descricao(dados.dia_semana),
-        "horario_inicio": dados.horario_inicio.strftime("%H:%M"),
-        "recessos": sorted(data.isoformat() for data in dados.recessos),
-        "rodadas": rodadas,
-    }
-    # O calendário econômico semanal deve acompanhar o primeiro encontro;
-    # resultados históricos continuam imutáveis.
-    if turma.modo_jogo != "LEGADO":
-        from ..motor.avancado import config
-        configuracao = config(turma)
-        configuracao.update(
-            periodicidade="SEMANAL",
-            data_inicio_simulada=rodadas[0]["aula"],
-            rodada_inicio_calendario=turma.rodada_atual,
-            calendario_automatico=True,
-        )
-        turma.configuracao_simulacao = configuracao
-    aplicar_proxima_janela(turma)
+    from ..agenda_academica import programar
+    programar(turma, dados)
+    # O mês simulado acompanha a primeira aula de decisão. Com a formação
+    # aberta, o calendário só é fixado quando o professor a encerrar.
+    from ..calendario_automatico import ajustar_ao_inicio
+    ajustar_ao_inicio(db, turma, agenda=True)
     db.commit()
     db.refresh(turma)
     return ser.turma(turma, completa=True)
@@ -576,10 +549,43 @@ def configurar_ingresso(turma_id: int, dados: IngressoTurmaEntrada, db: Session 
     turma = bloquear_turma(db, turma.id)
     if not dados.formacao_encerrada and (turma.rodada_atual != 1 or turma.status != StatusTurma.ABERTA):
         raise HTTPException(422, "Não é possível reabrir a formação após o início das rodadas.")
+    if not dados.formacao_encerrada and turma.formacao_encerrada and turma.modo_equipe and _rodada_iniciada(db, turma):
+        raise HTTPException(422, "Não é possível reabrir a formação depois que as equipes começaram a decidir.")
     turma.visivel_ingresso = dados.visivel_ingresso
-    turma.formacao_encerrada = dados.formacao_encerrada
+    if dados.formacao_encerrada and not turma.formacao_encerrada:
+        _encerrar_formacao(db, turma)
+    elif not dados.formacao_encerrada and turma.formacao_encerrada:
+        turma.formacao_encerrada = False
+        from ..agenda_academica import aplicar_proxima_janela
+        aplicar_proxima_janela(turma)
     db.commit()
     return ser.turma(turma)
+
+
+def _rodada_iniciada(db: Session, turma: Turma) -> bool:
+    return db.query(Decisao).join(Empresa).filter(Empresa.turma_id == turma.id, Decisao.rodada == turma.rodada_atual).first() is not None
+
+
+def _encerrar_formacao(db: Session, turma: Turma) -> None:
+    """Encerra a formação e inicia o jogo (regra do professor, 15/11/2026).
+
+    Exige todos os cadastrados em equipes de 2 a 5. Com agenda acadêmica, a
+    rodada 1 passa para a primeira aula seguinte ao encerramento; sem agenda,
+    ela abre imediatamente.
+    """
+    if turma.modo_equipe:
+        db.flush()
+        for empresa in turma.empresas:
+            db.expire(empresa, ["membros"])
+        pendencias = pendencias_formacao(db, turma)
+        if pendencias:
+            raise HTTPException(422, "A formação não pode ser encerrada. " + " ".join(pendencias))
+    turma.formacao_encerrada = True
+    if turma.agenda_academica:
+        from ..agenda_academica import dados_salvos, programar
+        programar(turma, dados_salvos(turma.agenda_academica))
+    from ..calendario_automatico import ajustar_ao_inicio
+    ajustar_ao_inicio(db, turma, agenda=bool(turma.agenda_academica))
 
 
 @router.get("/turmas/{turma_id}/formacao")
@@ -627,10 +633,14 @@ def distribuir_sem_equipe(turma_id: int, db: Session = Depends(get_db), professo
     if not turma.modo_equipe or turma.rodada_atual != 1 or turma.status != StatusTurma.ABERTA:
         raise HTTPException(422, "A distribuição só ocorre na formação das equipes, antes de fechar a primeira rodada.")
     livres = sala(db, turma)["disponiveis"]
-    candidatas = [e for e in turma.empresas if 3 <= len(e.membros) < 5]
-    vagas = [e for e in candidatas for _ in range(5-len(e.membros))]
+    incompletas = [e for e in turma.empresas if len(e.membros) < MIN_INTEGRANTES]
+    if incompletas:
+        nomes = ", ".join(e.nome for e in incompletas)
+        raise HTTPException(422, f"Equipes com menos de {MIN_INTEGRANTES} integrantes: {nomes}. Organize essas equipes antes de distribuir.")
+    candidatas = [e for e in turma.empresas if MIN_INTEGRANTES <= len(e.membros) < MAX_INTEGRANTES]
+    vagas = [e for e in candidatas for _ in range(MAX_INTEGRANTES-len(e.membros))]
     if len(vagas) < len(livres):
-        raise HTTPException(422, f"Há {len(livres)} alunos sem equipe e apenas {len(vagas)} vagas em equipes com pelo menos 3 integrantes. Organize novas equipes antes de distribuir.")
+        raise HTTPException(422, f"Há {len(livres)} alunos sem equipe e apenas {len(vagas)} vagas em equipes com pelo menos {MIN_INTEGRANTES} integrantes. Organize novas equipes antes de distribuir.")
     distribuicao = []
     for aluno in livres:
         empresa = secrets.choice(vagas)
@@ -639,7 +649,8 @@ def distribuir_sem_equipe(turma_id: int, db: Session = Depends(get_db), professo
         versao = invalidar_aprovacoes(db, empresa)
         registrar(db, empresa, db.get(Usuario, aluno["aluno_id"]), "DISTRIBUIR_EQUIPE", versao, {"professor_id": professor.id})
         distribuicao.append({"aluno": aluno["nome"], "empresa": empresa.nome})
-    turma.formacao_encerrada = True
+    db.flush()
+    _encerrar_formacao(db, turma)
     db.commit()
     return {"distribuicao": distribuicao, "mensagem": "Formação encerrada; alunos sem equipe distribuídos nas vagas disponíveis."}
 
@@ -658,7 +669,7 @@ def incluir_excepcionalmente(turma_id: int, dados: InclusaoExcepcionalEntrada, d
     empresa = db.get(Empresa, dados.empresa_id)
     if not turma.modo_equipe or not m or m.turma_id != turma.id or not empresa or empresa.turma_id != turma.id:
         raise HTTPException(422, "Selecione um aluno cadastrado e uma equipe desta turma.")
-    if turma.status != StatusTurma.ABERTA or len(empresa.membros) >= 5:
+    if turma.status != StatusTurma.ABERTA or len(empresa.membros) >= MAX_INTEGRANTES:
         raise HTTPException(422, "A equipe não tem vaga disponível ou a turma foi encerrada.")
     if db.query(MembroEmpresa).filter_by(turma_id=turma.id, aluno_id=m.aluno_id).first() or db.query(Empresa).filter_by(turma_id=turma.id, aluno_id=m.aluno_id).first():
         raise HTTPException(409, "Este aluno já está em uma equipe.")
@@ -667,6 +678,48 @@ def incluir_excepcionalmente(turma_id: int, dados: InclusaoExcepcionalEntrada, d
     registrar(db, empresa, m.aluno, "INCLUSAO_EXCEPCIONAL", versao, {"professor_id": professor.id, "motivo": dados.motivo.strip()})
     db.commit()
     return {"mensagem": "Inclusão excepcional registrada com justificativa."}
+
+
+class ProrrogacaoEntrada(BaseModel):
+    rodada: int = Field(ge=1, le=60)
+    # Dia e hora no horário de Brasília; ambos vazios cancelam a extensão.
+    data: Optional[date] = None
+    horario: Optional[time] = None
+
+
+@router.put("/turmas/{turma_id}/prorrogacao")
+def estender_fechamento(turma_id: int, dados: ProrrogacaoEntrada, db: Session = Depends(get_db), professor: Usuario = Depends(exigir_professor)):
+    """Exceção pontual: estende o fechamento de uma rodada (ex.: aula 1 aberta por 2 ou 3 dias).
+
+    O padrão continua automático pela agenda; as rodadas seguintes abrem na
+    primeira aula depois do novo fechamento.
+    """
+    from datetime import datetime, timezone
+    from zoneinfo import ZoneInfo
+    from ..models import agora
+    from ..agenda_academica import dados_salvos, programar
+    _turma_do_professor(db, turma_id, professor)
+    turma = bloquear_turma(db, turma_id)
+    if turma.status != StatusTurma.ABERTA:
+        raise HTTPException(409, "A turma está encerrada.")
+    if not turma.agenda_academica:
+        raise HTTPException(422, "Programe primeiro o calendário acadêmico. Sem calendário, use o prazo manual da rodada.")
+    if not turma.rodada_atual <= dados.rodada <= turma.total_rodadas:
+        raise HTTPException(422, f"Escolha uma rodada entre {turma.rodada_atual} e {turma.total_rodadas}.")
+    if (dados.data is None) != (dados.horario is None):
+        raise HTTPException(422, "Informe o dia e o horário do fechamento, ou deixe ambos vazios para cancelar a extensão.")
+    prorrogacoes = dict(turma.agenda_academica.get("prorrogacoes") or {})
+    if dados.data is None:
+        prorrogacoes.pop(str(dados.rodada), None)
+    else:
+        limite = datetime.combine(dados.data, dados.horario, ZoneInfo("America/Sao_Paulo")).astimezone(timezone.utc).replace(tzinfo=None)
+        if limite <= agora():
+            raise HTTPException(422, "Escolha um fechamento que ainda não tenha passado (horário de Brasília).")
+        prorrogacoes[str(dados.rodada)] = limite.isoformat() + "Z"
+    turma.agenda_academica = {**turma.agenda_academica, "prorrogacoes": prorrogacoes}
+    programar(turma, dados_salvos(turma.agenda_academica))
+    db.commit()
+    return ser.turma(turma, completa=True)
 
 
 class PrazoEntrada(BaseModel):

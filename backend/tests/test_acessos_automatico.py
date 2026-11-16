@@ -12,7 +12,8 @@ def test_auto_data_fixa_e_acessos_com_autorizacao(cliente, professor):
     eid = _entrar(cliente,aluno,t['codigo'],'Equipe Auto')
     url = f'/api/aluno/empresas/{eid}'
     p = cliente.get(url,headers=aluno).json()
-    assert p['turma']['calendario']['inicio'] == datetime.now(ZoneInfo('America/Sao_Paulo')).date().isoformat()
+    assert p['turma']['calendario']['inicio'] == datetime.now(ZoneInfo('America/Sao_Paulo')).date().replace(day=1).isoformat()
+    assert p['turma']['calendario']['periodicidade'] == 'MENSAL_CALENDARIO'
     assert cliente.get(url,headers=aluno).json()['turma']['calendario']==p['turma']['calendario']
     assert cliente.post(url+'/acessos',headers=aluno,json={'aba':'financas'}).status_code==201
     rel = cliente.get(f"/api/professor/turmas/{t['id']}/acessos",headers=professor).json()

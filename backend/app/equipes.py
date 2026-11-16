@@ -12,6 +12,10 @@ from .models import CargoEquipe, Decisao, Empresa, MembroEmpresa, RegistroEquipe
 
 
 CARGOS = [cargo.value for cargo in CargoEquipe]
+# Regra do professor (15/11/2026): equipes de 2 a 5 integrantes em todos os setores.
+MIN_INTEGRANTES = 2
+MAX_INTEGRANTES = 5
+FAIXA_EQUIPE = f"de {MIN_INTEGRANTES} a {MAX_INTEGRANTES}"
 CAMPOS_DECISAO = (
     "preco", "marketing", "pd", "networking", "contratar", "demitir",
     "emprestimo", "amortizacao", "regime_solicitado",
@@ -124,14 +128,43 @@ def pendencias_equipe(
 ) -> list:
     membros = empresa.membros
     pendencias = []
-    if not 3 <= len(membros) <= 5:
-        pendencias.append(f"Reúna de 3 a 5 alunos (atualmente {len(membros)}).")
+    if not MIN_INTEGRANTES <= len(membros) <= MAX_INTEGRANTES:
+        pendencias.append(f"Reúna {FAIXA_EQUIPE} alunos (atualmente {len(membros)}).")
     if empresa.lider_id is None:
         pendencias.append("Escolham o líder da equipe.")
     if decisao is None or decisao.automatica:
         pendencias.append(f"Salve uma decisão para a rodada {empresa.turma.rodada_atual}.")
     elif incluir_aprovacoes and not decisao.enviada_em:
         pendencias.append("O líder ainda não enviou a decisão final.")
+    return pendencias
+
+
+def formacao_aberta(turma: Turma) -> bool:
+    """O jogo só começa quando o professor encerra a formação das equipes."""
+    return bool(getattr(turma, "modo_equipe", False) and not getattr(turma, "formacao_encerrada", True) and getattr(turma, "rodada_atual", 1) == 1)
+
+
+def exigir_formacao_encerrada(turma: Turma) -> None:
+    if formacao_aberta(turma):
+        raise HTTPException(
+            403,
+            "A formação das equipes ainda está aberta. Vocês podem montar a equipe, escolher o líder "
+            "e distribuir os cargos; as decisões começam quando o professor encerrar a formação.",
+        )
+
+
+def pendencias_formacao(db: Session, turma: Turma) -> list:
+    """Lista quem impede o início do jogo: alunos sem equipe e equipes fora da faixa."""
+    from .ingresso import sala
+    pendencias = []
+    if not turma.empresas:
+        pendencias.append("Nenhuma equipe foi criada.")
+    for aluno in sala(db, turma)["disponiveis"]:
+        pendencias.append(f"{aluno['nome']} está cadastrado(a) na turma, mas sem equipe.")
+    for empresa in turma.empresas:
+        quantidade = len(empresa.membros)
+        if not MIN_INTEGRANTES <= quantidade <= MAX_INTEGRANTES:
+            pendencias.append(f"{empresa.nome}: {quantidade} integrante(s); a equipe precisa ter {FAIXA_EQUIPE}.")
     return pendencias
 
 

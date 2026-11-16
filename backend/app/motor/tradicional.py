@@ -169,6 +169,11 @@ def _quitar(titulos, rodada):
     return restantes, _soma(t["valor"] for t in vencidos)
 
 
+def _semanal(p: dict) -> bool:
+    """Vida útil e horizonte em semanas só no calendário semanal antigo."""
+    return p.get("_calendario", {}).get("periodicidade") == "SEMANAL"
+
+
 def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
              multiplicador_custo: float = 1) -> dict:
     """Prepara produção e obrigações certas sem modificar os argumentos."""
@@ -328,7 +333,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     for ativo_linha in s["ativos_linhas"]:
         if ativo_linha.get("ativacao", rodada) > rodada:
             continue
-        vida_util = max(1, int(ativo_linha.get("vida_util", 104 if "_calendario" in p else 24)))
+        vida_util = max(1, int(ativo_linha.get("vida_util", 104 if _semanal(p) else 24)))
         parcela = min(ativo_linha.get("valor_liquido", 0), _proporcao(ativo_linha.get("custo", 0), fracao, vida_util))
         ativo_linha["valor_liquido"] = _soma([ativo_linha.get("valor_liquido", 0), -parcela])
         depreciacao = _soma([depreciacao, parcela])
@@ -355,7 +360,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     linhas_ativadas_agora, linhas_ativadas_agora_ids, linhas_sem_capex = [], set(), []
     investimento_linhas = 0.0
     caixa_para_ativacao = max(0, caixa_obrigacoes + emprestimo - amortizacao - investimento_maquinas)
-    vida_util_linha = int(cfg.get("vida_util_linha", 104 if "_calendario" in p else 24))
+    vida_util_linha = int(cfg.get("vida_util_linha", 104 if _semanal(p) else 24))
     for item in itens:
         produto_id = item["produto_id"]
         if produto_id in linhas_ativas:
@@ -771,7 +776,7 @@ def apurar(preparo: dict, demanda: float,
     operacao.update(funcionarios_inicio=c["empresa"].get("funcionarios",0),
                     desligamentos_efetivos=c["turnover"]+min(max(0,int(d.get("demitir",0))),max(0,c["empresa"].get("funcionarios",0)-c["turnover"])))
     operacao.update(c["kpis"])
-    operacao.update(reconciliar_financeiros(balanco, s, dre, c["rodada"], p.get("taxa_cheque_especial", 0.08), c["compras_mes"], dias=p.get("_calendario", {}).get("dias",30), horizonte=52 if "_calendario" in p else 12))
+    operacao.update(reconciliar_financeiros(balanco, s, dre, c["rodada"], p.get("taxa_cheque_especial", 0.08), c["compras_mes"], dias=p.get("_calendario", {}).get("dias",30), horizonte=52 if _semanal(p) else 12))
     operacao.update(indicadores_entrega)
     operacao.update(
         admissoes=(max(0, int(d.get("contratar", 0))) + max(0, int(d.get("contratar_tecnicos") or 0))

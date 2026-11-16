@@ -42,7 +42,10 @@ class ConfiguracaoSimulacao(BaseModel):
 
     model_config = ConfigDict(allow_inf_nan=False, extra="forbid")
 
-    periodicidade: Literal["MENSAL", "SEMANAL"] = "MENSAL"
+    # MENSAL: modelo mensal sem datas (turmas antigas). SEMANAL: calendário
+    # semanal das turmas já iniciadas. MENSAL_CALENDARIO: padrão desde 16/11/2026,
+    # cada rodada = um mês do calendário, com sazonalidade da PMC/IBGE.
+    periodicidade: Literal["MENSAL", "SEMANAL", "MENSAL_CALENDARIO"] = "MENSAL"
     data_inicio_simulada: Optional[str] = None
     cenario_mei_plp186: bool = False
     atividade_rural: bool = False
@@ -52,6 +55,9 @@ class ConfiguracaoSimulacao(BaseModel):
     # Definido pela edição de mercado publicada; é usado somente nas próximas
     # rodadas para relacionar a sazonalidade ao segmento escolhido pela turma.
     setor_mercado: Optional[str] = Field(None, min_length=3, max_length=120)
+    # Edição dos fatores da PMC congelada no início do calendário: a
+    # atualização anual não muda as regras de uma turma em andamento.
+    sazonalidade_pmc: Optional[dict] = None
 
     capacidade_maquina: int = Field(240, ge=1, le=100_000)
     preco_maquina: float = Field(12000.0, gt=0, le=10_000_000)
@@ -79,12 +85,14 @@ class ConfiguracaoSimulacao(BaseModel):
 
     @model_validator(mode="after")
     def validar_pesos(self):
-        if self.periodicidade == "SEMANAL" and self.data_inicio_simulada is None:
+        if self.periodicidade in ("SEMANAL", "MENSAL_CALENDARIO") and self.data_inicio_simulada is None:
             from datetime import datetime
             from zoneinfo import ZoneInfo
             self.data_inicio_simulada = datetime.now(ZoneInfo("America/Sao_Paulo")).date().isoformat()
         if self.data_inicio_simulada:
-            date.fromisoformat(self.data_inicio_simulada)
+            inicio = date.fromisoformat(self.data_inicio_simulada)
+            if self.periodicidade == "MENSAL_CALENDARIO":
+                self.data_inicio_simulada = inicio.replace(day=1).isoformat()
         total = self.peso_lucro + self.peso_patrimonio + self.peso_satisfacao + self.peso_participacao
         if not isclose(total, 1.0, rel_tol=0, abs_tol=1e-6):
             raise ValueError("Os pesos dos indicadores pedagógicos devem somar 1.")
@@ -179,8 +187,8 @@ class ParametrosTurma(BaseModel):
 
     @model_validator(mode="after")
     def validar_calendario_do_modelo(self):
-        if self.modo_jogo == "LEGADO" and self.configuracao_simulacao.periodicidade == "SEMANAL":
-            raise ValueError("O motor legado preserva o calendário mensal. Use Tradicional ou Startup para semanas.")
+        if self.modo_jogo == "LEGADO" and self.configuracao_simulacao.periodicidade != "MENSAL":
+            raise ValueError("O motor legado preserva o modelo mensal sem calendário. Use Tradicional ou Startup.")
         return self
 
 
@@ -189,18 +197,25 @@ class TurmaEntrada(ParametrosTurma):
 
 
 class AgendaAcademicaEntrada(BaseModel):
-    """Calendário real da disciplina; a simulação continua com períodos semanais."""
+    """Calendário real da disciplina: cada rodada fica aberta só durante a aula."""
 
     inicio_letivo: date
     fim_letivo: date
     dia_semana: int = Field(ge=0, le=6, description="0=segunda-feira; 6=domingo")
     horario_inicio: time
+    horario_fim: time
     recessos: list[date] = Field(default_factory=list, max_length=80)
 
     @model_validator(mode="after")
     def validar_periodo(self):
         if self.fim_letivo < self.inicio_letivo:
             raise ValueError("O fim do período letivo deve ocorrer depois do início.")
+        inicio = self.horario_inicio.hour * 60 + self.horario_inicio.minute
+        fim = self.horario_fim.hour * 60 + self.horario_fim.minute
+        if fim <= inicio:
+            raise ValueError("O término da aula deve ser depois do início, no mesmo dia.")
+        if fim - inicio > 120:
+            raise ValueError("A janela de decisão vai até 2 horas (duas aulas de 50 minutos com intervalo).")
         if any(data < self.inicio_letivo or data > self.fim_letivo for data in self.recessos):
             raise ValueError("Os recessos devem estar dentro do período letivo.")
         return self

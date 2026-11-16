@@ -164,6 +164,10 @@ def processar_rodada(
     if not empresas:
         raise ValueError("Não há empresas na turma para processar a rodada.")
 
+    from ..equipes import formacao_aberta
+    if formacao_aberta(turma):
+        # Nem o fechamento forçado inicia o jogo com a formação aberta.
+        raise ValueError("A formação das equipes ainda está aberta. Encerre a formação para iniciar a rodada 1.")
     if turma.modo_equipe and not forcar:
         from ..equipes import pendencias_fechamento
 

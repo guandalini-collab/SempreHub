@@ -4,7 +4,7 @@ from datetime import datetime, time, timezone
 from zoneinfo import ZoneInfo
 from fastapi import HTTPException
 from .models import Turma, StatusTurma, agora
-from .equipes import bloquear_turma
+from .equipes import bloquear_turma, exigir_formacao_encerrada, formacao_aberta
 BRASILIA = ZoneInfo("America/Sao_Paulo")
 
 def limite_brasilia(data):
@@ -15,12 +15,14 @@ def vencido(turma, instante=None):
 
 def validar_salvamento(turma, rodada=None, instante=None):
     instante = instante or agora()
+    exigir_formacao_encerrada(turma)
     abertura = getattr(turma, "abertura_rodada", None)
     if abertura and (rodada is None or rodada == turma.rodada_atual) and instante < abertura:
         inicio = abertura.replace(tzinfo=timezone.utc).astimezone(BRASILIA).strftime("%d/%m/%Y às %H:%M")
         raise HTTPException(403, f"A rodada abre conforme o calendário acadêmico em {inicio} (horário de Brasília).")
     if turma.prazo_rodada and (rodada is None or rodada == turma.prazo_numero_rodada) and instante >= turma.prazo_rodada:
-        raise HTTPException(403, "Prazo encerrado às 23:59:59 de Brasília. A rodada é encerrada automaticamente; atualize o painel para consultar o próximo mês.")
+        fim = turma.prazo_rodada.replace(tzinfo=timezone.utc).astimezone(BRASILIA).strftime("%d/%m/%Y às %H:%M")
+        raise HTTPException(403, f"A janela de decisão terminou em {fim} (horário de Brasília). Fora da janela é possível apenas consultar resultados.")
 
 def fechar_vencidas():
     from .database import SessionLocal
@@ -33,7 +35,7 @@ def fechar_vencidas():
         try:
             with SessionLocal() as db:
                 turma = bloquear_turma(db, turma_id)
-                if not vencido(turma) or turma.status != StatusTurma.ABERTA:
+                if not vencido(turma) or turma.status != StatusTurma.ABERTA or formacao_aberta(turma):
                     continue
                 evento = processar_rodada(db, turma, forcar=True)
                 professor_id, rodada = turma.professor_id, evento.rodada

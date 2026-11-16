@@ -1,8 +1,10 @@
+export interface ProximoMes { inicio:string; mes:number; ano:number; fator:number; atividade_pmc:string|null; variacao:number; fonte:string; estado:string }
 export interface CalendarioSimulado {
-  periodicidade: 'SEMANAL'; inicio: string; fim: string; dias: number; fator_mensal: number;
+  periodicidade: 'SEMANAL'|'MENSAL_CALENDARIO'; inicio: string; fim: string; dias: number; fator_mensal: number;
+  mes?: number; ano?: number; proximo_mes?: ProximoMes;
   semana_iso: number; ano_iso: number; ano_fiscal: number; semana_iso_fim?: number; ano_iso_fim?: number;
   meses: {data:string;peso_mensal:number}[];
-  sazonalidade:{estado:string;perfil:string;setor?:string|null;eventos:string[];demanda:number;insumos:number;frete:number;detalhes_eventos?:{nome:string;data:string;fase:string;impacto_demanda:number;orientacao:string;fonte:string}[]};
+  sazonalidade:{estado:string;perfil?:string;fonte?:string;atividade_pmc?:string|null;observacao?:string;periodo_base?:string|null;setor?:string|null;eventos:string[];demanda:number;insumos:number;frete:number;detalhes_eventos?:{nome:string;data:string;fase:string;impacto_demanda:number;orientacao:string;fonte:string}[]};
   proximos_eventos:{nome:string;data:string;impacto?:string;peso_setorial?:number}[];
 }
 export const dataCurta=(v:string)=>new Date(v+'T12:00:00').toLocaleDateString('pt-BR');
@@ -13,7 +15,8 @@ export const rotuloSemanaIso=(c:Pick<CalendarioSimulado,'semana_iso'|'ano_iso'|'
   if(fim===c.semana_iso&&anoFim===c.ano_iso) return `Semana ISO ${c.semana_iso}/${c.ano_iso}`;
   return anoFim===c.ano_iso?`Semanas ISO ${c.semana_iso}–${fim}/${c.ano_iso}`:`Semanas ISO ${c.semana_iso}/${c.ano_iso}–${fim}/${anoFim}`;
 };
-export const tituloPeriodo=(c?:CalendarioSimulado|null)=>c?`${rotuloSemanaIso(c)} · ${dataCurta(c.inicio)} a ${dataCurta(c.fim)}`:'Calendário mensal';
+export const nomeMes=(inicio:string)=>new Date(inicio+'T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+export const tituloPeriodo=(c?:CalendarioSimulado|null)=>!c?'Calendário mensal':c.periodicidade==='MENSAL_CALENDARIO'?`Mês de operação: ${nomeMes(c.inicio)}`:`${rotuloSemanaIso(c)} · ${dataCurta(c.inicio)} a ${dataCurta(c.fim)}`;
 
 // Rateio por dia em centavos: semanas atravessam meses sem duplicar receitas ou despesas.
 export function consolidarDres(resultados:import('./tipos').Resultado[], tipo:'mes'|'trimestre') {

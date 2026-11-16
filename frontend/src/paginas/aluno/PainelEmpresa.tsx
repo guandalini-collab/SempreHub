@@ -52,12 +52,22 @@ function CalendarioSazonal({calendario}:{calendario:CalendarioSimulado}) {
   const sazonal = calendario.sazonalidade;
   const eventos = sazonal.detalhes_eventos ?? [];
   const proximos = calendario.proximos_eventos ?? [];
+  if (calendario.periodicidade === "MENSAL_CALENDARIO") return <section className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 text-sm" aria-label="Cenário sazonal da rodada">
+    <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <strong className="text-marinho">{tituloPeriodo(calendario)}</strong>
+      <span className="rounded-full bg-white px-2 py-1 text-xs font-semibold text-corporativo">Fator sazonal: {sazonal.demanda.toFixed(3)}</span>
+    </div>
+    <p className="mt-2 text-slate-700">{sazonal.setor ? <>Setor: <strong>{sazonal.setor}</strong>. </> : null}{sazonal.atividade_pmc ? <>Atividade de referência no IBGE: <strong>{sazonal.atividade_pmc}</strong>. Fator 1,00 = mês médio do ano. </> : null}{sazonal.observacao} A sazonalidade ajusta a procura do mercado neste mês; não garante vendas.</p>
+    {eventos.length > 0 && <p className="mt-2 text-xs text-slate-600">Datas do mês (só aviso; o efeito já está no fator): {eventos.map(e=>e.nome + " (" + new Date(e.data + "T12:00:00").toLocaleDateString("pt-BR") + ")").join(" · ")}.</p>}
+    {calendario.proximo_mes && <p className="mt-2 text-xs text-slate-600">Próximo mês: fator {calendario.proximo_mes.fator.toFixed(3)}.</p>}
+    <p className="mt-2 text-xs text-slate-500">Fonte: {sazonal.fonte}. {sazonal.estado}.</p>
+  </section>;
   return <section className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 text-sm" aria-label="Cenário sazonal da rodada">
     <div className="flex flex-wrap items-baseline justify-between gap-2">
       <strong className="text-marinho">{tituloPeriodo(calendario)}</strong>
       <span className="rounded-full bg-white px-2 py-1 text-xs font-semibold text-corporativo">Procura estimada: {sazonal.demanda.toFixed(2)}×</span>
     </div>
-    <p className="mt-2 text-slate-700">{sazonal.setor ? <>Setor: <strong>{sazonal.setor}</strong>. </> : <>Perfil de referência: <strong>{sazonal.perfil.toLowerCase()}</strong>. </>}A sazonalidade ajusta a procura do mercado nesta semana; não garante vendas.</p>
+    <p className="mt-2 text-slate-700">{sazonal.setor ? <>Setor: <strong>{sazonal.setor}</strong>. </> : <>Perfil de referência: <strong>{(sazonal.perfil ?? "neutro").toLowerCase()}</strong>. </>}A sazonalidade ajusta a procura do mercado nesta semana; não garante vendas.</p>
     {eventos.length > 0 ? <div className="mt-3 grid gap-2 md:grid-cols-2">{eventos.map(evento=><div key={evento.nome + "-" + evento.fase} className="rounded-lg border border-blue-100 bg-white px-3 py-2"><p className="font-semibold text-marinho">{evento.fase === "pós-evento" ? "Após " : ""}{evento.nome} · {evento.impacto_demanda >= 0 ? "+" : ""}{(evento.impacto_demanda * 100).toFixed(1)}% na procura-base</p><p className="mt-1 text-xs text-slate-600">{evento.orientacao}</p></div>)}</div> : <p className="mt-3 text-slate-600">Não há pico sazonal aplicável nesta semana. Mantenha a decisão baseada no mercado e na capacidade da empresa.</p>}
     {proximos.length > 0 && <p className="mt-3 text-xs text-slate-600">Próximos marcos do setor: {proximos.map(e=>e.nome + " (" + new Date(e.data + "T12:00:00").toLocaleDateString("pt-BR") + ")").join(" · ")}.</p>}
     <p className="mt-2 text-xs text-slate-500">Calendário civil brasileiro · estimativa didática do modelo. Confira também as fontes oficiais e as notícias da rodada.</p>
@@ -148,7 +158,7 @@ const ITENS_PAINEL = [
   {id:"cockpit",titulo:"Cockpit de decisão",descricao:"Visão rápida dos indicadores e alertas antes do envio.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   ...AREAS_INDICADORES.map(a => ({id: `resultado-${a.id}`, titulo: a.titulo, descricao: "Consulte os valores da rodada e interprete-os com sua equipe usando o manual.", simbolo: "", grupo: "Resultados e evolução", pai: "resultados"})),
   {id:"demonstrativos",titulo:"DRE e balanço",descricao:"Demonstrativos e resultado da rodada.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
-  {id:"dashboard-semanal",titulo:"Painel semanal",descricao:"Compare indicadores e registre bases observadas por semana.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
+  {id:"dashboard-semanal",titulo:"Painel semanal",descricao:"Compare indicadores e registre bases observadas por rodada.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {id:"evolucao",titulo:"Evolução por rodada",descricao:"Compare caixa, lucro e participação ao longo do tempo.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {id:"historico",titulo:"Histórico detalhado",descricao:"Consulte as decisões e os resultados anteriores.",simbolo:"",grupo:"Resultados e evolução",pai:"resultados"},
   {
@@ -705,7 +715,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar, aoPr
 
         </div>
         {turma.modo_jogo === "LEGADO" && ["producao", "logistica"].includes(area) && <div className="rounded-xl border-l-4 border-blue-600 bg-blue-50 p-5"><h3 className="font-bold">{area === "producao" ? "Capacidade no modelo básico" : "Logística no modelo básico"}</h3><p className="mt-2 text-sm">{area === "producao" ? "Neste modelo, a capacidade depende da equipe de funcionários. Estoques, máquinas e planejamento de produção são controles do modelo Empresa tradicional." : "Este modelo não possui escolha de frete ou entregas. Esses controles estão disponíveis no modelo Empresa tradicional; no modelo Startup, a operação é digital."}</p><p className="mt-2 text-sm">Confira a capacidade e os gastos previstos na prévia abaixo.</p></div>}
-        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao etapaRH={etapaRH} etapaFinanceira={etapaFinanceira} rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} fatorPeriodo={turma.calendario?.fator_mensal??1} semanal={!!turma.calendario} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} produtosMix={d.plano_comercial?.produtos ?? []} />}
+        {turma.modo_jogo !== "LEGADO" && d.simulacao && <ControlesSimulacao etapaRH={etapaRH} etapaFinanceira={etapaFinanceira} rodada={turma.rodada_atual} area={area} modo={turma.modo_jogo} valores={d.simulacao} aoMudar={(simulacao) => atualizar("simulacao", simulacao)} config={turma.parametros?.configuracao_simulacao ?? turma.configuracao_simulacao ?? CONFIGURACAO_MOTOR_PADRAO} fatorPeriodo={turma.calendario?.fator_mensal??1} semanal={turma.calendario?.periodicidade==="SEMANAL"} salarioBase={p.salario_base} marketing={d.marketing} mixSelecionado={!!d.plano_comercial} produtosMix={d.plano_comercial?.produtos ?? []} />}
 
         {painelAuxiliar === "previa" && <Modal titulo="Prévia estimada — não é o resultado da rodada" aoFechar={()=>setPainelAuxiliar(null)}><div className="text-sm">
           {!previsao && !erroPrevisao && <p role="status">Calculando prévia…</p>}

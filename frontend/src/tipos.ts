@@ -73,8 +73,10 @@ export interface AgendaAcademica {
   dia_semana: number;
   dia_descricao: string;
   horario_inicio: string;
+  horario_fim?: string;
   recessos: string[];
-  rodadas: {rodada:number; abre_em:string; fecha_em:string; aula:string}[];
+  rodadas: {rodada:number; abre_em:string; fecha_em:string; aula:string; prorrogada?:boolean}[];
+  prorrogacoes?: Record<string,string>;
 }
 
 export interface Empresa {

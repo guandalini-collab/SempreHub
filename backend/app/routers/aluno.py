@@ -15,7 +15,7 @@ from ..motor.simulacao import perfil_inicial, prever_decisao
 from ..schemas import AprovarDecisaoEntrada, DecisaoEntrada, EntrarEquipeEntrada, EntrarTurmaEntrada, EquipeEntrada
 from ..seguranca import exigir_aluno
 from ..ingresso import matricular, sala
-from ..equipes import exigir_lider, pendencias_envio, registrar_envio
+from ..equipes import FAIXA_EQUIPE, MAX_INTEGRANTES, MIN_INTEGRANTES, exigir_lider, pendencias_envio, registrar_envio
 from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/api/aluno", tags=["aluno"])
@@ -122,8 +122,8 @@ def entrar_na_equipe(
         or db.query(Empresa).filter(Empresa.turma_id == turma.id, Empresa.aluno_id == aluno.id).first()
     ):
         raise HTTPException(409, "Você já participa de uma empresa nesta turma.")
-    if len(empresa.membros) >= 5:
-        raise HTTPException(422, "Esta equipe já tem 5 alunos. Entre em outra equipe.")
+    if len(empresa.membros) >= MAX_INTEGRANTES:
+        raise HTTPException(422, f"Esta equipe já tem {MAX_INTEGRANTES} alunos. Entre em outra equipe.")
     db.add(MembroEmpresa(empresa_id=empresa.id, turma_id=turma.id, aluno_id=aluno.id, cargos=[]))
     versao = invalidar_aprovacoes(db, empresa)
     registrar(db, empresa, aluno, "ENTRAR_EQUIPE", versao)
@@ -414,8 +414,8 @@ def escolher_lider(empresa_id: int, dados: LiderEntrada, db: Session = Depends(g
     if not empresa.turma.modo_equipe or empresa.turma.status != StatusTurma.ABERTA:
         raise HTTPException(422, "A equipe não está disponível para escolha de liderança.")
     ids = {m.aluno_id for m in empresa.membros}
-    if not 3 <= len(ids) <= 5 or dados.aluno_id not in ids or aluno.id not in ids:
-        raise HTTPException(422, "Reúna de 3 a 5 integrantes e escolha alguém da própria equipe.")
+    if not MIN_INTEGRANTES <= len(ids) <= MAX_INTEGRANTES or dados.aluno_id not in ids or aluno.id not in ids:
+        raise HTTPException(422, f"Reúna {FAIXA_EQUIPE} integrantes e escolha alguém da própria equipe.")
     if empresa.lider_id is None:
         votos = {**{k:v for k,v in (empresa.votos_lider or {}).items() if int(k) in ids and v in ids}, str(aluno.id): dados.aluno_id}
         empresa.votos_lider = votos
@@ -465,6 +465,9 @@ def salvar_bases_dashboard(empresa_id:int,rodada:int,dados:BasesSemanais,db:Sess
     from ..dashboard_semanal import resultado_semana,consultar
     empresa=_empresa_para_alterar(db,empresa_id,aluno)
     exigir_lider(empresa,aluno)
+    from ..prazos import validar_salvamento
+    # Fora da janela da aula o aluno só consulta (regra do professor, 15/11/2026).
+    validar_salvamento(empresa.turma)
     resultado_semana(db,empresa_id,rodada)
     obs=db.query(ObservacaoSemanal).filter_by(empresa_id=empresa_id,rodada=rodada).first()
     if not obs:

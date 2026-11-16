@@ -61,7 +61,7 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
       </Secao>
       <div hidden={area !== "producao" || etapaProducao !== "localizacao"}><CentroGravidade estudo={valores.centro_gravidade} aoMudar={(estudo) => mudar("centro_gravidade", estudo)} /></div>
       <Secao titulo="Logística e entregas" oculto={area !== "logistica"}>
-        <Campo rotulo="Orçamento de escoamento da semana" ajuda="Reserva financeira para despachar produtos físicos. Sem este orçamento, mercadorias prontas permanecem no estoque e não geram receita nesta semana.">
+        <Campo rotulo="Orçamento de escoamento do período" ajuda="Reserva financeira para despachar produtos físicos. Sem este orçamento, mercadorias prontas permanecem no estoque e não geram receita nesta semana.">
           <ControleVisual rotulo="Orçamento logístico" valor={valores.orcamento_logistico} aoMudar={(v) => mudar("orcamento_logistico", v)} limite={1_000_000} />
         </Campo>
         <Campo rotulo="Entrega" ajuda="O frete é cobrado por unidade vendida. A experiência da entrega afeta a satisfação futura.">
@@ -224,7 +224,7 @@ export function RelatorioFinanceiro({ detalhes, somenteBalanco = false }: { deta
 export function PreviaOperacional({ simulacao, modo }: { simulacao: PreviaSimulacao; modo: ModoJogo }) {
   return <div className="mt-3 border-t border-slate-200 pt-3">
     <dl className="grid grid-cols-2 gap-3 text-xs">
-      {modo === "TRADICIONAL" && simulacao.producao != null && <Dado rotulo="Produção viável nesta semana" valor={`${inteiro(simulacao.producao)} un.`} />}
+      {modo === "TRADICIONAL" && simulacao.producao != null && <Dado rotulo="Produção viável neste período" valor={`${inteiro(simulacao.producao)} un.`} />}
       {simulacao.estado && modo === "TRADICIONAL" && <Dado rotulo="Matéria-prima após preparo" valor={`${inteiro(simulacao.estado.estoque_mp.quantidade)} un.`} />}
       {simulacao.estado && modo === "STARTUP" && <Dado rotulo="Participação após aporte" valor={percentual(simulacao.estado.participacao_fundadores, 1)} />}
     </dl>

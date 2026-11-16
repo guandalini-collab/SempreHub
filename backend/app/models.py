@@ -500,3 +500,13 @@ class ConsultaOficial(Base):
     ocupado_ate = Column(DateTime, nullable=True)
     estado = Column(String(80), nullable=False, default='PENDENTE')
     erro = Column(String(500), nullable=True)
+
+
+class SerieOficial(Base):
+    """Séries oficiais calculadas pelo sistema (ex.: sazonalidade da PMC/IBGE)."""
+    __tablename__ = 'series_oficiais'
+    id = Column(Integer, primary_key=True)
+    chave = Column(String(60), nullable=False, unique=True)
+    dados = Column(JSON, nullable=True)
+    tentado_em = Column(DateTime, nullable=True)
+    erro = Column(String(500), nullable=True)

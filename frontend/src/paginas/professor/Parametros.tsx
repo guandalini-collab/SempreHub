@@ -8,7 +8,7 @@ import ConfiguracaoSimulacao from "../../componentes/ConfiguracaoSimulacao";
 export const PARAMETROS_PADRAO: Parametros = {
   modo_jogo: "TRADICIONAL",
   cenario: "ZERO",
-  configuracao_simulacao: {...CONFIGURACAO_MOTOR_PADRAO, periodicidade: "SEMANAL", data_inicio_simulada: new Date().toLocaleDateString("en-CA",{timeZone:"America/Sao_Paulo"}), perfil_sazonal: "NEUTRO"},
+  configuracao_simulacao: {...CONFIGURACAO_MOTOR_PADRAO, periodicidade: "MENSAL_CALENDARIO", data_inicio_simulada: new Date().toLocaleDateString("en-CA",{timeZone:"America/Sao_Paulo"})},
   modo_equipe: true,
   total_rodadas: 52,
   caixa_inicial: 20000,
@@ -37,7 +37,7 @@ type Definicao = {
 
 const GRUPOS: { titulo: string; cor: string; campos: Definicao[] }[] = [
   { titulo: "Cenário de Mercado", cor: "bg-royal", campos: [
-    { campo: "total_rodadas", rotulo: "Total de rodadas", ajuda: "Cada rodada representa uma semana no calendário semanal; turmas históricas mantêm meses.", tipo: "inteiro" },
+    { campo: "total_rodadas", rotulo: "Total de rodadas", ajuda: "Cada rodada representa um mês de operação do calendário; turmas semanais anteriores mantêm semanas.", tipo: "inteiro" },
     { campo: "probabilidade_evento", rotulo: "Chance de evento ao sortear", ajuda: "Usada quando você escolhe “sortear”.", tipo: "percentual" },
     { campo: "preco_referencia", rotulo: "Preço de referência", ajuda: "Preço “justo” percebido pelos clientes.", tipo: "moeda" },
     { campo: "demanda_base_por_empresa", rotulo: "Demanda base por empresa (un./mês)", ajuda: "O mercado total cresce com o número de empresas.", tipo: "decimal" },
@@ -83,9 +83,9 @@ export function EditorParametros({
           <legend className={`float-left w-full px-5 py-4 text-base font-bold ${grupo.cor} ${grupo.cor === "bg-hub" ? "text-sky-950" : "text-white"}`}>{grupo.titulo}</legend>
           <div className="clear-both grid gap-5 p-5 sm:grid-cols-2 xl:grid-cols-3">
             {grupo.titulo === "Custos e Limites da Empresa" && <div className="sm:col-span-2 xl:col-span-3">
-      {exibirModo && <Campo rotulo="Participação dos alunos" ajuda={modoBloqueado ? "Ao converter para equipes, empresas e resultados são preservados. Cada aluno atual inicia como CEO; complete a equipe e confirme novamente as decisões da rodada atual." : "Em equipes, 3 a 5 alunos dividem os cargos e todos confirmam cada decisão."}>
+      {exibirModo && <Campo rotulo="Participação dos alunos" ajuda={modoBloqueado ? "Ao converter para equipes, empresas e resultados são preservados. Cada aluno atual inicia como CEO; complete a equipe e confirme novamente as decisões da rodada atual." : "Em equipes, 2 a 5 alunos dividem os cargos; o líder envia a decisão."}>
         <select className={estiloEntrada} value={valores.modo_equipe ? "EQUIPE" : "INDIVIDUAL"} onChange={(e) => aoMudar({ ...valores, modo_equipe: e.target.value === "EQUIPE" })}>
-          <option value="EQUIPE">Equipes de 3 a 5 alunos</option>
+          <option value="EQUIPE">Equipes de 2 a 5 alunos</option>
           <option value="INDIVIDUAL" disabled={(modoBloqueado || somenteRodadas) && valores.modo_equipe}>Individual</option>
         </select>
       </Campo>}
