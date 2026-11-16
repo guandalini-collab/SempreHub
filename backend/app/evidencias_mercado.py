@@ -287,6 +287,8 @@ def validar_evidencias(edicao, turma=None, descartar_artigos=False):
     except FonteInsegura:
         raise HTTPException(422, "Fonte bloqueada: use somente HTTPS público, sem endereços internos.") from None
     for produto in edicao.produtos:
+        if getattr(produto, "origem", None) == "catalogo_fixo":
+            continue  # preço do catálogo aprovado; custo pela fórmula PAC + Simples
         try:
             # Valida o preço original, evitando aplicar 0,60 novamente na publicação.
             if produto.tipo_documento == "preco_varejo" and produto.valor_documentado is not None:

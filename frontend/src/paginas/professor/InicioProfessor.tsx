@@ -81,7 +81,7 @@ export default function InicioProfessor({ abrirTurma, proprietario=false }: { ab
             <p className="mt-2 text-sm text-slate-500">
               {t.quantidade_empresas} empresa(s) · {t.status === "ABERTA" ? `rodada ${t.rodada_atual} de ${t.total_rodadas}` : `${t.total_rodadas} rodadas`}
             </p>
-            <p className="mt-1 text-xs text-slate-500">{t.modo_equipe ? "Equipes de 2 a 5 alunos" : "Participação individual"} · {t.modo_jogo === "STARTUP" ? "Startup" : t.modo_jogo === "TRADICIONAL" ? "Empresa tradicional" : "Modelo básico"}{t.cenario === "CRISE" ? " · recuperação" : ""}</p>
+            <p className="mt-1 text-xs text-slate-500">{t.modo_equipe ? "Equipes de 3 a 5 alunos" : "Participação individual"} · {t.modo_jogo === "STARTUP" ? "Startup" : t.modo_jogo === "TRADICIONAL" ? "Empresa tradicional" : "Modelo básico"}{t.cenario === "CRISE" ? " · recuperação" : ""}</p>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               <button type="button" onClick={() => abrirTurma(t.id)} className="rounded-lg bg-blue-700 px-4 py-3 text-center text-sm font-bold text-white hover:bg-blue-800">Abrir turma →</button>
               <Botao type="button" variante="perigo" carregando={excluindoId===t.id} disabled={excluindoId!==null&&excluindoId!==t.id} onClick={() => excluirTurma(t)}>Excluir turma</Botao>
@@ -140,7 +140,7 @@ function NovaTurma({ aoCriar, aoCancelar }: { aoCriar: (t: Turma) => void; aoCan
         <ConfiguracaoSimulacao valores={parametros} aoMudar={(jogo) => setParametros({ ...parametros, ...jogo })} />
         <Campo rotulo="Participação dos alunos" ajuda="Equipes dividem os cargos de gestão e confirmam as decisões em conjunto.">
           <select className={estiloEntrada} value={parametros.modo_equipe ? "EQUIPE" : "INDIVIDUAL"} onChange={(e) => setParametros({ ...parametros, modo_equipe: e.target.value === "EQUIPE" })}>
-            <option value="EQUIPE">Equipes de 2 a 5 alunos</option>
+            <option value="EQUIPE">Equipes de 3 a 5 alunos</option>
             <option value="INDIVIDUAL">Individual</option>
           </select>
         </Campo>

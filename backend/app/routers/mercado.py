@@ -20,13 +20,59 @@ from .professor import _turma_do_professor
 from .aluno import _empresa_do_aluno
 
 router = APIRouter(tags=["mercado"])
-SETORES = ["Eletrônicos e Tecnologia", "Alimentos e Bebidas", "Vestuário e Moda", "Cosméticos e Beleza", "Móveis e Decoração", "Automotivo", "Esportes e Fitness", "Saúde e Bem-estar", "Educação e Cursos", "Pet Care", "Construção e Materiais", "Entretenimento e Mídia"]
+from ..catalogo_fixo import SETORES as SETORES_CATALOGO
+# Seis setores aprovados em 16/11/2026 (catálogo fixo em catalogo_fixo.py).
+SETORES = list(SETORES_CATALOGO.values())
+CHAVE_SETOR = {nome.casefold(): chave for chave, nome in SETORES_CATALOGO.items()}
+
+
+def chave_setor(nome: str | None) -> str | None:
+    return CHAVE_SETOR.get(str(nome or "").strip().casefold())
+
+
+def usa_catalogo_fixo(turma) -> bool:
+    """Empresa tradicional e modelo básico usam o catálogo fixo; a Startup
+    seguirá a lógica do Modo Empresa do zero (decisão de 16/11/2026)."""
+    return turma.modo_jogo != "STARTUP"
+
+
+def produtos_do_catalogo(setor_nome: str) -> list[dict]:
+    """Itens do catálogo fixo convertidos para o formato de produto da edição.
+
+    O custo exibido usa a primeira faixa do Simples (4%); o custo efetivo de
+    cada empresa é recalculado no envio pela receita dos últimos 12 meses."""
+    from ..catalogo_fixo import catalogo
+    from ..custos_catalogo import custo_compra
+    chave = chave_setor(setor_nome)
+    if not chave:
+        raise HTTPException(422, "Escolha um dos seis setores do catálogo: " + ", ".join(SETORES) + ".")
+    produtos = []
+    for item in catalogo(chave):
+        custo = custo_compra(item["preco_mediana"], chave)
+        faixa = (f"; faixa central R$ {item['preco_q1']:.2f} a R$ {item['preco_q3']:.2f}"
+                 if item["preco_q1"] is not None else "")
+        produtos.append({
+            "natureza": "FISICO", "id": item["id"], "nome": item["nome"],
+            "descricao": f"Linha {item['linha']}. Preço de varejo de referência: mediana de {item['n_anuncios']} anúncios ({item['fonte']}, {item['data_coleta']}).",
+            "custo_unitario": custo["custo_unitario"], "unidade": item["unidade"],
+            "base_custo": (f"Custo de compra = {custo['formula']}. Preço de varejo R$ {item['preco_mediana']:.2f}{faixa}; "
+                           f"taxa de margem da PAC {custo['taxa_margem_pac']*100:.1f}% ({custo['atividade_pac']}); "
+                           f"Simples {custo['aliquota_efetiva_simples']*100:.2f}% (recalculado pela receita da empresa)."),
+            "data": f"Coleta em {item['data_coleta']}", "fontes": [],
+            "tipo_documento": "preco_varejo", "valor_documentado": item["preco_mediana"],
+            "estado_indicador": "Valor Calculado", "formula_aplicada": "Catálogo fixo: varejo × (1 − Simples) ÷ (1 + margem PAC)",
+            "origem": "catalogo_fixo", "linha_catalogo": item["linha"], "preco_q1": item["preco_q1"],
+            "preco_q3": item["preco_q3"], "n_anuncios": item["n_anuncios"], "fonte_preco": item["fonte"],
+            "aviso_catalogo": " ".join(a for a in (item["aviso"], custo["aviso"]) if a) or None,
+        })
+    return produtos
 
 class Pesquisa(BaseModel):
     setor: str = Field(min_length=3, max_length=120)
     comercio: Literal["B2C", "B2B", "HIBRIDO"] = "B2C"
     noticias: int = Field(3, ge=0, le=10)
     analises: int = Field(2, ge=0, le=10)
+    # Só a Startup recebe produtos da pesquisa; os demais modos usam o catálogo fixo.
     produtos: int = Field(3, ge=1, le=10)
 
 class Fonte(BaseModel):
@@ -94,6 +140,14 @@ class Produto(BaseModel):
     capex_ativacao: float | None = Field(default=None, ge=0, le=10_000_000)
     midias_recomendadas: list[str] = Field(default_factory=list, max_length=80)
     fonte_especificacao: str | None = Field(default=None, max_length=400)
+    # Itens do catálogo fixo (preço de varejo com fonte, n e data da coleta).
+    origem: Literal["catalogo_fixo"] | None = None
+    linha_catalogo: str | None = Field(default=None, max_length=80)
+    preco_q1: float | None = Field(default=None, gt=0, le=1000000)
+    preco_q3: float | None = Field(default=None, gt=0, le=1000000)
+    n_anuncios: int | None = Field(default=None, ge=1, le=10000)
+    fonte_preco: str | None = Field(default=None, max_length=200)
+    aviso_catalogo: str | None = Field(default=None, max_length=500)
 
 class Edicao(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
@@ -103,7 +157,7 @@ class Edicao(BaseModel):
     comercio: Literal["B2C", "B2B", "HIBRIDO"]
     noticias: list[Artigo] = Field(max_length=10)
     analises: list[Artigo] = Field(max_length=10)
-    produtos: list[Produto] = Field(min_length=1, max_length=10)
+    produtos: list[Produto] = Field(min_length=1, max_length=60)
     # Avisos ao professor sobre a pesquisa (ex.: menos notícias confirmadas que
     # o solicitado). Não são exibidos aos alunos.
     avisos: list[str] = Field(default_factory=list, max_length=10)
@@ -152,6 +206,8 @@ def _remover_fontes_nao_confirmadas(edicao, pesquisadas, exigir_algo=True):
                 retirados.append(f"{rotulo} “{item.titulo[:80]}”")
         setattr(edicao, campo, mantidos)
     for produto in edicao.produtos:
+        if produto.origem == "catalogo_fixo":
+            continue
         produto.fontes = [f for f in produto.fontes if _chave_url(f.url) in confirmadas]
         if produto.evidencia_custo and _chave_url(produto.evidencia_custo.url) not in confirmadas:
             produto.evidencia_custo = None
@@ -176,6 +232,8 @@ def validar_fontes(dados, pesquisadas=None):
                 raise HTTPException(422, "Fonte não aceita: redes sociais, vídeos, fóruns, lojas, marketplaces e encurtadores não podem ser citados.")
             urls.append(fonte.url)
     for produto in dados.produtos:
+        if produto.origem == "catalogo_fixo":
+            continue
         # A estimativa só é permitida para o preço do produto. Nunca torna
         # opcionais as fontes de notícias ou de análises de mercado.
         if not produto.fontes and produto.estado_indicador == "Estimativa do Modelo":
@@ -333,7 +391,10 @@ def _processar_principal(bruto, fontes, turma, dados):
             if isinstance(bruto.get(k), list):
                 bruto[k] = bruto[k][:getattr(dados, k)]
         bruto["avisos"] = list(bruto.get("avisos") or [])
-        _completar_produtos_estimados(bruto, turma, dados)
+        if usa_catalogo_fixo(turma):
+            bruto["produtos"] = produtos_do_catalogo(dados.setor)
+        else:
+            _completar_produtos_estimados(bruto, turma, dados)
     try: edicao=Edicao.model_validate(bruto)
     except ValidationError as erro:
         campos = sorted({str(e["loc"][0]) for e in erro.errors() if e["loc"]})
@@ -344,7 +405,7 @@ def _processar_principal(bruto, fontes, turma, dados):
     from ..catalogo_setorial import enriquecer_produto
     edicao.produtos = [Produto.model_validate(enriquecer_produto(edicao.setor, produto.model_dump(), indice))
                        for indice, produto in enumerate(edicao.produtos)]
-    if len(edicao.produtos)!=dados.produtos:
+    if not usa_catalogo_fixo(turma) and len(edicao.produtos)!=dados.produtos:
         raise HTTPException(502,"A pesquisa não entregou as quantidades solicitadas.")
     _remover_fontes_nao_confirmadas(edicao, fontes, exigir_algo=False)
     validar_fontes(edicao,fontes)
@@ -383,9 +444,22 @@ def executar_pesquisa(db, turma, dados, rodada, exigir_rodada_atual=True):
     Usada pelo botão do professor e pela pesquisa automática.
     """
     if turma.status != StatusTurma.ABERTA: raise HTTPException(409,"Turma encerrada.")
+    catalogo_fixo = usa_catalogo_fixo(turma)
+    instrucoes = INSTRUCOES_PESQUISA
     schema = Edicao.model_json_schema()
-    schema["$defs"]["Produto"]["properties"]["natureza"] = {"type": "string", "enum": ["FISICO", "SERVICO_DIGITAL"]}
-    schema["$defs"]["Produto"]["required"].extend(["natureza", "tipo_documento"])
+    if catalogo_fixo:
+        if not chave_setor(dados.setor):
+            raise HTTPException(422, "Escolha um dos seis setores do catálogo: " + ", ".join(SETORES) + ".")
+        definido = (turma.configuracao_simulacao or {}).get("setor_mercado")
+        if definido and chave_setor(definido) and chave_setor(definido) != chave_setor(dados.setor):
+            raise HTTPException(409, f"O setor desta turma é {definido}; o catálogo não muda durante o jogo.")
+        # Produtos vêm do catálogo fixo: a pesquisa traz só notícias e análises.
+        schema["properties"].pop("produtos", None)
+        schema["required"] = [c for c in schema.get("required", []) if c != "produtos"]
+        instrucoes = INSTRUCOES_PESQUISA + " NESTA TURMA NÃO PESQUISE PRODUTOS: o catálogo de produtos e preços é fixo e já está definido. Entregue somente notícias e análises; omita o campo produtos."
+    else:
+        schema["$defs"]["Produto"]["properties"]["natureza"] = {"type": "string", "enum": ["FISICO", "SERVICO_DIGITAL"]}
+        schema["$defs"]["Produto"]["required"].extend(["natureza", "tipo_documento"])
     base = {"modo_operacao": turma.modo_jogo, "data_consulta": datetime.now(timezone.utc).date().isoformat()}
     avisos_camadas = []
     # Notícias e análises das edições publicadas nas últimas 4 rodadas: a nova
@@ -397,7 +471,7 @@ def executar_pesquisa(db, turma, dados, rodada, exigir_rodada_atual=True):
                      | {_chave_url(f.get("url", "")) for a in anteriores for f in (a.get("fontes") or []) if f.get("url")})
     evitar_anteriores = [str(a.get("titulo", "")) for a in anteriores][:20] + [f.get("url", "") for a in anteriores for f in (a.get("fontes") or [])][:20]
     try:
-        bruto,fontes=gerar_json(INSTRUCOES_PESQUISA,{**dados.model_dump(),"calendario_simulado":ser.turma(turma).get("calendario"),"evitar":evitar_anteriores,**base},True,schema,False,dados.setor)
+        bruto,fontes=gerar_json(instrucoes,{**dados.model_dump(),"calendario_simulado":ser.turma(turma).get("calendario"),"evitar":evitar_anteriores,**base},True,schema,False,dados.setor)
         if isinstance(bruto, dict):
             _retirar_repetidas(bruto, ja_publicados, avisos_camadas)
         edicao = _processar_principal(bruto, fontes, turma, dados)
@@ -464,6 +538,10 @@ def revisar(turma_id:int, edicao_id:int,dados:Edicao, db:Session=Depends(get_db)
     # ficha operacional (linha, insumo, qualificação e mídia) que conecta a
     # decisão comercial aos demais departamentos.
     from ..catalogo_setorial import enriquecer_produto
+    if usa_catalogo_fixo(turma):
+        # O catálogo é fixo: a revisão do professor altera textos e fontes de
+        # notícias e análises, nunca produtos ou preços.
+        dados.produtos = [Produto.model_validate(p) for p in produtos_do_catalogo(dados.setor)]
     dados.produtos = [Produto.model_validate(enriquecer_produto(dados.setor, produto.model_dump(), indice))
                       for indice, produto in enumerate(dados.produtos)]
     validar_fontes(dados)
@@ -607,7 +685,7 @@ def validar_plano(db,empresa,dados,rascunho=False):
     if plano is None:
         if rascunho: return
         if any(d.plano_comercial for d in empresa.decisoes) or db.query(ConteudoMercado).filter(ConteudoMercado.turma_id==empresa.turma_id,ConteudoMercado.publicado.is_(True),ConteudoMercado.rodada<=empresa.turma.rodada_atual).first():
-            raise HTTPException(422,"Complete o mix de todos os produtos do catálogo antes de enviar.")
+            raise HTTPException(422,"Monte o sortimento (ao menos um produto do catálogo) e complete o mix antes de enviar.")
         return
     e=db.get(ConteudoMercado,plano.edicao_id)
     if not e or e.turma_id!=empresa.turma_id or not e.publicado or e.rodada>empresa.turma.rodada_atual:
@@ -625,11 +703,27 @@ def validar_plano(db,empresa,dados,rascunho=False):
     if not itens:
         # Compatibilidade somente para catálogos de um produto; históricos não são reescritos.
         if len(catalogados)>1:
-            raise HTTPException(422,"Complete o mix de todos os produtos do catálogo antes de enviar.")
+            raise HTTPException(422,"Monte o sortimento (ao menos um produto do catálogo) e complete o mix antes de enviar.")
         from ..schemas import MixProduto
         itens=[MixProduto(**{**plano.model_dump(exclude={"produtos","analises","estrategias","edicao_id"}),"preco":dados.preco,"peso":100,"revisado":True})]
         plano.produtos=itens
-    if len({p.produto_id for p in itens})!=len(itens) or {p.produto_id for p in itens}!=set(catalogados):
+    fixo = any(p.get("origem") == "catalogo_fixo" for p in catalogados.values())
+    if len({p.produto_id for p in itens})!=len(itens):
+        raise HTTPException(422,"Não repita produtos no sortimento.")
+    if fixo:
+        # Sortimento escolhido pela equipe (Levy e Weitz: variedade e sortimento).
+        if not {p.produto_id for p in itens} <= set(catalogados):
+            raise HTTPException(422,"O sortimento só pode conter produtos do catálogo do setor.")
+        from ..catalogo_fixo import item as item_catalogo
+        from ..custos_catalogo import custo_compra
+        from ..models import Resultado
+        receitas=[r.receita for r in db.query(Resultado).filter(Resultado.empresa_id==empresa.id).order_by(Resultado.rodada).all()]
+        chave=chave_setor(e.dados.get("setor"))
+        for p in itens:
+            ficha=item_catalogo(p.produto_id)
+            catalogados[p.produto_id]={**catalogados[p.produto_id],
+                                       "custo_unitario":custo_compra(ficha["preco_mediana"],chave,receitas)["custo_unitario"]}
+    elif {p.produto_id for p in itens}!=set(catalogados):
         raise HTTPException(422,"O mix deve conter todos os produtos do catálogo, uma única vez.")
     from ..custos_campanhas import necessarios, orcamento, validar_dependencias, validar_cotacoes, arredondar
     total=digital=0

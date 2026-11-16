@@ -49,7 +49,7 @@ def _criar_equipe(cliente, professor, quantidade=3, total_rodadas=3, encerrar=Tr
         assert resposta.json()["empresa"]["id"] == empresa_id
         alunos.append(aluno)
     equipe = {"turma": turma, "id": empresa_id, "codigo": codigo, "alunos": alunos}
-    if quantidade >= 2:
+    if quantidade >= 3:
         for aluno in alunos[:quantidade//2+1]:
             assert cliente.post(f"/api/aluno/empresas/{empresa_id}/lider", headers=aluno["headers"], json={"aluno_id": fundador["id"], "rodada": 1}).status_code == 200
         if encerrar:
@@ -201,11 +201,10 @@ def test_minimo_dois_e_maximo_cinco(cliente, professor):
     assert cliente.post("/api/aluno/equipes/entrar",headers=sexto["headers"],json={"empresa_id":equipe["id"]}).status_code==422
 
 
-def test_dupla_e_equipe_valida(cliente, professor):
-    equipe=_criar_equipe(cliente,professor,quantidade=2)
-    painel=_painel(cliente,equipe["id"],equipe["alunos"][0])
-    assert painel["equipe"]["lider_id"]==equipe["alunos"][0]["id"]
-    assert not any("Reúna" in p for p in painel["equipe"]["pendencias"])
+def test_dupla_nao_e_equipe_valida(cliente, professor):
+    equipe=_criar_equipe(cliente,professor,quantidade=2,encerrar=False)
+    r=_encerrar_formacao(cliente,professor,equipe["turma"]["id"],422)
+    assert "fora da faixa" in r.json()["detail"] or "3 a 5" in r.json()["detail"]
 
 
 def test_formacao_aberta_bloqueia_decisao_e_fechamento(cliente, professor):
@@ -222,7 +221,7 @@ def test_formacao_aberta_bloqueia_decisao_e_fechamento(cliente, professor):
 
 
 def test_aluno_cadastrado_sem_equipe_impede_inicio(cliente, professor):
-    equipe=_criar_equipe(cliente,professor,quantidade=2,encerrar=False)
+    equipe=_criar_equipe(cliente,professor,quantidade=3,encerrar=False)
     avulso=_aluno(cliente,9)
     assert cliente.post("/api/aluno/matricula",headers=avulso["headers"],json={"turma_id":equipe["turma"]["id"]}).status_code==200
     r=_encerrar_formacao(cliente,professor,equipe["turma"]["id"],422)

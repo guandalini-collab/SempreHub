@@ -12,8 +12,8 @@ from .models import CargoEquipe, Decisao, Empresa, MembroEmpresa, RegistroEquipe
 
 
 CARGOS = [cargo.value for cargo in CargoEquipe]
-# Regra do professor (15/11/2026): equipes de 2 a 5 integrantes em todos os setores.
-MIN_INTEGRANTES = 2
+# Regra do professor (15/11/2026): equipes de 3 a 5 integrantes em todos os setores (revisto em 16/11/2026: 2 a 5 → 3 a 5, opção 1 aprovada pelo professor).
+MIN_INTEGRANTES = 3
 MAX_INTEGRANTES = 5
 FAIXA_EQUIPE = f"de {MIN_INTEGRANTES} a {MAX_INTEGRANTES}"
 CAMPOS_DECISAO = (

@@ -356,7 +356,7 @@ class PlanoComercial(BaseModel):
     versao_custos: Literal[2] = 2
     custos_campanha: Optional[dict] = None
     edicao_id: int = Field(gt=0)
-    produtos: list[MixProduto] = Field(default_factory=list, max_length=10)
+    produtos: list[MixProduto] = Field(default_factory=list, max_length=60)
     produto_id: str = Field(max_length=80)
     estrategia_preco: Literal["PENETRACAO", "COMPETITIVO", "DESNATAMENTO", "VALOR"]
     posicionamento: Literal["QUALIDADE", "PRECO", "INOVACAO"]

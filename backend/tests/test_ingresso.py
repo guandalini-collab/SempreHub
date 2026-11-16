@@ -39,13 +39,13 @@ def test_professor_distribui_somente_cadastrados_e_respeita_limites(cliente,prof
 
 
 def test_sem_vagas_nao_distribui_parcialmente(cliente,professor):
-    equipe=_criar_equipe(cliente,professor,quantidade=1,encerrar=False)
+    equipe=_criar_equipe(cliente,professor,quantidade=2,encerrar=False)
     a=_aluno(cliente,10)
     cliente.post("/api/aluno/matricula",headers=a["headers"],json={"turma_id":equipe["turma"]["id"]})
     url=f"/api/professor/turmas/{equipe['turma']['id']}"
     antes=cliente.get(url+"/formacao",headers=professor).json()
     r=cliente.post(url+"/distribuir-sem-equipe",headers=professor,json={})
-    assert r.status_code==422 and "menos de 2 integrantes" in r.json()["detail"]
+    assert r.status_code==422 and "menos de 3 integrantes" in r.json()["detail"]
     assert cliente.get(url+"/formacao",headers=professor).json()==antes
 
 

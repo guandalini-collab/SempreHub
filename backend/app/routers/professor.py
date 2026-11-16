@@ -569,7 +569,7 @@ def _rodada_iniciada(db: Session, turma: Turma) -> bool:
 def _encerrar_formacao(db: Session, turma: Turma) -> None:
     """Encerra a formação e inicia o jogo (regra do professor, 15/11/2026).
 
-    Exige todos os cadastrados em equipes de 2 a 5. Com agenda acadêmica, a
+    Exige todos os cadastrados em equipes de 3 a 5. Com agenda acadêmica, a
     rodada 1 passa para a primeira aula seguinte ao encerramento; sem agenda,
     ela abre imediatamente.
     """

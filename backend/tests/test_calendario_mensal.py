@@ -150,7 +150,7 @@ def test_fora_da_janela_so_consulta():
 
 
 def test_formacao_com_agenda_comeca_na_aula_seguinte(cliente, professor):
-    equipe = _criar_equipe(cliente, professor, quantidade=2, total_rodadas=2, encerrar=False)
+    equipe = _criar_equipe(cliente, professor, quantidade=3, total_rodadas=2, encerrar=False)
     turma_id = equipe["turma"]["id"]
     hoje = date.today()
     r = cliente.put(f"/api/professor/turmas/{turma_id}/agenda-academica", headers=professor, json={
@@ -223,7 +223,7 @@ def test_extensao_validada(cliente, professor):
 
 
 def test_extensao_definida_com_formacao_aberta_vale_no_encerramento(cliente, professor):
-    equipe = _criar_equipe(cliente, professor, quantidade=2, total_rodadas=2, encerrar=False)
+    equipe = _criar_equipe(cliente, professor, quantidade=3, total_rodadas=2, encerrar=False)
     turma_id = equipe["turma"]["id"]
     r = cliente.put(f"/api/professor/turmas/{turma_id}/agenda-academica", headers=professor, json={
         "inicio_letivo": "2027-03-01", "fim_letivo": "2027-06-30", "dia_semana": 0,
