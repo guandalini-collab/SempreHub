@@ -562,7 +562,12 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     verba_midia=investimento_efetivo(d)
     # Marca perde força sem presença ativa; a resposta ao investimento é
     # logarítmica, evitando que orçamento alto compre demanda infinita.
-    marca = atualizar_marca(e.get("marca", 0), verba_midia)
+    # Item 2 (17/11/2026): nas turmas com catálogo fixo a mídia não alimenta a
+    # "marca"; o efeito da propaganda no tempo já está no estoque de propaganda
+    # (itens A e C). Kotler e Keller (2013, cap. 9) não dão função numérica de
+    # acumulação ou decaimento da marca.
+    catalogo_fixo = any(i.get("preco_mercado") for i in itens)
+    marca = float(e.get("marca", 0)) if catalogo_fixo else atualizar_marca(e.get("marca", 0), verba_midia)
     canal = getattr(op.get("canal", "DIRETO"), "value", op.get("canal", "DIRETO"))
     digital = min(verba_midia, _dinheiro(max(0, op.get("marketing_digital", 0))))
     fator_canal = {
@@ -573,7 +578,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     taxa_comissao_canal = {"DIRETO": 0.0, "DISTRIBUIDOR": 0.05, "DIGITAL": 0.03}.get(canal, 0.0)
     # Marketing digital é parte do orçamento já lançado e melhora a marca;
     # não é uma despesa adicional nem um segundo custo.
-    if digital:
+    if digital and not catalogo_fixo:
         marca = atualizar_marca(marca, digital, eficiencia=.0002, decaimento=0)
     # Esta informação precisa existir já na preparação: a divisão de mercado
     # acontece antes da apuração de vendas. Sem ela, uma empresa com catálogo
@@ -581,7 +586,6 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     produto_publicado = bool(itens)
     # Catálogo fixo (item C, 17/11/2026): propaganda na forma exponencial —
     # sem verba o fator é 1 e a loja segue vendendo (Cooper e Nakanishi, p. 35-36).
-    catalogo_fixo = any(i.get("preco_mercado") for i in itens)
     comercial_ativo = produto_publicado and (marketing > 0 or catalogo_fixo)
     preco = max(0.01, d.get("preco", 100))
     atratividade = atrativo_porter(marca, qualidade, preco, p.get("preco_referencia", 100))

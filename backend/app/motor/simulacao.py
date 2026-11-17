@@ -229,7 +229,9 @@ def processar_rodada(
                 c.alertas.append("Nenhuma decisão enviada: o sistema repetiu as decisões do mês anterior.")
             _preparar_empresa(c, turma, rodada)
 
-            empresa.marca = RETENCAO_MARCA * empresa.marca + math.sqrt(max(0.0, investimento_efetivo(decisao)) / 1000)
+            # Item 2 (17/11/2026): com catálogo fixo, a mídia não alimenta a marca.
+            if not any(i.get("preco_mercado") for i in ((decisao.plano_comercial or {}).get("produtos") or [])):
+                empresa.marca = RETENCAO_MARCA * empresa.marca + math.sqrt(max(0.0, investimento_efetivo(decisao)) / 1000)
             empresa.qualidade = RETENCAO_QUALIDADE * empresa.qualidade + 0.5 * math.sqrt(
                 max(0.0, decisao.pd) / 1000
             )

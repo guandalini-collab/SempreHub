@@ -894,6 +894,8 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 
 **Persistência da propaganda.** Propaganda e promoção têm efeitos defasados, sentidos no mês em que são feitas e nos seguintes (COOPER; NAKANISHI, 1988, seção 3.9 e apêndice 3.10.1). O estoque de propaganda soma a veiculação do mês e a dos três meses anteriores, com pesos 1; 0,44; 0,19 e 0,09 (as potências 1, 2 e 3 de 0,44). O valor 0,44 é a persistência média em dados mensais, e cerca de 90% do efeito acumulado se esgota em três meses (CLARKE, 1976, tabela 2). Com isso, o efeito de longo prazo fica em cerca de 0,21, próximo do 0,24 encontrado por Sethuraman, Tellis e Briesch (2011). Aplicar o valor de Clarke à forma exponencial e limitar a soma a três meses são escolhas do jogo.
 
+**Marca.** Brand equity é o efeito diferencial que o conhecimento da marca exerce sobre a resposta do consumidor ao marketing; a marca não é construída só por propaganda, e sua essência é um bom produto (KOTLER; KELLER, 2013, p. 257-267). A obra não oferece uma regra numérica para acumular ou perder marca. Por isso, nas turmas com catálogo, a verba de mídia não aumenta a marca: o efeito da propaganda ao longo do tempo é o da persistência descrita acima, e contá-lo também na marca seria contar duas vezes.
+
 **Tamanho do mercado.** O mercado mensal de cada loja é a receita mensal de uma loja pequena da atividade (IBGE, PAC 2024, tabelas 10645 e 10647), atualizada pelo índice de receita nominal da PMC (IBGE, tabela 8883), multiplicada pelo número de lojas na disputa e pela sazonalidade. A razão entre a loja pequena e a média (0,4348) só é publicada para o varejo total e é aplicada às atividades como estimativa.
 
 **Sazonalidade.** Fatores da replicação do ajuste X-13ARIMA-SEATS da PMC (IBGE, Nota metodológica 01/2022; U.S. CENSUS BUREAU).
@@ -933,6 +935,8 @@ IBGE. *Índice Nacional de Preços ao Consumidor Amplo (IPCA)*: tabela 7060. Rio
 IBGE. *Pesquisa Anual de Comércio 2024*: tabelas 10645, 10647 e 10649. Rio de Janeiro: IBGE. Disponível em: https://sidra.ibge.gov.br. Acesso em: 17 nov. 2026.
 
 IBGE. *Pesquisa Mensal de Comércio*: tabelas 8882 e 8883; Nota metodológica 01/2022. Rio de Janeiro: IBGE. Disponível em: https://sidra.ibge.gov.br. Acesso em: 17 nov. 2026.
+
+KOTLER, Philip; KELLER, Kevin Lane. *Administração de marketing*. 14. ed. Tradução de Sônia Midori Yamamoto. São Paulo: Pearson Education do Brasil, 2013.
 
 LEVY, Michael; WEITZ, Barton A. *Retailing management*. 8. ed. New York: McGraw-Hill/Irwin, [2011 ou 2012]. Capítulo 2: Types of retailers. (Definições consultadas no manual do professor da obra.)
 
