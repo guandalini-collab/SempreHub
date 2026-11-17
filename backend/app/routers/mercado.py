@@ -43,23 +43,30 @@ def produtos_do_catalogo(setor_nome: str) -> list[dict]:
     cada empresa é recalculado no envio pela receita dos últimos 12 meses."""
     from ..catalogo_fixo import catalogo
     from ..custos_catalogo import custo_compra
+    from ..database import SessionLocal
+    from ..ipca_catalogo import preco_corrigido, series_vigentes
+    with SessionLocal() as sessao:
+        series = series_vigentes(sessao).get("series", {})
     chave = chave_setor(setor_nome)
     if not chave:
         raise HTTPException(422, "Escolha um dos seis setores do catálogo: " + ", ".join(SETORES) + ".")
     produtos = []
     for item in catalogo(chave):
-        custo = custo_compra(item["preco_mediana"], chave)
+        ipca = preco_corrigido(item, series=series)
+        custo = custo_compra(ipca["preco"], chave)
+        correcao = (f" Corrigido pelo IPCA ({ipca['indice']}, {ipca['periodo']}): fator {ipca['fator']:.4f}."
+                    if ipca["periodo"] else f" Correção pelo IPCA ({ipca['indice']}) a partir do mês seguinte ao da coleta; ainda sem mês publicado.")
         faixa = (f"; faixa central R$ {item['preco_q1']:.2f} a R$ {item['preco_q3']:.2f}"
                  if item["preco_q1"] is not None else "")
         produtos.append({
             "natureza": "FISICO", "id": item["id"], "nome": item["nome"],
             "descricao": f"Linha {item['linha']}. Preço de varejo de referência: mediana de {item['n_anuncios']} anúncios ({item['fonte']}, {item['data_coleta']}).",
             "custo_unitario": custo["custo_unitario"], "unidade": item["unidade"],
-            "base_custo": (f"Custo de compra = {custo['formula']}. Preço de varejo R$ {item['preco_mediana']:.2f}{faixa}; "
+            "base_custo": (f"Custo de compra = {custo['formula']}. Preço de varejo conferido R$ {item['preco_mediana']:.2f}{faixa}.{correcao} Preço usado R$ {ipca['preco']:.2f}; "
                            f"taxa de margem da PAC {custo['taxa_margem_pac']*100:.1f}% ({custo['atividade_pac']}); "
                            f"Simples {custo['aliquota_efetiva_simples']*100:.2f}% (recalculado pela receita da empresa)."),
             "data": f"Coleta em {item['data_coleta']}", "fontes": [],
-            "tipo_documento": "preco_varejo", "valor_documentado": item["preco_mediana"],
+            "tipo_documento": "preco_varejo", "valor_documentado": ipca["preco"],
             "estado_indicador": "Valor Calculado", "formula_aplicada": "Catálogo fixo: varejo × (1 − Simples) ÷ (1 + margem PAC)",
             "origem": "catalogo_fixo", "linha_catalogo": item["linha"], "preco_q1": item["preco_q1"],
             "preco_q3": item["preco_q3"], "n_anuncios": item["n_anuncios"], "fonte_preco": item["fonte"],
@@ -719,10 +726,13 @@ def validar_plano(db,empresa,dados,rascunho=False):
         from ..models import Resultado
         receitas=[r.receita for r in db.query(Resultado).filter(Resultado.empresa_id==empresa.id).order_by(Resultado.rodada).all()]
         chave=chave_setor(e.dados.get("setor"))
+        from ..ipca_catalogo import preco_corrigido
         for p in itens:
             ficha=item_catalogo(p.produto_id)
+            # Preço da edição publicada (já corrigido pelo IPCA na pesquisa da rodada).
+            varejo=catalogados[p.produto_id].get("valor_documentado") or preco_corrigido(ficha,db)["preco"]
             catalogados[p.produto_id]={**catalogados[p.produto_id],
-                                       "custo_unitario":custo_compra(ficha["preco_mediana"],chave,receitas)["custo_unitario"]}
+                                       "custo_unitario":custo_compra(varejo,chave,receitas)["custo_unitario"]}
     elif {p.produto_id for p in itens}!=set(catalogados):
         raise HTTPException(422,"O mix deve conter todos os produtos do catálogo, uma única vez.")
     from ..custos_campanhas import necessarios, orcamento, validar_dependencias, validar_cotacoes, arredondar
