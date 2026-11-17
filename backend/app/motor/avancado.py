@@ -102,7 +102,9 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0, efeitos_op
     if itens:
         from .portfolio import atrativos, diagnosticos_segmentacao
         segmentacao = ((decisao.plano_comercial or {}).get("analises") or {}).get("segmentacao")
-        base=(turma.preco_referencia/decisao.preco)**(1.4 if turma.modo_jogo=="STARTUP" else 2)
+        from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
+        # Startup mantém 1,4 até ser refeita com o Modo Empresa do zero (dezembro).
+        base=(turma.preco_referencia/decisao.preco)**(1.4 if turma.modo_jogo=="STARTUP" else ELASTICIDADE_PRECO_ESCOLHA)
         preparo["atratividade"]*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade,segmentacao))/sum(i["peso"] for i in itens)/base
         preparo["diagnosticos_segmentacao"] = diagnosticos_segmentacao(itens, segmentacao)
     from .estrategia import avaliar, mensagens
@@ -231,7 +233,7 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     crescimento_acumulado = sum(periodo(cfg, n)["fator_mensal"] for n in range(cfg.get("rodada_inicio_calendario",1), rodada)) if cal else rodada-1
     total = (temporal["demanda_base_por_empresa"] * len(preparos)
              * (1 + turma.crescimento_mercado_mensal) ** crescimento_acumulado
-             * (turma.preco_referencia / media) ** .8 * multiplicador * (cal["sazonalidade"]["demanda"] if cal else 1))
+             * multiplicador * (cal["sazonalidade"]["demanda"] if cal else 1))
     # Uma empresa sem produto publicado ou sem ativação comercial não disputa
     # demanda. A fatia que ela deixaria de atender migra para concorrentes.
     atrativos = [max(.001, p["atratividade"]) if p.get("comercial_ativo") else 0.0 for p in preparos] + [b["atratividade"] for b in bots]

@@ -43,8 +43,13 @@ from .tributos import (
 # ---------------------------------------------------------------------------
 # Constantes de comportamento do mercado
 # ---------------------------------------------------------------------------
-ELASTICIDADE_PRECO_ESCOLHA = 2.0  # quanto o preço relativo pesa na escolha entre empresas
-ELASTICIDADE_PRECO_MERCADO = 0.8  # quanto o preço médio altera o tamanho total do mercado
+# Elasticidade-preço da escolha entre lojas (aprovada em 16/11/2026): −2,62,
+# média de 1.851 estimativas da meta-análise de Bijmolt, van Heerde e Pieters
+# (2005, Journal of Marketing Research); Tellis (1988) encontrou −1,76.
+ELASTICIDADE_PRECO_ESCOLHA = 2.62
+# A elasticidade do tamanho do mercado (0,8) foi retirada por não ter fonte: o
+# tamanho do mercado segue só a sazonalidade do IBGE até haver estimativa
+# publicada por categoria.
 PESO_MARCA = 0.30
 PESO_QUALIDADE = 0.25
 RETENCAO_MARCA = 0.80  # parte da marca que permanece de um mês para o outro
@@ -455,7 +460,6 @@ def _dividir_mercado(
         turma.demanda_base_por_empresa
         * n
         * (1 + turma.crescimento_mercado_mensal) ** (rodada - 1)
-        * (turma.preco_referencia / preco_medio) ** ELASTICIDADE_PRECO_MERCADO
         * multiplicador_demanda
     )
     soma_atratividade = sum(c.atratividade for c in calculos) + sum(b["atratividade"] for b in concorrentes) or 1.0

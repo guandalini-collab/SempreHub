@@ -184,7 +184,11 @@ def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0, segment
             valores.append(0.0)
             continue
         segmento = diagnostico_segmentacao(p, segmentacao)
-        valores.append(p['peso']*(ref/preco)**2*canal*pos*(1+math.sqrt(campanha/1000))**.3 * segmento["fator"])
+        from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
+        # Produto do catálogo fixo: a referência é o preço de mercado do item.
+        if p.get('preco_mercado'):
+            ref = float(p['preco_mercado'])
+        valores.append(p['peso']*(ref/preco)**ELASTICIDADE_PRECO_ESCOLHA*canal*pos*(1+math.sqrt(campanha/1000))**.3 * segmento["fator"])
     return valores
 
 

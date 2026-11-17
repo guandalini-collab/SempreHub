@@ -741,6 +741,7 @@ def validar_plano(db,empresa,dados,rascunho=False):
         produto=catalogados[item.produto_id]
         item.custo_unitario=produto["custo_unitario"]
         item.produto_nome=produto["nome"]
+        item.preco_mercado=produto.get("valor_documentado") if produto.get("origem")=="catalogo_fixo" else None
         for chave in ("linha_produto", "qualificacao_minima", "insumo_chave", "fator_setup",
                       "volume_armazenagem_m3", "capex_ativacao", "midias_recomendadas"):
             setattr(item, chave, produto.get(chave))

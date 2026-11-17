@@ -349,6 +349,8 @@ class MixProduto(BaseModel):
     volume_armazenagem_m3: Optional[float] = Field(None, ge=0, le=1000)
     capex_ativacao: Optional[float] = Field(None, ge=0, le=10_000_000)
     midias_recomendadas: list[str] = Field(default_factory=list, max_length=80)
+    # Preço de varejo do catálogo fixo (corrigido pelo IPCA), preenchido pelo servidor.
+    preco_mercado: Optional[float] = Field(None, gt=0, le=1000000)
 
 
 class PlanoComercial(BaseModel):
