@@ -327,7 +327,7 @@ def prever_decisao(empresa: Empresa, decisao: Decisao, turma: Turma) -> dict:
     folha = copia.funcionarios * turma.salario_base * FATOR_CLT[copia.regime_tributario]
     juros = _juros(c, turma)
     gastos = (
-        folha + turma.custos_fixos_mensais + decisao.marketing + decisao.pd
+        folha + _custos_fixos(turma) + decisao.marketing + decisao.pd
         + decisao.networking + c.rescisoes + juros
     )
     multiplicador_cmv = turma.cmv_multiplicador if turma.cmv_rodadas_restantes > 0 else 1.0
@@ -410,6 +410,13 @@ def _aplicar_financiamento(empresa: Empresa, decisao: Decisao, turma: Turma, c: 
         if c.amortizacao < amortizar:
             c.alertas.append(f"Amortização ajustada para {_reais(c.amortizacao)} (dívida ou caixa insuficiente).")
     empresa.divida = empresa.divida + c.emprestimo - c.amortizacao
+
+
+def _custos_fixos(turma) -> float:
+    """Despesas fixas da loja: PAC 2024 nas turmas com catálogo fixo; senão, parâmetro da turma."""
+    from ..mercado_pac import custos_da_turma
+    custos = custos_da_turma(turma)
+    return custos["custos_fixos"]["total"] if custos else turma.custos_fixos_mensais
 
 
 def _atratividade(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo) -> float:
@@ -614,7 +621,7 @@ def _apurar(
         - impostos
         - cmv
         - folha
-        - turma.custos_fixos_mensais
+        - _custos_fixos(turma)
         - decisao.marketing
         - decisao.pd
         - decisao.networking
@@ -638,7 +645,7 @@ def _apurar(
     empresa.necessidade_realizacao = _limitar(empresa.necessidade_realizacao)
 
     # Fase (Dornelas)
-    custos_fixos_totais = turma.custos_fixos_mensais + folha
+    custos_fixos_totais = _custos_fixos(turma) + folha
     if empresa.caixa < custos_fixos_totais:
         empresa.fase_atual = FaseAtual.SOBREVIVENCIA
         c.alertas.append(
@@ -665,7 +672,7 @@ def _apurar(
             impostos=impostos,
             cmv=cmv,
             folha=folha,
-            custos_fixos=turma.custos_fixos_mensais,
+            custos_fixos=_custos_fixos(turma),
             marketing=decisao.marketing,
             pd=decisao.pd,
             networking_invest=decisao.networking,

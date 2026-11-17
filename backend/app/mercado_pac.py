@@ -133,6 +133,7 @@ def ciclo() -> None:
     from .database import SessionLocal
     with SessionLocal() as db:
         atualizar(db)
+        atualizar_selic(db)
 
 
 
@@ -153,3 +154,96 @@ def demanda_por_loja(turma, planos=None, fator_periodo: float = 1.0) -> dict | N
     with SessionLocal() as db:
         series = series_vigentes(db)
     return {**receita_mensal_loja(setor, series), "fator_periodo": fator_periodo}
+
+
+# ---------------------------------------------------------------------------
+# Custos da loja (aprovado em 17/11/2026: "tudo conforme a literatura; o que
+# for de mercado, buscar"). Custo de manter estoque pelos componentes da
+# literatura (capital + físicos; Azzi et al., 2014, via Andriolo): o capital é
+# remunerado pela Selic do mês (BCB, SGS 4390); o espaço é o aluguel da loja,
+# custo fixo publicado pela PAC (sem volume por m³, que não tem fonte).
+# Despesas fixas: PAC 2024, tabela 10649 (despesas no ano por atividade), por
+# unidade local e por mês, na escala da loja pequena (mesma razão 0,4348).
+# ---------------------------------------------------------------------------
+FONTE_DESPESAS = "IBGE, PAC 2024, tabela 10649 (despesas no ano, R$ mil) ÷ unidades locais (tabela 10645)"
+UNIDADES_LOCAIS = {"colchoes": 86_846, "moveis": 86_846, "vestuario": 133_797, "bicicletas": 54_113,
+                   "pet": 128_563, "mochilas": 31_665}
+# R$ mil no ano: aluguéis e condomínios; serviços de terceiros; comunicação; energia, água e esgoto; impostos e taxas
+DESPESAS_PAC = {
+    "moveis": (2_611_318, 4_021_780, 272_476, 812_014, 1_087_929),
+    "bicicletas": (1_964_644, 2_288_785, 200_462, 346_552, 909_926),
+    "vestuario": (5_795_575, 5_590_573, 407_805, 1_361_614, 1_660_164),
+    "mochilas": (2_147_201, 1_613_371, 142_182, 312_236, 315_296),
+    "pet": (2_920_556, 4_833_821, 383_593, 679_956, 1_132_119),
+}
+DESPESAS_PAC["colchoes"] = DESPESAS_PAC["moveis"]
+ROTULOS_DESPESAS = ("Aluguel e condomínio", "Serviços de terceiros (contabilidade, informática etc.)",
+                    "Comunicação", "Energia, água e esgoto", "Impostos e taxas (IPTU, alvarás etc.)")
+CHAVE_SELIC = "selic_mensal"
+# BCB, SGS 4390 (Selic acumulada no mês, % a.m.), consultada em 17/11/2026.
+SELIC_BASE = {"serie": {"202510": 1.28, "202511": 1.05, "202512": 1.22, "202601": 1.16, "202602": 1.00,
+                        "202603": 1.21, "202604": 1.09, "202605": 1.07, "202606": 1.12, "202607": 1.22,
+                        "202608": 1.09, "202609": 1.08, "202610": 1.07}, "consultado_em": "2026-11-17"}
+
+
+def custos_fixos_loja(setor: str) -> dict:
+    componentes = [round(v * 1000 / UNIDADES_LOCAIS[setor] / 12 * RAZAO_LOJA_PEQUENA, 2) for v in DESPESAS_PAC[setor]]
+    return {"total": round(sum(componentes), 2), "componentes": dict(zip(ROTULOS_DESPESAS, componentes)),
+            "fonte": FONTE_DESPESAS, "aviso": "Estimativa: média da atividade por loja, na escala da loja pequena (0,4348)."}
+
+
+def selic_mensal(db=None) -> tuple[float, str]:
+    """Última Selic mensal completa (% a.m. → fração)."""
+    dados = SELIC_BASE
+    if db is not None:
+        from .models import SerieOficial
+        registro = db.query(SerieOficial).filter_by(chave=CHAVE_SELIC).first()
+        if registro and registro.dados:
+            dados = registro.dados
+    mes = max(dados["serie"])
+    return dados["serie"][mes] / 100, mes
+
+
+def atualizar_selic(db, abrir=urllib.request.urlopen, hoje=None) -> bool:
+    from .models import SerieOficial, agora
+    registro = db.query(SerieOficial).filter_by(chave=CHAVE_SELIC).first()
+    if registro and registro.tentado_em and agora() - registro.tentado_em < timedelta(days=1):
+        return False
+    if registro is None:
+        registro = SerieOficial(chave=CHAVE_SELIC, dados=None)
+        db.add(registro)
+    registro.tentado_em = agora()
+    hoje = hoje or agora().date()
+    try:
+        url = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.4390/dados/ultimos/13?formato=json"
+        with abrir(url, timeout=30) as resposta:
+            dados = json.loads(resposta.read().decode("utf-8"))
+        corrente = f"{hoje.year}{hoje.month:02d}"
+        serie = {f"{d['data'][6:]}{d['data'][3:5]}": float(d["valor"]) for d in dados}
+        serie = {p: v for p, v in serie.items() if p < corrente}  # só meses completos
+        if not serie:
+            raise ValueError("Série da Selic vazia.")
+        registro.dados = {"serie": serie, "consultado_em": hoje.isoformat()}
+        registro.erro = None
+    except Exception as erro:
+        registro.erro = str(erro)[:500]
+        logging.getLogger(__name__).warning("Selic mensal não atualizada: %s", erro)
+        db.commit()
+        return False
+    db.commit()
+    return True
+
+
+def custos_da_turma(turma) -> dict | None:
+    """Custos fixos e taxa de capital do estoque para turmas com catálogo fixo."""
+    if getattr(turma, "modo_jogo", None) == "STARTUP":
+        return None
+    from .routers.mercado import chave_setor
+    setor = chave_setor((turma.configuracao_simulacao or {}).get("setor_mercado"))
+    if not setor:
+        return None
+    from .database import SessionLocal
+    with SessionLocal() as db:
+        taxa, mes = selic_mensal(db)
+    return {"custos_fixos": custos_fixos_loja(setor), "taxa_capital_estoque": taxa,
+            "selic_referencia": mes, "fonte_selic": "BCB, SGS 4390 (Selic acumulada no mês)"}

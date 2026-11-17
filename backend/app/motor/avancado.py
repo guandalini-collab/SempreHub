@@ -68,6 +68,15 @@ def parametros(turma):
         if isinstance(valor, (date, datetime)):
             dados[nome] = valor.isoformat()
     dados["configuracao_simulacao"] = config(turma)
+    from ..mercado_pac import custos_da_turma
+    custos = custos_da_turma(turma)
+    if custos:
+        # Catálogo fixo: despesas fixas da loja pela PAC 2024 e custo de capital
+        # do estoque pela Selic do mês; o custo por m³ sem fonte é retirado.
+        dados["custos_fixos_mensais"] = custos["custos_fixos"]["total"]
+        dados["configuracao_simulacao"]["custo_armazenagem"] = custos["taxa_capital_estoque"]
+        dados["configuracao_simulacao"]["custo_armazenagem_m3"] = 0.0
+        dados["custos_loja"] = custos
     return dados
 
 
@@ -332,7 +341,7 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         anterior = empresa.resultados[-1] if empresa.resultados else None
         if anterior:
             empresa.necessidade_realizacao = _limitar(empresa.necessidade_realizacao + (3 if dre["receita"] > anterior.receita else -2))
-        empresa.fase_atual = (FaseAtual.SOBREVIVENCIA if empresa.caixa < turma.custos_fixos_mensais + dre["folha"] else
+        empresa.fase_atual = (FaseAtual.SOBREVIVENCIA if empresa.caixa < dre["custos_fixos"] + dre["folha"] else
                               FaseAtual.CAPTACAO if empresa.divida > 0 else
                               FaseAtual.OPERACAO_ESTAVEL if dre["lucro_liquido"] > 0 else FaseAtual.PLANEJAMENTO)
         detalhes = deepcopy(a["detalhes"])

@@ -52,3 +52,27 @@ def test_atualizacao_pela_api_recusa_serie_incompleta(cliente):
     from app.mercado_pac import series_vigentes
     with SessionLocal() as db:
         assert fator_atualizacao(series_vigentes(db)["series"]["31555"])[0] == pytest.approx(1.1)
+
+
+def test_custos_da_loja_pela_pac_e_capital_pela_selic(cliente):
+    import datetime
+    from app.mercado_pac import (atualizar_selic, custos_da_turma, custos_fixos_loja, selic_mensal)
+    moveis = custos_fixos_loja("moveis")
+    # Aluguel: R$ 2.611.318 mil ÷ 86.846 lojas ÷ 12 meses × 0,4348.
+    assert moveis["componentes"]["Aluguel e condomínio"] == pytest.approx(2_611_318_000 / 86_846 / 12 * RAZAO_LOJA_PEQUENA, abs=.01)
+    assert moveis["total"] == pytest.approx(sum(moveis["componentes"].values()), abs=.05)
+    turma = SimpleNamespace(modo_jogo="LEGADO", configuracao_simulacao={"setor_mercado": "Móveis Residenciais"})
+    custos = custos_da_turma(turma)
+    assert custos["custos_fixos"]["total"] == moveis["total"] and custos["taxa_capital_estoque"] == pytest.approx(.0107)
+    from app.database import SessionLocal
+    dados = [{"data": "01/10/2026", "valor": "1.07"}, {"data": "01/11/2026", "valor": "0.51"}]
+    with SessionLocal() as db:
+        assert atualizar_selic(db, lambda url, timeout: io.BytesIO(json.dumps(dados).encode()), hoje=datetime.date(2026, 11, 17))
+        assert selic_mensal(db) == (pytest.approx(.0107), "202610")  # novembro incompleto fica fora
+    from app.motor.avancado import parametros
+    from app.models import Turma
+    with SessionLocal() as db:
+        t = Turma(nome="x", modo_jogo="TRADICIONAL", configuracao_simulacao={"setor_mercado": "Pet Shop"})
+        p = parametros(t)
+    assert p["custos_fixos_mensais"] == custos_fixos_loja("pet")["total"]
+    assert p["configuracao_simulacao"]["custo_armazenagem_m3"] == 0.0
