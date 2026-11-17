@@ -14,8 +14,9 @@ Aprovado em 16/11/2026:
 - Atualização: PMC, tabela 8883 (índice de receita nominal, sem ajuste
   sazonal): média dos últimos 12 meses publicados ÷ média de 2024. A PMC
   cobre empresas com 20 ou mais pessoas ocupadas (aviso exibido).
-- Conversão em unidades: o motor trabalha em unidades; a receita é dividida
-  pelo preço médio de mercado dos produtos em disputa (preços do catálogo).
+- A disputa é em reais (opção B, aprovada em 17/11/2026, com base em Cooper
+  e Nakanishi, Market-Share Analysis): cada loja recebe uma fatia em reais, e
+  cada produto converte a sua parte em unidades pelo próprio preço.
 """
 from __future__ import annotations
 
@@ -134,33 +135,21 @@ def ciclo() -> None:
         atualizar(db)
 
 
-def preco_medio_mercado(planos: list[dict | None]) -> float | None:
-    """Preço de mercado médio (ponderado pelo peso) dos produtos em disputa."""
-    total = pesos = 0.0
-    for plano in planos:
-        for item in (plano or {}).get("produtos") or []:
-            if item.get("preco_mercado"):
-                total += float(item["preco_mercado"]) * float(item.get("peso") or 1)
-                pesos += float(item.get("peso") or 1)
-    return total / pesos if pesos else None
 
+def demanda_por_loja(turma, planos=None, fator_periodo: float = 1.0) -> dict | None:
+    """Receita de mercado por loja no período (R$), ou None sem catálogo fixo.
 
-def demanda_por_loja(turma, planos: list[dict | None], fator_periodo: float = 1.0) -> dict | None:
-    """Unidades por loja no período, ou None quando a turma não usa o catálogo fixo."""
+    Opção B (aprovada em 17/11/2026): a disputa entre lojas é em reais
+    (Cooper e Nakanishi, Market-Share Analysis, cap. 2, eq. 2.1, e cap. 4); as
+    unidades são calculadas depois, produto a produto, pelo preço de cada um.
+    """
     if getattr(turma, "modo_jogo", None) == "STARTUP":
         return None
     from .routers.mercado import chave_setor
     setor = chave_setor((turma.configuracao_simulacao or {}).get("setor_mercado"))
     if not setor:
         return None
-    preco = preco_medio_mercado(planos)
-    if not preco:
-        from .catalogo_fixo import catalogo
-        precos = [i["preco_mediana"] for i in catalogo(setor)]
-        preco = sum(precos) / len(precos)
     from .database import SessionLocal
     with SessionLocal() as db:
         series = series_vigentes(db)
-    receita = receita_mensal_loja(setor, series)
-    return {**receita, "preco_medio_mercado": round(preco, 2), "fator_periodo": fator_periodo,
-            "unidades": receita["receita"] * fator_periodo / preco}
+    return {**receita_mensal_loja(setor, series), "fator_periodo": fator_periodo}

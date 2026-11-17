@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from app.mercado_pac import (BASE, RAZAO_LOJA_PEQUENA, atualizar, demanda_por_loja, fator_atualizacao,
-                             preco_medio_mercado, receita_mensal_loja)
+                             receita_mensal_loja)
 
 
 def test_receita_da_loja_pequena_atualizada_pela_pmc():
@@ -17,21 +17,29 @@ def test_receita_da_loja_pequena_atualizada_pela_pmc():
     assert "Estimativa" in r["aviso"]
 
 
-def test_demanda_em_unidades_pelo_preco_de_mercado_e_lojas_na_disputa(cliente):
+def test_mercado_em_reais_com_lojas_na_disputa(cliente):
     turma = SimpleNamespace(modo_jogo="TRADICIONAL", configuracao_simulacao={"setor_mercado": "Pet Shop"})
-    planos = [{"produtos": [{"preco_mercado": 59.0, "peso": 1}, {"preco_mercado": 43.0, "peso": 1}]}]
-    assert preco_medio_mercado(planos) == 51.0
-    d = demanda_por_loja(turma, planos)
-    assert d["unidades"] == pytest.approx(receita_mensal_loja("pet")["receita"] / 51.0)
-    assert demanda_por_loja(SimpleNamespace(modo_jogo="STARTUP", configuracao_simulacao={"setor_mercado": "Pet Shop"}), planos) is None
+    d = demanda_por_loja(turma)
+    assert d["receita"] == receita_mensal_loja("pet")["receita"]
+    assert demanda_por_loja(SimpleNamespace(modo_jogo="STARTUP", configuracao_simulacao={"setor_mercado": "Pet Shop"})) is None
     from app.motor.avancado import _mercado
     turma = SimpleNamespace(modo_jogo="TRADICIONAL", configuracao_simulacao={"setor_mercado": "Pet Shop", "concorrentes_virtuais": 2},
                             demanda_base_por_empresa=100, crescimento_mercado_mensal=.5, preco_referencia=50, taxa_juros_mensal=.025)
-    decisao = SimpleNamespace(preco=50, emprestimo=0, plano_comercial=planos[0])
-    p = {"atratividade": 1e9, "comercial_ativo": True, "avaliacao_estrategica": {"fator": 1}}
+    decisao = SimpleNamespace(preco=50, emprestimo=0, plano_comercial={"produtos": []})
+    p = {"atratividade": 1e9, "comercial_ativo": True, "avaliacao_estrategica": {"fator": 1}, "parametros": {}}
     demandas, bots = _mercado([p], [decisao], turma, 3, 1)
-    # Mercado = loja pequena × 3 lojas (1 equipe + 2 concorrentes); sem crescimento sem fonte.
-    assert sum(demandas) + sum(b["unidades_vendidas"] for b in bots) == pytest.approx(d["unidades"] * 3, rel=1e-6)
+    # Mercado = loja pequena × 3 lojas (1 equipe + 2 concorrentes), em reais; sem crescimento sem fonte.
+    assert sum(demandas) + sum(b["receita"] for b in bots) == pytest.approx(d["receita"] * 3, rel=1e-6)
+    assert p["parametros"]["mercado_em_reais"] is True
+
+
+def test_fatia_em_reais_vira_unidades_pelo_preco_de_cada_produto():
+    from app.motor.portfolio import pesos_em_valor, unidades_da_receita
+    itens = [{"preco": 29.0}, {"preco": 187.0}]
+    pesos = [1.0, 1.0]  # mesma fatia de receita para cada produto
+    assert unidades_da_receita(2_160.0, itens, pesos) == pytest.approx(1_080 / 29 + 1_080 / 187)
+    pv = pesos_em_valor(itens, pesos)
+    assert pv[0] / sum(pv) * unidades_da_receita(2_160.0, itens, pesos) * 29 == pytest.approx(1_080)
 
 
 def test_atualizacao_pela_api_recusa_serie_incompleta(cliente):

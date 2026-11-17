@@ -192,6 +192,23 @@ def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0, segment
     return valores
 
 
+def pesos_em_valor(itens, pesos):
+    """Converte pesos de atratividade (fatias de receita) em pesos de unidades.
+
+    Cooper e Nakanishi (Market-Share Analysis, cap. 2 e 4): participação pode
+    ser medida em valor, e só se somam medidas que "add together sensibly". A
+    fatia em reais de cada produto vira unidades pelo preço do próprio produto.
+    """
+    return [w / max(.01, float(p.get("preco", 0) or 0)) if float(p.get("preco", 0) or 0) > 0 else 0.0
+            for p, w in zip(itens, pesos)]
+
+
+def unidades_da_receita(receita, itens, pesos):
+    """Unidades totais correspondentes a uma demanda em reais repartida pelos pesos."""
+    soma = sum(pesos)
+    return receita * sum(pesos_em_valor(itens, pesos)) / soma if soma else 0.0
+
+
 def produzir(estado, itens, op, capacidade, maquinas, multiplicador,
              taxas_defeito_linha=None, qualificacao_linha=None):
     estoque=deepcopy(estado.get('estoques_produtos') or {})

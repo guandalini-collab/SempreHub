@@ -638,9 +638,18 @@ def apurar(preparo: dict, demanda: float,
     s, d, p = c["estado"], c["decisao"], c["parametros"]
     cfg, op = p.get("configuracao_simulacao") or {}, d.get("simulacao") or {}
     pa = s["estoque_pa"]
-    demanda = max(0, math.floor(demanda))
     plano_comercial = d.get("plano_comercial") or {}
     itens=plano_comercial.get("produtos", [])
+    demanda_reais = None
+    if p.get("mercado_em_reais") and itens:
+        # Opção B (aprovada em 17/11/2026): a disputa é em reais; cada produto
+        # converte sua fatia em unidades pelo próprio preço.
+        from .portfolio import atrativos, unidades_da_receita
+        pesos_mercado = atrativos(itens, p.get("preco_referencia", 100), p.get("custo_referencia_portfolio", 40),
+                                  c["marca"], c["qualidade"], (plano_comercial.get("analises") or {}).get("segmentacao"))
+        demanda_reais = demanda
+        demanda = unidades_da_receita(demanda, itens, pesos_mercado)
+    demanda = max(0, math.floor(demanda))
     publicado = bool(itens)
     # A mercadoria só sai do estoque se a empresa reservou recurso para o
     # escoamento. O frete contratado define uma capacidade física de entrega.
@@ -663,6 +672,9 @@ def apurar(preparo: dict, demanda: float,
         from .portfolio import vender, atrativos
         segmentacao = (plano_comercial.get("analises") or {}).get("segmentacao")
         pesos=atrativos(itens,p.get("preco_referencia",100),p.get("custo_referencia_portfolio",40),c["marca"],c["qualidade"], segmentacao)
+        if demanda_reais is not None:
+            from .portfolio import pesos_em_valor
+            pesos = pesos_em_valor(itens, pesos)
         linhas=vender(s,itens,demanda_comercial,pesos,c.get("diagnosticos_segmentacao"))
         vendas=sum(l["vendas"] for l in linhas)
         cmv=_soma(l["cmv"] for l in linhas);receita=_soma(l["receita"] for l in linhas)
@@ -788,6 +800,8 @@ def apurar(preparo: dict, demanda: float,
     )
     operacao.update(localizacao)
     operacao["produtos"]=linhas
+    if demanda_reais is not None:
+        operacao.update(demanda_reais=round(demanda_reais, 2))
     operacao.update(demanda=demanda, demanda_comercial=demanda_comercial, vendas=vendas, ruptura=ruptura,
                     estoque_mp_final=deepcopy(s["estoque_mp"]), estoque_pa_final=deepcopy(pa),
                     satisfacao=s["satisfacao"], moral=s["rh"]["moral"], qualificacao=s["rh"]["qualificacao"],

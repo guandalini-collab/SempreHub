@@ -76,6 +76,8 @@ class _Calculo:
     atratividade: float = 0.0
     demanda: float = 0.0
     vendas: float = 0.0
+    # Mercado em reais (catálogo fixo): reais de receita por unidade vendida.
+    reais_por_unidade: float = 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -239,7 +241,8 @@ def processar_rodada(
         concorrentes = _dividir_mercado(calculos, turma, rodada, multiplicador_demanda)
 
         # 4. Apuração
-        unidades_totais = sum(c.vendas for c in calculos) + sum(b["vendas"] for b in concorrentes) or 1.0
+        # Com o mercado em reais, a participação é em valor (Cooper e Nakanishi, eq. 2.1).
+        unidades_totais = sum(c.vendas * (c.reais_por_unidade or 1) for c in calculos) + sum(b["vendas"] for b in concorrentes) or 1.0
         for c in calculos:
             _apurar(db, c, turma, rodada, evento, multiplicador_cmv, unidades_totais)
 
@@ -463,9 +466,11 @@ def _dividir_mercado(
         sazonal = cal["sazonalidade"]["demanda"] if cal else 1.0
         if cal:
             pac = demanda_por_loja(turma, [c.decisao.plano_comercial for c in calculos], cal["fator_mensal"])
+        # Opção B (aprovada em 17/11/2026): o mercado é medido em reais.
+        reais_loja = pac["receita"] * pac["fator_periodo"]
         for bot in concorrentes:
-            bot["capacidade"] = pac["unidades"]
-    demanda_total = pac["unidades"] * (n + quantidade) * multiplicador_demanda * sazonal if pac else (
+            bot["capacidade"] = reais_loja
+    demanda_total = reais_loja * (n + quantidade) * multiplicador_demanda * sazonal if pac else (
         turma.demanda_base_por_empresa
         * n
         * (1 + turma.crescimento_mercado_mensal) ** (rodada - 1)
@@ -474,6 +479,17 @@ def _dividir_mercado(
     soma_atratividade = sum(c.atratividade for c in calculos) + sum(b["atratividade"] for b in concorrentes) or 1.0
     for c in calculos:
         c.demanda = demanda_total * c.atratividade / soma_atratividade
+        if pac and c.demanda > 0:
+            # A fatia em reais vira unidades de cada produto pelo próprio preço.
+            itens = (c.decisao.plano_comercial or {}).get("produtos") or []
+            reais = c.demanda
+            if itens:
+                from .portfolio import atrativos, unidades_da_receita
+                pesos = atrativos(itens, turma.preco_referencia, turma.custo_unitario, c.empresa.marca, c.empresa.qualidade)
+                c.demanda = unidades_da_receita(reais, itens, pesos)
+            else:
+                c.demanda = reais / max(0.01, c.decisao.preco)
+            c.reais_por_unidade = reais / c.demanda if c.demanda else 0.0
         c.vendas = min(c.demanda, c.capacidade)
 
     for bot in concorrentes:
@@ -525,6 +541,9 @@ def _apurar(
     if itens:
         from .portfolio import atrativos
         pesos=atrativos(itens,turma.preco_referencia,turma.custo_unitario,c.empresa.marca,c.empresa.qualidade)
+        if c.reais_por_unidade:
+            from .portfolio import pesos_em_valor
+            pesos = pesos_em_valor(itens, pesos)
         soma_pesos = sum(pesos) or 1.0
         linhas=[{"produto_id":p["produto_id"],"nome":p["produto_nome"],"preco":p["preco"],"custos_campanha":deepcopy(p.get("custos_campanha")),"vendas":c.vendas*w/soma_pesos,"receita":c.vendas*w/soma_pesos*p["preco"],"cmv":c.vendas*w/soma_pesos*p["custo_unitario"]*multiplicador_cmv} for p,w in zip(itens,pesos)]
         receita=sum(l["receita"] for l in linhas)
@@ -641,7 +660,7 @@ def _apurar(
             demanda=c.demanda,
             capacidade=c.capacidade,
             unidades_vendidas=c.vendas,
-            participacao_mercado=c.vendas / unidades_totais,
+            participacao_mercado=c.vendas * (c.reais_por_unidade or 1) / unidades_totais,
             receita=receita,
             impostos=impostos,
             cmv=cmv,

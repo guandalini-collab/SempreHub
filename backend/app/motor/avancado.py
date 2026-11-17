@@ -224,8 +224,11 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     from ..mercado_pac import demanda_por_loja
     pac = demanda_por_loja(turma, [d.plano_comercial for d in decisoes], cal["fator_mensal"] if cal else 1.0)
     if pac:
-        # Catálogo fixo: receita da loja pequena (PAC) ÷ preço médio de mercado.
-        temporal["demanda_base_por_empresa"] = pac["unidades"]
+        # Catálogo fixo (opção B): o mercado é medido em reais.
+        temporal["demanda_base_por_empresa"] = pac["receita"] * pac["fator_periodo"]
+        for p in preparos:
+            p.setdefault("parametros", {})["mercado_em_reais"] = True
+            p["parametros"]["mercado_pac"] = {k: pac[k] for k in ("receita", "atividade_pac", "fator_pmc", "periodo_pmc", "aviso")}
     bots = []
     for i in range(cfg["concorrentes_virtuais"]):
         # Política pública, determinística: não lê as decisões privadas dos alunos.
@@ -251,7 +254,11 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     soma = sum(atrativos)
     demandas = [total * atr / soma if atr > 0 else 0.0 for atr in atrativos]
     for bot, demanda in zip(bots, demandas[len(preparos):]):
-        bot["unidades_vendidas"] = min(bot["capacidade"], demanda)
+        if pac:
+            bot["receita"] = round(min(bot["capacidade"], demanda), 2)
+            bot["unidades_vendidas"] = 0.0  # concorrente simulado medido em valor
+        else:
+            bot["unidades_vendidas"] = min(bot["capacidade"], demanda)
     # O fator de conversão é aplicado uma única vez depois da disputa.
     # Assim não desaparece quando há somente uma empresa no mercado.
     return [demanda * p["avaliacao_estrategica"]["fator"] for demanda, p in zip(demandas, preparos)], bots
@@ -297,9 +304,19 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
     for empresa, p, demanda in zip(empresas, preparos, demandas):
         apuracoes.append(motor(turma).apurar(p, demanda,
                         lambda receita, cmv, e=empresa, alertas=p["alertas"]: _tributar(e, turma, receita, cmv, alertas)))
-    total_vendas = sum(a["vendas"] for a in apuracoes) + sum(b["unidades_vendidas"] for b in bots)
+    em_reais = any(p.get("parametros", {}).get("mercado_em_reais") for p in preparos)
+    if em_reais:
+        # Participação em valor (Cooper e Nakanishi, eq. 2.1: "dollar volume").
+        medida = [a["dre"]["receita"] for a in apuracoes]
+        total_vendas = sum(medida) + sum(b.get("receita", 0) for b in bots)
+        for bot in bots:
+            bot["participacao_mercado"] = bot.get("receita", 0) / total_vendas if total_vendas else 0
+    else:
+        medida = [a["vendas"] for a in apuracoes]
+        total_vendas = sum(medida) + sum(b["unidades_vendidas"] for b in bots)
+        for bot in bots:
+            bot["participacao_mercado"] = bot["unidades_vendidas"] / total_vendas if total_vendas else 0
     for bot in bots:
-        bot["participacao_mercado"] = bot["unidades_vendidas"] / total_vendas if total_vendas else 0
         bot.pop("atratividade")
         bot.pop("capacidade")
     from ..atualizacoes_oficiais import consultar as consultar_fontes
@@ -342,7 +359,7 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         detalhes["decisao"].pop("enviada_em", None)
         db.add(Resultado(empresa_id=empresa.id, rodada=rodada, preco=d.preco,
                         demanda=demanda, capacidade=a["capacidade"], unidades_vendidas=a["vendas"],
-                        participacao_mercado=a["vendas"] / total_vendas if total_vendas else 0,
+                        participacao_mercado=(a["dre"]["receita"] if em_reais else a["vendas"]) / total_vendas if total_vendas else 0,
                         receita=dre["receita"], impostos=dre["impostos"], cmv=dre["cmv"], folha=dre["folha"],
                         custos_fixos=dre["custos_fixos"], marketing=dre["marketing"], pd=dre["pd"],
                         networking_invest=dre["networking"], rescisoes=dre["rescisoes"], royalties=dre["royalties"],
