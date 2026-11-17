@@ -66,9 +66,13 @@ def atividade_do_setor(setor: str | None) -> str | None:
     return None
 
 
-def fator(edicao: dict | None, setor: str | None, mes: int) -> dict:
+def fator(edicao: dict | None, setor: str | None, mes: int, ano: int | None = None) -> dict:
     """Fator do mês (1–12) para o setor, com a origem explícita."""
-    edicao = edicao or BASE
+    if edicao is None:
+        from .sazonalidade_x13 import edicao_base
+        edicao = edicao_base()
+    if edicao.get("metodo") == "X13":
+        return _fator_x13(edicao, setor, mes, ano)
     atividade = atividade_do_setor(setor)
     if atividade is None or atividade not in edicao.get("series", {}):
         return {
@@ -81,6 +85,27 @@ def fator(edicao: dict | None, setor: str | None, mes: int) -> dict:
         "periodo": edicao.get("periodo"),
         "observacao": f"Média de {edicao.get('periodo')} do índice sem ajuste sazonal (mês ÷ média do ano).",
     }
+
+
+def _fator_x13(edicao: dict, setor: str | None, mes: int, ano: int | None) -> dict:
+    """Fator previsto pela replicação do X-13 para o mês; fora do horizonte,
+    vale o mesmo mês do último ano previsto (com aviso)."""
+    atividade = atividade_do_setor(setor)
+    serie = (edicao.get("previsto") or {}).get(atividade or "")
+    if not serie:
+        return {"fator": 1.0, "atividade": None,
+                "observacao": "Setor sem série do IBGE associada; nenhuma sazonalidade foi aplicada à procura."}
+    detalhes = (edicao.get("detalhes") or {}).get(atividade, {})
+    chave = f"{ano}{mes:02d}" if ano else None
+    if chave in serie:
+        valor, nota = serie[chave], ""
+    else:
+        mesmo_mes = sorted(p for p in serie if p.endswith(f"{mes:02d}"))
+        valor = serie[mesmo_mes[-1]]
+        nota = f" Mês fora do horizonte previsto: usado o fator de {mesmo_mes[-1][4:]}/{mesmo_mes[-1][:4]}."
+    conversao = f" Ajuste aditivo convertido em percentual: {detalhes['conversao']}." if detalhes.get("ajuste") == "aditivo" else ""
+    return {"fator": float(valor), "atividade": detalhes.get("atividade"), "periodo": f"série até {edicao.get('dados_ate')}",
+            "observacao": f"Fator sazonal e de calendário previsto pela replicação do X-13 (modelo ARIMA {detalhes.get('arima')}).{conversao}{nota}"}
 
 
 def calcular(valores: dict[str, float]) -> list[float]:

@@ -133,7 +133,9 @@ def _periodo_mensal(config, rodada):
     fator do IBGE e não é somado de novo (evita contar o Natal duas vezes).
     Insumos e frete não recebem acréscimo sazonal sem fonte.
     """
-    from .sazonalidade_pmc import ESTADO, FONTE, fator
+    from .sazonalidade_pmc import fator
+    from .sazonalidade_x13 import ESTADO as ESTADO_X13, FONTE as FONTE_X13
+    from .sazonalidade_pmc import ESTADO as ESTADO_MEDIA, FONTE as FONTE_MEDIA
     primeira = config.get('rodada_inicio_calendario', 1)
     if rodada < primeira:
         return None
@@ -142,9 +144,11 @@ def _periodo_mensal(config, rodada):
     fim = inicio.replace(day=dias_mes)
     setor = config.get('setor_mercado')
     edicao = config.get('sazonalidade_pmc')
-    atual = fator(edicao, setor, inicio.month)
+    atual = fator(edicao, setor, inicio.month, inicio.year)
     seguinte = _somar_meses(inicio, 1)
-    proximo = fator(edicao, setor, seguinte.month)
+    proximo = fator(edicao, setor, seguinte.month, seguinte.year)
+    x13 = edicao is None or edicao.get("metodo") == "X13"
+    ESTADO, FONTE = (ESTADO_X13, FONTE_X13) if x13 else (ESTADO_MEDIA, FONTE_MEDIA)
     eventos_ano = [evento for ano in range(inicio.year - 1, inicio.year + 2) for evento in _eventos_do_ano(ano)]
     no_mes = [e for e in sorted(eventos_ano, key=lambda e: e['data']) if inicio <= e['data'] <= fim]
     informativo = "Somente informativo: o efeito na procura já está no fator do IBGE."

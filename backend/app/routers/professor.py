@@ -110,7 +110,7 @@ def criar_turma(
         from zoneinfo import ZoneInfo
         turma.configuracao_simulacao = {**turma.configuracao_simulacao, "data_inicio_simulada": datetime.now(ZoneInfo("America/Sao_Paulo")).date().isoformat()}
     if (turma.configuracao_simulacao or {}).get("periodicidade") == "MENSAL_CALENDARIO" and not turma.configuracao_simulacao.get("sazonalidade_pmc"):
-        from ..motor.sazonalidade_pmc import edicao_vigente
+        from ..motor.sazonalidade_x13 import edicao_vigente
         turma.configuracao_simulacao = {**turma.configuracao_simulacao, "sazonalidade_pmc": edicao_vigente(db)}
     db.add(turma)
     db.commit()

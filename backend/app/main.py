@@ -87,7 +87,7 @@ async def iniciar_calendario():
                 import logging
                 logging.getLogger(__name__).warning('Serviço de atualização oficial pendente; nova tentativa automática.')
             try:
-                from .motor.sazonalidade_pmc import ciclo as atualizar_sazonalidade
+                from .motor.sazonalidade_x13 import ciclo as atualizar_sazonalidade
                 await asyncio.to_thread(atualizar_sazonalidade)
             except Exception:
                 import logging

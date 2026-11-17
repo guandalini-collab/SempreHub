@@ -34,18 +34,25 @@ def test_meses_civis_com_virada_de_ano_e_fevereiro():
     assert periodo(cfg("2028-02-01"), 1)["dias"] == 29
 
 
-def test_sazonalidade_vem_da_pmc_sem_pesos_de_eventos_nem_acrescimo_de_custos():
+def test_sazonalidade_vem_da_replicacao_x13_sem_pesos_de_eventos_nem_acrescimo_de_custos():
+    from app.motor.sazonalidade_x13 import edicao_base
+    previsto = edicao_base()["previsto"]
     dezembro = periodo(cfg("2026-12-01"), 1)
     saz = dezembro["sazonalidade"]
-    assert saz["demanda"] == pmc.BASE["series"]["MOVEIS"][11]
-    assert saz["atividade_pmc"] == "Móveis"
+    assert saz["demanda"] == previsto["MOVEIS"]["202612"]
+    assert saz["atividade_pmc"] == "Móveis e eletrodomésticos"
     assert saz["insumos"] == 1.0 and saz["frete"] == 1.0
     assert "Natal" in saz["eventos"]
     assert all(e["impacto_demanda"] == 0.0 for e in saz["detalhes_eventos"])
-    assert "IBGE" in saz["fonte"] and "Estimativa técnica" in saz["estado"]
-    assert periodo(cfg("2026-12-01", "Vestuário e Moda Básica"), 1)["sazonalidade"]["demanda"] == 1.73
-    assert periodo(cfg("2026-12-01", "Pet Shop"), 1)["sazonalidade"]["demanda"] == 1.276
+    assert "IBGE" in saz["fonte"] and "Replicação" in saz["estado"]
+    vestuario = periodo(cfg("2026-12-01", "Vestuário e Moda Básica"), 1)["sazonalidade"]
+    assert vestuario["demanda"] == previsto["VESTUARIO"]["202612"] and "aditivo" in vestuario["observacao"]
+    assert periodo(cfg("2026-12-01", "Pet Shop"), 1)["sazonalidade"]["demanda"] == previsto["OUTROS"]["202612"]
     assert periodo(cfg("2026-12-01", "Mochilas, Malas e Bolsas"), 1)["sazonalidade"]["atividade_pmc"] == "Tecidos, vestuário e calçados"
+    # Fora do horizonte previsto, vale o mesmo mês do último ano previsto, com aviso.
+    longe = periodo(cfg("2030-12-01"), 1)["sazonalidade"]
+    assert longe["demanda"] == previsto["MOVEIS"][max(p for p in previsto["MOVEIS"] if p.endswith("12"))]
+    assert "fora do horizonte" in longe["observacao"]
 
 
 def test_setor_sem_serie_nao_recebe_sazonalidade_inventada():
@@ -57,8 +64,10 @@ def test_setor_sem_serie_nao_recebe_sazonalidade_inventada():
 def test_proximo_mes_para_o_cockpit():
     novembro = periodo(cfg("2026-11-01"), 1)
     assert novembro["proximo_mes"]["mes"] == 12
-    assert novembro["proximo_mes"]["fator"] == pmc.BASE["series"]["MOVEIS"][11]
-    assert novembro["proximo_mes"]["variacao"] == pytest.approx(1.194 / 1.190 - 1, abs=1e-4)
+    from app.motor.sazonalidade_x13 import edicao_base
+    previsto = edicao_base()["previsto"]["MOVEIS"]
+    assert novembro["proximo_mes"]["fator"] == previsto["202612"]
+    assert novembro["proximo_mes"]["variacao"] == pytest.approx(previsto["202612"] / previsto["202611"] - 1, abs=1e-4)
 
 
 def test_edicao_congelada_na_turma_prevalece():
@@ -237,3 +246,22 @@ def test_extensao_definida_com_formacao_aberta_vale_no_encerramento(cliente, pro
     turma = cliente.get(f"/api/professor/turmas/{turma_id}", headers=professor).json()["turma"]
     assert turma["prazo_rodada"].startswith("2027-03-04T01:00:00")
     assert turma["agenda_academica"]["rodadas"][1]["aula"] == "2027-03-08"
+
+
+def test_replicacao_x13_roda_e_revisao_anual(cliente):
+    """Roda o X-13 de verdade sobre a série da edição base quando o programa existe."""
+    import io, json
+    from app.motor import sazonalidade_x13 as x13
+    if not x13.encontrar_binario():
+        pytest.skip("Programa X-13 não instalado neste ambiente.")
+    base = x13.edicao_base()
+    assert set(base["previsto"]) == {"MOVEIS", "VESTUARIO", "OUTROS"} and len(base["previsto"]["MOVEIS"]) == 24
+    from app.database import SessionLocal
+    # Sem dezembro publicado, a revisão anual não troca a edição.
+    serie = {f"{a}{m:02d}": 100.0 for a in range(2000, 2027) for m in range(1, 13) if f"{a}{m:02d}" <= "202609"}
+    resposta = [{"resultados": [{"classificacoes": [{"id": "85", "categoria": {str(s["codigo"]): "x"}}],
+                                 "series": [{"serie": {k: str(v) for k, v in serie.items()}}]} for s in x13.SERIES.values()]}]
+    with SessionLocal() as db:
+        assert x13.atualizar(db, hoje=__import__("datetime").date(2027, 2, 1),
+                             abrir=lambda url, timeout: io.BytesIO(json.dumps(resposta).encode())) is False
+        assert x13.edicao_vigente(db)["dados_ate"] == base["dados_ate"]

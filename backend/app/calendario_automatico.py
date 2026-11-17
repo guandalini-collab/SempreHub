@@ -30,7 +30,7 @@ def mes_inicial(turma) -> date:
 def configurar_mes(db, turma, inicio: date) -> None:
     """Grava o calendário mensal com a edição vigente dos fatores do IBGE."""
     from .motor.avancado import config
-    from .motor.sazonalidade_pmc import edicao_vigente
+    from .motor.sazonalidade_x13 import edicao_vigente
     cfg = config(turma)
     cfg.update(
         periodicidade="MENSAL_CALENDARIO", data_inicio_simulada=inicio.replace(day=1).isoformat(),

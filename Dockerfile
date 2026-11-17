@@ -20,6 +20,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app/backend
 COPY backend/requirements.txt backend/requirements-postgres.txt ./
 RUN pip install --no-cache-dir -r requirements-postgres.txt
+# Programa X-13ARIMA-SEATS para a revisão anual da sazonalidade (replicação do
+# ajuste da PMC). Preferência: binário oficial do U.S. Census Bureau (build 62);
+# reserva: pacote x13binary (PyPI). Se nenhum for obtido, a imagem é gerada do
+# mesmo jeito e o sistema mantém a última edição dos fatores.
+COPY tools/instalar_x13.py /tmp/instalar_x13.py
+RUN python /tmp/instalar_x13.py || true
+RUN [ -x /opt/x13/x13as_ascii ] || pip install --no-cache-dir x13binary==1.1.61 || true
+ENV PATH="/opt/x13:${PATH}"
 COPY backend/app ./app
 COPY backend/alembic.ini ./alembic.ini
 COPY backend/alembic ./alembic
