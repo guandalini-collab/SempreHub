@@ -238,16 +238,16 @@ def test_porter_meio_termo(cliente, professor, monkeypatch):
     aluno = cadastrar(cliente, "Ana", "ana@aluno.iffar.edu.br")
     e = _entrar(cliente, aluno, turma["codigo"], "Ana")
     docente = f"/api/professor/turmas/{turma['id']}/mercado"
-    pesquisa = cliente.post(docente + "/pesquisar", headers=professor, json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+    pesquisa = cliente.post(docente + "/pesquisar", headers=professor, json={"setor": "Pet Shop", "noticias": 1, "analises": 1, "produtos": 1})
     assert pesquisa.status_code == 200, pesquisa.text
     eid = pesquisa.json()["id"]
     assert cliente.post(docente + f"/{eid}/publicar", headers=professor, json={}).status_code == 200
     plano = {
-        "edicao_id": eid, "produto_id": "produto-1", "estrategia_preco": "COMPETITIVO",
+        "edicao_id": eid, "produto_id": "pet-brinquedo", "estrategia_preco": "COMPETITIVO",
         "posicionamento": "PRECO", "canais": ["DIRETO"], "cobertura": "LOCAL",
         "intensidade": "MEDIA", "midias": [{"id": "email", "quantidade": 100}],
         "produtos": [{
-            "produto_id": "produto-1", "produto_nome": "Produto de teste", "preco": 80,
+            "produto_id": "pet-brinquedo", "produto_nome": "Produto de teste", "preco": 80,
             "peso": 1, "revisado": True, "estrategia_preco": "COMPETITIVO",
             "posicionamento": "PRECO", "canais": ["DIRETO"], "cobertura": "LOCAL",
             "intensidade": "MEDIA", "midias": [{"id": "email", "quantidade": 100}],

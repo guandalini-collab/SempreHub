@@ -83,10 +83,10 @@ def test_localizacao_altera_previa_dre_e_preserva_balanco(cliente, professor, mo
     estudo = {"pontos": [{"nome": "A", "x": 0, "y": 0, "volume": 1}, {"nome": "B", "x": 40, "y": 0, "volume": 3}], "local_x": 0, "local_y": 0}
     revisao = {k: True for k in ("decisoes", "financas", "producao", "logistica")}
     docente = f"/api/professor/turmas/{turma['id']}/mercado"
-    eid = cliente.post(docente + "/pesquisar", headers=professor, json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":1}).json()["id"]
+    eid = cliente.post(docente + "/pesquisar", headers=professor, json={"setor":"Pet Shop","noticias":1,"analises":1,"produtos":1}).json()["id"]
     assert cliente.post(docente + f"/{eid}/publicar", headers=professor, json={}).status_code == 200
-    plano = {"edicao_id":eid,"produto_id":"produto-1","estrategia_preco":"COMPETITIVO","posicionamento":"PRECO","canais":["DIRETO"],"cobertura":"LOCAL","intensidade":"BAIXA","midias":[{"id":"email","quantidade":100}]}
-    plano["produtos"]=[{**plano,"produto_id":"produto-1","produto_nome":"Produto de teste","preco":100,"peso":1,"revisado":True,"servicos":[{"id":"servico-email","quantidade":1}]}]
+    plano = {"edicao_id":eid,"produto_id":"pet-brinquedo","estrategia_preco":"COMPETITIVO","posicionamento":"PRECO","canais":["DIRETO"],"cobertura":"LOCAL","intensidade":"BAIXA","midias":[{"id":"email","quantidade":100}]}
+    plano["produtos"]=[{**plano,"produto_id":"pet-brinquedo","produto_nome":"Produto de teste","preco":100,"peso":1,"revisado":True,"servicos":[{"id":"servico-email","quantidade":1}]}]
     decisao = {"rodada": 1, "preco": 100, "marketing":557, "revisao_areas": revisao, "plano_comercial":plano, "simulacao": {"comprar_mp": 100, "producao": 100, "pro_labore":1500, "orcamento_logistico":10000, "centro_gravidade": estudo}}
     previa = cliente.post(base + "/previsao", headers=aluno, json=decisao)
     assert previa.status_code == 200, previa.text

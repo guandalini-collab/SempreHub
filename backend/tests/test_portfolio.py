@@ -15,10 +15,12 @@ def preparar(cliente,professor,monkeypatch,modo='TRADICIONAL'):
     turma=_criar_turma(cliente,professor,modo_jogo=modo,total_rodadas=3,demanda_base_por_empresa=20)
     aluno=cadastrar(cliente,'Ana',f'portfolio-{modo}@aluno.iffar.edu.br');empresa=_entrar(cliente,aluno,turma['codigo'],'Portfólio')
     url=f"/api/professor/turmas/{turma['id']}"
-    r=cliente.post(url+'/mercado/pesquisar',headers=professor,json={'setor':'Eletrônicos e Tecnologia','noticias':1,'analises':1,'produtos':2});assert r.status_code==200,r.text
+    r=cliente.post(url+'/mercado/pesquisar',headers=professor,json={'setor':'Pet Shop','noticias':1,'analises':1,'produtos':2});assert r.status_code==200,r.text
     eid=r.json()['id'];assert cliente.post(url+f'/mercado/{eid}/publicar',headers=professor,json={}).status_code==200
     mix={'estrategia_preco':'COMPETITIVO','posicionamento':'PRECO','canais':['DIRETO'],'cobertura':'LOCAL','intensidade':'BAIXA','midias':[{'id':'email','quantidade':100}]}
-    plano={'edicao_id':eid,'produto_id':'produto-1',**mix,'produtos':[{'produto_id':'produto-1',**mix,'preco':100,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]},{'produto_id':'produto-2',**mix,'preco':200,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]}]}
+    # Startup usa produtos da pesquisa; os demais modos, o catálogo fixo (Pet Shop).
+    p1,p2=('produto-1','produto-2') if modo=='STARTUP' else ('pet-brinquedo','pet-guia')
+    plano={'edicao_id':eid,'produto_id':p1,**mix,'produtos':[{'produto_id':p1,**mix,'preco':100,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]},{'produto_id':p2,**mix,'preco':200,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]}]}
     # Duas linhas comercializadas exigem duas campanhas auditáveis.
     decisao={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano}
     if modo == 'TRADICIONAL':
@@ -41,9 +43,15 @@ def preparar(cliente,professor,monkeypatch,modo='TRADICIONAL'):
 def test_portfolio_apura_sem_duplicar_caixa_ou_capacidade(cliente,professor,monkeypatch,modo):
     _,aluno,empresa,url,eid,d=preparar(cliente,professor,monkeypatch,modo)
     endpoint=f'/api/aluno/empresas/{empresa}/decisao'
-    incompleto=deepcopy(d);incompleto['plano_comercial']['produtos'].pop()
-    assert cliente.put(endpoint,headers=aluno,json=completar_decisao(incompleto)).status_code==422
-    duplicado=deepcopy(d);duplicado['plano_comercial']['produtos'][1]['produto_id']='produto-1'
+    produtos=d['plano_comercial']['produtos']
+    if modo=='STARTUP':
+        incompleto=deepcopy(d);incompleto['plano_comercial']['produtos'].pop()
+        assert cliente.put(endpoint,headers=aluno,json=completar_decisao(incompleto)).status_code==422
+    else:
+        # Catálogo fixo: a equipe escolhe o sortimento, mas só itens do setor.
+        fora=deepcopy(d);fora['plano_comercial']['produtos'][1]['produto_id']='moveis-mesa-em-l'
+        assert cliente.put(endpoint,headers=aluno,json=completar_decisao(fora)).status_code==422
+    duplicado=deepcopy(d);duplicado['plano_comercial']['produtos'][1]['produto_id']=produtos[0]['produto_id']
     assert cliente.put(endpoint,headers=aluno,json=completar_decisao(duplicado)).status_code==422
     # A confirmação visual por produto deixou de ser obrigatória; o conteúdo continua validado.
     for produto in d['plano_comercial']['produtos']:
@@ -51,7 +59,7 @@ def test_portfolio_apura_sem_duplicar_caixa_ou_capacidade(cliente,professor,monk
     d['plano_comercial']['produtos'][1]['custo_unitario']=.01
     r=cliente.put(endpoint,headers=aluno,json=completar_decisao(d));assert r.status_code==200,r.text
     assert r.json()['preco']==150
-    assert r.json()['plano_comercial']['produtos'][1]['custo_unitario']==80
+    assert r.json()['plano_comercial']['produtos'][1]['custo_unitario']==(80 if modo=='STARTUP' else 26.09)
     assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
     painel=cliente.get(f'/api/aluno/empresas/{empresa}',headers=aluno).json();resultado=painel['resultados'][0]
     linhas=resultado['produtos_resultado'];assert len(linhas)==2

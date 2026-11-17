@@ -16,16 +16,22 @@ from .test_fluxo import _criar_turma, _entrar
 def edicao():
     fonte={"titulo":"Fonte de aquisição","url":"https://www.ibge.gov.br/produto"}
     artigo={"titulo":"Mercado brasileiro","texto":"Dados de mercado consultados para esta edição.","data":"2026-10-06","fontes":[fonte]}
-    return {"setor":"Eletrônicos e Tecnologia","comercio":"B2C","noticias":[artigo],"analises":[artigo],"produtos":[{"natureza":"FISICO","id":"produto-1","nome":"Produto de teste","descricao":"Descrição de produto de teste","custo_unitario":30,"unidade":"unidade","base_custo":"Preço público de aquisição, não custo industrial.","data":"2026-10-06","fontes":[fonte],"evidencia_custo":{"url":"https://www.ibge.gov.br/produto","trecho":"Produto de teste R$ 30,00 por unidade ou cliente/mês."}}]}
+    return {"setor":"Pet Shop","comercio":"B2C","noticias":[artigo],"analises":[artigo],"produtos":[{"natureza":"FISICO","id":"produto-1","nome":"Produto de teste","descricao":"Descrição de produto de teste","custo_unitario":30,"unidade":"unidade","base_custo":"Preço público de aquisição, não custo industrial.","data":"2026-10-06","fontes":[fonte],"evidencia_custo":{"url":"https://www.ibge.gov.br/produto","trecho":"Produto de teste R$ 30,00 por unidade ou cliente/mês."}}]}
 
 
-@pytest.mark.parametrize("origem", ["documentado", "varejo", "fallback"])
-def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch,origem):
+def digital():
+    dados = edicao()
+    for p in dados["produtos"]:
+        p.update(natureza="SERVICO_DIGITAL", unidade="cliente/mês")
+    return dados
+
+
+def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch):
+    # Catálogo fixo: o produto da pesquisa é ignorado; o custo vem do preço de
+    # varejo do catálogo (brinquedo, R$ 59) pela PAC (58,2%) e pelo Simples (4%).
     from app.routers import mercado
     dados = edicao()
-    if origem == "varejo": dados["produtos"][0]["tipo_documento"] = "preco_varejo"
-    if origem == "fallback": dados["produtos"][0].pop("evidencia_custo")
-    custo = {"documentado": 30, "varejo": 18, "fallback": 40}[origem]
+    custo = 35.8
     monkeypatch.setattr(mercado,"gerar_json",lambda *a:(dados,{"https://www.ibge.gov.br/produto"}))
     turma=_criar_turma(cliente,professor,total_rodadas=3)
     aluno=cadastrar(cliente,"Ana","ana@aluno.iffar.edu.br")
@@ -33,7 +39,7 @@ def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch,orig
     empresa=_entrar(cliente,aluno,turma["codigo"],"Empresa Ana")
     docente=f"/api/professor/turmas/{turma['id']}/mercado"
     base=f"/api/aluno/empresas/{empresa}"
-    r=cliente.post(docente+"/pesquisar",headers=professor,json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":1})
+    r=cliente.post(docente+"/pesquisar",headers=professor,json={"setor":"Pet Shop","noticias":1,"analises":1,"produtos":1})
     assert r.status_code==200,r.text
     eid=r.json()["id"]
     assert cliente.get(base+"/mercado-real",headers=aluno).json()["edicoes"]==[]
@@ -41,8 +47,8 @@ def test_revisao_publicacao_custo_e_historico(cliente,professor,monkeypatch,orig
     assert cliente.get(docente,headers=aluno).status_code==403
     assert cliente.post(docente+f"/{eid}/publicar",headers=professor,json={}).status_code==200
     assert cliente.put(docente+f"/{eid}",headers=professor,json=edicao()).status_code==409
-    plano={"edicao_id":eid,"produto_id":"produto-1","estrategia_preco":"COMPETITIVO","posicionamento":"PRECO","canais":["DIRETO"],"cobertura":"LOCAL","intensidade":"MEDIA","midias":[{"id":"email","quantidade":100}],"estrategias":{"SWOT":"Análise da equipe"},"custo_unitario":1}
-    plano["produtos"]=[{**plano,"produto_id":"produto-1","preco":60,"peso":1,"revisado":True,"servicos":[{"id":"servico-email","quantidade":1}]}]
+    plano={"edicao_id":eid,"produto_id":"pet-brinquedo","estrategia_preco":"COMPETITIVO","posicionamento":"PRECO","canais":["DIRETO"],"cobertura":"LOCAL","intensidade":"MEDIA","midias":[{"id":"email","quantidade":100}],"estrategias":{"SWOT":"Análise da equipe"},"custo_unitario":1}
+    plano["produtos"]=[{**plano,"produto_id":"pet-brinquedo","preco":60,"peso":1,"revisado":True,"servicos":[{"id":"servico-email","quantidade":1}]}]
     decisao={"preco":60,"marketing":557,"plano_comercial":plano}
     r=cliente.put(base+"/decisao",headers=aluno,json=completar_decisao(decisao))
     assert r.status_code==200,r.text
@@ -73,7 +79,14 @@ def test_recusa_fontes_nao_confirmadas(cliente,professor,monkeypatch):
     monkeypatch.setattr(mercado,"gerar_json",lambda *a:(edicao(),set()))
     turma=_criar_turma(cliente,professor)
     base=f"/api/professor/turmas/{turma['id']}/mercado"
-    assert cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Eletrônicos","noticias":1,"analises":1,"produtos":1}).status_code==502
+    # Notícias e análises com fonte não confirmada saem; o catálogo fixo fica.
+    r=cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Pet Shop","noticias":1,"analises":1,"produtos":1})
+    assert r.status_code==200, r.text
+    assert r.json()["dados"]["noticias"]==[] and r.json()["dados"]["analises"]==[]
+    startup=_criar_turma(cliente,professor,modo_jogo="STARTUP")
+    monkeypatch.setattr(mercado,"gerar_json",lambda *a:(digital(),set()))
+    base=f"/api/professor/turmas/{startup['id']}/mercado"
+    assert cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Pet Shop","noticias":1,"analises":1,"produtos":1}).status_code==502
     assert cliente.get(base,headers=professor).json()["edicoes"]==[]
 
 
@@ -98,7 +111,7 @@ def test_custo_catalogo_aplicado_servico_digital(cliente,professor,monkeypatch):
     aluno=cadastrar(cliente,"Bia","catalogo-startup@aluno.iffar.edu.br")
     empresa=_entrar(cliente,aluno,turma["codigo"],"Serviço digital")
     docente=f"/api/professor/turmas/{turma['id']}/mercado"
-    eid=cliente.post(docente+"/pesquisar",headers=professor,json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":1}).json()["id"]
+    eid=cliente.post(docente+"/pesquisar",headers=professor,json={"setor":"Pet Shop","noticias":1,"analises":1,"produtos":1}).json()["id"]
     cliente.post(docente+f"/{eid}/publicar",headers=professor,json={})
     # Serviço digital também precisa de catálogo publicado, campanha compatível
     # e capacidade humana/operacional; não há demanda orgânica implícita.
@@ -167,19 +180,21 @@ def test_fontes_rastreamento_nao_altera_identidade_da_pagina():
         validar_fontes(dados,{"https://www.ibge.gov.br/produto?sku=diferente"})
 
 
-def test_pesquisa_sem_custo_documentado_cria_catalogo_estimado(cliente,professor,monkeypatch):
+def test_catalogo_fixo_substitui_produtos_da_pesquisa(cliente,professor,monkeypatch):
     from app.routers import mercado
     bruto=edicao()
-    bruto["produtos"]=[]
     monkeypatch.setattr(mercado,"gerar_json",lambda *a:(bruto,{"https://www.ibge.gov.br/produto"}))
     turma=_criar_turma(cliente,professor)
     base=f"/api/professor/turmas/{turma['id']}/mercado"
-    r=cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Eletrônicos e Tecnologia","noticias":1,"analises":1,"produtos":3})
+    r=cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Pet Shop","noticias":1,"analises":1,"produtos":3})
     assert r.status_code==200, r.text
     dados=r.json()["dados"]
-    assert len(dados["produtos"]) == 3
-    assert all(p["estado_indicador"] == "Estimativa do Modelo" for p in dados["produtos"])
-    assert all(p["custo_unitario"] > 0 for p in dados["produtos"])
+    assert len(dados["produtos"]) == 15 and "produto-1" not in {p["id"] for p in dados["produtos"]}
+    assert all(p["origem"] == "catalogo_fixo" and p["estado_indicador"] == "Valor Calculado" for p in dados["produtos"])
+    brinquedo = next(p for p in dados["produtos"] if p["id"] == "pet-brinquedo")
+    assert brinquedo["valor_documentado"] == 59 and brinquedo["custo_unitario"] == 35.8 and brinquedo["n_anuncios"] == 11
+    # Setor fora do catálogo é recusado, e o setor não muda depois de publicado.
+    assert cliente.post(base+"/pesquisar",headers=professor,json={"setor":"Automotivo","noticias":1,"analises":1}).status_code==422
     assert cliente.post(base + f"/{r.json()['id']}/publicar", headers=professor, json={}).status_code == 200
 
 
@@ -188,9 +203,9 @@ def test_recusa_produto_fisico_em_startup_e_outro_setor(cliente, professor, monk
     monkeypatch.setattr(mercado, "gerar_json", lambda *a: (edicao(), {"https://www.ibge.gov.br/produto"}))
     turma = _criar_turma(cliente, professor, modo_jogo="STARTUP")
     base = f"/api/professor/turmas/{turma['id']}/mercado"
-    pesquisa = {"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1}
+    pesquisa = {"setor": "Pet Shop", "noticias": 1, "analises": 1, "produtos": 1}
     assert cliente.post(base + "/pesquisar", headers=professor, json=pesquisa).status_code == 422
-    assert cliente.post(base + "/pesquisar", headers=professor, json={**pesquisa, "setor": "Alimentos e Bebidas"}).status_code == 502
+    assert cliente.post(base + "/pesquisar", headers=professor, json={**pesquisa, "setor": "Móveis Residenciais"}).status_code == 502
     assert cliente.get(base, headers=professor).json()["edicoes"] == []
 
 
@@ -218,21 +233,22 @@ def test_pesquisa_com_menos_noticias_salva_o_confirmado_e_avisa(cliente, profess
     turma = _criar_turma(cliente, professor, total_rodadas=2)
     docente = f"/api/professor/turmas/{turma['id']}/mercado"
     resposta = cliente.post(docente + "/pesquisar", headers=professor,
-                            json={"setor": "Eletrônicos e Tecnologia", "noticias": 3, "analises": 1, "produtos": 1})
+                            json={"setor": "Pet Shop", "noticias": 3, "analises": 1, "produtos": 1})
     assert resposta.status_code == 200, resposta.text
     salvo = resposta.json()["dados"]
-    assert salvo["noticias"] == [] and len(salvo["analises"]) == 1 and len(salvo["produtos"]) == 1
+    assert salvo["noticias"] == [] and len(salvo["analises"]) == 1 and len(salvo["produtos"]) == 15
     assert "notícias: 0 de 3" in salvo["avisos"][0]
 
 
 def test_produto_incompleto_vira_estimativa_identificada(cliente, professor, monkeypatch):
     from app.routers import mercado
-    dados = edicao()
+    # Só a Startup recebe produtos da pesquisa (os demais modos usam o catálogo fixo).
+    dados = digital()
     dados["produtos"][0]["custo_unitario"] = 0  # pesquisa sem preço encontrado
     monkeypatch.setattr(mercado, "gerar_json", lambda *a: (dados, {"https://www.ibge.gov.br/produto"}))
-    turma = _criar_turma(cliente, professor, total_rodadas=3)
+    turma = _criar_turma(cliente, professor, total_rodadas=3, modo_jogo="STARTUP")
     r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
-                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+                     json={"setor": "Pet Shop", "noticias": 1, "analises": 1, "produtos": 1})
     assert r.status_code == 200, r.text
     edic = r.json()["dados"]
     assert edic["produtos"][0]["estado_indicador"] == "Estimativa do Modelo"
@@ -248,7 +264,7 @@ def test_item_com_fonte_nao_confirmada_sai_e_o_resto_fica(cliente, professor, mo
     monkeypatch.setattr(mercado, "gerar_json", lambda *a: (dados, {"https://www.ibge.gov.br/produto/"}))
     turma = _criar_turma(cliente, professor, total_rodadas=3)
     r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
-                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+                     json={"setor": "Pet Shop", "noticias": 1, "analises": 1, "produtos": 1})
     assert r.status_code == 200, r.text
     edic = r.json()["dados"]
     assert edic["noticias"] == [] and len(edic["analises"]) == 1
@@ -259,11 +275,11 @@ def test_nada_conferido_nao_salva_edicao(cliente, professor, monkeypatch):
     from app.routers import mercado
     def falhar(url): raise ValueError("Documento não disponível como HTML.")
     monkeypatch.setattr("app.evidencias_mercado.obter_documento", falhar)
-    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (edicao(), {"https://www.ibge.gov.br/produto"}))
-    turma = _criar_turma(cliente, professor, total_rodadas=3)
+    monkeypatch.setattr(mercado, "gerar_json", lambda *a: (digital(), {"https://www.ibge.gov.br/produto"}))
+    turma = _criar_turma(cliente, professor, total_rodadas=3, modo_jogo="STARTUP")
     base = f"/api/professor/turmas/{turma['id']}/mercado"
     r = cliente.post(base + "/pesquisar", headers=professor,
-                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+                     json={"setor": "Pet Shop", "noticias": 1, "analises": 1, "produtos": 1})
     assert r.status_code == 502 and "página não pôde ser lida" in r.json()["detail"]
     assert cliente.get(base, headers=professor).json()["edicoes"] == []
 
@@ -289,14 +305,14 @@ def test_camadas_completam_noticias_com_imprensa_e_web(cliente, professor, monke
     monkeypatch.setattr(mercado, "gerar_json", gerar)
     turma = _criar_turma(cliente, professor, total_rodadas=3)
     r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
-                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+                     json={"setor": "Pet Shop", "noticias": 1, "analises": 1, "produtos": 1})
     assert r.status_code == 200, r.text
     edic = r.json()["dados"]
     assert chamadas == [1, 2, 3]
     assert edic["noticias"][0]["fontes"][0]["natureza"] == "imprensa"
     assert [a["titulo"] for a in edic["analises"]] == ["Tendência do setor"]
     assert edic["analises"][0]["fontes"][0]["natureza"] == "fonte de mercado (site não oficial)"
-    assert edic["produtos"][0]["estado_indicador"] == "Estimativa do Modelo"
+    assert edic["produtos"][0]["origem"] == "catalogo_fixo"
     assert any("Camada 2 (imprensa) completou 1 notícia(s)" in a for a in edic["avisos"])
 
 
@@ -309,7 +325,7 @@ def test_camada_seguinte_so_roda_se_faltar_item(cliente, professor, monkeypatch)
     monkeypatch.setattr(mercado, "gerar_json", gerar)
     turma = _criar_turma(cliente, professor, total_rodadas=3)
     r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
-                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+                     json={"setor": "Pet Shop", "noticias": 1, "analises": 1, "produtos": 1})
     assert r.status_code == 200 and chamadas == [1]
 
 
@@ -332,7 +348,7 @@ def test_nao_repete_noticia_publicada_nas_ultimas_rodadas(cliente, professor, mo
         db.add(ConteudoMercado(turma_id=t.id, rodada=2, publicado=True, dados=edicao()))
         db.commit()
     r = cliente.post(f"/api/professor/turmas/{turma['id']}/mercado/pesquisar", headers=professor,
-                     json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1})
+                     json={"setor": "Pet Shop", "noticias": 1, "analises": 1, "produtos": 1})
     assert r.status_code == 200, r.text
     edic = r.json()["dados"]
     titulo_antigo = edicao()["noticias"][0]["titulo"]

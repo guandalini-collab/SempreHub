@@ -52,21 +52,22 @@ def test_segmentacao_afeta_vendas_e_resultado_preserva_historico(cliente, profes
     alunos = [cadastrar(cliente, 'Ana', f'estrategia-{modo}-{i}@aluno.iffar.edu.br') for i in range(2)]
     empresas = [_entrar(cliente, aluno, turma['codigo'], f'Empresa {i}') for i, aluno in enumerate(alunos)]
     docente = f"/api/professor/turmas/{turma['id']}"
-    r = cliente.post(docente + '/mercado/pesquisar', headers=professor, json={'setor': 'Eletrônicos e Tecnologia', 'noticias': 1, 'analises': 1, 'produtos': 1})
+    r = cliente.post(docente + '/mercado/pesquisar', headers=professor, json={'setor': 'Pet Shop', 'noticias': 1, 'analises': 1, 'produtos': 1})
     assert r.status_code == 200, r.text
     eid = r.json()['id']
     assert cliente.post(docente + f'/mercado/{eid}/publicar', headers=professor, json={}).status_code == 200
+    produto = 'produto-1' if modo == 'STARTUP' else 'pet-brinquedo'
     for i, (aluno, empresa) in enumerate(zip(alunos, empresas)):
         # A comparação estratégica ocorre com empresas realmente aptas a
         # vender: produto publicado, campanha compatível e estrutura mínima.
         # Sem essa cadeia, a demanda é corretamente zero para ambas.
         plano = {
-            'edicao_id': eid, 'produto_id': 'produto-1',
+            'edicao_id': eid, 'produto_id': produto,
             'estrategia_preco': 'COMPETITIVO', 'posicionamento': 'PRECO',
             'canais': ['DIRETO'], 'cobertura': 'LOCAL', 'intensidade': 'BAIXA',
             'midias': [{'id': 'email', 'quantidade': 100}],
             'produtos': [{
-                'produto_id': 'produto-1', 'produto_nome': 'Produto de teste',
+                'produto_id': produto, 'produto_nome': 'Produto de teste',
                 'preco': 100, 'peso': 1, 'revisado': True,
                 'estrategia_preco': 'COMPETITIVO', 'posicionamento': 'PRECO',
                 'canais': ['DIRETO'], 'cobertura': 'LOCAL', 'intensidade': 'BAIXA',

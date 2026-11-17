@@ -35,9 +35,11 @@ def test_salva_e_publica_estimativa_sem_prova(cliente, professor, monkeypatch, f
     from app.routers import mercado
     from app.models import ConteudoMercado
     from app.database import SessionLocal
+    # Só a Startup recebe produtos da pesquisa; os demais modos usam o catálogo fixo.
     dados = edicao(); dados['produtos'][0].pop('evidencia_custo')
+    dados['produtos'][0].update(natureza='SERVICO_DIGITAL', unidade='cliente/mês')
     monkeypatch.setattr(mercado, 'gerar_json', lambda *a: (dados, {'https://www.ibge.gov.br/produto'}))
-    turma = _criar_turma(cliente, professor)
+    turma = _criar_turma(cliente, professor, modo_jogo='STARTUP')
     base = f"/api/professor/turmas/{turma['id']}/mercado"
     r = cliente.post(base + '/pesquisar', headers=professor, json={'setor':dados['setor'],'noticias':1,'analises':1,'produtos':1})
     assert r.status_code == 200

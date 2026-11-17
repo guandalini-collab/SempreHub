@@ -92,7 +92,7 @@ def test_startup_separa_aporte_de_receita_e_preserva_clientes_sem_nuvem(cliente,
     base_docente = f"/api/professor/turmas/{turma['id']}/mercado"
     pesquisa = cliente.post(
         base_docente + "/pesquisar", headers=professor,
-        json={"setor": "Eletrônicos e Tecnologia", "noticias": 1, "analises": 1, "produtos": 1},
+        json={"setor": "Pet Shop", "noticias": 1, "analises": 1, "produtos": 1},
     )
     assert pesquisa.status_code == 200, pesquisa.text
     edicao_id = pesquisa.json()["id"]

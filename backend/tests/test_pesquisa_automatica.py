@@ -32,8 +32,8 @@ def _gerar_ok(monkeypatch, chamadas=None):
     monkeypatch.setattr(mercado, "gerar_json", gerar)
 
 
-def _turma_com_agenda(cliente, professor, setor="Eletrônicos e Tecnologia"):
-    turma = _criar_turma(cliente, professor, total_rodadas=3)
+def _turma_com_agenda(cliente, professor, setor="Pet Shop", modo_jogo="LEGADO"):
+    turma = _criar_turma(cliente, professor, total_rodadas=3, modo_jogo=modo_jogo)
     with SessionLocal() as db:
         t = db.get(Turma, turma["id"])
         t.agenda_academica = {"rodadas": [
@@ -87,7 +87,9 @@ def test_ate_tres_tentativas_e_nenhuma_depois_de_30_min_antes(cliente, professor
     from app.routers import mercado
     def falhar(*a): raise HTTPException(502, "A pesquisa não respondeu. Tente novamente.")
     monkeypatch.setattr(mercado, "gerar_json", falhar)
-    turma_id = _turma_com_agenda(cliente, professor)
+    # Startup: sem catálogo fixo, nada conferido não gera edição. Nos modos com
+    # catálogo, a edição sai com o catálogo e o aviso de notícias faltantes.
+    turma_id = _turma_com_agenda(cliente, professor, modo_jogo="STARTUP")
     auto.executar_ciclo(ABERTURA - timedelta(minutes=120))
     assert _registro(turma_id, 2)[:2] == ("FALHOU", 1)
     auto.executar_ciclo(ABERTURA - timedelta(minutes=100))
@@ -153,7 +155,7 @@ def test_sem_agenda_pesquisa_e_publica_logo_apos_o_fechamento(cliente, professor
     assert _registro(turma_id, 1) is None  # primeira rodada fica com o professor
     with SessionLocal() as db:
         t = db.get(Turma, turma_id)
-        t.configuracao_simulacao = {**(t.configuracao_simulacao or {}), "setor_mercado": "Eletrônicos e Tecnologia"}
+        t.configuracao_simulacao = {**(t.configuracao_simulacao or {}), "setor_mercado": "Pet Shop"}
         db.commit()
     aluno = cadastrar(cliente, "Ana", "ana-auto@aluno.iffar.edu.br")
     empresa = _entrar(cliente, aluno, turma["codigo"], "Empresa Ana")
