@@ -221,6 +221,11 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     cfg = config(turma)
     temporal = adaptar({"configuracao_simulacao":cfg,"demanda_base_por_empresa":turma.demanda_base_por_empresa}, rodada)
     cal = temporal.get("_calendario")
+    from ..mercado_pac import demanda_por_loja
+    pac = demanda_por_loja(turma, [d.plano_comercial for d in decisoes], cal["fator_mensal"] if cal else 1.0)
+    if pac:
+        # Catálogo fixo: receita da loja pequena (PAC) ÷ preço médio de mercado.
+        temporal["demanda_base_por_empresa"] = pac["unidades"]
     bots = []
     for i in range(cfg["concorrentes_virtuais"]):
         # Política pública, determinística: não lê as decisões privadas dos alunos.
@@ -231,9 +236,15 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     precos = [d.preco for d in decisoes] + [b["preco"] for b in bots]
     media = sum(precos) / len(precos)
     crescimento_acumulado = sum(periodo(cfg, n)["fator_mensal"] for n in range(cfg.get("rodada_inicio_calendario",1), rodada)) if cal else rodada-1
-    total = (temporal["demanda_base_por_empresa"] * len(preparos)
-             * (1 + turma.crescimento_mercado_mensal) ** crescimento_acumulado
-             * multiplicador * (cal["sazonalidade"]["demanda"] if cal else 1))
+    if pac:
+        # Mercado = loja pequena × lojas na disputa (equipes + concorrentes) ×
+        # sazonalidade; o crescimento sem fonte dá lugar à atualização pela PMC.
+        total = (temporal["demanda_base_por_empresa"] * (len(preparos) + len(bots))
+                 * multiplicador * (cal["sazonalidade"]["demanda"] if cal else 1))
+    else:
+        total = (temporal["demanda_base_por_empresa"] * len(preparos)
+                 * (1 + turma.crescimento_mercado_mensal) ** crescimento_acumulado
+                 * multiplicador * (cal["sazonalidade"]["demanda"] if cal else 1))
     # Uma empresa sem produto publicado ou sem ativação comercial não disputa
     # demanda. A fatia que ela deixaria de atender migra para concorrentes.
     atrativos = [max(.001, p["atratividade"]) if p.get("comercial_ativo") else 0.0 for p in preparos] + [b["atratividade"] for b in bots]

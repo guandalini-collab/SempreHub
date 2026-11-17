@@ -455,8 +455,17 @@ def _dividir_mercado(
     concorrentes = [{"preco": turma.preco_referencia * (.9 + .05 * (i % 5)),
                      "atratividade": (1 / (.9 + .05 * (i % 5))) ** ELASTICIDADE_PRECO_ESCOLHA * forca_concorrente(cfg, i),
                      "capacidade": turma.demanda_base_por_empresa} for i in range(quantidade)]
-    preco_medio = (sum(max(0.01, c.decisao.preco) for c in calculos) + sum(b["preco"] for b in concorrentes)) / (n + quantidade)
-    demanda_total = (
+    from ..mercado_pac import demanda_por_loja
+    pac = demanda_por_loja(turma, [c.decisao.plano_comercial for c in calculos])
+    if pac:
+        from .calendario import periodo
+        cal = periodo(cfg, rodada)
+        sazonal = cal["sazonalidade"]["demanda"] if cal else 1.0
+        if cal:
+            pac = demanda_por_loja(turma, [c.decisao.plano_comercial for c in calculos], cal["fator_mensal"])
+        for bot in concorrentes:
+            bot["capacidade"] = pac["unidades"]
+    demanda_total = pac["unidades"] * (n + quantidade) * multiplicador_demanda * sazonal if pac else (
         turma.demanda_base_por_empresa
         * n
         * (1 + turma.crescimento_mercado_mensal) ** (rodada - 1)

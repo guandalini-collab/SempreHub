@@ -98,6 +98,12 @@ async def iniciar_calendario():
             except Exception:
                 import logging
                 logging.getLogger(__name__).warning('IPCA do catálogo pendente; mantida a última série.')
+            try:
+                from .mercado_pac import ciclo as atualizar_pmc
+                await asyncio.to_thread(atualizar_pmc)
+            except Exception:
+                import logging
+                logging.getLogger(__name__).warning('PMC (receita nominal) pendente; mantida a última série.')
             primeira_execucao=False
             await asyncio.sleep(300)
     app.state.atualizacoes = asyncio.create_task(consultar_fontes())
