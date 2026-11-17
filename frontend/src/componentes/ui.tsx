@@ -380,6 +380,7 @@ const LINHAS_DRE: { chave: keyof Dre; rotulo: string }[] = [
   { chave: "rescisoes", rotulo: "(−) Rescisões" },
   { chave: "royalties", rotulo: "(−) Royalties da franquia" },
   { chave: "juros", rotulo: "(−) Juros" },
+  { chave: "rendimento_aplicacao", rotulo: "(+) Rendimento de aplicação (Selic)" },
   { chave: "multas", rotulo: "(−) Multas" },
 ];
 
@@ -404,7 +405,7 @@ export function TabelaDre({ dre, paginar = false, periodo = "período" }: { dre:
           ({ chave, rotulo }) => (
             <tr key={chave} className="border-b border-slate-100">
               <td className="py-1.5 text-slate-600">{rotulo}</td>
-              <td className="py-1.5 text-right text-red-700"><ValorMonetario valor={-(dre[chave] ?? 0)}/></td>
+              <td className={`py-1.5 text-right ${(dre[chave] ?? 0) < 0 ? "text-emerald-700" : "text-red-700"}`}><ValorMonetario valor={-(dre[chave] ?? 0)}/></td>
             </tr>
           )
         )}

@@ -155,9 +155,115 @@ def diagnosticos_segmentacao(itens, segmentacao=None):
 
 
 ELASTICIDADE_PROPAGANDA = 0.12  # Sethuraman, Tellis e Briesch (2011), média de curto prazo
+# Persistência (carryover) do efeito da propaganda: Clarke (1976, JMR, Tabela 2),
+# coeficiente médio da variável dependente defasada por intervalo dos dados.
+PERSISTENCIA_PROPAGANDA = {"MENSAL": 0.440, "SEMANAL": 0.537}
+DEFASAGENS_PROPAGANDA = 3  # Clarke: 90% do efeito acumulado em cerca de 3 meses
 
 
-def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0, segmentacao=None):
+def persistencia_propaganda(periodicidade=None):
+    return PERSISTENCIA_PROPAGANDA["SEMANAL" if periodicidade == "SEMANAL" else "MENSAL"]
+
+
+def veiculacao_por_produto(plano):
+    """Veiculação (R$) de cada produto do catálogo fixo em um plano comercial."""
+    return {item.get("produto_id"): diagnostico_midia(item)["investimento_veiculacao"]
+            for item in ((plano or {}).get("produtos") or []) if item.get("preco_mercado")}
+
+
+def estoques_propaganda(planos, persistencia):
+    """Estoque de propaganda por produto: soma de λ^v × veiculação(t − v).
+
+    ``planos[v]`` é o plano do período t − v (``None`` quando não houve). É a
+    forma de defasagens distribuídas de Cooper e Nakanishi (1988, apêndice
+    3.10.1) com pesos geométricos (Koyck), como em Clarke (1976).
+    """
+    estoques = {}
+    for v, plano in enumerate(planos[:DEFASAGENS_PROPAGANDA + 1]):
+        for pid, valor in veiculacao_por_produto(plano).items():
+            estoques[pid] = estoques.get(pid, 0.0) + (persistencia ** v) * valor
+    return estoques
+
+
+def beta_propaganda(concorrentes, persistencia):
+    """Coeficiente da forma exponencial (MNL) da propaganda.
+
+    Cooper e Nakanishi (1988, p. 33-36): elasticidade MNL = β(1 − s)X. O β é
+    calibrado para que, na empresa média (participação 1/n e estoque igual à
+    média do mercado), a elasticidade de curto prazo seja 0,12 (Sethuraman,
+    Tellis e Briesch, 2011); o longo prazo resulta 0,12 × Σ λ^v.
+    """
+    soma = sum(persistencia ** v for v in range(DEFASAGENS_PROPAGANDA + 1))
+    return ELASTICIDADE_PROPAGANDA * soma / (1 - 1 / max(2, int(concorrentes)))
+
+
+def fator_propaganda(estoque, propaganda):
+    """exp(β × estoque ÷ estoque médio do mercado); 1 quando ninguém anunciou."""
+    media = float((propaganda or {}).get("media") or 0)
+    if media <= 0:
+        return 1.0
+    return math.exp(float(propaganda["beta"]) * max(0.0, float(estoque)) / media)
+
+
+def contexto_propaganda(estoques_por_empresa, concorrentes, persistencia):
+    """Média do estoque de propaganda por produto ofertado no mercado e β."""
+    valores = [v for estoques in estoques_por_empresa.values() for v in estoques.values()]
+    return {"media": sum(valores) / len(valores) if valores else 0.0,
+            "beta": beta_propaganda(concorrentes, persistencia), "persistencia": persistencia,
+            "estoques_por_empresa": estoques_por_empresa}
+
+
+def propaganda_para(turma, rodada, empresa, plano_corrente):
+    """Propaganda de uma empresa: do fechamento (contexto guardado) ou da prévia."""
+    if turma.modo_jogo == "STARTUP":
+        return None
+    cache = getattr(turma, "_contexto_propaganda", None)
+    if cache and cache[0] == rodada:
+        contexto = cache[1]
+    else:
+        contexto = contexto_propaganda_turma(turma, rodada, {empresa.id: plano_corrente})
+    return propaganda_da_empresa(contexto, empresa.id)
+
+
+def contexto_propaganda_turma(turma, rodada, planos_correntes=None, guardar=False):
+    """Contexto da propaganda da rodada para turmas com catálogo fixo.
+
+    No fechamento, ``planos_correntes`` traz as decisões vigentes de todas as
+    empresas. Na prévia de uma equipe, as demais entram com o último plano
+    enviado, a mesma regra que o jogo aplica a quem não envia decisão.
+    """
+    cache = getattr(turma, "_contexto_propaganda", None)
+    if cache and cache[0] == rodada and not guardar:
+        return cache[1]
+    cfg = turma.configuracao_simulacao or {}
+    persistencia = persistencia_propaganda(cfg.get("periodicidade"))
+    estoques = {}
+    for empresa in turma.empresas:
+        por_rodada = {d.rodada: d.plano_comercial for d in empresa.decisoes
+                      if d.rodada < rodada and d.plano_comercial and (d.enviada_em or d.automatica)}
+        if planos_correntes is not None and empresa.id in planos_correntes:
+            atual = planos_correntes[empresa.id]
+        else:
+            atual = por_rodada[max(por_rodada)] if por_rodada else None
+        planos = [atual] + [por_rodada.get(rodada - v) for v in range(1, DEFASAGENS_PROPAGANDA + 1)]
+        estoques[empresa.id] = estoques_propaganda(planos, persistencia)
+    concorrentes = len(turma.empresas) + int(cfg.get("concorrentes_virtuais", 0) or 0)
+    contexto = contexto_propaganda(estoques, concorrentes, persistencia)
+    if guardar:
+        turma._contexto_propaganda = (rodada, contexto)
+    return contexto
+
+
+def propaganda_da_empresa(contexto, empresa_id):
+    """Recorte do contexto para uma empresa (serializável, vai nos parâmetros)."""
+    if not contexto:
+        return None
+    estoques = dict(contexto["estoques_por_empresa"].get(empresa_id, {}))
+    return {"estoques": estoques, "media": contexto["media"], "beta": contexto["beta"],
+            "persistencia": contexto["persistencia"]}
+
+
+def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0, segmentacao=None, propaganda=None):
     from ..catalogo_campanhas import CAMPANHAS
     custos={i:v for i,n,c,v,u in CAMPANHAS}
     valores=[]
@@ -180,6 +286,28 @@ def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0, segment
         # eficaz. A veiculação compatível é a única base de atração.
         if not p.get("midias_recomendadas") and (p.get('custos_campanha') or {}).get('versao')==2:
             campanha=p['custos_campanha']['investimento_efetivo']
+        if p.get('preco_mercado'):
+            # Catálogo fixo (aprovado em 17/11/2026). Propaganda na forma
+            # exponencial (MNL), indicada por Cooper e Nakanishi (1988, p. 35-36)
+            # por haver efeito limiar: sem veiculação o fator é exp(0) = 1, e a
+            # loja segue disputando clientes. O estoque de propaganda soma os
+            # últimos meses com persistência λ (Clarke, 1976), medido contra a
+            # média do mercado (distintividade, p. 71-74). β calibrado pela
+            # elasticidade 0,12 (Sethuraman, Tellis e Briesch, 2011). Todas as
+            # mídias têm o mesmo peso por real.
+            segmento = diagnostico_segmentacao(p, segmentacao)
+            if propaganda is None:
+                # Sem contexto de mercado (uso direto): só o mês corrente, contra
+                # a média dos próprios produtos do plano.
+                estoques_locais = estoques_propaganda([{"produtos": itens}], persistencia_propaganda())
+                propaganda = {"estoques": estoques_locais,
+                              "media": sum(estoques_locais.values()) / len(estoques_locais) if estoques_locais else 0.0,
+                              "beta": beta_propaganda(2, persistencia_propaganda())}
+            estoque = (propaganda.get("estoques") or {}).get(p.get("produto_id"), 0.0)
+            from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
+            valores.append(p['peso']*(float(p['preco_mercado'])/preco)**ELASTICIDADE_PRECO_ESCOLHA
+                           *canal*pos*fator_propaganda(estoque, propaganda)*segmento["fator"])
+            continue
         # Nas linhas novas não há demanda orgânica. Se a equipe escolheu mídia
         # incompatível (ou não escolheu nenhum canal), a verba aparece como
         # despesa, porém esta linha não disputa consumidores nesta semana.
@@ -187,20 +315,6 @@ def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0, segment
             valores.append(0.0)
             continue
         segmento = diagnostico_segmentacao(p, segmentacao)
-        if p.get('preco_mercado'):
-            # Catálogo fixo (aprovado em 17/11/2026): efeito da propaganda pela
-            # elasticidade média de curto prazo, 0,12 (Sethuraman, Tellis e
-            # Briesch, 2011, JMR, 751 estimativas), com o mesmo peso por real em
-            # todas as mídias (TV e impresso sem diferença significativa no curto
-            # prazo). Sem verba de veiculação, a linha não gera demanda.
-            veiculacao = diagnostico["investimento_veiculacao"]
-            if veiculacao <= 0:
-                valores.append(0.0)
-                continue
-            from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
-            valores.append(p['peso']*(float(p['preco_mercado'])/preco)**ELASTICIDADE_PRECO_ESCOLHA
-                           *canal*pos*veiculacao**ELASTICIDADE_PROPAGANDA*segmento["fator"])
-            continue
         from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
         # Produto do catálogo fixo: a referência é o preço de mercado do item.
         if p.get('preco_mercado'):

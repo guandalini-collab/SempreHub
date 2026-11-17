@@ -189,6 +189,15 @@ export function RelatorioFinanceiro({ detalhes, somenteBalanco = false }: { deta
       ]} />
       <p className="mt-3 text-xs text-slate-600">Estoque e vendas a prazo exigem financiamento até o dinheiro entrar. Contratação, horas extras, P&D e juros consomem caixa; máquinas geram saída de investimento. Caixa negativo exige atenção. A necessidade operacional não é dinheiro disponível.</p>
       {balanco.caixa < 0 && <p className="mt-2 font-semibold text-red-700">Caixa negativo: a empresa depende de financiamento e pode pagar cheque especial.</p>}
+      {typeof detalhes.operacao.taxa_aplicacao === "number" && <div className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-950">
+        <p className="font-semibold">Custo de oportunidade do estoque</p>
+        <ListaFinanceira linhas={[
+          ["Estoque médio do período (a custo)", Number(detalhes.operacao.estoque_medio ?? 0)],
+          ["Rendimento do caixa aplicado à Selic", Number(detalhes.operacao.rendimento_aplicacao ?? 0)],
+          ["Quanto o estoque médio deixou de render", Number(detalhes.operacao.custo_oportunidade_estoque ?? 0)],
+        ]} />
+        <p className="mt-2 text-xs">Selic do mês: {(Number(detalhes.operacao.taxa_aplicacao) * 100).toFixed(2).replace(".", ",")}%. O dinheiro parado em estoque não rende; por isso o custo de manter estoque é principalmente custo de oportunidade do capital (Ballou, 2007; Assaf Neto, 2014). A Selic é o piso desse custo, pois estoque tem risco.</p>
+      </div>}
     </Cartao></div>
     <div hidden={abaFinanceira!==4}><Cartao titulo={detalhes.modo === "STARTUP" ? "Aquisição e retenção de clientes" : "Produção e entregas da rodada"}>
       <dl className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">

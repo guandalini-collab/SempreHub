@@ -170,3 +170,37 @@ def test_estoque_historico_nao_e_clonado_no_portfolio():
     assert estado['estoques_produtos']['original']['estoque_pa']=={'quantidade':7,'valor':210}
     assert estado['estoques_produtos']['novo']['estoque_pa']=={'quantidade':0,'valor':0}
     assert estado['estoque_pa']=={'quantidade':7,'valor':210}
+
+
+def test_catalogo_propaganda_persiste_e_caixa_rende_selic(cliente,professor,monkeypatch):
+    """Itens A, B e C (17/11/2026) no fechamento do modo Tradicional."""
+    from .decisoes import completar_decisao
+    turma,aluno,empresa,url,eid,d=preparar(cliente,professor,monkeypatch)
+    base=f'/api/aluno/empresas/{empresa}'
+    r=cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d));assert r.status_code==200,r.text
+    f=cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'});assert f.status_code==200,f.text
+    res=cliente.get(base,headers=aluno).json()['resultados'][0]
+    det=res['detalhes_simulacao']
+    prop=det['configuracao']['propaganda']
+    assert prop['persistencia']==.44 and prop['media']>0
+    assert set(prop['estoques'])=={'pet-brinquedo','pet-guia'}
+    op=det['operacao']
+    assert op['taxa_aplicacao']>0 and op['rendimento_aplicacao']>0
+    assert res['dre']['rendimento_aplicacao']==-op['rendimento_aplicacao']
+    assert res['dre']['armazenagem']==0
+    assert op['custo_oportunidade_estoque']==round(op['estoque_medio']*op['taxa_aplicacao'],2)
+    # Mês seguinte sem propaganda: o estoque do mês anterior persiste (× 0,44)
+    # e a loja continua disputando clientes (fator exp(0) = 1 no limite).
+    estoques_1=prop['estoques']
+    sem=deepcopy(d);sem['rodada']=2
+    for item in sem['plano_comercial']['produtos']:item['midias']=[];item['servicos']=[]
+    sem['plano_comercial']['midias']=[];sem['marketing']=0
+    r=cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(sem))
+    assert r.status_code==200,r.text
+    f=cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':2,'evento':'NENHUM'});assert f.status_code==200,f.text
+    res2=cliente.get(base,headers=aluno).json()['resultados'][1]
+    prop2=res2['detalhes_simulacao']['configuracao']['propaganda']
+    for pid,valor in estoques_1.items():
+        assert prop2['estoques'][pid]==pytest.approx(.44*valor)
+    assert res2['detalhes_simulacao']['operacao']['comercial_ativo'] is True
+    assert res2['demanda']>0

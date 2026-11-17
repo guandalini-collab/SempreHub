@@ -180,6 +180,7 @@ export interface Dre {
   refugos?: number;
   frete?: number;
   armazenagem?: number;
+  rendimento_aplicacao?: number;
   depreciacao?: number;
   beneficios?: number;
   treinamento?: number;

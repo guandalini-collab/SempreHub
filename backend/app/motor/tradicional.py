@@ -579,7 +579,10 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     # acontece antes da apuração de vendas. Sem ela, uma empresa com catálogo
     # e campanha válidos seria excluída indevidamente da demanda.
     produto_publicado = bool(itens)
-    comercial_ativo = produto_publicado and marketing > 0
+    # Catálogo fixo (item C, 17/11/2026): propaganda na forma exponencial —
+    # sem verba o fator é 1 e a loja segue vendendo (Cooper e Nakanishi, p. 35-36).
+    catalogo_fixo = any(i.get("preco_mercado") for i in itens)
+    comercial_ativo = produto_publicado and (marketing > 0 or catalogo_fixo)
     preco = max(0.01, d.get("preco", 100))
     atratividade = atrativo_porter(marca, qualidade, preco, p.get("preco_referencia", 100))
     atratividade *= (0.5 + 0.5 * s["satisfacao"] / 100) * fator_canal
@@ -646,7 +649,8 @@ def apurar(preparo: dict, demanda: float,
         # converte sua fatia em unidades pelo próprio preço.
         from .portfolio import atrativos, unidades_da_receita
         pesos_mercado = atrativos(itens, p.get("preco_referencia", 100), p.get("custo_referencia_portfolio", 40),
-                                  c["marca"], c["qualidade"], (plano_comercial.get("analises") or {}).get("segmentacao"))
+                                  c["marca"], c["qualidade"], (plano_comercial.get("analises") or {}).get("segmentacao"),
+                                  p.get("propaganda"))
         demanda_reais = demanda
         demanda = unidades_da_receita(demanda, itens, pesos_mercado)
     demanda = max(0, math.floor(demanda))
@@ -659,11 +663,12 @@ def apurar(preparo: dict, demanda: float,
     orcamento_logistico = max(0.0, float(op.get("orcamento_logistico", 0)))
     capacidade_entrega = (math.floor(orcamento_logistico / custo_frete)
                            if custo_frete > 0 and orcamento_logistico > 0 else 0)
-    comercial_ativo = publicado and c.get("marketing", 0) > 0
+    catalogo_fixo = any(i.get("preco_mercado") for i in itens)
+    comercial_ativo = publicado and (c.get("marketing", 0) > 0 or catalogo_fixo)
     demanda_comercial = min(demanda, capacidade_entrega) if comercial_ativo else 0
     if demanda and not publicado:
         c["alertas"].append("Demanda anulada: nenhum produto foi publicado no mix comercial.")
-    elif demanda and c.get("marketing", 0) <= 0:
+    elif demanda and c.get("marketing", 0) <= 0 and not catalogo_fixo:
         c["alertas"].append("Demanda anulada: marketing da semana está zerado; não há alcance orgânico automático.")
     elif demanda and capacidade_entrega <= 0:
         c["alertas"].append("Demanda anulada: não há orçamento de logística para despachar os pedidos.")
@@ -671,7 +676,7 @@ def apurar(preparo: dict, demanda: float,
     if itens:
         from .portfolio import vender, atrativos
         segmentacao = (plano_comercial.get("analises") or {}).get("segmentacao")
-        pesos=atrativos(itens,p.get("preco_referencia",100),p.get("custo_referencia_portfolio",40),c["marca"],c["qualidade"], segmentacao)
+        pesos=atrativos(itens,p.get("preco_referencia",100),p.get("custo_referencia_portfolio",40),c["marca"],c["qualidade"], segmentacao, p.get("propaganda"))
         if demanda_reais is not None:
             from .portfolio import pesos_em_valor
             pesos = pesos_em_valor(itens, pesos)
@@ -705,6 +710,15 @@ def apurar(preparo: dict, demanda: float,
             ocupacao_armazenagem_m3 += estoque_linha.get("quantidade", 0) * max(0, float(item.get("volume_armazenagem_m3") or 0))
     armazenagem_por_volume = _produto(ocupacao_armazenagem_m3, cfg.get("custo_armazenagem_m3", 0))
     armazenagem = _soma([armazenagem_sobre_valor, armazenagem_por_volume])
+    # Item B (17/11/2026): aplicação do caixa positivo de abertura à Selic do
+    # mês (Assaf Neto, 2014, p. 91 e 126). O custo de oportunidade do estoque
+    # é informativo: estoque médio × Selic (Ballou, 2007, p. 279).
+    taxa_aplicacao = max(0.0, float(p.get("rendimento_caixa_mensal") or 0))
+    if taxa_aplicacao and _semanal(p):
+        taxa_aplicacao = (1 + taxa_aplicacao) ** (7 / 30) - 1
+    rendimento_aplicacao = _produto(max(0.0, c["caixa_inicio"]), taxa_aplicacao) if taxa_aplicacao else 0.0
+    estoque_medio = _dinheiro((float(c["estoque_pa_inicial"].get("valor", 0)) + float(pa["valor"])) / 2)
+    custo_oportunidade_estoque = _produto(estoque_medio, taxa_aplicacao) if taxa_aplicacao else 0.0
     royalties = _produto(receita, c["taxa_royalties"])
     comissao_canal = _soma(l["comissao_canal"] for l in linhas) if linhas else _produto(receita, c["taxa_comissao_canal"])
     # Inadimplência só alcança vendas a prazo; não reduz ficticiamente vendas à vista.
@@ -726,8 +740,11 @@ def apurar(preparo: dict, demanda: float,
         "treinamento": c["treinamento"], "manutencao": c["manutencao"],
         "eventos_operacionais": custos_eventos,
     }
+    if taxa_aplicacao:
+        # Receita financeira lançada com sinal negativo entre as despesas.
+        dre["rendimento_aplicacao"] = -rendimento_aplicacao
     dre["lucro_liquido"] = _soma([receita, -_soma(v for k, v in dre.items() if k != "receita")])
-    recebimentos = _soma([c["recebimentos_vencidos"], venda_vista])
+    recebimentos = _soma([c["recebimentos_vencidos"], venda_vista, rendimento_aplicacao])
     # DRE reconhece impostos por competência. No DFC, o tributo é liquidado no
     # fechamento mensal simulado; até lá, torna-se obrigação de curto prazo.
     periodo = p.get("_calendario", {})
@@ -816,6 +833,9 @@ def apurar(preparo: dict, demanda: float,
                     ocupacao_armazenagem_m3=_dinheiro(ocupacao_armazenagem_m3),
                     armazenagem_sobre_valor=armazenagem_sobre_valor,
                     armazenagem_por_volume=armazenagem_por_volume)
+    if taxa_aplicacao:
+        operacao.update(taxa_aplicacao=taxa_aplicacao, rendimento_aplicacao=rendimento_aplicacao,
+                        estoque_medio=estoque_medio, custo_oportunidade_estoque=custo_oportunidade_estoque)
     operacao["eventos_operacionais"] = deepcopy(p.get("eventos_operacionais") or {})
     detalhes = {"versao_motor": 1, "engine_version": ENGINE_VERSION, "modo": "TRADICIONAL", "configuracao": deepcopy(p),
                 "estado_inicial": deepcopy(c["estado_inicial"]), "estado_final": deepcopy(s),

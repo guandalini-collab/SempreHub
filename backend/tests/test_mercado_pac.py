@@ -76,3 +76,6 @@ def test_custos_da_loja_pela_pac_e_capital_pela_selic(cliente):
         p = parametros(t)
     assert p["custos_fixos_mensais"] == custos_fixos_loja("pet")["total"]
     assert p["configuracao_simulacao"]["custo_armazenagem_m3"] == 0.0
+    # Item B: sem despesa de armazenagem; o caixa positivo rende a Selic do mês.
+    assert p["configuracao_simulacao"]["custo_armazenagem"] == 0.0
+    assert p["rendimento_caixa_mensal"] == pytest.approx(.0107)

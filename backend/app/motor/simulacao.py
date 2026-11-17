@@ -219,8 +219,11 @@ def processar_rodada(
     else:
         # 2. Preparação de cada empresa
         calculos: List[_Calculo] = []
+        vigentes = {empresa.id: decisao_vigente(db, empresa, rodada, turma) for empresa in empresas}
+        from .portfolio import contexto_propaganda_turma
+        contexto_propaganda_turma(turma, rodada, {i: d.plano_comercial for i, d in vigentes.items()}, guardar=True)
         for empresa in empresas:
-            decisao = decisao_vigente(db, empresa, rodada, turma)
+            decisao = vigentes[empresa.id]
             c = _Calculo(empresa=empresa, decisao=decisao, caixa_inicio=empresa.caixa)
             if decisao.automatica:
                 c.alertas.append("Nenhuma decisão enviada: o sistema repetiu as decisões do mês anterior.")
@@ -449,8 +452,8 @@ def _atratividade(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo)
     c.alertas.extend(mensagens(avaliacao))
     itens=(decisao.plano_comercial or {}).get("produtos", [])
     if itens:
-        from .portfolio import atrativos
-        valor*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade))/sum(p["peso"] for p in itens)/((referencia/preco)**ELASTICIDADE_PRECO_ESCOLHA)
+        from .portfolio import atrativos, propaganda_para
+        valor*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade,None,propaganda_para(turma,turma.rodada_atual,empresa,decisao.plano_comercial)))/sum(p["peso"] for p in itens)/((referencia/preco)**ELASTICIDADE_PRECO_ESCOLHA)
     return valor
 
 
@@ -492,7 +495,9 @@ def _dividir_mercado(
             reais = c.demanda
             if itens:
                 from .portfolio import atrativos, unidades_da_receita
-                pesos = atrativos(itens, turma.preco_referencia, turma.custo_unitario, c.empresa.marca, c.empresa.qualidade)
+                from .portfolio import propaganda_para
+                pesos = atrativos(itens, turma.preco_referencia, turma.custo_unitario, c.empresa.marca, c.empresa.qualidade,
+                                  None, propaganda_para(turma, rodada, c.empresa, c.decisao.plano_comercial))
                 c.demanda = unidades_da_receita(reais, itens, pesos)
             else:
                 c.demanda = reais / max(0.01, c.decisao.preco)
@@ -547,7 +552,9 @@ def _apurar(
     itens=(decisao.plano_comercial or {}).get("produtos", [])
     if itens:
         from .portfolio import atrativos
-        pesos=atrativos(itens,turma.preco_referencia,turma.custo_unitario,c.empresa.marca,c.empresa.qualidade)
+        from .portfolio import propaganda_para
+        pesos=atrativos(itens,turma.preco_referencia,turma.custo_unitario,c.empresa.marca,c.empresa.qualidade,
+                        None,propaganda_para(turma,rodada,c.empresa,c.decisao.plano_comercial))
         if c.reais_por_unidade:
             from .portfolio import pesos_em_valor
             pesos = pesos_em_valor(itens, pesos)

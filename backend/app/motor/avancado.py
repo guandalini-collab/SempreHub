@@ -71,11 +71,16 @@ def parametros(turma):
     from ..mercado_pac import custos_da_turma
     custos = custos_da_turma(turma)
     if custos:
-        # Catálogo fixo: despesas fixas da loja pela PAC 2024 e custo de capital
-        # do estoque pela Selic do mês; o custo por m³ sem fonte é retirado.
+        # Catálogo fixo: despesas fixas da loja pela PAC 2024. Item B (17/11/2026):
+        # o custo de manter estoque é o custo de oportunidade do capital
+        # (Ballou, 2007, p. 279-280; Assaf Neto, 2014, p. 701-702). O caixa
+        # positivo rende a Selic do mês (Assaf Neto, p. 91 e 126) e o estoque
+        # parado deixa de render; não há despesa de armazenagem separada (o
+        # espaço já está no aluguel da PAC).
         dados["custos_fixos_mensais"] = custos["custos_fixos"]["total"]
-        dados["configuracao_simulacao"]["custo_armazenagem"] = custos["taxa_capital_estoque"]
+        dados["configuracao_simulacao"]["custo_armazenagem"] = 0.0
         dados["configuracao_simulacao"]["custo_armazenagem_m3"] = 0.0
+        dados["rendimento_caixa_mensal"] = custos["taxa_capital_estoque"]
         dados["custos_loja"] = custos
     return dados
 
@@ -100,6 +105,8 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0, efeitos_op
         p["custo_unitario"] = decisao.plano_comercial["custo_unitario"]
         if turma.modo_jogo == "STARTUP":
             p["configuracao_simulacao"]["custo_nuvem_cliente"] = decisao.plano_comercial["custo_unitario"]
+    from .portfolio import propaganda_para
+    p["propaganda"] = propaganda_para(turma, turma.rodada_atual, empresa, decisao.plano_comercial)
     p["multa_evento"] = multa
     p["multas"] = multa
     p["eventos_operacionais"] = deepcopy(efeitos_operacionais or {})
@@ -114,7 +121,7 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0, efeitos_op
         from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
         # Startup mantém 1,4 até ser refeita com o Modo Empresa do zero (dezembro).
         base=(turma.preco_referencia/decisao.preco)**(1.4 if turma.modo_jogo=="STARTUP" else ELASTICIDADE_PRECO_ESCOLHA)
-        preparo["atratividade"]*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade,segmentacao))/sum(i["peso"] for i in itens)/base
+        preparo["atratividade"]*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade,segmentacao,p.get("propaganda")))/sum(i["peso"] for i in itens)/base
         preparo["diagnosticos_segmentacao"] = diagnosticos_segmentacao(itens, segmentacao)
     from .estrategia import avaliar, mensagens
     avaliacao = avaliar(decisao, turma)
@@ -277,8 +284,13 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
     from .simulacao import decisao_vigente, _aplicar_mudanca_regime, _Calculo, _limitar
     from . import eventos as ev
     decisoes, preparos = [], []
+    vigentes = {empresa.id: decisao_vigente(db, empresa, rodada, turma) for empresa in empresas}
+    if turma.modo_jogo != "STARTUP":
+        # Estoque de propaganda de todas as lojas da rodada (itens A e C).
+        from .portfolio import contexto_propaganda_turma
+        contexto_propaganda_turma(turma, rodada, {i: d.plano_comercial for i, d in vigentes.items()}, guardar=True)
     for empresa in empresas:
-        d = decisao_vigente(db, empresa, rodada, turma)
+        d = vigentes[empresa.id]
         calendario = periodo(config(turma), rodada)
         anterior_calendario = periodo(config(turma), rodada-1) if calendario and rodada>1 else None
         if (calendario and anterior_calendario and calendario["ano_fiscal"] != anterior_calendario["ano_fiscal"]) or (not calendario and rodada > 1 and (rodada - 1) % 12 == 0):

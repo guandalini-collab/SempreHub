@@ -43,6 +43,7 @@ ROTULOS_DRE = {
     "armazenagem": "Armazenagem",
     "depreciacao": "Depreciação",
     "juros": "Juros",
+    "rendimento_aplicacao": "Rendimento de aplicação (Selic), redutor de despesas",
 }
 
 ROTULOS_BALANCO = {

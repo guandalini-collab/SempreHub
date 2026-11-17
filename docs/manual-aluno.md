@@ -936,7 +936,9 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 
 **Sensibilidade ao preço.** A atratividade de cada produto varia com o preço relativo ao preço de mercado do item, com elasticidade de −2,62, média de 1.851 estimativas da meta-análise de Bijmolt, van Heerde e Pieters (2005), conforme citada por van Heerde et al. (2013).
 
-**Efeito da propaganda.** A atratividade varia com a verba de veiculação elevada a 0,12, elasticidade média de curto prazo de 751 estimativas; no curto prazo, televisão e mídia impressa não diferem de forma significativa (SETHURAMAN; TELLIS; BRIESCH, 2011). Sem verba de veiculação, o produto não gera procura: esta é uma regra do jogo, não um resultado do estudo.
+**Efeito da propaganda.** A elasticidade média de curto prazo da propaganda é 0,12 (751 estimativas) e, no curto prazo, televisão e mídia impressa não diferem de forma significativa; por isso todas as mídias têm o mesmo peso por real (SETHURAMAN; TELLIS; BRIESCH, 2011). A propaganda entra na atratividade na forma exponencial, indicada para variáveis com efeito limiar, pois "em nível extremamente baixo de gasto, a propaganda não é muito eficaz" (COOPER; NAKANISHI, 1988, p. 35-36, tradução nossa): sem veiculação o fator é 1 e a loja continua vendendo, mas atrai menos que as concorrentes que anunciam. O fator é exp(β × estoque de propaganda ÷ estoque médio do mercado), porque nos modelos de atração o que conta é a distintividade da ação diante dos concorrentes (COOPER; NAKANISHI, 1988, p. 71-74). O β é calibrado para que, na empresa média, a elasticidade seja 0,12; com cinco lojas, β ≈ 0,26. A calibração no ponto médio é escolha do jogo, não resultado dos estudos.
+
+**Persistência da propaganda.** Propaganda e promoção têm efeitos defasados, sentidos no mês em que são feitas e nos seguintes (COOPER; NAKANISHI, 1988, seção 3.9 e apêndice 3.10.1). O estoque de propaganda soma a veiculação do mês e a dos três meses anteriores, com pesos 1; 0,44; 0,19 e 0,09 (as potências 1, 2 e 3 de 0,44). O valor 0,44 é a persistência média em dados mensais, e cerca de 90% do efeito acumulado se esgota em três meses (CLARKE, 1976, tabela 2). Com isso, o efeito de longo prazo fica em cerca de 0,21, próximo do 0,24 encontrado por Sethuraman, Tellis e Briesch (2011). Aplicar o valor de Clarke à forma exponencial e limitar a soma a três meses são escolhas do jogo.
 
 **Tamanho do mercado.** O mercado mensal de cada loja é a receita mensal de uma loja pequena da atividade (IBGE, PAC 2024, tabelas 10645 e 10647), atualizada pelo índice de receita nominal da PMC (IBGE, tabela 8883), multiplicada pelo número de lojas na disputa e pela sazonalidade. A razão entre a loja pequena e a média (0,4348) só é publicada para o varejo total e é aplicada às atividades como estimativa.
 
@@ -944,7 +946,7 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 
 **Custos fixos da loja.** Aluguel e condomínio, serviços de terceiros, comunicação, energia, água e esgoto, e impostos e taxas da atividade (IBGE, PAC 2024, tabela 10649), por loja e por mês, na escala da loja pequena (estimativa).
 
-**Custo de manter estoque.** A literatura de logística divide o custo de manter estoque em custo do capital imobilizado, custos proporcionais ao valor e custos físicos de espaço e manuseio (ANDRIOLO, 2015, com base em AZZI et al., 2014). No jogo, o capital parado em estoque paga a Selic do último mês completo (Banco Central, série 4390), e o espaço é o aluguel da loja, já incluído nos custos fixos.
+**Custo de manter estoque.** O custo de manutenção é proporcional ao estoque médio e reúne espaço, capital, seguros e impostos, e riscos de perda e obsolescência; o capital pode representar mais de 80% do total (BALLOU, 2007, p. 279-280). O custo do capital é o custo de oportunidade: o retorno da alternativa que a empresa deixou de aproveitar ao investir em estoque (ASSAF NETO, 2014, p. 701-702; AZZI et al., 2014). Em decisões de compra, esse custo é geralmente medido pela taxa da melhor aplicação financeira disponível, e a Selic é aceita no Brasil como taxa livre de risco (ASSAF NETO, 2014, p. 91 e 126). No jogo, o caixa positivo de abertura rende a Selic do último mês completo (BANCO CENTRAL DO BRASIL, série 4390), lançada na DRE como rendimento de aplicação; o dinheiro parado em estoque não rende. O relatório mostra quanto o estoque médio deixou de render (estoque médio × Selic). Não há despesa de armazenagem separada, porque o espaço é o aluguel da loja, já incluído nos custos fixos. Limites declarados: a Selic é o piso do custo de oportunidade, pois estoque tem risco e a diferença em relação à taxa sem risco é prêmio pelo risco (ASSAF NETO, 2014, p. 171-172); perdas e obsolescência não são modeladas.
 
 **Preços e custo de compra.** Preços de varejo efetivamente encontrados, corrigidos pelo IPCA (IBGE, tabela 7060); custo de compra pela taxa de margem da PAC (IBGE, tabela 10645) e pela alíquota efetiva do Simples Nacional (BRASIL, 2006).
 
@@ -954,15 +956,19 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 
 AGÊNCIA NACIONAL DE AVIAÇÃO CIVIL (Brasil). Resolução nº 400, de 13 de dezembro de 2016. Dispõe sobre as condições gerais de transporte aéreo. Brasília: ANAC, 2016.
 
-ANDRIOLO, Alessandro. *Responsible inventory models for operation and logistics management*. 2015. Tese (Doutorado em Engenharia Mecatrônica e da Inovação Mecânica do Produto) – Università degli Studi di Padova, Pádua, 2015. Disponível em: https://www.research.unipd.it/bitstream/11577/3424091/1/andriolo_alessandro_tesi.pdf. Acesso em: 17 nov. 2026.
+ASSAF NETO, Alexandre. *Finanças corporativas e valor*. 7. ed. São Paulo: Atlas, 2014.
 
-AZZI, Anna *et al*. Inventory holding costs measurement: a multi-case study. *The International Journal of Logistics Management*, v. 25, n. 1, 2014. (Consultado o resumo.)
+AZZI, Anna *et al*. Inventory holding costs measurement: a multi-case study. *The International Journal of Logistics Management*, v. 25, n. 1, p. 109-132, 2014. DOI: 10.1108/IJLM-01-2012-0004.
+
+BALLOU, Ronald H. *Gerenciamento da cadeia de suprimentos/logística empresarial*. Tradução de Raul Rubenich. 5. ed. Porto Alegre: Bookman, 2007. Recurso eletrônico. Editado também como livro impresso em 2006.
 
 BANCO CENTRAL DO BRASIL. *Sistema Gerenciador de Séries Temporais*: série 4390 – Taxa de juros Selic acumulada no mês. Brasília: BCB. Disponível em: https://dadosabertos.bcb.gov.br/dataset/4390-taxa-de-juros---selic-acumulada-no-mes. Acesso em: 17 nov. 2026.
 
 BIJMOLT, Tammo H. A.; VAN HEERDE, Harald J.; PIETERS, Rik G. M. New empirical generalizations on the determinants of price elasticity. *Journal of Marketing Research*, v. 42, n. 2, p. 141-156, 2005. (Valores citados em VAN HEERDE *et al.*, 2013.)
 
 BRASIL. Lei Complementar nº 123, de 14 de dezembro de 2006. Institui o Estatuto Nacional da Microempresa e da Empresa de Pequeno Porte. Anexo I com redação dada pela Lei Complementar nº 155, de 27 de outubro de 2016. Brasília: Presidência da República. Disponível em: https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm. Acesso em: 16 nov. 2026.
+
+CLARKE, Darral G. Econometric measurement of the duration of advertising effect on sales. *Journal of Marketing Research*, v. 13, n. 4, p. 345-357, 1976. DOI: 10.1177/002224377601300404.
 
 CONSELHO NACIONAL DE TRÂNSITO (Brasil). Resolução nº 996, de 15 de junho de 2023. Brasília: Contran, 2023.
 
