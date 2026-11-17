@@ -154,6 +154,9 @@ def diagnosticos_segmentacao(itens, segmentacao=None):
     return {item.get("produto_id"): diagnostico_segmentacao(item, segmentacao) for item in itens}
 
 
+ELASTICIDADE_PROPAGANDA = 0.12  # Sethuraman, Tellis e Briesch (2011), média de curto prazo
+
+
 def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0, segmentacao=None):
     from ..catalogo_campanhas import CAMPANHAS
     custos={i:v for i,n,c,v,u in CAMPANHAS}
@@ -184,6 +187,20 @@ def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0, segment
             valores.append(0.0)
             continue
         segmento = diagnostico_segmentacao(p, segmentacao)
+        if p.get('preco_mercado'):
+            # Catálogo fixo (aprovado em 17/11/2026): efeito da propaganda pela
+            # elasticidade média de curto prazo, 0,12 (Sethuraman, Tellis e
+            # Briesch, 2011, JMR, 751 estimativas), com o mesmo peso por real em
+            # todas as mídias (TV e impresso sem diferença significativa no curto
+            # prazo). Sem verba de veiculação, a linha não gera demanda.
+            veiculacao = diagnostico["investimento_veiculacao"]
+            if veiculacao <= 0:
+                valores.append(0.0)
+                continue
+            from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
+            valores.append(p['peso']*(float(p['preco_mercado'])/preco)**ELASTICIDADE_PRECO_ESCOLHA
+                           *canal*pos*veiculacao**ELASTICIDADE_PROPAGANDA*segmento["fator"])
+            continue
         from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
         # Produto do catálogo fixo: a referência é o preço de mercado do item.
         if p.get('preco_mercado'):

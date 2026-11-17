@@ -153,9 +153,10 @@ def test_midias_por_produto_somadas_e_influenciam_distribuicao(cliente,professor
     r=cliente.put(f'/api/aluno/empresas/{empresa}/decisao',headers=aluno,json=completar_decisao(d))
     assert r.status_code==200,r.text
     saved=r.json()['plano_comercial']['produtos']
-    base=deepcopy(saved)
-    for p in base:p.update(midias=[],custos_campanha=None)
-    a=atrativos(saved,100,30);b=atrativos(base,100,30)
+    igual=deepcopy(saved)
+    igual[1]['midias']=[{'id':'email','quantidade':100}]
+    a=atrativos(saved,100,30);b=atrativos(igual,100,30)
+    # O produto com o dobro de mídia ganha participação (elasticidade 0,12).
     assert a[1]/a[0]>b[1]/b[0]
     d['marketing']=12
     assert cliente.put(f'/api/aluno/empresas/{empresa}/decisao',headers=aluno,json=completar_decisao(d)).status_code==422
