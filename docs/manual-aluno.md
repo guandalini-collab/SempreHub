@@ -100,15 +100,13 @@ As metas são referências de comparação escolhidas pela equipe para uma seman
 
 Se a simulação começa em 15 de outubro, o Dia das Crianças já passou. O Natal está aproximadamente dez semanas à frente. A equipe deve avaliar a procura esperada, a capacidade e o estoque antes de contratar, comprar ou anunciar. Comprar máquina em uma semana só libera sua capacidade na rodada seguinte. Aumento esperado de procura não garante vendas nem obriga investimento: preços, concorrentes, disponibilidade e decisões da equipe continuam afetando o resultado.
 
-### Sazonalidade por setor: Estimativa do Modelo
+### Sazonalidade por setor: replicação do ajuste do IBGE
 
-O calendário usa datas do calendário civil brasileiro e identifica Volta às aulas, Carnaval, Semana do Consumidor, Páscoa, Dia das Mães, Dia dos Namorados, Dia dos Pais, Dia das Crianças, Black Friday, Natal e Ano-Novo. Carnaval e Páscoa são calculados para cada ano; Dia das Mães e Dia dos Pais seguem o segundo domingo de maio e de agosto; Black Friday é a última sexta-feira de novembro. A tela mostra a data, a fase de preparação ou pós-evento e a orientação da semana.
+Cada rodada corresponde a um mês de operação. A procura de cada mês é multiplicada pelo fator sazonal do setor, calculado pela **replicação do ajuste sazonal X-13ARIMA-SEATS** que o IBGE aplica à Pesquisa Mensal de Comércio (PMC, tabela 8882, índice de volume sem ajuste sazonal). A replicação segue as especificações publicadas na Nota metodológica IBGE 01/2022: modelo ARIMA de cada série, outliers e efeitos de calendário (Carnaval, Páscoa e Corpus Christi). Colchões e Móveis usam a série "Móveis e eletrodomésticos"; Vestuário e Mochilas, "Tecidos, vestuário e calçados"; Bicicletas e Pet Shop, "Outros artigos de uso pessoal e doméstico".
 
-Depois que o professor publica o setor da turma, o motor aplica pesos próprios para o setor escolhido — por exemplo, Eletrônicos e Tecnologia tende a responder mais a Black Friday e Natal; Educação e Cursos à volta às aulas; Alimentos e Bebidas, Vestuário e Moda, Cosméticos e Beleza, Pet Care e os demais setores possuem combinações próprias. Antes da publicação, o perfil geral da turma é apenas uma alternativa de continuidade: Neutro mantém o fator de procura em 1; Varejo, Alimentação e Serviços usam sensibilidades amplas. Esses pesos são **Estimativas do Modelo**: não são previsão de vendas, estatística oficial nem garantia de resultado.
+As datas comemorativas (Dia das Mães, Black Friday, Natal etc.) aparecem apenas como aviso: o efeito delas já está no fator do IBGE e não é contado duas vezes. A série de vestuário é ajustada pelo IBGE de forma aditiva; o efeito em pontos de índice é convertido em percentual pelo nível médio da série ajustada nos 12 meses anteriores, e a tela informa essa conversão. Os fatores são previstos para 24 meses e revistos uma vez por ano, quando a PMC publica um ano completo novo; cada turma mantém a edição vigente no início do jogo.
 
-O efeito começa na preparação para a data e pode ter uma pequena normalização posterior. Os eventos ativos são combinados de forma determinística e a procura fica limitada a uma faixa segura do modelo. Em negócios tradicionais, uma procura maior também pode elevar a necessidade projetada de insumos e a pressão de frete. Em Startups, a sazonalidade influencia a procura e o planejamento comercial, sem criar custo físico automático de insumos ou frete. Não há números aleatórios nessa regra.
-
-Use a indicação como pergunta de gestão, e não como ordem automática: há capacidade, estoque, caixa, pessoas, campanha e logística para atender a oportunidade? Contratações, compras, produção e investimentos continuam sendo decisões da equipe. Preço, concorrência, disponibilidade e qualidade ainda podem reduzir o resultado mesmo em uma data favorável.
+Use a indicação como pergunta de gestão: há estoque, caixa, pessoas e campanha para atender a procura do mês? Preço, concorrência e disponibilidade continuam afetando o resultado.
 
 ### Consequências nos departamentos
 
@@ -853,13 +851,13 @@ Margem de contribuição positiva permite dividir esses compromissos pela margem
 LTV tradicional permanece Dados indisponíveis, pois não há retenção e frequência de compra registradas para sustentar seu cálculo. A estimativa de LTV do modelo Startup segue sua própria regra de assinaturas e cancelamentos.
 
 
-## Origem dos custos no catálogo de produtos
+## Origem dos preços e custos do catálogo de produtos
 
-O custo unitário pode aparecer como **Valor Calculado** quando sustentado pelo preço documentado de aquisição, ou como **Estimativa do Modelo**. Um preço de varejo comprovado gera uma projeção didática: **custo estimado = preço de varejo × 0,60** (desconto de 40%). Essa projeção não comprova o custo real de fabricação.
+Nos seis setores do jogo, os produtos e preços vêm de um **catálogo fixo**: para cada item, o preço de varejo é a mediana dos anúncios efetivamente encontrados, com o número de anúncios, a fonte (Buscapé, lojas oficiais do Mercado Livre ou site de uma rede) e a data da coleta. O preço é corrigido mês a mês pela variação do IPCA (IBGE, tabela 7060) do subitem do produto; sem subitem próprio, usa-se o item, e sem item, o índice geral.
 
-Se a fonte estiver inacessível ou não confirmar o produto e o preço, o catálogo usa o custo unitário padrão configurado na turma, sempre identificado como **Estimativa do Modelo**. O professor recebe o motivo da falha na revisão da edição. Para esse recurso, o custo padrão deve ser maior que zero. Notícias e análises mantêm suas exigências de fontes e datas; links inseguros continuam bloqueados.
+O custo de compra da loja é calculado, e não estimado por percentual fixo: **custo = preço de varejo × (1 − alíquota efetiva do Simples Nacional) ÷ (1 + taxa de margem da atividade na PAC 2024)**. A taxa de margem vem da Pesquisa Anual de Comércio (IBGE, tabela 10645); a alíquota efetiva segue o Anexo I da Lei Complementar 123/2006 e é recalculada pela receita dos últimos 12 meses da própria empresa.
 
-A equipe deve interpretar a origem do custo ao definir preço, margem, produção e financiamento. Depois de publicado, o custo é aplicado pelo sistema às decisões e preservado com a edição; não é um campo livre para o aluno alterar. Edições e resultados históricos não são recalculados. A regra dos três caminhos possui identificação própria, separada da versão do motor de indicadores.
+A equipe escolhe o sortimento — quais produtos do catálogo a loja revende — e define preço, canais e mídia de cada item escolhido. A montagem de móveis e camas box é um serviço à parte do produto.
 
 ## Painel de comando executivo
 
@@ -928,3 +926,62 @@ O boletim nacional não substitui dados específicos por UF, município, ativida
 
 As notícias e análises da edição de mercado vêm de órgãos públicos, institutos de pesquisa, do Sebrae e de entidades setoriais do setor da turma, como associações da indústria e do varejo. Quando o dado vem de uma entidade setorial ou do Sebrae, a fonte aparece com a marcação "fonte não governamental": é um levantamento da própria entidade, não uma estatística oficial. Dados da FAO aparecem como "organismo internacional". Quando as fontes oficiais e setoriais não bastam, a edição pode trazer reportagens, marcadas como "imprensa", e páginas de portais e sites especializados, marcadas como "fonte de mercado (site não oficial)". Todas são páginas reais, com data conferida, mas têm graus diferentes de confiabilidade. Considere essa diferença ao usar o número em uma decisão.
 
+## Fundamentos teóricos e referências das regras do jogo
+
+Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Esta seção indica, regra por regra, de onde vem cada decisão do simulador, para que a equipe estude a teoria e compreenda o resultado na prática. Obras em inglês podem ser lidas com ajuda de tradução.
+
+**Sortimento da loja.** Variedade é o número de categorias que a loja oferece; sortimento é o número de itens em cada categoria. Um sortimento amplo e profundo atrai clientes, mas exige mais estoque (LEVY; WEITZ, cap. 2).
+
+**Participação de mercado e disputa em reais.** A participação de uma empresa é a razão entre as suas vendas e as vendas do mercado, medidas em quantidade ou em valor; só se somam medidas que façam sentido somadas. Como os produtos têm preços muito diferentes, o jogo mede a disputa entre as lojas em reais, e cada produto converte a sua parte em unidades pelo próprio preço (COOPER; NAKANISHI, 1988, cap. 2 e 4).
+
+**Sensibilidade ao preço.** A atratividade de cada produto varia com o preço relativo ao preço de mercado do item, com elasticidade de −2,62, média de 1.851 estimativas da meta-análise de Bijmolt, van Heerde e Pieters (2005), conforme citada por van Heerde et al. (2013).
+
+**Efeito da propaganda.** A atratividade varia com a verba de veiculação elevada a 0,12, elasticidade média de curto prazo de 751 estimativas; no curto prazo, televisão e mídia impressa não diferem de forma significativa (SETHURAMAN; TELLIS; BRIESCH, 2011). Sem verba de veiculação, o produto não gera procura: esta é uma regra do jogo, não um resultado do estudo.
+
+**Tamanho do mercado.** O mercado mensal de cada loja é a receita mensal de uma loja pequena da atividade (IBGE, PAC 2024, tabelas 10645 e 10647), atualizada pelo índice de receita nominal da PMC (IBGE, tabela 8883), multiplicada pelo número de lojas na disputa e pela sazonalidade. A razão entre a loja pequena e a média (0,4348) só é publicada para o varejo total e é aplicada às atividades como estimativa.
+
+**Sazonalidade.** Fatores da replicação do ajuste X-13ARIMA-SEATS da PMC (IBGE, Nota metodológica 01/2022; U.S. CENSUS BUREAU).
+
+**Custos fixos da loja.** Aluguel e condomínio, serviços de terceiros, comunicação, energia, água e esgoto, e impostos e taxas da atividade (IBGE, PAC 2024, tabela 10649), por loja e por mês, na escala da loja pequena (estimativa).
+
+**Custo de manter estoque.** A literatura de logística divide o custo de manter estoque em custo do capital imobilizado, custos proporcionais ao valor e custos físicos de espaço e manuseio (ANDRIOLO, 2015, com base em AZZI et al., 2014). No jogo, o capital parado em estoque paga a Selic do último mês completo (Banco Central, série 4390), e o espaço é o aluguel da loja, já incluído nos custos fixos.
+
+**Preços e custo de compra.** Preços de varejo efetivamente encontrados, corrigidos pelo IPCA (IBGE, tabela 7060); custo de compra pela taxa de margem da PAC (IBGE, tabela 10645) e pela alíquota efetiva do Simples Nacional (BRASIL, 2006).
+
+**Regras de produto.** Bicicleta elétrica: pedal assistido, sem acelerador, até 1.000 W e 32 km/h (CONTRAN, 2023). Ração: as faixas super premium e premium são declaradas pelo fabricante, não definidas pela Instrução Normativa MAPA 30/2009. Mala de bordo: medida das companhias aéreas; franquia mínima de 10 kg (ANAC, 2016).
+
+### Referências
+
+AGÊNCIA NACIONAL DE AVIAÇÃO CIVIL (Brasil). Resolução nº 400, de 13 de dezembro de 2016. Dispõe sobre as condições gerais de transporte aéreo. Brasília: ANAC, 2016.
+
+ANDRIOLO, Alessandro. *Responsible inventory models for operation and logistics management*. 2015. Tese (Doutorado em Engenharia Mecatrônica e da Inovação Mecânica do Produto) – Università degli Studi di Padova, Pádua, 2015. Disponível em: https://www.research.unipd.it/bitstream/11577/3424091/1/andriolo_alessandro_tesi.pdf. Acesso em: 17 nov. 2026.
+
+AZZI, Anna *et al*. Inventory holding costs measurement: a multi-case study. *The International Journal of Logistics Management*, v. 25, n. 1, 2014. (Consultado o resumo.)
+
+BANCO CENTRAL DO BRASIL. *Sistema Gerenciador de Séries Temporais*: série 4390 – Taxa de juros Selic acumulada no mês. Brasília: BCB. Disponível em: https://dadosabertos.bcb.gov.br/dataset/4390-taxa-de-juros---selic-acumulada-no-mes. Acesso em: 17 nov. 2026.
+
+BIJMOLT, Tammo H. A.; VAN HEERDE, Harald J.; PIETERS, Rik G. M. New empirical generalizations on the determinants of price elasticity. *Journal of Marketing Research*, v. 42, n. 2, p. 141-156, 2005. (Valores citados em VAN HEERDE *et al.*, 2013.)
+
+BRASIL. Lei Complementar nº 123, de 14 de dezembro de 2006. Institui o Estatuto Nacional da Microempresa e da Empresa de Pequeno Porte. Anexo I com redação dada pela Lei Complementar nº 155, de 27 de outubro de 2016. Brasília: Presidência da República. Disponível em: https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm. Acesso em: 16 nov. 2026.
+
+CONSELHO NACIONAL DE TRÂNSITO (Brasil). Resolução nº 996, de 15 de junho de 2023. Brasília: Contran, 2023.
+
+COOPER, Lee G.; NAKANISHI, Masao. *Market-share analysis*: evaluating competitive marketing effectiveness. Boston: Kluwer Academic Publishers, 1988. Edição eletrônica disponível em: https://www.anderson.ucla.edu/faculty/lee.cooper/MCI_Book/Book1.htm. Acesso em: 17 nov. 2026.
+
+IBGE. *Índice Nacional de Preços ao Consumidor Amplo (IPCA)*: tabela 7060. Rio de Janeiro: IBGE. Disponível em: https://sidra.ibge.gov.br. Acesso em: 16 nov. 2026.
+
+IBGE. *Pesquisa Anual de Comércio 2024*: tabelas 10645, 10647 e 10649. Rio de Janeiro: IBGE. Disponível em: https://sidra.ibge.gov.br. Acesso em: 17 nov. 2026.
+
+IBGE. *Pesquisa Mensal de Comércio*: tabelas 8882 e 8883; Nota metodológica 01/2022. Rio de Janeiro: IBGE. Disponível em: https://sidra.ibge.gov.br. Acesso em: 17 nov. 2026.
+
+LEVY, Michael; WEITZ, Barton A. *Retailing management*. 8. ed. New York: McGraw-Hill/Irwin, [2011 ou 2012]. Capítulo 2: Types of retailers. (Definições consultadas no manual do professor da obra.)
+
+MINISTÉRIO DA AGRICULTURA, PECUÁRIA E ABASTECIMENTO (Brasil). Instrução Normativa nº 30, de 5 de agosto de 2009. Brasília: MAPA, 2009.
+
+SETHURAMAN, Raj; TELLIS, Gerard J.; BRIESCH, Richard A. How well does advertising work? Generalizations from meta-analysis of brand advertising elasticities. *Journal of Marketing Research*, v. 48, n. 3, p. 457-471, 2011.
+
+U.S. CENSUS BUREAU. *X-13ARIMA-SEATS seasonal adjustment program*. Washington, DC: U.S. Census Bureau. Disponível em: https://www.census.gov/data/software/x13as.html. Acesso em: 16 nov. 2026.
+
+VAN HEERDE, Harald J. *et al*. Price and advertising effectiveness over the business cycle. *Journal of Marketing Research*, v. 50, n. 2, p. 177-193, 2013.
+
+**Fontes de mercado dos preços** (coletas de 15 e 16 nov. 2026): Buscapé; lojas oficiais do Mercado Livre; sites da Renner, Riachuelo, MadeiraMadeira, Petz e Decathlon. Preços de serviços: MercadoMineiro (banho e tosa, Belo Horizonte, out. 2026), GetNinjas e Cronoshare (montagem de móveis, valores indicativos).

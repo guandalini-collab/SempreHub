@@ -23,6 +23,7 @@ STYLES={
  'Chapter':ParagraphStyle('Chapter',fontName='Helvetica-Bold',fontSize=12,leading=18,textColor=BLACK,spaceAfter=18,keepWithNext=True),
  'Sub':ParagraphStyle('Sub',fontName='Helvetica-Bold',fontSize=12,leading=18,textColor=BLACK,spaceBefore=12,spaceAfter=12,keepWithNext=True),
  'Small':ParagraphStyle('Small',fontName='Helvetica',fontSize=10,leading=12,textColor=BLACK,spaceAfter=12,allowWidows=0,allowOrphans=0),
+ 'Reference':ParagraphStyle('Reference',fontName='Helvetica',fontSize=12,leading=14,textColor=BLACK,alignment=0,spaceAfter=14,allowWidows=0,allowOrphans=0),
  'Cell':ParagraphStyle('Cell',fontName='Helvetica',fontSize=10,leading=12,textColor=BLACK,spaceAfter=0),
  'Center':ParagraphStyle('Center',fontName='Helvetica',fontSize=12,leading=18,textColor=BLACK,alignment=1,spaceAfter=18),
  'TOC':ParagraphStyle('TOC',fontName='Helvetica',fontSize=12,leading=13,textColor=BLACK,spaceBefore=0,leftIndent=0,firstLineIndent=0,rightIndent=25),
@@ -32,6 +33,7 @@ def inline(text):
  text=html.escape(text.strip()).replace('—','-').replace('–','-')
  text=re.sub(r'\[([^]]+)\]\((https?://[^)]+)\)',lambda m:f'<link href="{html.escape(html.unescape(m[2]),quote=True)}">{m[1]}</link>',text)
  text=re.sub(r'\*\*(.+?)\*\*',r'<b>\1</b>',text)
+ text=re.sub(r'(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])',r'<i>\1</i>',text)
  text=re.sub(r'`(.+?)`',r'\1',text)
  return text
 class VectorFigure(Flowable):
@@ -105,7 +107,7 @@ def build(stem):
   if all(re.match(r'^(\d+\. |\- )',line) for line in lines):
    story += [Paragraph(inline(line),STYLES['List']) for line in lines]
   else:
-   estilo=ParagraphStyle('LetterBody',parent=STYLES['Body'],spaceAfter=4,keepWithNext=' '.join(lines).startswith('Espero que')) if lastheading=='Carta de apresentação' else STYLES['Body']
+   estilo=ParagraphStyle('LetterBody',parent=STYLES['Body'],spaceAfter=4,keepWithNext=' '.join(lines).startswith('Espero que')) if lastheading=='Carta de apresentação' else (STYLES['Reference'] if lastheading=='Referências' else STYLES['Body'])
    story.append(Paragraph(inline(' '.join(lines)),estilo))
   markup.append('<p>'+inline(' '.join(lines))+'</p>')
  # The source logo is merged as vector PDF after ReportLab pagination; this
