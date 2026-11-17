@@ -325,7 +325,7 @@ def validar_coerencia(edicao, turma, pesquisa=None, exigir_natureza=False):
 @router.get("/api/professor/turmas/{turma_id}/mercado")
 def listar(turma_id:int, db:Session=Depends(get_db), usuario:Usuario=Depends(exigir_professor)):
     turma=_turma_do_professor(db,turma_id,usuario)
-    return {"setores":SETORES,"edicoes":[serializar(e) for e in db.query(ConteudoMercado).filter_by(turma_id=turma_id).order_by(ConteudoMercado.id.desc()).all()],
+    return {"setores":SETORES,"catalogo_fixo":usa_catalogo_fixo(turma),"setor_turma":(turma.configuracao_simulacao or {}).get("setor_mercado") if usa_catalogo_fixo(turma) else None,"edicoes":[serializar(e) for e in db.query(ConteudoMercado).filter_by(turma_id=turma_id).order_by(ConteudoMercado.id.desc()).all()],
             "pesquisa_automatica":_situacao_automatica(db,turma)}
 
 
