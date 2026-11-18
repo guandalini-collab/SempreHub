@@ -66,3 +66,12 @@ def test_concorrente_simulado_com_catalogo_usa_a_mesma_forma():
     assert atratividade_concorrente_catalogo(0.9, 1.3, ctx) == pytest.approx((1 / .9) ** 2.62 * math.exp(.26) * 1.3)
     # Sem propaganda no mercado, o fator é 1.
     assert atratividade_concorrente_catalogo(1.0, 1.0, {"media": 0.0, "beta": .26}) == 1.0
+
+
+def test_porter_so_diagnostico_no_catalogo():
+    """Item 2c: sem penalidade; aviso compara com o preço de mercado do item."""
+    from app.motor.portfolio import avisos_posicionamento_catalogo
+    caro, barato = _item(70.0), _item(50.0)
+    assert "custo com preço acima do mercado em 1" in avisos_posicionamento_catalogo([caro, barato], "CUSTO")[0]
+    assert "diferenciação com preço abaixo do mercado em 1" in avisos_posicionamento_catalogo([caro, barato], "DIFERENCIACAO")[0]
+    assert avisos_posicionamento_catalogo([_item(59.0)], "CUSTO") == []

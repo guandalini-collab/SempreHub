@@ -594,7 +594,10 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     atratividade = 1.0 if catalogo_fixo else atrativo_porter(marca, qualidade, preco, p.get("preco_referencia", 100))
     atratividade *= (0.5 + 0.5 * s["satisfacao"] / 100) * fator_canal
     diferenciar = op.get("posicionamento", "CUSTO") == "DIFERENCIACAO"
-    desalinhada = ((diferenciar and marca < 3 and qualidade < 3)
+    if catalogo_fixo:
+        from .portfolio import avisos_posicionamento_catalogo
+        alertas.extend(avisos_posicionamento_catalogo(itens, op.get("posicionamento", "CUSTO")))
+    desalinhada = not catalogo_fixo and ((diferenciar and marca < 3 and qualidade < 3)
                    or (not diferenciar and preco > p.get("preco_referencia", 100)))
     if desalinhada:
         atratividade *= 0.75

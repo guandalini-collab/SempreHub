@@ -434,14 +434,19 @@ def _atratividade(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo)
         * (1 + empresa.qualidade) ** PESO_QUALIDADE
     )
     limiar_diferenciacao = 0.20 * referencia * turma.demanda_base_por_empresa
-    if preco < 0.95 * referencia and (investimento_efetivo(decisao) + decisao.pd) > limiar_diferenciacao:
+    if itens_catalogo:
+        # Item 2c: Porter como diagnóstico, sem penalidade numérica.
+        from .portfolio import avisos_posicionamento_catalogo
+        c.alertas.extend(avisos_posicionamento_catalogo(itens_catalogo, (decisao.plano_comercial or {}).get("posicionamento", "CUSTO")))
+    elif preco < 0.95 * referencia and (investimento_efetivo(decisao) + decisao.pd) > limiar_diferenciacao:
         valor *= PENALIDADE_MEIO_TERMO
         c.alertas.append(
             "Porter — meio-termo: preço abaixo do mercado com gasto alto em diferenciação confunde o "
             "posicionamento e reduziu sua atratividade em 30%."
         )
     if (
-        preco > 1.15 * referencia
+        not itens_catalogo
+        and preco > 1.15 * referencia
         and empresa.marca < LIMIAR_PREMIUM_MARCA_QUALIDADE
         and empresa.qualidade < LIMIAR_PREMIUM_MARCA_QUALIDADE
     ):

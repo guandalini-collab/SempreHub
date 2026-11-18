@@ -278,6 +278,22 @@ def atratividade_concorrente_catalogo(razao_preco, forca, contexto=None):
             * fator_propaganda(media, {"media": media, "beta": contexto.get("beta", 0)}) * forca)
 
 
+def avisos_posicionamento_catalogo(itens, posicionamento):
+    """Item 2c (18/11/2026): Porter (1980, cap. 2) como diagnóstico, sem
+    penalidade numérica; compara o preço de cada item com o preço de mercado."""
+    acima = [i for i in itens if i.get("preco_mercado") and float(i["preco"]) > float(i["preco_mercado"])]
+    abaixo = [i for i in itens if i.get("preco_mercado") and float(i["preco"]) < float(i["preco_mercado"])]
+    if posicionamento == "DIFERENCIACAO":
+        if abaixo:
+            return [f"Porter: posicionamento em diferenciação com preço abaixo do mercado em {len(abaixo)} item(ns). "
+                    "Sem diferença percebida, a disputa tende a se dar por preço (risco de meio-termo)."]
+        return []
+    if acima:
+        return [f"Porter: posicionamento em custo com preço acima do mercado em {len(acima)} item(ns). "
+                "A liderança em custo pede preços competitivos (risco de meio-termo)."]
+    return []
+
+
 def contexto_guardado(turma, rodada):
     cache = getattr(turma, "_contexto_propaganda", None)
     return cache[1] if cache and cache[0] == rodada else None

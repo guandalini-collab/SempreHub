@@ -896,6 +896,8 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 
 **Atratividade da loja e concorrentes simulados.** Nos modelos de atração, todas as lojas seguem a mesma forma, e só influenciam as participações os atributos em que elas diferem (COOPER; NAKANISHI, 1988, p. 71-73). Como todas vendem os mesmos produtos reais do catálogo, a qualidade do produto não diferencia uma loja de outra. A atratividade da loja é a média, ponderada pelos pesos do sortimento, da atratividade de cada produto: (preço de mercado ÷ preço da loja)^2,62 × fator de propaganda. Os concorrentes simulados seguem a mesma fórmula: cobram de 0,90 a 1,10 do preço de mercado de cada item e anunciam na média do mercado. A força dos concorrentes, definida pelo professor, multiplica a atratividade deles e corresponde ao componente próprio de cada loja nos modelos de escolha de loja (BRIESCH; CHINTAGUNTA; FOX, 2009); os valores de força e a propaganda dos simulados na média são escolhas do jogo.
 
+**Posicionamento (Porter).** Porter descreve três estratégias genéricas: liderança em custo, diferenciação e enfoque. A empresa que não se define em nenhuma delas fica no "meio-termo", situação estratégica pobre, com baixa rentabilidade quase garantida (PORTER, 2004, cap. 2). O autor não quantifica esse efeito. Por isso, nas turmas com catálogo, o posicionamento não reduz a demanda por um percentual fixo: o jogo compara o preço de cada item com o preço de mercado e emite um aviso quando a estratégia declarada e os preços se contradizem. A baixa rentabilidade, quando ocorrer, resulta das próprias decisões de preço, custo e despesas.
+
 **Marca.** Brand equity é o efeito diferencial que o conhecimento da marca exerce sobre a resposta do consumidor ao marketing; a marca não é construída só por propaganda, e sua essência é um bom produto (KOTLER; KELLER, 2013, p. 257-267). A obra não oferece uma regra numérica para acumular ou perder marca. Por isso, nas turmas com catálogo, a verba de mídia não aumenta a marca: o efeito da propaganda ao longo do tempo é o da persistência descrita acima, e contá-lo também na marca seria contar duas vezes.
 
 **Tamanho do mercado.** O mercado mensal de cada loja é a receita mensal de uma loja pequena da atividade (IBGE, PAC 2024, tabelas 10645 e 10647), atualizada pelo índice de receita nominal da PMC (IBGE, tabela 8883), multiplicada pelo número de lojas na disputa e pela sazonalidade. A razão entre a loja pequena e a média (0,4348) só é publicada para o varejo total e é aplicada às atividades como estimativa.
@@ -945,6 +947,8 @@ KOTLER, Philip; KELLER, Kevin Lane. *Administração de marketing*. 14. ed. Trad
 LEVY, Michael; WEITZ, Barton A. *Retailing management*. 8. ed. New York: McGraw-Hill/Irwin, [2011 ou 2012]. Capítulo 2: Types of retailers. (Definições consultadas no manual do professor da obra.)
 
 MINISTÉRIO DA AGRICULTURA, PECUÁRIA E ABASTECIMENTO (Brasil). Instrução Normativa nº 30, de 5 de agosto de 2009. Brasília: MAPA, 2009.
+
+PORTER, Michael E. *Estratégia competitiva*: técnicas para análise de indústrias e da concorrência. Tradução de Elizabeth Maria de Pinho Braga. 2. ed. Rio de Janeiro: Elsevier, 2004.
 
 SETHURAMAN, Raj; TELLIS, Gerard J.; BRIESCH, Richard A. How well does advertising work? Generalizations from meta-analysis of brand advertising elasticities. *Journal of Marketing Research*, v. 48, n. 3, p. 457-471, 2011.
 

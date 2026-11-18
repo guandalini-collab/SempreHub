@@ -204,5 +204,7 @@ def test_catalogo_propaganda_persiste_e_caixa_rende_selic(cliente,professor,monk
         assert prop2['estoques'][pid]==pytest.approx(.44*valor)
     assert res2['detalhes_simulacao']['operacao']['comercial_ativo'] is True
     assert res2['demanda']>0
+    # Item 2c: sem penalidade de 25% por posicionamento no catálogo.
+    assert not any('atratividade reduzida em 25%' in a for a in res['alertas'])
     # Item 2: com catálogo fixo, a mídia não alimenta a marca.
     assert res['marca']==res2['marca']==0
