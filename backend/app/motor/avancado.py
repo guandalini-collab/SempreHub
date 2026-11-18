@@ -121,6 +121,8 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0, efeitos_op
         from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
         # Startup mantém 1,4 até ser refeita com o Modo Empresa do zero (dezembro).
         base=(turma.preco_referencia/decisao.preco)**(1.4 if turma.modo_jogo=="STARTUP" else ELASTICIDADE_PRECO_ESCOLHA)
+        if any(i.get("preco_mercado") for i in itens):
+            base = 1.0  # item 2b: sem divisão pelo preço de referência antigo
         preparo["atratividade"]*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade,segmentacao,p.get("propaganda")))/sum(i["peso"] for i in itens)/base
         preparo["diagnosticos_segmentacao"] = diagnosticos_segmentacao(itens, segmentacao)
     from .estrategia import avaliar, mensagens
@@ -249,8 +251,14 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     for i in range(cfg["concorrentes_virtuais"]):
         # Política pública, determinística: não lê as decisões privadas dos alunos.
         preco = turma.preco_referencia * (0.9 + .05 * (i % 5))
+        if pac:
+            from .portfolio import atratividade_concorrente_catalogo, contexto_guardado
+            atratividade_bot = atratividade_concorrente_catalogo(0.9 + .05 * (i % 5), forca_concorrente(cfg, i),
+                                                                 contexto_guardado(turma, rodada))
+        else:
+            atratividade_bot = atrativo_porter(2.5 + .12 * (i % 4), 2.0 + .08 * (rodada - 1), preco, turma.preco_referencia) * forca_concorrente(cfg, i)
         bots.append({"empresa": f"Concorrente virtual {i + 1}", "virtual": True, "preco": preco,
-                     "atratividade": atrativo_porter(2.5 + .12 * (i % 4), 2.0 + .08 * (rodada - 1), preco, turma.preco_referencia) * forca_concorrente(cfg, i),
+                     "atratividade": atratividade_bot,
                      "capacidade": temporal["demanda_base_por_empresa"]})
     precos = [d.preco for d in decisoes] + [b["preco"] for b in bots]
     media = sum(precos) / len(precos)

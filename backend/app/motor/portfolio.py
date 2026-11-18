@@ -263,6 +263,26 @@ def propaganda_da_empresa(contexto, empresa_id):
             "persistencia": contexto["persistencia"]}
 
 
+def atratividade_concorrente_catalogo(razao_preco, forca, contexto=None):
+    """Concorrente simulado com catálogo fixo (item 2b, 18/11/2026).
+
+    Mesma forma das equipes (Cooper e Nakanishi, 1988, p. 71-73): preço em
+    relação ao preço de mercado de cada item elevado à elasticidade e fator de
+    propaganda no estoque médio do mercado. ``forca`` é o ajuste do professor,
+    interpretado como o intercepto da loja (Briesch; Chintagunta; Fox, 2009).
+    """
+    from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
+    contexto = contexto or {}
+    media = float(contexto.get("media") or 0)
+    return ((1 / razao_preco) ** ELASTICIDADE_PRECO_ESCOLHA
+            * fator_propaganda(media, {"media": media, "beta": contexto.get("beta", 0)}) * forca)
+
+
+def contexto_guardado(turma, rodada):
+    cache = getattr(turma, "_contexto_propaganda", None)
+    return cache[1] if cache and cache[0] == rodada else None
+
+
 def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0, segmentacao=None, propaganda=None):
     from ..catalogo_campanhas import CAMPANHAS
     custos={i:v for i,n,c,v,u in CAMPANHAS}

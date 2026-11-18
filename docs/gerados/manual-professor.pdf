@@ -3929,10 +3929,10 @@ endobj
 326 0 obj
 <<
 /Author (Professor Guandalini)
-/CreationDate (D\07220261117182116\05503\04700\047)
+/CreationDate (D\07220261118203435\05503\04700\047)
 /Creator (\050unspecified\051)
 /Keywords ()
-/ModDate (D\07220261117182116\05503\04700\047)
+/ModDate (D\07220261118203435\05503\04700\047)
 /Producer (ReportLab PDF Library \055 \050opensource\051)
 /Subject (\050unspecified\051)
 /Title (SempreHub \055 Manual do professor)
@@ -34818,7 +34818,7 @@ endstream
 endobj
 441 0 obj
 <<
-/Length 4799
+/Length 4734
 >>
 stream
 q
@@ -34845,33 +34845,33 @@ BT 1 0 0 1 0 96 Tm -0.125793 Tw 18 TL /F1 12 Tf 0 0 0 rg (m\352s e a dos tr\352s
 Q
 Q
 q
-1 0 0 1 91.03937 508.8504 cm
+1 0 0 1 91.03937 418.8504 cm
+q
+BT 1 0 0 1 0 204 Tm .603931 Tw 18 TL /F2 12 Tf 0 0 0 rg (Atratividade da loja e concorrentes simulados.) Tj /F1 12 Tf ( Nos modelos de atra\347\343o, todas) Tj T* 0 Tw -0.047746 Tw (as lojas seguem a mesma forma, e s\363 influenciam as participa\347\365es os atributos em) Tj T* 0 Tw .063573 Tw (que elas diferem \(COOPER; NAKANISHI, 1988, p. 71-73\). Como todas vendem os) Tj T* 0 Tw 1.514482 Tw (mesmos produtos reais do cat\341logo, a qualidade do produto n\343o diferencia uma) Tj T* 0 Tw 4.050716 Tw (loja de outra. A atratividade da loja \351 a m\351dia, ponderada pelos pesos do) Tj T* 0 Tw 3.849028 Tw (sortimento, da atratividade de cada produto: \(pre\347o de mercado \367 pre\347o da) Tj T* 0 Tw 1.739131 Tw (loja\)^2,62 \327 fator de propaganda. Os concorrentes simulados seguem a mesma) Tj T* 0 Tw .26582 Tw (f\363rmula: cobram de 0,90 a 1,10 do pre\347o de mercado de cada item e anunciam na) Tj T* 0 Tw .669028 Tw (m\351dia do mercado. A for\347a dos concorrentes, definida pelo professor, multiplica a) Tj T* 0 Tw .120301 Tw (atratividade deles e corresponde ao componente pr\363prio de cada loja nos modelos) Tj T* 0 Tw .338276 Tw (de escolha de loja \(BRIESCH; CHINTAGUNTA; FOX, 2009\); os valores de for\347a e) Tj T* 0 Tw (a propaganda dos simulados na m\351dia s\343o escolhas do jogo.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 284.8504 cm
 q
 BT 1 0 0 1 0 114 Tm 1.500276 Tw 18 TL /F2 12 Tf 0 0 0 rg (Marca.) Tj /F1 12 Tf ( Brand equity \351 o efeito diferencial que o conhecimento da marca exerce) Tj T* 0 Tw 1.385793 Tw (sobre a resposta do consumidor ao marketing; a marca n\343o \351 constru\355da s\363 por) Tj T* 0 Tw 2.908664 Tw (propaganda, e sua ess\352ncia \351 um bom produto \(KOTLER; KELLER, 2013, p.) Tj T* 0 Tw -0.053724 Tw (257-267\). A obra n\343o oferece uma regra num\351rica para acumular ou perder marca.) Tj T* 0 Tw 2.001665 Tw (Por isso, nas turmas com cat\341logo, a verba de m\355dia n\343o aumenta a marca: o) Tj T* 0 Tw 2.101177 Tw (efeito da propaganda ao longo do tempo \351 o da persist\352ncia descrita acima, e) Tj T* 0 Tw (cont\341-lo tamb\351m na marca seria contar duas vezes.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 392.8504 cm
+1 0 0 1 91.03937 168.8504 cm
 q
 BT 1 0 0 1 0 96 Tm 1.747639 Tw 18 TL /F2 12 Tf 0 0 0 rg (Tamanho do mercado.) Tj /F1 12 Tf ( O mercado mensal de cada loja \351 a receita mensal de) Tj T* 0 Tw 4.058482 Tw (uma loja pequena da atividade \(IBGE, PAC 2024, tabelas 10645 e 10647\),) Tj T* 0 Tw 6.469531 Tw (atualizada pelo \355ndice de receita nominal da PMC \(IBGE, tabela 8883\),) Tj T* 0 Tw .46087 Tw (multiplicada pelo n\372mero de lojas na disputa e pela sazonalidade. A raz\343o entre a) Tj T* 0 Tw .289707 Tw (loja pequena e a m\351dia \(0,4348\) s\363 \351 publicada para o varejo total e \351 aplicada \340s) Tj T* 0 Tw (atividades como estimativa.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 348.8504 cm
+1 0 0 1 91.03937 124.8504 cm
 q
 BT 1 0 0 1 0 24 Tm 4.257413 Tw 18 TL /F2 12 Tf 0 0 0 rg (Sazonalidade.) Tj /F1 12 Tf ( Fatores da replica\347\343o do ajuste X-13ARIMA-SEATS da PMC) Tj T* 0 Tw (\(IBGE, Nota metodol\363gica 01/2022; U.S. CENSUS BUREAU\).) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 286.8504 cm
-q
-BT 1 0 0 1 0 42 Tm .871531 Tw 18 TL /F2 12 Tf 0 0 0 rg (Custos fixos da loja.) Tj /F1 12 Tf ( Aluguel e condom\355nio, servi\347os de terceiros, comunica\347\343o,) Tj T* 0 Tw .561485 Tw (energia, \341gua e esgoto, e impostos e taxas da atividade \(IBGE, PAC 2024, tabela) Tj T* 0 Tw (10649\), por loja e por m\352s, na escala da loja pequena \(estimativa\).) Tj T* ET
-Q
-Q
-q
 1 0 0 1 91.03937 62.85039 cm
 q
-BT 1 0 0 1 0 204 Tm 1.942119 Tw 18 TL /F2 12 Tf 0 0 0 rg (Custo de manter estoque.) Tj /F1 12 Tf ( O custo de manuten\347\343o \351 proporcional ao estoque) Tj T* 0 Tw 5.169276 Tw (m\351dio e re\372ne espa\347o, capital, seguros e impostos, e riscos de perda e) Tj T* 0 Tw -0.056724 Tw (obsolesc\352ncia; o capital pode representar mais de 80% do total \(BALLOU, 2007, p.) Tj T* 0 Tw 1.433793 Tw (279-280\). O custo do capital \351 o custo de oportunidade: o retorno da alternativa) Tj T* 0 Tw .445276 Tw (que a empresa deixou de aproveitar ao investir em estoque \(ASSAF NETO, 2014,) Tj T* 0 Tw .923331 Tw (p. 701-702; AZZI et al., 2014\). Em decis\365es de compra, esse custo \351 geralmente) Tj T* 0 Tw .923331 Tw (medido pela taxa da melhor aplica\347\343o financeira dispon\355vel, e a Selic \351 aceita no) Tj T* 0 Tw .126957 Tw (Brasil como taxa livre de risco \(ASSAF NETO, 2014, p. 91 e 126\). No jogo, o caixa) Tj T* 0 Tw .172276 Tw (positivo de abertura rende a Selic do \372ltimo m\352s completo \(BANCO CENTRAL DO) Tj T* 0 Tw 1.092301 Tw (BRASIL, s\351rie 4390\), lan\347ada na DRE como rendimento de aplica\347\343o; o dinheiro) Tj T* 0 Tw .609276 Tw (parado em estoque n\343o rende. O relat\363rio mostra quanto o estoque m\351dio deixou) Tj T* 0 Tw 1.181755 Tw (de render \(estoque m\351dio \327 Selic\). N\343o h\341 despesa de armazenagem separada,) Tj T* 0 Tw ET
+BT 1 0 0 1 0 42 Tm .871531 Tw 18 TL /F2 12 Tf 0 0 0 rg (Custos fixos da loja.) Tj /F1 12 Tf ( Aluguel e condom\355nio, servi\347os de terceiros, comunica\347\343o,) Tj T* 0 Tw .561485 Tw (energia, \341gua e esgoto, e impostos e taxas da atividade \(IBGE, PAC 2024, tabela) Tj T* 0 Tw (10649\), por loja e por m\352s, na escala da loja pequena \(estimativa\).) Tj T* ET
 Q
 Q
  
@@ -35360,7 +35360,7 @@ endstream
 endobj
 443 0 obj
 <<
-/Length 4555
+/Length 4331
 >>
 stream
 q
@@ -35381,72 +35381,47 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (53) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 678.8504 cm
+1 0 0 1 91.03937 462.8504 cm
 q
-BT 1 0 0 1 0 60 Tm 4.411639 Tw 18 TL /F1 12 Tf 0 0 0 rg (porque o espa\347o \351 o aluguel da loja, j\341 inclu\355do nos custos fixos. Limites) Tj T* 0 Tw .62102 Tw (declarados: a Selic \351 o piso do custo de oportunidade, pois estoque tem risco e a) Tj T* 0 Tw .050808 Tw (diferen\347a em rela\347\343o \340 taxa sem risco \351 pr\352mio pelo risco \(ASSAF NETO, 2014, p.) Tj T* 0 Tw (171-172\); perdas e obsolesc\352ncia n\343o s\343o modeladas.) Tj T* ET
+BT 1 0 0 1 0 276 Tm 1.942119 Tw 18 TL /F2 12 Tf 0 0 0 rg (Custo de manter estoque.) Tj /F1 12 Tf ( O custo de manuten\347\343o \351 proporcional ao estoque) Tj T* 0 Tw 5.169276 Tw (m\351dio e re\372ne espa\347o, capital, seguros e impostos, e riscos de perda e) Tj T* 0 Tw -0.056724 Tw (obsolesc\352ncia; o capital pode representar mais de 80% do total \(BALLOU, 2007, p.) Tj T* 0 Tw 1.433793 Tw (279-280\). O custo do capital \351 o custo de oportunidade: o retorno da alternativa) Tj T* 0 Tw .445276 Tw (que a empresa deixou de aproveitar ao investir em estoque \(ASSAF NETO, 2014,) Tj T* 0 Tw .923331 Tw (p. 701-702; AZZI et al., 2014\). Em decis\365es de compra, esse custo \351 geralmente) Tj T* 0 Tw .923331 Tw (medido pela taxa da melhor aplica\347\343o financeira dispon\355vel, e a Selic \351 aceita no) Tj T* 0 Tw .126957 Tw (Brasil como taxa livre de risco \(ASSAF NETO, 2014, p. 91 e 126\). No jogo, o caixa) Tj T* 0 Tw .172276 Tw (positivo de abertura rende a Selic do \372ltimo m\352s completo \(BANCO CENTRAL DO) Tj T* 0 Tw 1.092301 Tw (BRASIL, s\351rie 4390\), lan\347ada na DRE como rendimento de aplica\347\343o; o dinheiro) Tj T* 0 Tw .609276 Tw (parado em estoque n\343o rende. O relat\363rio mostra quanto o estoque m\351dio deixou) Tj T* 0 Tw 1.181755 Tw (de render \(estoque m\351dio \327 Selic\). N\343o h\341 despesa de armazenagem separada,) Tj T* 0 Tw 4.411639 Tw (porque o espa\347o \351 o aluguel da loja, j\341 inclu\355do nos custos fixos. Limites) Tj T* 0 Tw .62102 Tw (declarados: a Selic \351 o piso do custo de oportunidade, pois estoque tem risco e a) Tj T* 0 Tw .050808 Tw (diferen\347a em rela\347\343o \340 taxa sem risco \351 pr\352mio pelo risco \(ASSAF NETO, 2014, p.) Tj T* 0 Tw (171-172\); perdas e obsolesc\352ncia n\343o s\343o modeladas.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 598.8504 cm
+1 0 0 1 91.03937 382.8504 cm
 q
 BT 1 0 0 1 0 60 Tm 5.633701 Tw 18 TL /F2 12 Tf 0 0 0 rg (Pre\347os e custo de compra.) Tj /F1 12 Tf ( Pre\347os de varejo efetivamente encontrados,) Tj T* 0 Tw .946276 Tw (corrigidos pelo IPCA \(IBGE, tabela 7060\); custo de compra pela taxa de margem) Tj T* 0 Tw 4.60721 Tw (da PAC \(IBGE, tabela 10645\) e pela al\355quota efetiva do Simples Nacional) Tj T* 0 Tw (\(BRASIL, 2006\).) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 500.8504 cm
+1 0 0 1 91.03937 284.8504 cm
 q
 BT 1 0 0 1 0 78 Tm .938731 Tw 18 TL /F2 12 Tf 0 0 0 rg (Regras de produto.) Tj /F1 12 Tf ( Bicicleta el\351trica: pedal assistido, sem acelerador, at\351 1.000) Tj T* 0 Tw .673177 Tw (W e 32 km/h \(CONTRAN, 2023\). Ra\347\343o: as faixas super premium e premium s\343o) Tj T* 0 Tw -0.148966 Tw (declaradas pelo fabricante, n\343o definidas pela Instru\347\343o Normativa MAPA 30/2009.) Tj T* 0 Tw .168276 Tw (Mala de bordo: medida das companhias a\351reas; franquia m\355nima de 10 kg \(ANAC,) Tj T* 0 Tw (2016\).) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 470.8504 cm
+1 0 0 1 91.03937 254.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 6 Tm /F2 12 Tf 18 TL (24.1 Refer\352ncias) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 416.8504 cm
+1 0 0 1 91.03937 200.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 30 Tm /F1 12 Tf 14 TL (AG\312NCIA NACIONAL DE AVIA\307\303O CIVIL \(Brasil\). Resolu\347\343o n\272 400, de 13 de) Tj T* (dezembro de 2016. Disp\365e sobre as condi\347\365es gerais de transporte a\351reo.) Tj T* (Bras\355lia: ANAC, 2016.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 374.8504 cm
+1 0 0 1 91.03937 158.8504 cm
 q
 BT 1 0 0 1 0 16 Tm 14 TL /F1 12 Tf 0 0 0 rg (ASSAF NETO, Alexandre. ) Tj /F4 12 Tf (Finan\347as corporativas e valor) Tj /F1 12 Tf (. 7. ed. S\343o Paulo: Atlas,) Tj T* (2014.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 318.8504 cm
+1 0 0 1 91.03937 102.8504 cm
 q
 BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (AZZI, Anna ) Tj /F4 12 Tf (et al) Tj /F1 12 Tf (. Inventory holding costs measurement: a multi-case study. ) Tj /F4 12 Tf (The) Tj T* (International Journal of Logistics Management) Tj /F1 12 Tf (, v. 25, n. 1, p. 109-132, 2014. DOI:) Tj T* (10.1108/IJLM-01-2012-0004.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 262.8504 cm
-q
-BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (BALLOU, Ronald H. ) Tj /F4 12 Tf (Gerenciamento da cadeia de suprimentos/log\355stica) Tj T* (empresarial) Tj /F1 12 Tf (. Tradu\347\343o de Raul Rubenich. 5. ed. Porto Alegre: Bookman, 2007.) Tj T* (Recurso eletr\364nico. Editado tamb\351m como livro impresso em 2006.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 192.8504 cm
-q
-BT 1 0 0 1 0 44 Tm 14 TL /F1 12 Tf 0 0 0 rg (BANCO CENTRAL DO BRASIL. ) Tj /F4 12 Tf (Sistema Gerenciador de S\351ries Temporais) Tj /F1 12 Tf (: s\351rie) Tj T* (4390 - Taxa de juros Selic acumulada no m\352s. Bras\355lia: BCB. Dispon\355vel em: https:) Tj  T* (//dadosabertos.bcb.gov.br/dataset/4390-taxa-de-juros---selic-acumulada-no-mes.) Tj T* (Acesso em: 17 nov. 2026.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 122.8504 cm
-q
-BT 1 0 0 1 0 44 Tm 14 TL /F1 12 Tf 0 0 0 rg (BIJMOLT, Tammo H. A.; VAN HEERDE, Harald J.; PIETERS, Rik G. M. New) Tj T* (empirical generalizations on the determinants of price elasticity. ) Tj /F4 12 Tf (Journal of) Tj T* (Marketing Research) Tj /F1 12 Tf (, v. 42, n. 2, p. 141-156, 2005. \(Valores citados em VAN) Tj T* (HEERDE ) Tj /F4 12 Tf (et al.) Tj /F1 12 Tf (, 2013.\)) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 66.85039 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 30 Tm /F1 12 Tf 14 TL (BRASIL. Lei Complementar n\272 123, de 14 de dezembro de 2006. Institui o Estatuto) Tj T* (Nacional da Microempresa e da Empresa de Pequeno Porte. Anexo I com reda\347\343o) Tj T* (dada pela Lei Complementar n\272 155, de 27 de outubro de 2016. Bras\355lia:) Tj T* ET
 Q
 Q
  
@@ -35935,7 +35910,7 @@ endstream
 endobj
 445 0 obj
 <<
-/Length 4580
+/Length 4428
 >>
 stream
 q
@@ -35956,84 +35931,71 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (54) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 722.8504 cm
+1 0 0 1 91.03937 708.8504 cm
+q
+BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (BALLOU, Ronald H. ) Tj /F4 12 Tf (Gerenciamento da cadeia de suprimentos/log\355stica) Tj T* (empresarial) Tj /F1 12 Tf (. Tradu\347\343o de Raul Rubenich. 5. ed. Porto Alegre: Bookman, 2007.) Tj T* (Recurso eletr\364nico. Editado tamb\351m como livro impresso em 2006.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 638.8504 cm
+q
+BT 1 0 0 1 0 44 Tm 14 TL /F1 12 Tf 0 0 0 rg (BANCO CENTRAL DO BRASIL. ) Tj /F4 12 Tf (Sistema Gerenciador de S\351ries Temporais) Tj /F1 12 Tf (: s\351rie) Tj T* (4390 - Taxa de juros Selic acumulada no m\352s. Bras\355lia: BCB. Dispon\355vel em: https:) Tj  T* (//dadosabertos.bcb.gov.br/dataset/4390-taxa-de-juros---selic-acumulada-no-mes.) Tj T* (Acesso em: 17 nov. 2026.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 568.8504 cm
+q
+BT 1 0 0 1 0 44 Tm 14 TL /F1 12 Tf 0 0 0 rg (BIJMOLT, Tammo H. A.; VAN HEERDE, Harald J.; PIETERS, Rik G. M. New) Tj T* (empirical generalizations on the determinants of price elasticity. ) Tj /F4 12 Tf (Journal of) Tj T* (Marketing Research) Tj /F1 12 Tf (, v. 42, n. 2, p. 141-156, 2005. DOI:) Tj T* (10.1509/jmkr.42.2.141.62296.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 484.8504 cm
 q
 0 0 0 rg
-BT 1 0 0 1 0 16 Tm /F1 12 Tf 14 TL (Presid\352ncia da Rep\372blica. Dispon\355vel em:) Tj T* (https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm. Acesso em: 16 nov. 2026.) Tj T* ET
+BT 1 0 0 1 0 58 Tm /F1 12 Tf 14 TL (BRASIL. Lei Complementar n\272 123, de 14 de dezembro de 2006. Institui o Estatuto) Tj T* (Nacional da Microempresa e da Empresa de Pequeno Porte. Anexo I com reda\347\343o) Tj T* (dada pela Lei Complementar n\272 155, de 27 de outubro de 2016. Bras\355lia:) Tj T* (Presid\352ncia da Rep\372blica. Dispon\355vel em:) Tj T* (https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm. Acesso em: 16 nov. 2026.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 666.8504 cm
+1 0 0 1 91.03937 428.8504 cm
+q
+BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (BRIESCH, Richard A.; CHINTAGUNTA, Pradeep K.; FOX, Edward J. How does) Tj T* (assortment affect grocery store choice? ) Tj /F4 12 Tf (Journal of Marketing Research) Tj /F1 12 Tf (, v. 46, n. 2,) Tj T* (p. 176-189, 2009. DOI: 10.1509/jmkr.46.2.176.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 372.8504 cm
 q
 BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (CLARKE, Darral G. Econometric measurement of the duration of advertising effect) Tj T* (on sales. ) Tj /F4 12 Tf (Journal of Marketing Research) Tj /F1 12 Tf (, v. 13, n. 4, p. 345-357, 1976. DOI:) Tj T* (10.1177/002224377601300404.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 624.8504 cm
+1 0 0 1 91.03937 330.8504 cm
 q
 0 0 0 rg
 BT 1 0 0 1 0 16 Tm /F1 12 Tf 14 TL (CONSELHO NACIONAL DE TR\302NSITO \(Brasil\). Resolu\347\343o n\272 996, de 15 de) Tj T* (junho de 2023. Bras\355lia: Contran, 2023.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 540.8504 cm
+1 0 0 1 91.03937 246.8504 cm
 q
 BT 1 0 0 1 0 58 Tm 14 TL /F1 12 Tf 0 0 0 rg (COOPER, Lee G.; NAKANISHI, Masao. ) Tj /F4 12 Tf (Market-share analysis) Tj /F1 12 Tf (: evaluating) Tj T* (competitive marketing effectiveness. Boston: Kluwer Academic Publishers, 1988.) Tj T* (Edi\347\343o eletr\364nica dispon\355vel em:) Tj T* (https://www.anderson.ucla.edu/faculty/lee.cooper/MCI_Book/Book1.htm. Acesso) Tj T* (em: 17 nov. 2026.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 484.8504 cm
+1 0 0 1 91.03937 190.8504 cm
 q
 BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (IBGE. ) Tj /F4 12 Tf (\315ndice Nacional de Pre\347os ao Consumidor Amplo \(IPCA\)) Tj /F1 12 Tf (: tabela 7060. Rio) Tj T* (de Janeiro: IBGE. Dispon\355vel em: https://sidra.ibge.gov.br. Acesso em: 16 nov.) Tj T* (2026.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 442.8504 cm
+1 0 0 1 91.03937 148.8504 cm
 q
 BT 1 0 0 1 0 16 Tm 14 TL /F1 12 Tf 0 0 0 rg (IBGE. ) Tj /F4 12 Tf (Pesquisa Anual de Com\351rcio 2024) Tj /F1 12 Tf (: tabelas 10645, 10647 e 10649. Rio de) Tj T* (Janeiro: IBGE. Dispon\355vel em: https://sidra.ibge.gov.br. Acesso em: 17 nov. 2026.) Tj T* ET
 Q
 Q
 q
-1 0 0 1 91.03937 386.8504 cm
+1 0 0 1 91.03937 92.85039 cm
 q
 BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (IBGE. ) Tj /F4 12 Tf (Pesquisa Mensal de Com\351rcio) Tj /F1 12 Tf (: tabelas 8882 e 8883; Nota metodol\363gica) Tj T* (01/2022. Rio de Janeiro: IBGE. Dispon\355vel em: https://sidra.ibge.gov.br. Acesso) Tj T* (em: 17 nov. 2026.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 330.8504 cm
-q
-BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (KOTLER, Philip; KELLER, Kevin Lane. ) Tj /F4 12 Tf (Administra\347\343o de marketing) Tj /F1 12 Tf (. 14. ed.) Tj T* (Tradu\347\343o de S\364nia Midori Yamamoto. S\343o Paulo: Pearson Education do Brasil,) Tj T* (2013.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 274.8504 cm
-q
-BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (LEVY, Michael; WEITZ, Barton A. ) Tj /F4 12 Tf (Retailing management) Tj /F1 12 Tf (. 8. ed. New York:) Tj T* (McGraw-Hill/Irwin, [2011 ou 2012]. Cap\355tulo 2: Types of retailers. \(Defini\347\365es) Tj T* (consultadas no manual do professor da obra.\)) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 232.8504 cm
-q
-0 0 0 rg
-BT 1 0 0 1 0 16 Tm /F1 12 Tf 14 TL (MINIST\311RIO DA AGRICULTURA, PECU\301RIA E ABASTECIMENTO \(Brasil\).) Tj T* (Instru\347\343o Normativa n\272 30, de 5 de agosto de 2009. Bras\355lia: MAPA, 2009.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 176.8504 cm
-q
-BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (SETHURAMAN, Raj; TELLIS, Gerard J.; BRIESCH, Richard A. How well does) Tj T* (advertising work? Generalizations from meta-analysis of brand advertising) Tj T* (elasticities. ) Tj /F4 12 Tf (Journal of Marketing Research) Tj /F1 12 Tf (, v. 48, n. 3, p. 457-471, 2011.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 120.8504 cm
-q
-BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (U.S. CENSUS BUREAU. ) Tj /F4 12 Tf (X-13ARIMA-SEATS seasonal adjustment program) Tj /F1 12 Tf (.) Tj T* (Washington, DC: U.S. Census Bureau. Dispon\355vel em:) Tj T* (https://www.census.gov/data/software/x13as.html. Acesso em: 16 nov. 2026.) Tj T* ET
-Q
-Q
-q
-1 0 0 1 91.03937 78.85039 cm
-q
-BT 1 0 0 1 0 16 Tm 14 TL /F1 12 Tf 0 0 0 rg (VAN HEERDE, Harald J. ) Tj /F4 12 Tf (et al) Tj /F1 12 Tf (. Price and advertising effectiveness over the) Tj T* (business cycle. ) Tj /F4 12 Tf (Journal of Marketing Research) Tj /F1 12 Tf (, v. 50, n. 2, p. 177-193, 2013.) Tj T* ET
 Q
 Q
  
@@ -36522,7 +36484,7 @@ endstream
 endobj
 447 0 obj
 <<
-/Length 966
+/Length 2887
 >>
 stream
 q
@@ -36543,7 +36505,44 @@ BT /F1 10 Tf 12 TL ET
 BT 1 0 0 1 527.4627 785.1969 Tm (55) Tj T* ET
 Q
 q
-1 0 0 1 91.03937 694.8504 cm
+1 0 0 1 91.03937 708.8504 cm
+q
+BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (KOTLER, Philip; KELLER, Kevin Lane. ) Tj /F4 12 Tf (Administra\347\343o de marketing) Tj /F1 12 Tf (. 14. ed.) Tj T* (Tradu\347\343o de S\364nia Midori Yamamoto. S\343o Paulo: Pearson Education do Brasil,) Tj T* (2013.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 652.8504 cm
+q
+BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (LEVY, Michael; WEITZ, Barton A. ) Tj /F4 12 Tf (Retailing management) Tj /F1 12 Tf (. 8. ed. New York:) Tj T* (McGraw-Hill/Irwin, [2011 ou 2012]. Cap\355tulo 2: Types of retailers. \(Defini\347\365es) Tj T* (consultadas no manual do professor da obra.\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 610.8504 cm
+q
+0 0 0 rg
+BT 1 0 0 1 0 16 Tm /F1 12 Tf 14 TL (MINIST\311RIO DA AGRICULTURA, PECU\301RIA E ABASTECIMENTO \(Brasil\).) Tj T* (Instru\347\343o Normativa n\272 30, de 5 de agosto de 2009. Bras\355lia: MAPA, 2009.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 554.8504 cm
+q
+BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (SETHURAMAN, Raj; TELLIS, Gerard J.; BRIESCH, Richard A. How well does) Tj T* (advertising work? Generalizations from meta-analysis of brand advertising) Tj T* (elasticities. ) Tj /F4 12 Tf (Journal of Marketing Research) Tj /F1 12 Tf (, v. 48, n. 3, p. 457-471, 2011.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 498.8504 cm
+q
+BT 1 0 0 1 0 30 Tm 14 TL /F1 12 Tf 0 0 0 rg (U.S. CENSUS BUREAU. ) Tj /F4 12 Tf (X-13ARIMA-SEATS seasonal adjustment program) Tj /F1 12 Tf (.) Tj T* (Washington, DC: U.S. Census Bureau. Dispon\355vel em:) Tj T* (https://www.census.gov/data/software/x13as.html. Acesso em: 16 nov. 2026.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 456.8504 cm
+q
+BT 1 0 0 1 0 16 Tm 14 TL /F1 12 Tf 0 0 0 rg (VAN HEERDE, Harald J. ) Tj /F4 12 Tf (et al) Tj /F1 12 Tf (. Price and advertising effectiveness over the) Tj T* (business cycle. ) Tj /F4 12 Tf (Journal of Marketing Research) Tj /F1 12 Tf (, v. 50, n. 2, p. 177-193, 2013.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 91.03937 386.8504 cm
 q
 BT 1 0 0 1 0 44 Tm 14 TL /F2 12 Tf 0 0 0 rg (Fontes de mercado dos pre\347os) Tj /F1 12 Tf ( \(coletas de 15 e 16 nov. 2026\): Buscap\351; lojas) Tj T* (oficiais do Mercado Livre; sites da Renner, Riachuelo, MadeiraMadeira, Petz e) Tj T* (Decathlon. Pre\347os de servi\347os: MercadoMineiro \(banho e tosa, Belo Horizonte,) Tj T* (out. 2026\), GetNinjas e Cronoshare \(montagem de m\363veis, valores indicativos\).) Tj T* ET
 Q
@@ -39017,34 +39016,34 @@ xref
 0004165579 00000 n 
 0004170479 00000 n 
 0004187153 00000 n 
-0004192006 00000 n 
-0004208680 00000 n 
-0004213289 00000 n 
-0004229963 00000 n 
-0004234597 00000 n 
-0004251271 00000 n 
-0004252290 00000 n 
-0004268964 00000 n 
-0004269005 00000 n 
-0004269355 00000 n 
-0004269704 00000 n 
-0004270054 00000 n 
-0004270834 00000 n 
-0004271614 00000 n 
-0004271970 00000 n 
-0004272323 00000 n 
-0004272674 00000 n 
-0004273027 00000 n 
-0004273136 00000 n 
-0004273250 00000 n 
-0004292085 00000 n 
+0004191941 00000 n 
+0004208615 00000 n 
+0004213000 00000 n 
+0004229674 00000 n 
+0004234156 00000 n 
+0004250830 00000 n 
+0004253771 00000 n 
+0004270445 00000 n 
+0004270486 00000 n 
+0004270836 00000 n 
+0004271185 00000 n 
+0004271535 00000 n 
+0004272315 00000 n 
+0004273095 00000 n 
+0004273451 00000 n 
+0004273804 00000 n 
+0004274155 00000 n 
+0004274508 00000 n 
+0004274617 00000 n 
+0004274731 00000 n 
+0004293566 00000 n 
 trailer
 <<
 /Size 463
 /Root 1 0 R
 /Info 326 0 R
-/ID [ (\270\202\344\236\377\362\254\216j\377\004\356\245y\002\005) (\270\202\344\236\377\362\254\216j\377\004\356\245y\002\005) ]
+/ID [ (\376\265\056\357\344\054\055\252\052\251\344\050A\305\327O) (\376\265\056\357\344\054\055\252\052\251\344\050A\305\327O) ]
 >>
 startxref
-4312237
+4313718
 %%EOF

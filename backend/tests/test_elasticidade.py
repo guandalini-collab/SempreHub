@@ -55,3 +55,14 @@ def test_atrativos_usam_estoque_de_propaganda():
     a_sem, = atrativos([sem], 100, 30, propaganda={**propaganda, "estoques": {}})
     assert a_sem > 0
     assert a_com / a_sem == pytest.approx(math.exp(0.3))
+
+
+def test_concorrente_simulado_com_catalogo_usa_a_mesma_forma():
+    """Item 2b: preço relativo ^ −2,62 × propaganda na média × força."""
+    import math
+    from app.motor.portfolio import atratividade_concorrente_catalogo
+    ctx = {"media": 50.0, "beta": 0.26}
+    assert atratividade_concorrente_catalogo(1.0, 1.0, ctx) == pytest.approx(math.exp(0.26))
+    assert atratividade_concorrente_catalogo(0.9, 1.3, ctx) == pytest.approx((1 / .9) ** 2.62 * math.exp(.26) * 1.3)
+    # Sem propaganda no mercado, o fator é 1.
+    assert atratividade_concorrente_catalogo(1.0, 1.0, {"media": 0.0, "beta": .26}) == 1.0

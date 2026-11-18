@@ -427,7 +427,8 @@ def _custos_fixos(turma) -> float:
 def _atratividade(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo) -> float:
     preco = max(0.01, decisao.preco)
     referencia = turma.preco_referencia
-    valor = (
+    itens_catalogo = [i for i in ((decisao.plano_comercial or {}).get("produtos") or []) if i.get("preco_mercado")]
+    valor = 1.0 if itens_catalogo else (
         (referencia / preco) ** ELASTICIDADE_PRECO_ESCOLHA
         * (1 + empresa.marca) ** PESO_MARCA
         * (1 + empresa.qualidade) ** PESO_QUALIDADE
@@ -455,7 +456,7 @@ def _atratividade(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo)
     itens=(decisao.plano_comercial or {}).get("produtos", [])
     if itens:
         from .portfolio import atrativos, propaganda_para
-        valor*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade,None,propaganda_para(turma,turma.rodada_atual,empresa,decisao.plano_comercial)))/sum(p["peso"] for p in itens)/((referencia/preco)**ELASTICIDADE_PRECO_ESCOLHA)
+        valor*=sum(atrativos(itens,turma.preco_referencia,turma.custo_unitario,empresa.marca,empresa.qualidade,None,propaganda_para(turma,turma.rodada_atual,empresa,decisao.plano_comercial)))/sum(p["peso"] for p in itens)/(1.0 if itens_catalogo else (referencia/preco)**ELASTICIDADE_PRECO_ESCOLHA)
     return valor
 
 
@@ -480,8 +481,12 @@ def _dividir_mercado(
             pac = demanda_por_loja(turma, [c.decisao.plano_comercial for c in calculos], cal["fator_mensal"])
         # Opção B (aprovada em 17/11/2026): o mercado é medido em reais.
         reais_loja = pac["receita"] * pac["fator_periodo"]
-        for bot in concorrentes:
+        from .portfolio import atratividade_concorrente_catalogo, contexto_guardado
+        for i, bot in enumerate(concorrentes):
             bot["capacidade"] = reais_loja
+            # Item 2b: mesma forma das equipes, propaganda na média do mercado.
+            bot["atratividade"] = atratividade_concorrente_catalogo(.9 + .05 * (i % 5), forca_concorrente(cfg, i),
+                                                                    contexto_guardado(turma, rodada))
     demanda_total = reais_loja * (n + quantidade) * multiplicador_demanda * sazonal if pac else (
         turma.demanda_base_por_empresa
         * n

@@ -588,7 +588,10 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     # sem verba o fator é 1 e a loja segue vendendo (Cooper e Nakanishi, p. 35-36).
     comercial_ativo = produto_publicado and (marketing > 0 or catalogo_fixo)
     preco = max(0.01, d.get("preco", 100))
-    atratividade = atrativo_porter(marca, qualidade, preco, p.get("preco_referencia", 100))
+    # Item 2b (18/11/2026): com catálogo fixo os produtos são idênticos entre as
+    # lojas e não há fórmula de pesos para marca/qualidade (Cooper e Nakanishi,
+    # 1988, p. 71-73); preço e propaganda entram pelos produtos (atrativos).
+    atratividade = 1.0 if catalogo_fixo else atrativo_porter(marca, qualidade, preco, p.get("preco_referencia", 100))
     atratividade *= (0.5 + 0.5 * s["satisfacao"] / 100) * fator_canal
     diferenciar = op.get("posicionamento", "CUSTO") == "DIFERENCIACAO"
     desalinhada = ((diferenciar and marca < 3 and qualidade < 3)

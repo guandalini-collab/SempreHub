@@ -894,6 +894,8 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 
 **Persistência da propaganda.** Propaganda e promoção têm efeitos defasados, sentidos no mês em que são feitas e nos seguintes (COOPER; NAKANISHI, 1988, seção 3.9 e apêndice 3.10.1). O estoque de propaganda soma a veiculação do mês e a dos três meses anteriores, com pesos 1; 0,44; 0,19 e 0,09 (as potências 1, 2 e 3 de 0,44). O valor 0,44 é a persistência média em dados mensais, e cerca de 90% do efeito acumulado se esgota em três meses (CLARKE, 1976, tabela 2). Com isso, o efeito de longo prazo fica em cerca de 0,21, próximo do 0,24 encontrado por Sethuraman, Tellis e Briesch (2011). Aplicar o valor de Clarke à forma exponencial e limitar a soma a três meses são escolhas do jogo.
 
+**Atratividade da loja e concorrentes simulados.** Nos modelos de atração, todas as lojas seguem a mesma forma, e só influenciam as participações os atributos em que elas diferem (COOPER; NAKANISHI, 1988, p. 71-73). Como todas vendem os mesmos produtos reais do catálogo, a qualidade do produto não diferencia uma loja de outra. A atratividade da loja é a média, ponderada pelos pesos do sortimento, da atratividade de cada produto: (preço de mercado ÷ preço da loja)^2,62 × fator de propaganda. Os concorrentes simulados seguem a mesma fórmula: cobram de 0,90 a 1,10 do preço de mercado de cada item e anunciam na média do mercado. A força dos concorrentes, definida pelo professor, multiplica a atratividade deles e corresponde ao componente próprio de cada loja nos modelos de escolha de loja (BRIESCH; CHINTAGUNTA; FOX, 2009); os valores de força e a propaganda dos simulados na média são escolhas do jogo.
+
 **Marca.** Brand equity é o efeito diferencial que o conhecimento da marca exerce sobre a resposta do consumidor ao marketing; a marca não é construída só por propaganda, e sua essência é um bom produto (KOTLER; KELLER, 2013, p. 257-267). A obra não oferece uma regra numérica para acumular ou perder marca. Por isso, nas turmas com catálogo, a verba de mídia não aumenta a marca: o efeito da propaganda ao longo do tempo é o da persistência descrita acima, e contá-lo também na marca seria contar duas vezes.
 
 **Tamanho do mercado.** O mercado mensal de cada loja é a receita mensal de uma loja pequena da atividade (IBGE, PAC 2024, tabelas 10645 e 10647), atualizada pelo índice de receita nominal da PMC (IBGE, tabela 8883), multiplicada pelo número de lojas na disputa e pela sazonalidade. A razão entre a loja pequena e a média (0,4348) só é publicada para o varejo total e é aplicada às atividades como estimativa.
@@ -920,9 +922,11 @@ BALLOU, Ronald H. *Gerenciamento da cadeia de suprimentos/logística empresarial
 
 BANCO CENTRAL DO BRASIL. *Sistema Gerenciador de Séries Temporais*: série 4390 – Taxa de juros Selic acumulada no mês. Brasília: BCB. Disponível em: https://dadosabertos.bcb.gov.br/dataset/4390-taxa-de-juros---selic-acumulada-no-mes. Acesso em: 17 nov. 2026.
 
-BIJMOLT, Tammo H. A.; VAN HEERDE, Harald J.; PIETERS, Rik G. M. New empirical generalizations on the determinants of price elasticity. *Journal of Marketing Research*, v. 42, n. 2, p. 141-156, 2005. (Valores citados em VAN HEERDE *et al.*, 2013.)
+BIJMOLT, Tammo H. A.; VAN HEERDE, Harald J.; PIETERS, Rik G. M. New empirical generalizations on the determinants of price elasticity. *Journal of Marketing Research*, v. 42, n. 2, p. 141-156, 2005. DOI: 10.1509/jmkr.42.2.141.62296.
 
 BRASIL. Lei Complementar nº 123, de 14 de dezembro de 2006. Institui o Estatuto Nacional da Microempresa e da Empresa de Pequeno Porte. Anexo I com redação dada pela Lei Complementar nº 155, de 27 de outubro de 2016. Brasília: Presidência da República. Disponível em: https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm. Acesso em: 16 nov. 2026.
+
+BRIESCH, Richard A.; CHINTAGUNTA, Pradeep K.; FOX, Edward J. How does assortment affect grocery store choice? *Journal of Marketing Research*, v. 46, n. 2, p. 176-189, 2009. DOI: 10.1509/jmkr.46.2.176.
 
 CLARKE, Darral G. Econometric measurement of the duration of advertising effect on sales. *Journal of Marketing Research*, v. 13, n. 4, p. 345-357, 1976. DOI: 10.1177/002224377601300404.
 
