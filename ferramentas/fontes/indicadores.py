@@ -91,7 +91,7 @@ def sidra_buscar(tabela: int, termo: str = "", obter=obter_json) -> dict:
             "periodicidade": meta.get("periodicidade"),
             "variaveis": [{"id": v["id"], "nome": v["nome"]} for v in meta.get("variaveis", [])
                           if not t or t in _sem_acento(v["nome"])],
-            "categorias": [{"classificacao": cl["id"], "classificacao_nome": cl["nome"], "id": c["id"], "nome": c["nome"]}
+            "categorias": [{"classificacao": cl["id"], "classificacao_nome": cl.get("nome", ""), "id": c["id"], "nome": c["nome"]}
                            for cl in meta.get("classificacoes", []) for c in cl.get("categorias", [])
                            if t and t in _sem_acento(c["nome"])][:60],
             "link": f"{SIDRA_BASE}/{tabela}/metadados"}
