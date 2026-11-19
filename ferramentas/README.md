@@ -73,18 +73,18 @@ Boletim toda segunda-feira às 7h40 (`crontab -e`):
 | Endividamento das famílias / renda 12 meses | BCB SGS | 29037 | conferido (dados abertos BCB) |
 | IPCA mensal | IBGE SIDRA | 7060, var. 63, cat. 315[7169] | conferido (em uso no backend) |
 | IPCA 12 meses | IBGE SIDRA | 7060, variável resolvida pelo nome | resolvido na execução |
-| IPCA mensal (alternativa) | BCB SGS | 433 | fonte secundária; preferir SIDRA |
-| Expectativas (IPCA, Selic, Câmbio, PIB) | BCB Focus (Olinda) | ExpectativasMercadoAnuais | conferido em fonte secundária |
+| IPCA mensal (alternativa) | BCB SGS | 433 | conferido na API (19/11/2026) |
+| Expectativas (IPCA, Selic, Câmbio, PIB) | BCB Focus (Olinda) | ExpectativasMercadoAnuais | conferido na API (19/11/2026) |
 | PMC volume | IBGE SIDRA | 8882, var. 7169, 11046[56734] | conferido (em uso no backend) |
 | PMC receita nominal | IBGE SIDRA | 8883, var. 7169, 11046[56735] | conferido (em uso no backend) |
 | PMC atividades | IBGE SIDRA, classif. 85 | 90673 tecidos, vestuário e calçados; 31555 móveis; 103158 outros artigos de uso pessoal e doméstico | conferido |
-| PIM-PF | IBGE SIDRA | 8888; atividades resolvidas pelo nome | tabela conferida em fonte secundária |
-| Vestuário | Comex Stat | capítulos 61 e 62 | conferido em fonte secundária |
-| Colchões | Comex Stat | NCM 9404.21.00 e 9404.29.00 | conferido em fonte secundária |
-| Móveis | Comex Stat | posições 9401 e 9403 | conferido em fonte secundária |
-| Bicicletas | Comex Stat | NCM 8712.00.10; 8711.60.00; subposições 8714.91 a 8714.99 | 8714.9x a conferir |
-| Pet | Comex Stat | NCM 2309.10.00 | conferido em fonte secundária |
-| Mochilas e malas | Comex Stat | subposições 4202.11, 4202.12, 4202.19, 4202.92 | conferido em fonte secundária |
+| PIM-PF | IBGE SIDRA | 8888, var. 12606; atividades 3.13, 3.14, 3.15, 3.30 e 3.31 | conferido na API (19/11/2026) |
+| Vestuário | Comex Stat | capítulos 61 e 62 | conferido na API (19/11/2026) |
+| Colchões | Comex Stat | NCM 9404.21.00 e 9404.29.00 | conferido na API (19/11/2026) |
+| Móveis | Comex Stat | posições 9401 e 9403 | conferido na API (19/11/2026) |
+| Bicicletas | Comex Stat | NCM 8712.00.10; 8711.60.00; subposições 8714.91 a 8714.99 | conferido na API (19/11/2026); 8714.9x sem leitura do nome |
+| Pet | Comex Stat | NCM 2309.10.00 | conferido na API (19/11/2026) |
+| Mochilas e malas | Comex Stat | subposições 4202.11, 4202.12, 4202.19, 4202.92 | conferido na API (19/11/2026) |
 
 Observações:
 - 8711.60.00 inclui outros veículos elétricos de duas rodas, não só bicicletas elétricas.

@@ -22,7 +22,9 @@ def _abrir(req, tempo, tentativas):
                 break
             if "CERTIFICATE" in str(e):  # certificado ausente não se resolve tentando de novo
                 break
-            time.sleep(1.5 * (n + 1))
+            # 429 = limite de taxa (o GDELT pede intervalo de alguns segundos entre consultas).
+            limite = isinstance(e, urllib.error.HTTPError) and e.code == 429
+            time.sleep((6.0 if limite else 1.5) * (n + 1))
     raise RuntimeError(f"Falha ao consultar {req.full_url}: {erro}")
 
 
