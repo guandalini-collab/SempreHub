@@ -91,13 +91,21 @@ def test_segmentacao_afeta_vendas_e_resultado_preserva_historico(cliente, profes
     assert cliente.post(docente + '/fechar-rodada', headers=professor, json={'rodada': 1, 'evento': 'NENHUM'}).status_code == 200
     resultados = [cliente.get(f'/api/aluno/empresas/{empresa}', headers=aluno).json()['resultados'][0] for aluno, empresa in zip(alunos, empresas)]
     bom, ruim = resultados
-    assert bom['demanda'] > ruim['demanda']
-    assert bom['unidades_vendidas'] > ruim['unidades_vendidas']
-    assert bom['dre']['receita'] > ruim['dre']['receita']
-    assert bom['dre']['lucro_liquido'] > ruim['dre']['lucro_liquido']
     assert any('público-alvo' in a for a in ruim['alertas'])
-    if modo != 'LEGADO':
+    if modo == 'STARTUP':
+        assert bom['demanda'] > ruim['demanda']
+        assert bom['unidades_vendidas'] > ruim['unidades_vendidas']
+        assert bom['dre']['receita'] > ruim['dre']['receita']
+        assert bom['dre']['lucro_liquido'] > ruim['dre']['lucro_liquido']
         assert ruim['detalhes_simulacao']['avaliacao_estrategica']['fator'] == .95
+    else:
+        # Item 2d: com catálogo fixo a segmentação declarada é devolutiva e
+        # avaliação, sem efeito na demanda.
+        assert bom['demanda'] == pytest.approx(ruim['demanda'])
+        assert any('Próximo passo' in a for a in ruim['alertas'])
+        if modo == 'TRADICIONAL':
+            av = ruim['detalhes_simulacao']['avaliacao_estrategica']
+            assert av['fator'] == 1.0 and av['diagnostico'] and av['achados']
     assert cliente.post(docente + '/fechar-rodada', headers=professor, json={'rodada': 2, 'evento': 'NENHUM'}).status_code == 200
     final = cliente.get(f'/api/aluno/empresas/{empresas[1]}', headers=alunos[1]).json()
     assert final['resultados'][0] == ruim

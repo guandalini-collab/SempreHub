@@ -10,6 +10,18 @@ def quadrante(crescimento, participacao):
     return ("ESTRELA" if participacao >= 1 else "INTERROGACAO") if crescimento >= 10 else ("VACA" if participacao >= 1 else "ABACAXI")
 
 
+AJUSTES = {
+    "diretriz": "Revise a diretriz da SWOT ou o posicionamento comercial para que indiquem a mesma estratégia.",
+    "rivalidade": "Reavalie a intensidade da rivalidade com base no nível de concorrência informado na rodada.",
+    "quadrante": "Reclassifique o produto na BCG pelos cortes de crescimento (10%) e participação relativa (1×).",
+    "juros": "Atualize a premissa de juros da PESTEL com a taxa do mês antes de pedir crédito.",
+    "preco": "Ajuste o preço ou revise o limite de compra declarado para o público-alvo.",
+    "cobertura": "Alinhe a cobertura do mix à área escolhida para o público-alvo.",
+    "canais": "Inclua ao menos um canal de compra declarado para o público-alvo.",
+    "midias": "Escolha ao menos uma das mídias indicadas na segmentação.",
+}
+
+
 def avaliar(decisao, turma):
     plano = decisao.plano_comercial or {}
     itens=plano.get("produtos", [])
@@ -19,6 +31,12 @@ def avaliar(decisao, turma):
         peso=sum(p["peso"] for p in itens)
         reducao=round(sum(p["peso"]*r["reducao"] for p,r in zip(itens,resultados))/peso,6)
         achados=[{**a,"produto_id":p["produto_id"],"texto":p.get("produto_nome",p["produto_id"])+": "+a["texto"]} for p,r in zip(itens,resultados) for a in r["achados"]]
+        if any(p.get("preco_mercado") for p in itens):
+            # Item 2d (18/11/2026): com catálogo fixo, a coerência dos planos é
+            # devolutiva e avaliação, sem efeito na demanda (Gosen; Washbush,
+            # 2004; Anderson; Lawton, 2009; Hattie; Timperley, 2007).
+            achados=[{**a,"ajuste":AJUSTES.get(a["criterio"],"")} for a in achados]
+            return {"versao":2,"fator":1.0,"reducao":0.0,"diagnostico":True,"achados":achados,"avaliada":any(r["avaliada"] for r in resultados),"produtos":[{"produto_id":p["produto_id"],**r} for p,r in zip(itens,resultados)]}
         return {"versao":1,"fator":1-reducao,"reducao":reducao,"achados":achados,"avaliada":any(r["avaliada"] for r in resultados),"produtos":[{"produto_id":p["produto_id"],**r} for p,r in zip(itens,resultados)]}
     analises = plano.get("analises")
     achados = []
@@ -58,4 +76,7 @@ def avaliar(decisao, turma):
 def mensagens(avaliacao):
     if not avaliacao["achados"]:
         return []
+    if avaliacao.get("diagnostico"):
+        return (["Coerência do plano (sem efeito na demanda; serve para revisão e para a avaliação do professor):"]
+                + [f"{a['ferramenta']}: {a['texto']} Próximo passo: {a['ajuste']}".strip() for a in avaliacao["achados"]])
     return [f"Alinhamento estratégico: redução de {avaliacao['reducao']:.0%} na conversão da demanda comercial (limite 20%)."] + [f"{a['ferramenta']}: {a['texto']}" for a in avaliacao["achados"]]

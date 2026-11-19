@@ -104,7 +104,11 @@ def diagnostico_segmentacao(item, segmentacao=None):
     fator = 1.0
     preco_maximo = alvo.get("preco_maximo")
     preco = float(item.get("preco", 0) or 0)
-    if preco_maximo is not None and preco > float(preco_maximo):
+    catalogo = bool(item.get("preco_mercado"))
+    if catalogo and preco_maximo is not None and preco > float(preco_maximo):
+        avisos.append("Preço acima do limite de compra declarado para o público-alvo. "
+                      "Próximo passo: ajuste o preço ou revise o limite declarado.")
+    elif preco_maximo is not None and preco > float(preco_maximo):
         return {
             "fator": 0.0, "status": "preco_acima_do_teto", "preco": preco,
             "preco_maximo": float(preco_maximo),
@@ -140,9 +144,13 @@ def diagnostico_segmentacao(item, segmentacao=None):
         fator *= 0.50
         avisos.append("As mídias escolhidas não coincidem com os canais declarados para o público-alvo.")
 
+    if catalogo:
+        # Item 2d (18/11/2026): no catálogo a segmentação declarada é devolutiva,
+        # sem efeito na demanda (sem demanda por segmento no modelo).
+        fator = 1.0
     return {
         "fator": max(0.0, min(1.0, fator)),
-        "status": "alinhado" if not avisos else "alinhamento_parcial",
+        "status": ("alinhado" if not avisos else "alinhamento_parcial") if not catalogo else ("alinhado" if not avisos else "diagnostico"),
         "preco": preco, "preco_maximo": preco_maximo,
         "canais_produto": sorted(canais_produto), "canais_publico": sorted(canais_alvo),
         "cobertura_produto": cobertura_produto, "cobertura_publico": cobertura_alvo,

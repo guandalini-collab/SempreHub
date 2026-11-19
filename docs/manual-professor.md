@@ -785,7 +785,7 @@ A barra de prazo no painel docente representa somente as últimas 24 horas da da
 
 ### Critérios de coerência estratégica
 
-As incompatibilidades estruturadas podem reduzir a demanda comercial: SWOT e posicionamento, 4%; BCG e quadrante, 3%; público e preço, 5%; cobertura, 3%; canais, 4%; mídias, 4%. A redução total é limitada a 20%. Diagnósticos de consulta e textos livres não recebem penalidades automáticas. Demanda, capacidade, custos e concorrência continuam influenciando os resultados; nenhuma escolha garante lucro.
+Nas turmas com catálogo, as incompatibilidades entre as ferramentas e as decisões não alteram a demanda: aparecem no resultado da rodada como devolutiva, com o próximo passo sugerido, e servem para a revisão da equipe e a avaliação do professor (veja "Coerência dos planos" nos fundamentos teóricos). Nas demais turmas, as incompatibilidades estruturadas podem reduzir a demanda comercial: SWOT e posicionamento, 4%; BCG e quadrante, 3%; público e preço, 5%; cobertura, 3%; canais, 4%; mídias, 4%. A redução total é limitada a 20%. Diagnósticos de consulta e textos livres não recebem penalidades automáticas. Demanda, capacidade, custos e concorrência continuam influenciando os resultados; nenhuma escolha garante lucro.
 
 
 ### Navegação focada dos alunos
@@ -898,6 +898,8 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 
 **Posicionamento (Porter).** Porter descreve três estratégias genéricas: liderança em custo, diferenciação e enfoque. A empresa que não se define em nenhuma delas fica no "meio-termo", situação estratégica pobre, com baixa rentabilidade quase garantida (PORTER, 2004, cap. 2). O autor não quantifica esse efeito. Por isso, nas turmas com catálogo, o posicionamento não reduz a demanda por um percentual fixo: o jogo compara o preço de cada item com o preço de mercado e emite um aviso quando a estratégia declarada e os preços se contradizem. A baixa rentabilidade, quando ocorrer, resulta das próprias decisões de preço, custo e despesas.
 
+**Coerência dos planos.** Planejar estrategicamente melhora o desempenho da empresa, mas o efeito médio é pequeno e varia muito entre estudos (MILLER; CARDINAL, 1994); corrigido o viés de publicação, ele deixa de ser significativo (SHEA-VAN FOSSEN; ROTHSTEIN; KORN, 2006). O efeito vem das decisões que o planejamento orienta, e medir planejamento apenas por documentos escritos é problemático (MILLER; CARDINAL, 1994, p. 1660-1661). A coerência (fit) entre elementos da estratégia tem vários significados e não deve ser convertida em uma fórmula de conveniência (VENKATRAMAN, 1989). Em simuladores, o resultado no jogo não é medida de aprendizagem, que deve ser avaliada diretamente (GOSEN; WASHBUSH, 2004; ANDERSON; LAWTON, 2009), e o modelo precisa de verossimilhança (CHIN; DUKES; GAMSON, 2009; FARIA *et al.*, 2009). Por isso, nas turmas com catálogo, SWOT, Porter, PESTEL, BCG e segmentação não reduzem a demanda: cada incoerência gera uma devolutiva que diz o que está incoerente e qual é o próximo passo, a forma de feedback mais eficaz segundo Hattie e Timperley (2007), e fica registrada para a avaliação do professor.
+
 **Marca.** Brand equity é o efeito diferencial que o conhecimento da marca exerce sobre a resposta do consumidor ao marketing; a marca não é construída só por propaganda, e sua essência é um bom produto (KOTLER; KELLER, 2013, p. 257-267). A obra não oferece uma regra numérica para acumular ou perder marca. Por isso, nas turmas com catálogo, a verba de mídia não aumenta a marca: o efeito da propaganda ao longo do tempo é o da persistência descrita acima, e contá-lo também na marca seria contar duas vezes.
 
 **Tamanho do mercado.** O mercado mensal de cada loja é a receita mensal de uma loja pequena da atividade (IBGE, PAC 2024, tabelas 10645 e 10647), atualizada pelo índice de receita nominal da PMC (IBGE, tabela 8883), multiplicada pelo número de lojas na disputa e pela sazonalidade. A razão entre a loja pequena e a média (0,4348) só é publicada para o varejo total e é aplicada às atividades como estimativa.
@@ -916,6 +918,8 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 
 AGÊNCIA NACIONAL DE AVIAÇÃO CIVIL (Brasil). Resolução nº 400, de 13 de dezembro de 2016. Dispõe sobre as condições gerais de transporte aéreo. Brasília: ANAC, 2016.
 
+ANDERSON, Philip H.; LAWTON, Leigh. Business simulations and cognitive learning: developments, desires, and future directions. *Simulation & Gaming*, v. 40, n. 2, p. 193-216, 2009. DOI: 10.1177/1046878108321624.
+
 ASSAF NETO, Alexandre. *Finanças corporativas e valor*. 7. ed. São Paulo: Atlas, 2014.
 
 AZZI, Anna *et al*. Inventory holding costs measurement: a multi-case study. *The International Journal of Logistics Management*, v. 25, n. 1, p. 109-132, 2014. DOI: 10.1108/IJLM-01-2012-0004.
@@ -930,11 +934,19 @@ BRASIL. Lei Complementar nº 123, de 14 de dezembro de 2006. Institui o Estatuto
 
 BRIESCH, Richard A.; CHINTAGUNTA, Pradeep K.; FOX, Edward J. How does assortment affect grocery store choice? *Journal of Marketing Research*, v. 46, n. 2, p. 176-189, 2009. DOI: 10.1509/jmkr.46.2.176.
 
+CHIN, Jeffrey; DUKES, Richard; GAMSON, William. Assessment in simulation and gaming: a review of the last 40 years. *Simulation & Gaming*, v. 40, n. 4, p. 553-568, 2009. DOI: 10.1177/1046878109332955.
+
 CLARKE, Darral G. Econometric measurement of the duration of advertising effect on sales. *Journal of Marketing Research*, v. 13, n. 4, p. 345-357, 1976. DOI: 10.1177/002224377601300404.
 
 CONSELHO NACIONAL DE TRÂNSITO (Brasil). Resolução nº 996, de 15 de junho de 2023. Brasília: Contran, 2023.
 
 COOPER, Lee G.; NAKANISHI, Masao. *Market-share analysis*: evaluating competitive marketing effectiveness. Boston: Kluwer Academic Publishers, 1988. Edição eletrônica disponível em: https://www.anderson.ucla.edu/faculty/lee.cooper/MCI_Book/Book1.htm. Acesso em: 17 nov. 2026.
+
+FARIA, A. J.; HUTCHINSON, David; WELLINGTON, William J.; GOLD, Steven. Developments in business gaming: a review of the past 40 years. *Simulation & Gaming*, v. 40, n. 4, p. 464-487, 2009. DOI: 10.1177/1046878108327585.
+
+GOSEN, Jerry; WASHBUSH, John. A review of scholarship on assessing experiential learning effectiveness. *Simulation & Gaming*, v. 35, n. 2, p. 270-293, 2004. DOI: 10.1177/1046878104263544.
+
+HATTIE, John; TIMPERLEY, Helen. The power of feedback. *Review of Educational Research*, v. 77, n. 1, p. 81-112, 2007. DOI: 10.3102/003465430298487.
 
 IBGE. *Índice Nacional de Preços ao Consumidor Amplo (IPCA)*: tabela 7060. Rio de Janeiro: IBGE. Disponível em: https://sidra.ibge.gov.br. Acesso em: 16 nov. 2026.
 
@@ -946,14 +958,21 @@ KOTLER, Philip; KELLER, Kevin Lane. *Administração de marketing*. 14. ed. Trad
 
 LEVY, Michael; WEITZ, Barton A. *Retailing management*. 8. ed. New York: McGraw-Hill/Irwin, [2011 ou 2012]. Capítulo 2: Types of retailers. (Definições consultadas no manual do professor da obra.)
 
+MILLER, C. Chet; CARDINAL, Laura B. Strategic planning and firm performance: a synthesis of more than two decades of research. *Academy of Management Journal*, v. 37, n. 6, p. 1649-1665, 1994. DOI: 10.2307/256804.
+
 MINISTÉRIO DA AGRICULTURA, PECUÁRIA E ABASTECIMENTO (Brasil). Instrução Normativa nº 30, de 5 de agosto de 2009. Brasília: MAPA, 2009.
 
 PORTER, Michael E. *Estratégia competitiva*: técnicas para análise de indústrias e da concorrência. Tradução de Elizabeth Maria de Pinho Braga. 2. ed. Rio de Janeiro: Elsevier, 2004.
 
 SETHURAMAN, Raj; TELLIS, Gerard J.; BRIESCH, Richard A. How well does advertising work? Generalizations from meta-analysis of brand advertising elasticities. *Journal of Marketing Research*, v. 48, n. 3, p. 457-471, 2011.
 
+SHEA-VAN FOSSEN, Rita J.; ROTHSTEIN, Hannah R.; KORN, Helaine J. Thirty-five years of strategic planning and firm performance research: a meta-analysis. *In*: ACADEMY OF MANAGEMENT ANNUAL MEETING, 2006. *Best Conference Paper* BPS. [S. l.]: Academy of Management, 2006. p. M1-M6.
+
 U.S. CENSUS BUREAU. *X-13ARIMA-SEATS seasonal adjustment program*. Washington, DC: U.S. Census Bureau. Disponível em: https://www.census.gov/data/software/x13as.html. Acesso em: 16 nov. 2026.
 
 VAN HEERDE, Harald J. *et al*. Price and advertising effectiveness over the business cycle. *Journal of Marketing Research*, v. 50, n. 2, p. 177-193, 2013.
 
+VENKATRAMAN, N. The concept of fit in strategy research: toward verbal and statistical correspondence. *Academy of Management Review*, v. 14, n. 3, p. 423-444, 1989. DOI: 10.5465/amr.1989.4279078.
+
 **Fontes de mercado dos preços** (coletas de 15 e 16 nov. 2026): Buscapé; lojas oficiais do Mercado Livre; sites da Renner, Riachuelo, MadeiraMadeira, Petz e Decathlon. Preços de serviços: MercadoMineiro (banho e tosa, Belo Horizonte, out. 2026), GetNinjas e Cronoshare (montagem de móveis, valores indicativos).
+
