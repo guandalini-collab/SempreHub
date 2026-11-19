@@ -229,6 +229,7 @@ export function RelatorioFinanceiro({ detalhes, somenteBalanco = false }: { deta
           <Operacao detalhes={detalhes} campo="refugo" rotulo="Refugo" />
           <Operacao detalhes={detalhes} campo="vendas" rotulo="Unidades vendidas" />
           <Operacao detalhes={detalhes} campo="ruptura" rotulo="Demanda não atendida" />
+          <RespostaRuptura detalhes={detalhes} />
           <Operacao detalhes={detalhes} campo="capacidade_produtiva" rotulo="Capacidade produtiva" />
           <Operacao detalhes={detalhes} campo="estoque_pa_final" rotulo="Produtos no estoque final" />
         </>}
@@ -264,6 +265,22 @@ function Titulos({ titulo, titulos }: { titulo: string; titulos: EstadoSimulacao
 function ListaFinanceira({ linhas }: { linhas: [string, number][] }) {
   const [pagina,setPagina]=React.useState(0);
   return <><dl className="divide-y divide-slate-100 text-sm">{linhas.slice(pagina*6,pagina*6+6).map(([rotulo, valor]) => <div key={rotulo} className="flex justify-between gap-3 py-1.5"><dt className="text-slate-600">{rotulo}</dt><dd className={`whitespace-nowrap font-semibold ${valor < 0 ? "text-red-700" : "text-marinho"}`}><ValorMonetario valor={valor}/></dd></div>)}</dl>{linhas.length>6&&<nav className="etapas-curtas mt-3" aria-label="Páginas do demonstrativo"><button type="button" disabled={!pagina} onClick={()=>setPagina(n=>n-1)}>← Anterior</button><span className="self-center text-xs">{pagina+1}/{Math.ceil(linhas.length/6)}</span><button type="button" disabled={(pagina+1)*6>=linhas.length} onClick={()=>setPagina(n=>n+1)}>Próxima →</button></nav>}</>;
+}
+
+function RespostaRuptura({ detalhes }: { detalhes: DetalhesSimulacao }) {
+  // Destino dos clientes que não encontraram o produto (Corsten e Gruen, 2003;
+  // Anderson, Fitzsimons e Simester, 2006).
+  const r = detalhes.operacao["resposta_ruptura"] as unknown as Record<string, unknown> | undefined;
+  if (!r || typeof r !== "object") return null;
+  const soma = (v: unknown) => typeof v === "number" ? v : v && typeof v === "object" ? Object.values(v as Record<string, number>).reduce((a, b) => a + (Number(b) || 0), 0) : 0;
+  return <>
+    <Dado rotulo="Clientes que trocaram por outro item da loja" valor={inteiro(soma(r.substituidas))} />
+    <Dado rotulo="Clientes que foram a outra loja" valor={inteiro(soma(r.outra_loja))} />
+    <Dado rotulo="Pedidos pendentes para o próximo mês" valor={inteiro(soma(r.pendentes))} />
+    <Dado rotulo="Clientes que desistiram da compra" valor={inteiro(soma(r.perdidas))} />
+    <Dado rotulo="Pendentes atendidos neste mês" valor={`${inteiro(soma(r.pendentes_atendidos))} (perdidos: ${inteiro(soma(r.pendentes_perdidos))})`} />
+    <Dado rotulo="Clientes vindos de outras lojas atendidos" valor={`${inteiro(soma(r.transferidas_atendidas))} (sem estoque: ${inteiro(soma(r.transferidas_perdidas))})`} />
+  </>;
 }
 
 function Operacao({ detalhes, campo, rotulo, tipo = "inteiro" }: { detalhes: DetalhesSimulacao; campo: string; rotulo: string; tipo?: "inteiro" | "moeda" | "percentual" | "decimal" }) {

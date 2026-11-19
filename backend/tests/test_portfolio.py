@@ -213,3 +213,7 @@ def test_catalogo_propaganda_persiste_e_caixa_rende_selic(cliente,professor,monk
     painel=cliente.get(base,headers=aluno).json()
     servico=painel['empresa']['estado_simulacao']['nivel_servico']
     assert 0<=servico['otif']<=1 and 0<=servico['taxa_ruptura']<=1
+    # Resposta à falta (18/11/2026): a carteira de pedidos pendentes fica no
+    # estado e o fechamento registra o destino dos clientes sem produto.
+    assert isinstance(painel['empresa']['estado_simulacao']['pedidos_pendentes'], dict)
+    assert 'resposta_ruptura' in res2['detalhes_simulacao']['operacao']

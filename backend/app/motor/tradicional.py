@@ -657,6 +657,7 @@ def apurar(preparo: dict, demanda: float,
     plano_comercial = d.get("plano_comercial") or {}
     itens=plano_comercial.get("produtos", [])
     demanda_reais = None
+    resposta_ruptura = None
     if p.get("mercado_em_reais") and itens:
         # Opção B (aprovada em 17/11/2026): a disputa é em reais; cada produto
         # converte sua fatia em unidades pelo próprio preço.
@@ -693,7 +694,18 @@ def apurar(preparo: dict, demanda: float,
         if demanda_reais is not None:
             from .portfolio import pesos_em_valor
             pesos = pesos_em_valor(itens, pesos)
-        linhas=vender(s,itens,demanda_comercial,pesos,c.get("diagnosticos_segmentacao"))
+        if catalogo_fixo and demanda_reais is not None:
+            # Resposta à falta (18/11/2026): pendentes do mês anterior, clientes
+            # vindos de outras lojas e destino de quem não encontrou o produto.
+            from .portfolio import vender_com_ruptura
+            linhas, resposta_ruptura = vender_com_ruptura(
+                s, itens, demanda_comercial, pesos, c.get("diagnosticos_segmentacao"),
+                pendentes=s.pop("pedidos_pendentes", None), transferidas=p.get("demanda_transferida"),
+                limite_extra=(capacidade_entrega - demanda_comercial) if comercial_ativo else 0)
+            s["pedidos_pendentes"] = resposta_ruptura["pendentes"]
+            demanda += sum(l["pendentes_recebidos"] + l["transferidas_recebidas"] for l in linhas)
+        else:
+            linhas=vender(s,itens,demanda_comercial,pesos,c.get("diagnosticos_segmentacao"))
         vendas=sum(l["vendas"] for l in linhas)
         cmv=_soma(l["cmv"] for l in linhas);receita=_soma(l["receita"] for l in linhas)
         pa=s["estoque_pa"]
@@ -835,6 +847,8 @@ def apurar(preparo: dict, demanda: float,
     )
     operacao.update(localizacao)
     operacao["produtos"]=linhas
+    if resposta_ruptura is not None:
+        operacao["resposta_ruptura"] = deepcopy(resposta_ruptura)
     if demanda_reais is not None:
         operacao.update(demanda_reais=round(demanda_reais, 2))
     operacao.update(demanda=demanda, demanda_comercial=demanda_comercial, vendas=vendas, ruptura=ruptura,
@@ -858,7 +872,7 @@ def apurar(preparo: dict, demanda: float,
     detalhes = {"versao_motor": 1, "engine_version": ENGINE_VERSION, "modo": "TRADICIONAL", "configuracao": deepcopy(p),
                 "estado_inicial": deepcopy(c["estado_inicial"]), "estado_final": deepcopy(s),
                 "operacao": operacao, "dfc": dfc, "balanco": balanco}
-    return {"estado": deepcopy(s), "caixa": caixa, "divida": c["divida"], "funcionarios": c["funcionarios"],
+    return {"transferencias_ruptura": deepcopy((resposta_ruptura or {}).get("outra_loja") or {}), "estado": deepcopy(s), "caixa": caixa, "divida": c["divida"], "funcionarios": c["funcionarios"],
             "capacidade": c["capacidade_produtiva"], "vendas": vendas, "dre": dre, "aliquota": aliquota,
             "detalhes": detalhes, "alertas": c["alertas"], "satisfacao": s["satisfacao"],
             "marca": c["marca"], "qualidade": c["qualidade"]}

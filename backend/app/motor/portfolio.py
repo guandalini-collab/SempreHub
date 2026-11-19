@@ -451,6 +451,130 @@ def sincronizar(estado):
         estado[k]={'quantidade':sum(p[k]['quantidade'] for p in estado['estoques_produtos'].values()),'valor':dinheiro(sum(p[k]['valor'] for p in estado['estoques_produtos'].values()))}
 
 
+# Resposta do consumidor à falta do produto (aprovado em 18/11/2026).
+# Itens de consumo do pet: Corsten e Gruen (2003, Figura 2) — substitui na
+# mesma loja 45% (19% mesma marca + 26% outra), compra em outra loja 31%,
+# adia 15%, desiste 9%. Duráveis: Anderson, Fitzsimons e Simester (2006,
+# Tabela 1) — 62% mantêm o pedido e esperam; 32% cancelam e 6% devolvem —,
+# com a regra qualitativa de Ballou (2007, p. 280). Vestuário: sem estudo
+# lido; a venda continua perdida (lacuna declarada).
+RESPOSTA_RUPTURA = {
+    "CONSUMO": {"substitui": .45, "outra_loja": .31, "adia": .15, "desiste": .09},
+    "DURAVEL": {"adia": .62, "desiste": .38},
+}
+LINHAS_CONSUMO_PET = {"Alimentação", "Higiene"}
+
+
+def classe_ruptura(produto_id):
+    """CONSUMO, DURAVEL ou None (venda perdida) para um item do catálogo fixo."""
+    from ..catalogo_fixo import item as item_catalogo
+    ficha = item_catalogo(produto_id)
+    if not ficha or ficha["setor"] == "vestuario":
+        return None
+    if ficha["setor"] == "pet" and ficha["linha"] in LINHAS_CONSUMO_PET:
+        return "CONSUMO"
+    return "DURAVEL"
+
+
+def linha_catalogo(produto_id):
+    from ..catalogo_fixo import item as item_catalogo
+    ficha = item_catalogo(produto_id)
+    return (ficha["setor"], ficha["linha"]) if ficha else None
+
+
+def vender_com_ruptura(estado, itens, demanda, pesos, diagnosticos_publico=None,
+                       pendentes=None, transferidas=None, limite_extra=None):
+    """Venda do catálogo com pedidos pendentes, demanda vinda de outras lojas e
+    resposta à falta. Prioridade no estoque: pendentes, clientes do mês e, por
+    último, clientes vindos de outras lojas. Pendente não atendido de novo e
+    cliente transferido não atendido são perdidos (sem cascata)."""
+    pendentes = {k: int(v) for k, v in (pendentes or {}).items() if v}
+    transferidas = {k: int(v) for k, v in (transferidas or {}).items() if v}
+    ids = {p['produto_id'] for p in itens}
+    pendentes = {k: v for k, v in pendentes.items() if k in ids}
+    transferidas = {k: v for k, v in transferidas.items() if k in ids}
+    if limite_extra is not None:
+        # Os pedidos extras também precisam de capacidade de entrega.
+        livre = max(0, int(limite_extra))
+        for fonte in (pendentes, transferidas):
+            total = sum(fonte.values())
+            if total > livre:
+                chaves = list(fonte)
+                partes = dividir(livre, [fonte[k] for k in chaves])
+                fonte.clear(); fonte.update({k: q for k, q in zip(chaves, partes) if q})
+            livre -= sum(fonte.values())
+    demandas = dividir(demanda, pesos)
+    linhas = []
+    resposta = {"substituidas": 0, "outra_loja": {}, "pendentes": {}, "perdidas": 0,
+                "pendentes_atendidos": 0, "pendentes_perdidos": 0,
+                "transferidas_atendidas": 0, "transferidas_perdidas": 0}
+    estoques = estado.setdefault('estoques_produtos', {})
+    for p, d in zip(itens, demandas):
+        pid = p['produto_id']
+        estoque_linha = estoques.setdefault(
+            pid, {'estoque_mp': {'quantidade': 0, 'valor': 0}, 'estoque_pa': {'quantidade': 0, 'valor': 0}})
+        st = estoque_linha['estoque_pa']
+        pend, trans = pendentes.get(pid, 0), transferidas.get(pid, 0)
+        disponivel = st['quantidade']
+        q_pend = min(pend, disponivel); disponivel -= q_pend
+        q_novo = min(d, disponivel); disponivel -= q_novo
+        q_trans = min(trans, disponivel)
+        q = q_pend + q_novo + q_trans
+        cmv = dinheiro(st['valor'] * q / st['quantidade']) if st['quantidade'] else 0
+        receita = dinheiro(q * p['preco']); st['quantidade'] -= q; st['valor'] = dinheiro(st['valor'] - cmv)
+        resposta["pendentes_atendidos"] += q_pend; resposta["pendentes_perdidos"] += pend - q_pend
+        resposta["transferidas_atendidas"] += q_trans; resposta["transferidas_perdidas"] += trans - q_trans
+        linhas.append({'produto_id': pid, 'nome': p['produto_nome'], 'preco': p['preco'],
+                       'custos_campanha': deepcopy(p.get('custos_campanha')),
+                       'demanda': d + pend + trans, 'vendas': q, 'receita': receita, 'cmv': cmv,
+                       'pendentes_recebidos': pend, 'transferidas_recebidas': trans, 'substituicoes': 0,
+                       'falta_clientes_mes': d - q_novo,
+                       'alinhamento_publico': deepcopy((diagnosticos_publico or {}).get(pid))})
+    # Resposta dos clientes do mês que não encontraram o produto.
+    for p, linha in zip(itens, linhas):
+        falta = linha['falta_clientes_mes']
+        if falta <= 0:
+            continue
+        classe = classe_ruptura(linha['produto_id'])
+        if classe is None:
+            resposta["perdidas"] += falta
+            continue
+        regra = RESPOSTA_RUPTURA[classe]
+        partes = dict(zip(regra, dividir(falta, list(regra.values()))))
+        if partes.get("adia"):
+            resposta["pendentes"][linha['produto_id']] = partes["adia"]
+        if partes.get("outra_loja"):
+            resposta["outra_loja"][linha['produto_id']] = partes["outra_loja"]
+        resposta["perdidas"] += partes.get("desiste", 0)
+        sub = partes.get("substitui", 0)
+        if sub:
+            # Substituto: outro item da mesma linha do catálogo com estoque.
+            mesma = linha_catalogo(linha['produto_id'])
+            candidatos = [(i, outra) for i, (q, outra) in enumerate(zip(itens, linhas))
+                          if outra is not linha and linha_catalogo(outra['produto_id']) == mesma
+                          and estoques[outra['produto_id']]['estoque_pa']['quantidade'] > 0]
+            if candidatos:
+                partes_sub = dividir(sub, [max(1e-9, pesos[i]) for i, _ in candidatos])
+                for (i, outra), qtd in zip(candidatos, partes_sub):
+                    st = estoques[outra['produto_id']]['estoque_pa']
+                    qtd = min(qtd, st['quantidade'])
+                    if qtd <= 0:
+                        continue
+                    cmv = dinheiro(st['valor'] * qtd / st['quantidade'])
+                    receita = dinheiro(qtd * outra['preco'])
+                    st['quantidade'] -= qtd; st['valor'] = dinheiro(st['valor'] - cmv)
+                    outra['vendas'] += qtd; outra['substituicoes'] += qtd
+                    outra['receita'] = dinheiro(outra['receita'] + receita); outra['cmv'] = dinheiro(outra['cmv'] + cmv)
+                    resposta["substituidas"] += qtd; sub -= qtd
+            resposta["perdidas"] += sub
+    for p, linha in zip(itens, linhas):
+        linha['comissao_canal'] = dinheiro(linha['receita'] * (.05 if 'ATACADO' in p['canais'] else .03 if any(
+            c in p['canais'] for c in ('ECOMMERCE', 'MARKETPLACE')) else 0))
+        linha['estoque_final'] = deepcopy(estoques[linha['produto_id']]['estoque_pa'])
+    sincronizar(estado)
+    return linhas, resposta
+
+
 def vender(estado,itens,demanda,pesos,diagnosticos_publico=None):
     demandas=dividir(demanda,pesos); linhas=[]
     for p,d in zip(itens,demandas):

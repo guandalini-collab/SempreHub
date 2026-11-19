@@ -54,7 +54,7 @@ PESO_MARCA = 0.30
 PESO_QUALIDADE = 0.25
 RETENCAO_MARCA = 0.80  # parte da marca que permanece de um mês para o outro
 RETENCAO_QUALIDADE = 0.90
-REAPROVEITAMENTO_DEMANDA = 0.50  # parte dos clientes não atendidos que compra de outra empresa
+REAPROVEITAMENTO_DEMANDA = 0.50  # regra histórica, só fora do catálogo fixo (sem fonte)
 PENALIDADE_MEIO_TERMO = 0.70  # Porter: preço baixo com gasto alto em diferenciação
 PENALIDADE_PREMIUM_SEM_BASE = 0.80  # Porter: preço alto sem marca nem qualidade
 LIMIAR_PREMIUM_MARCA_QUALIDADE = 3.0
@@ -465,6 +465,24 @@ def _atratividade(empresa: Empresa, decisao: Decisao, turma: Turma, c: _Calculo)
     return valor
 
 
+def _fracao_troca_de_loja(c) -> float:
+    """Parte dos clientes não atendidos que compra em outra loja.
+
+    Catálogo fixo (18/11/2026): só itens de consumo do pet trocam de loja,
+    31% (Corsten e Gruen, 2003); duráveis esperam ou desistem (Anderson,
+    Fitzsimons e Simester, 2006) e, como o modelo básico não guarda carteira
+    de pedidos, a espera não é modelada; vestuário perde a venda. A fração é
+    ponderada pelo peso de cada item no mix. Fora do catálogo, mantém-se a
+    regra histórica."""
+    itens = [i for i in ((c.decisao.plano_comercial or {}).get("produtos") or []) if i.get("preco_mercado")]
+    if not itens:
+        return REAPROVEITAMENTO_DEMANDA
+    from .portfolio import classe_ruptura, RESPOSTA_RUPTURA
+    total = sum(float(i.get("peso", 1) or 0) for i in itens)
+    consumo = sum(float(i.get("peso", 1) or 0) for i in itens if classe_ruptura(i["produto_id"]) == "CONSUMO")
+    return RESPOSTA_RUPTURA["CONSUMO"]["outra_loja"] * consumo / total if total else 0.0
+
+
 def _dividir_mercado(
     calculos: List[_Calculo], turma: Turma, rodada: int, multiplicador_demanda: float
 ) -> list:
@@ -520,7 +538,7 @@ def _dividir_mercado(
         bot["vendas"] = min(bot["capacidade"], demanda_total * bot["atratividade"] / soma_atratividade)
 
     # Clientes não atendidos: parte deles compra de quem ainda tem capacidade ociosa
-    nao_atendida = sum(c.demanda - c.vendas for c in calculos) * REAPROVEITAMENTO_DEMANDA
+    nao_atendida = sum((c.demanda - c.vendas) * _fracao_troca_de_loja(c) for c in calculos)
     com_folga = [c for c in calculos if c.capacidade > c.vendas]
     soma_folga = sum(c.atratividade for c in com_folga)
     if nao_atendida > 0 and soma_folga > 0:

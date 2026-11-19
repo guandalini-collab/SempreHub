@@ -288,6 +288,48 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     return [demanda * p["avaliacao_estrategica"]["fator"] for demanda, p in zip(demandas, preparos)], bots
 
 
+def _transferir_ruptura(turma, preparos, demandas, bots):
+    """Clientes que vão a outra loja quando falta o produto (Corsten e Gruen,
+    2003: 31% nos itens de consumo do pet). Uma apuração prévia, sem tributos,
+    mede a falta de cada loja; os clientes que trocam de loja procuram o mesmo
+    produto e se dividem pela atratividade das lojas que o vendem (equipes e
+    concorrentes simulados). Quem não encontra de novo desiste (sem cascata)."""
+    from .portfolio import dividir
+    apurar = motor(turma).apurar
+    previas = [apurar(p, demanda, lambda receita, cmv: (0.0, 0.0)) for p, demanda in zip(preparos, demandas)]
+    extras = [dict() for _ in preparos]
+    for i, previa in enumerate(previas):
+        itens_origem = {item["produto_id"]: item for item in
+                        ((preparos[i]["decisao"].get("plano_comercial") or {}).get("produtos") or [])}
+        for pid, unidades in (previa.get("transferencias_ruptura") or {}).items():
+            destinos = []
+            for j, p in enumerate(preparos):
+                vende = any(item["produto_id"] == pid for item in
+                            ((p["decisao"].get("plano_comercial") or {}).get("produtos") or []))
+                if j != i and vende and p.get("comercial_ativo"):
+                    destinos.append(("equipe", j, max(.001, p["atratividade"])))
+            destinos += [("bot", k, b["atratividade"]) for k, b in enumerate(bots)]
+            if not destinos:
+                continue
+            partes = dividir(unidades, [peso for *_, peso in destinos])
+            preco_mercado = float(itens_origem.get(pid, {}).get("preco_mercado") or 0)
+            for (tipo, indice, _), qtd in zip(destinos, partes):
+                if not qtd:
+                    continue
+                if tipo == "equipe":
+                    extras[indice][pid] = extras[indice].get(pid, 0) + qtd
+                else:
+                    bot = bots[indice]
+                    razao = bot["preco"] / turma.preco_referencia if turma.preco_referencia else 1.0
+                    valor = qtd * preco_mercado * razao
+                    if "receita" in bot:
+                        bot["receita"] = round(min(bot["capacidade"], bot["receita"] + valor), 2)
+                    bot["clientes_recebidos_ruptura"] = bot.get("clientes_recebidos_ruptura", 0) + qtd
+    for p, extra in zip(preparos, extras):
+        if extra:
+            p["parametros"]["demanda_transferida"] = extra
+
+
 def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demanda, multiplicador_custo):
     from .simulacao import decisao_vigente, _aplicar_mudanca_regime, _Calculo, _limitar
     from . import eventos as ev
@@ -329,6 +371,8 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
     demandas, bots = _mercado(preparos, decisoes, turma, rodada, multiplicador_demanda)
     demandas = [demanda * p["parametros"].get("eventos_operacionais", {}).get("demanda", 1.0)
                 for demanda, p in zip(demandas, preparos)]
+    if turma.modo_jogo != "STARTUP" and any(p.get("parametros", {}).get("mercado_em_reais") for p in preparos):
+        _transferir_ruptura(turma, preparos, demandas, bots)
     apuracoes = []
     for empresa, p, demanda in zip(empresas, preparos, demandas):
         apuracoes.append(motor(turma).apurar(p, demanda,

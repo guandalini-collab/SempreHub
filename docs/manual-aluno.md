@@ -950,6 +950,8 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 
 **Satisfação dos clientes e nível de serviço.** A satisfação cumulativa resulta da experiência total com a empresa ao longo do tempo e depende da qualidade, do preço (o valor percebido é a qualidade relativa ao preço) e das expectativas (ANDERSON; FORNELL; LEHMANN, 1994, p. 54-56). Nos dados suecos analisados pelos autores, satisfação e participação de mercado tiveram correlação negativa (−0,25 nos níveis e −0,37 nas variações), e ganhar participação pode até reduzir a satisfação (ANDERSON; FORNELL; LEHMANN, 1994, p. 63-64). A meta-análise de Szymanski e Henard (2001, p. 24-25) encontrou correlação de 0,52 entre satisfação e recompra, mas com poucos estudos, o que pede cautela; a de Otto, Szymanski e Varadarajan (2020) encontrou correlação média de 0,101 entre satisfação e desempenho, não significativa para participação de mercado (−0,019), e concluiu que a satisfação é melhor representada como mediadora dos efeitos das decisões de marketing sobre o desempenho. Essa literatura não sustenta um multiplicador de satisfação aplicado diretamente à atratividade da loja; além disso, o preço já entra na atratividade, e contá-lo de novo pela satisfação seria contar duas vezes. Por isso, nas turmas com catálogo, a satisfação não altera a disputa por clientes, e o painel operacional e a rubrica mostram o nível de serviço efetivamente medido no mês: o OTIF (pedidos entregues no prazo e completos), a parcela da demanda não atendida por falta de estoque (ruptura) e a parcela de entregas com atraso.
 
+**Falta do produto (ruptura).** Quando o cliente não encontra o produto, ele pode comprar em outra loja, adiar a compra, trocar por outro item ou desistir. Em 29 estudos com mais de 71 mil consumidores de bens de consumo de giro rápido, a média mundial foi: 31% compram em outra loja, 15% adiam, 19% trocam por outro item da mesma marca, 26% trocam de marca e 9% não compram (CORSTEN; GRUEN, 2003, p. 606). Esses percentuais variam por categoria e vêm de supermercados. Em bens duráveis, os produtos consolidados na preferência do cliente tendem a virar pedido pendente, enquanto itens com substituto fácil perdem a venda (BALLOU, 2007, p. 280). Num varejista de cama e acessórios para casa, 62% dos itens em falta foram mantidos pelo cliente, que esperou a entrega, 32% foram cancelados e 6% devolvidos; a troca por outro item foi desprezível, e os autores alertam que as magnitudes podem não se repetir em outros varejistas (ANDERSON; FITZSIMONS; SIMESTER, 2006). No simulador, nas turmas com catálogo: nos itens de consumo do pet (alimentação e higiene), 45% dos clientes sem produto compram outro item da mesma linha na mesma loja, se houver estoque; 31% procuram o mesmo produto nas outras lojas que o vendem, divididos pela atratividade; 15% voltam no mês seguinte e 9% desistem. Nos demais produtos, exceto vestuário, 62% viram pedido pendente para o mês seguinte e 38% desistem. Os pedidos pendentes têm prioridade sobre os clientes do mês; o pendente que não é atendido de novo, e o cliente vindo de outra loja que não encontra o produto, desistem. Em vestuário, a literatura lida indica que a troca é menos provável e que adiar ou cancelar é mais provável (KIM; LENNON, 2011, p. 116-117), mas não informa percentuais; por isso, a venda é perdida. Limitações declaradas: os percentuais de Corsten e Gruen são de supermercado; o estudo de Anderson, Fitzsimons e Simester é de venda por catálogo com entrega; o prazo de um mês para o pedido pendente e a perda do substituto inexistente são escolhas de modelagem; no modelo básico, que não guarda carteira de pedidos, só a troca de loja dos itens de consumo é aplicada; o efeito da falta nas compras futuras, medido por Anderson, Fitzsimons e Simester, não foi incluído.
+
 **Tamanho do mercado.** O mercado mensal de cada loja é a receita mensal de uma loja pequena da atividade (IBGE, PAC 2024, tabelas 10645 e 10647), atualizada pelo índice de receita nominal da PMC (IBGE, tabela 8883), multiplicada pelo número de lojas na disputa e pela sazonalidade. A razão entre a loja pequena e a média (0,4348) só é publicada para o varejo total e é aplicada às atividades como estimativa.
 
 **Sazonalidade.** Fatores da replicação do ajuste X-13ARIMA-SEATS da PMC (IBGE, Nota metodológica 01/2022; U.S. CENSUS BUREAU).
@@ -965,6 +967,8 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 ### Referências
 
 AGÊNCIA NACIONAL DE AVIAÇÃO CIVIL (Brasil). Resolução nº 400, de 13 de dezembro de 2016. Dispõe sobre as condições gerais de transporte aéreo. Brasília: ANAC, 2016.
+
+ANDERSON, Eric T.; FITZSIMONS, Gavan J.; SIMESTER, Duncan. Measuring and mitigating the costs of stockouts. *Management Science*, v. 52, n. 11, p. 1751-1763, 2006. DOI: 10.1287/mnsc.1060.0577.
 
 ANDERSON, Eugene W.; FORNELL, Claes; LEHMANN, Donald R. Customer satisfaction, market share, and profitability: findings from Sweden. *Journal of Marketing*, v. 58, n. 3, p. 53-66, 1994. DOI: 10.1177/002224299405800304.
 
@@ -992,6 +996,8 @@ CONSELHO NACIONAL DE TRÂNSITO (Brasil). Resolução nº 996, de 15 de junho de 
 
 COOPER, Lee G.; NAKANISHI, Masao. *Market-share analysis*: evaluating competitive marketing effectiveness. Boston: Kluwer Academic Publishers, 1988. Edição eletrônica disponível em: https://www.anderson.ucla.edu/faculty/lee.cooper/MCI_Book/Book1.htm. Acesso em: 17 nov. 2026.
 
+CORSTEN, Daniel; GRUEN, Thomas. Desperately seeking shelf availability: an examination of the extent, the causes, and the efforts to address retail out-of-stocks. *International Journal of Retail & Distribution Management*, v. 31, n. 12, p. 605-617, 2003. DOI: 10.1108/09590550310507731.
+
 FARIA, A. J.; HUTCHINSON, David; WELLINGTON, William J.; GOLD, Steven. Developments in business gaming: a review of the past 40 years. *Simulation & Gaming*, v. 40, n. 4, p. 464-487, 2009. DOI: 10.1177/1046878108327585.
 
 GOSEN, Jerry; WASHBUSH, John. A review of scholarship on assessing experiential learning effectiveness. *Simulation & Gaming*, v. 35, n. 2, p. 270-293, 2004. DOI: 10.1177/1046878104263544.
@@ -1003,6 +1009,8 @@ IBGE. *Índice Nacional de Preços ao Consumidor Amplo (IPCA)*: tabela 7060. Rio
 IBGE. *Pesquisa Anual de Comércio 2024*: tabelas 10645, 10647 e 10649. Rio de Janeiro: IBGE. Disponível em: https://sidra.ibge.gov.br. Acesso em: 17 nov. 2026.
 
 IBGE. *Pesquisa Mensal de Comércio*: tabelas 8882 e 8883; Nota metodológica 01/2022. Rio de Janeiro: IBGE. Disponível em: https://sidra.ibge.gov.br. Acesso em: 17 nov. 2026.
+
+KIM, Minjeong; LENNON, Sharron J. Consumer response to online apparel stockouts. *Psychology & Marketing*, v. 28, n. 2, p. 115-144, 2011. DOI: 10.1002/mar.20383.
 
 KOTLER, Philip; KELLER, Kevin Lane. *Administração de marketing*. 14. ed. Tradução de Sônia Midori Yamamoto. São Paulo: Pearson Education do Brasil, 2013.
 
