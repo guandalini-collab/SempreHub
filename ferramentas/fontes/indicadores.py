@@ -32,15 +32,19 @@ def _registro(fonte, serie, codigo, periodo, valor, unidade, endereco, situacao,
 # ---------------------------------------------------------------- BCB / SGS
 def sgs(codigo: int, ultimos: int = 1, obter=obter_json) -> list[dict]:
     nome, period, situacao, _ = catalogo.SGS.get(codigo, (f"Série SGS {codigo}", "?", "nao_catalogado", ""))
-    endereco = url(SGS_BASE.format(codigo=codigo) + f"/ultimos/{ultimos}", {"formato": "json"})
+    endereco = url(SGS_BASE.format(codigo=codigo) + f"/ultimos/{ultimos + 40}", {"formato": "json"})
     dados = obter(endereco)
     saida = []
     for d in dados:
         ref = datetime.strptime(d["data"], "%d/%m/%Y").date()
+        if ref > date.today():
+            # A série 432 (meta Selic) já traz datas futuras com a meta vigente até a próxima
+            # reunião do Copom (observado em 19/11/2026); só entra o que já ocorreu.
+            continue
         periodo = ref.strftime("%m/%Y") if period == "mensal" else ref.isoformat()
         saida.append(_registro("Banco Central do Brasil (SGS)", nome, codigo, periodo,
                                float(str(d["valor"]).replace(",", ".")), "", endereco, situacao))
-    return saida
+    return saida[-ultimos:]
 
 
 # ---------------------------------------------------------------- BCB / Focus
