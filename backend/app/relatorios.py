@@ -133,7 +133,9 @@ def indicadores_rodada(resultado, detalhes):
         if all(v is not None for v in partes + obrigacoes):
             ativos = max(0.0, partes[0]) + sum(partes[1:])
             passivos = sum(obrigacoes) + max(0.0, -partes[0])
-    satisfacao = _numero(final.get("satisfacao"))
+    servico = final.get("nivel_servico") if isinstance(final, dict) else None
+    satisfacao = (_numero(servico.get("otif")) * 100 if servico and _numero(servico.get("otif")) is not None
+                  else _numero(final.get("satisfacao")))
     if satisfacao is None:
         satisfacao = _numero(operacao.get("satisfacao"))
     return {
@@ -194,6 +196,8 @@ def _normalizar_comparacao(valor, valores):
 
 
 def gerar_relatorio(turma: Turma) -> dict:
+    from .routers.mercado import usa_catalogo_fixo
+    catalogo = usa_catalogo_fixo(turma)
     empresas = []
     for empresa in turma.empresas:
         decisoes = {d.rodada: d for d in empresa.decisoes}
@@ -264,7 +268,8 @@ def gerar_relatorio(turma: Turma) -> dict:
             "criterios": {
                 "lucro": "Lucro acumulado: comparação entre empresas, de 0 a 100; empate recebe 50.",
                 "patrimonio": "Patrimônio do último encerramento menos aportes: comparação entre empresas; empate recebe 50.",
-                "satisfacao": "Satisfação ao final da última rodada, de 0 a 100.",
+                "satisfacao": ("Nível de serviço (OTIF: pedidos entregues completos e no prazo) ao final da última rodada, de 0 a 100."
+                               if catalogo else "Satisfação ao final da última rodada, de 0 a 100."),
                 "participacao": "Média das confirmações da versão encerrada; no individual, proporção de entregas manuais.",
             },
             "observacao": "Pontuação didática comparativa, não é nota institucional. Critérios sem dados têm pesos redistribuídos. Login registra acesso, não comprova aprendizagem.",

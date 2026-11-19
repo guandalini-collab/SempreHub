@@ -102,6 +102,7 @@ export interface EstadoSimulacao {
   pagar: TituloFinanceiro[];
   rh: { moral: number; qualificacao: number; rotatividade_acumulada: number };
   satisfacao: number;
+  nivel_servico?: { otif: number | null; taxa_ruptura: number; taxa_atraso: number };
   clientes: number;
   participacao_fundadores: number;
   capital_aportado: number;

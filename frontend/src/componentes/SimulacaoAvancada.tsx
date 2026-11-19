@@ -124,7 +124,15 @@ export function PainelOperacional({ estado, modo }: { estado: EstadoSimulacao; m
           <Dado rotulo="Estoque obsoleto" valor={`${inteiro(estado.estoque_obsoleto.quantidade)} un. · ${reais(estado.estoque_obsoleto.valor)}`} />
           <Dado rotulo="Máquinas" valor={inteiro(estado.maquinas.length)} />
         </>}
-        <Dado rotulo="Satisfação dos clientes" valor={`${umDecimal(estado.satisfacao)} de 100`} />
+        {estado.nivel_servico ? (
+          <>
+            <Dado rotulo="Nível de serviço (OTIF)" valor={estado.nivel_servico.otif == null ? "—" : `${umDecimal(estado.nivel_servico.otif * 100)}%`} />
+            <Dado rotulo="Demanda não atendida (ruptura)" valor={`${umDecimal(estado.nivel_servico.taxa_ruptura * 100)}%`} />
+            <Dado rotulo="Entregas com atraso" valor={`${umDecimal(estado.nivel_servico.taxa_atraso * 100)}%`} />
+          </>
+        ) : (
+          <Dado rotulo="Satisfação dos clientes" valor={`${umDecimal(estado.satisfacao)} de 100`} />
+        )}
       </dl>
       {modo === "TRADICIONAL" && estado.maquinas.length > 0 && <ul className="mt-4 divide-y divide-slate-100 text-xs text-slate-600">{estado.maquinas.map((m, i) => <li key={i} className="py-2">Máquina {i + 1}: condição {percentual(m.condicao, 0)} · vida útil {m.vida_util} meses · valor líquido <ValorMonetario valor={m.valor_liquido}/> · disponível a partir da rodada {m.ativacao}</li>)}</ul>}
       <p className="mt-3 text-xs text-slate-500">Esses dados passam para a próxima rodada. O histórico mantém o estado de cada período concluído.</p>

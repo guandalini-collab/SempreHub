@@ -208,3 +208,8 @@ def test_catalogo_propaganda_persiste_e_caixa_rende_selic(cliente,professor,monk
     assert not any('atratividade reduzida em 25%' in a for a in res['alertas'])
     # Item 2: com catálogo fixo, a mídia não alimenta a marca.
     assert res['marca']==res2['marca']==0
+    # Item 2e: no catálogo, o estado guarda o nível de serviço (OTIF) e a
+    # satisfação não multiplica a atratividade.
+    painel=cliente.get(base,headers=aluno).json()
+    servico=painel['empresa']['estado_simulacao']['nivel_servico']
+    assert 0<=servico['otif']<=1 and 0<=servico['taxa_ruptura']<=1

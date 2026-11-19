@@ -592,7 +592,10 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     # lojas e não há fórmula de pesos para marca/qualidade (Cooper e Nakanishi,
     # 1988, p. 71-73); preço e propaganda entram pelos produtos (atrativos).
     atratividade = 1.0 if catalogo_fixo else atrativo_porter(marca, qualidade, preco, p.get("preco_referencia", 100))
-    atratividade *= (0.5 + 0.5 * s["satisfacao"] / 100) * fator_canal
+    # Item 2e (18/11/2026): com catálogo, satisfação não multiplica a
+    # atratividade; na literatura ela não se relaciona com participação de
+    # mercado (Otto; Szymanski; Varadarajan, 2020; Anderson; Fornell; Lehmann, 1994).
+    atratividade *= (1.0 if catalogo_fixo else (0.5 + 0.5 * s["satisfacao"] / 100)) * fator_canal
     diferenciar = op.get("posicionamento", "CUSTO") == "DIFERENCIACAO"
     if catalogo_fixo:
         from .portfolio import avisos_posicionamento_catalogo
@@ -786,6 +789,11 @@ def apurar(preparo: dict, demanda: float,
     indicadores_entrega = otif(demanda, vendas, modal)
     falhas_transporte = indicadores_entrega["pedidos_com_falha"] - indicadores_entrega["pedidos_nao_atendidos"]
     atraso = falhas_transporte / vendas if vendas else 0
+    if catalogo_fixo:
+        # Item 2e: indicadores observáveis de serviço no lugar do índice sintético.
+        s["nivel_servico"] = {"otif": indicadores_entrega["otif"],
+                              "taxa_ruptura": round(ruptura / demanda, 6) if demanda else 0.0,
+                              "taxa_atraso": round(atraso, 6)}
     s["satisfacao"] = round(_limitar(s["satisfacao"] + float(efeitos_eventos.get("satisfacao", 0)) + (2 - 30 * atraso if vendas else 0)
                                     - (20 * ruptura / demanda if demanda else 0)), 8)
     if c["kpis"]["oee"] is not None:

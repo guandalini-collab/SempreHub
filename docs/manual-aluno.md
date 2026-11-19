@@ -948,6 +948,8 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 
 **Marca.** Brand equity é o efeito diferencial que o conhecimento da marca exerce sobre a resposta do consumidor ao marketing; a marca não é construída só por propaganda, e sua essência é um bom produto (KOTLER; KELLER, 2013, p. 257-267). A obra não oferece uma regra numérica para acumular ou perder marca. Por isso, nas turmas com catálogo, a verba de mídia não aumenta a marca: o efeito da propaganda ao longo do tempo é o da persistência descrita acima, e contá-lo também na marca seria contar duas vezes.
 
+**Satisfação dos clientes e nível de serviço.** A satisfação cumulativa resulta da experiência total com a empresa ao longo do tempo e depende da qualidade, do preço (o valor percebido é a qualidade relativa ao preço) e das expectativas (ANDERSON; FORNELL; LEHMANN, 1994, p. 54-56). Nos dados suecos analisados pelos autores, satisfação e participação de mercado tiveram correlação negativa (−0,25 nos níveis e −0,37 nas variações), e ganhar participação pode até reduzir a satisfação (ANDERSON; FORNELL; LEHMANN, 1994, p. 63-64). A meta-análise de Szymanski e Henard (2001, p. 24-25) encontrou correlação de 0,52 entre satisfação e recompra, mas com poucos estudos, o que pede cautela; a de Otto, Szymanski e Varadarajan (2020) encontrou correlação média de 0,101 entre satisfação e desempenho, não significativa para participação de mercado (−0,019), e concluiu que a satisfação é melhor representada como mediadora dos efeitos das decisões de marketing sobre o desempenho. Essa literatura não sustenta um multiplicador de satisfação aplicado diretamente à atratividade da loja; além disso, o preço já entra na atratividade, e contá-lo de novo pela satisfação seria contar duas vezes. Por isso, nas turmas com catálogo, a satisfação não altera a disputa por clientes, e o painel operacional e a rubrica mostram o nível de serviço efetivamente medido no mês: o OTIF (pedidos entregues no prazo e completos), a parcela da demanda não atendida por falta de estoque (ruptura) e a parcela de entregas com atraso.
+
 **Tamanho do mercado.** O mercado mensal de cada loja é a receita mensal de uma loja pequena da atividade (IBGE, PAC 2024, tabelas 10645 e 10647), atualizada pelo índice de receita nominal da PMC (IBGE, tabela 8883), multiplicada pelo número de lojas na disputa e pela sazonalidade. A razão entre a loja pequena e a média (0,4348) só é publicada para o varejo total e é aplicada às atividades como estimativa.
 
 **Sazonalidade.** Fatores da replicação do ajuste X-13ARIMA-SEATS da PMC (IBGE, Nota metodológica 01/2022; U.S. CENSUS BUREAU).
@@ -963,6 +965,8 @@ Cada regra do SempreHub aplica um conceito da literatura ou um dado oficial. Est
 ### Referências
 
 AGÊNCIA NACIONAL DE AVIAÇÃO CIVIL (Brasil). Resolução nº 400, de 13 de dezembro de 2016. Dispõe sobre as condições gerais de transporte aéreo. Brasília: ANAC, 2016.
+
+ANDERSON, Eugene W.; FORNELL, Claes; LEHMANN, Donald R. Customer satisfaction, market share, and profitability: findings from Sweden. *Journal of Marketing*, v. 58, n. 3, p. 53-66, 1994. DOI: 10.1177/002224299405800304.
 
 ANDERSON, Philip H.; LAWTON, Leigh. Business simulations and cognitive learning: developments, desires, and future directions. *Simulation & Gaming*, v. 40, n. 2, p. 193-216, 2009. DOI: 10.1177/1046878108321624.
 
@@ -1008,11 +1012,15 @@ MILLER, C. Chet; CARDINAL, Laura B. Strategic planning and firm performance: a s
 
 MINISTÉRIO DA AGRICULTURA, PECUÁRIA E ABASTECIMENTO (Brasil). Instrução Normativa nº 30, de 5 de agosto de 2009. Brasília: MAPA, 2009.
 
+OTTO, Ashley S.; SZYMANSKI, David M.; VARADARAJAN, Rajan. Customer satisfaction and firm performance: insights from over a quarter century of empirical research. *Journal of the Academy of Marketing Science*, v. 48, n. 3, p. 543-564, 2020. DOI: 10.1007/s11747-019-00657-7.
+
 PORTER, Michael E. *Estratégia competitiva*: técnicas para análise de indústrias e da concorrência. Tradução de Elizabeth Maria de Pinho Braga. 2. ed. Rio de Janeiro: Elsevier, 2004.
 
 SETHURAMAN, Raj; TELLIS, Gerard J.; BRIESCH, Richard A. How well does advertising work? Generalizations from meta-analysis of brand advertising elasticities. *Journal of Marketing Research*, v. 48, n. 3, p. 457-471, 2011.
 
 SHEA-VAN FOSSEN, Rita J.; ROTHSTEIN, Hannah R.; KORN, Helaine J. Thirty-five years of strategic planning and firm performance research: a meta-analysis. *In*: ACADEMY OF MANAGEMENT ANNUAL MEETING, 2006. *Best Conference Paper* BPS. [S. l.]: Academy of Management, 2006. p. M1-M6.
+
+SZYMANSKI, David M.; HENARD, David H. Customer satisfaction: a meta-analysis of the empirical evidence. *Journal of the Academy of Marketing Science*, v. 29, n. 1, p. 16-35, 2001. DOI: 10.1177/009207030102900102.
 
 U.S. CENSUS BUREAU. *X-13ARIMA-SEATS seasonal adjustment program*. Washington, DC: U.S. Census Bureau. Disponível em: https://www.census.gov/data/software/x13as.html. Acesso em: 16 nov. 2026.
 
