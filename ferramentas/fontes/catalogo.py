@@ -32,7 +32,7 @@ SGS = {
             "mensal", "conferido",
             "https://dadosabertos.bcb.gov.br/dataset/29037-endividamento-das-familias-com-o-sistema-financeiro-nacional-em-relacao-a-renda-acumulada-dos"),
     433: ("Índice nacional de preços ao consumidor-amplo (IPCA) - variação mensal", "mensal",
-          "conferido_secundario", "valorfinal.com.br/custo-de-vida/indicadores (secundária); preferir SIDRA 7060"),
+          "conferido", "API do BCB em 19/11/2026: 0,14 em 10/2026, igual ao SIDRA 7060"),
 }
 
 # IPCA pelo IBGE (fonte produtora). Variável 63 = variação mensal (em uso no backend).
@@ -52,7 +52,8 @@ PMC = {
 }
 
 # Pesquisa Industrial Mensal - Produção Física (IBGE). Atividades resolvidas pelo nome.
-PIM = {"tabela": 8888, "situacao_tabela": "conferido_secundario",
+PIM = {"tabela": 8888, "situacao_tabela": "conferido",
+       "conferido_em": "19/11/2026: atividades 3.13, 3.31, 3.30 e 3.15 encontradas nos metadados",
        "conferencia": "valorfinal.com.br (secundária): tabela 8888, variáveis 12606/12607; confirmar nos metadados",
        "atividades_por_nome": {
            "vestuario": ["confecção de artigos do vestuário", "fabricação de produtos têxteis"],
@@ -62,22 +63,23 @@ PIM = {"tabela": 8888, "situacao_tabela": "conferido_secundario",
            "mochilas": ["artefatos de couro", "artigos para viagem"],
        }}
 
-# Comex Stat (MDIC): filtros "chapter" (2 dígitos), "position" (4), "subposition" (6), "ncm" (8).
+# Comex Stat (MDIC): filtros "chapter" (2 dígitos), "heading" (4), "subHeading" (6), "ncm" (8)
+# — nomes conforme o pacote comexr (CRAN); "chapter" e "ncm" conferidos na API em 19/11/2026.
 COMEX = {
-    "vestuario": {"chapter": [61, 62], "situacao": "conferido_secundario",
+    "vestuario": {"chapter": [61, 62], "situacao": "conferido",
                   "nota": "Cap. 61 (malha) e 62 (exceto malha) do Sistema Harmonizado"},
-    "colchoes": {"ncm": [94042100, 94042900], "situacao": "conferido_secundario",
+    "colchoes": {"ncm": [94042100, 94042900], "situacao": "conferido",
                  "nota": "9404.21.00 borracha/plástico alveolar; 9404.29.00 de outras matérias"},
-    "moveis": {"position": [9401, 9403], "situacao": "conferido_secundario",
+    "moveis": {"heading": [9401, 9403], "situacao": "conferido_secundario",
                "nota": "9401 assentos; 9403 outros móveis"},
     "bicicletas": {"ncm": [87120010, 87116000],
-                   "subposition": [871491, 871492, 871493, 871494, 871495, 871496, 871499],
+                   "subHeading": [871491, 871492, 871493, 871494, 871495, 871496, 871499],
                    "situacao": "conferido_secundario",
                    "nota": "8712.00.10 bicicletas; 8711.60.00 com motor elétrico (inclui outros veículos elétricos "
                            "de duas rodas); 8714.91-99 partes de bicicletas — subposições a conferir"},
-    "pet": {"ncm": [23091000], "situacao": "conferido_secundario",
+    "pet": {"ncm": [23091000], "situacao": "conferido",
             "nota": "2309.10.00 alimentos para cães ou gatos, acondicionados para venda a retalho"},
-    "mochilas": {"subposition": [420211, 420212, 420219, 420292], "situacao": "conferido_secundario",
+    "mochilas": {"subHeading": [420211, 420212, 420219, 420292], "situacao": "conferido_secundario",
                  "nota": "4202.1x malas; 4202.92 superfície exterior de plástico ou têxtil (inclui mochilas)"},
 }
 

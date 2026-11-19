@@ -160,7 +160,7 @@ def comex(setor: str, fluxo: str = "import", de: str | None = None, ate: str | N
     ate = ate or f"{hoje.year}-{hoje.month:02d}"
     cfg = catalogo.COMEX[setor]
     saida = []
-    for nivel in ("chapter", "position", "subposition", "ncm"):
+    for nivel in ("chapter", "heading", "subHeading", "ncm"):
         if not cfg.get(nivel):
             continue
         corpo = {"flow": fluxo, "monthDetail": True, "period": {"from": de, "to": ate},
@@ -174,8 +174,8 @@ def comex(setor: str, fluxo: str = "import", de: str | None = None, ate: str | N
             ano = _campo(l, "year", "ano", "coAno")
             mes = _campo(l, "monthNumber", "month", "mes", "coMes")
             periodo = f"{ano}-{int(mes):02d}" if mes not in (None, "") and str(mes).isdigit() else str(ano)
-            cod = _campo(l, "coNcm", "ncm", "coSh6", "subposition", "coSh4", "position", "heading",
-                         "coSh2", "chapter") or nivel
+            # Resposta conferida em 19/11/2026: "coNcm" (NCM) e "chapterCode" (capítulo).
+            cod = _campo(l, "coNcm", "subHeadingCode", "headingCode", "chapterCode") or nivel
             saida.append(_registro("MDIC (Comex Stat)", f"{'Importação' if fluxo == 'import' else 'Exportação'} — {cfg['nota']}",
                                    cod, periodo, float(_campo(l, "metricFOB", "vlFob") or 0), "US$ FOB", endereco,
                                    cfg["situacao"], {"kg": float(_campo(l, "metricKG", "kgLiquido") or 0),

@@ -30,21 +30,23 @@ def conferir() -> list[dict]:
     resultado = []
 
     def teste(rotulo, funcao):
+        print(f"consultando {rotulo}...", flush=True)
         try:
             r = funcao()
             ok = [x for x in r if x.get("tipo") != "falha"]
-            resultado.append({"item": rotulo, "ok": bool(ok), "amostra": (ok[:1] or r[:1])})
+            resultado.append({"item": rotulo, "ok": bool(ok), "amostra": (ok[-1:] or r[:1])})
         except Exception as e:  # noqa: BLE001
             resultado.append({"item": rotulo, "ok": False, "erro": str(e)[:300]})
 
     for codigo in catalogo.SGS:
         teste(f"SGS {codigo}", lambda c=codigo: indicadores.sgs(c))
-    teste("IPCA SIDRA 7060", indicadores.ipca)
+    teste("IPCA SIDRA 7060 (mensal e 12 meses)", lambda: [x for x in indicadores.ipca() if "12 meses" in x.get("serie", "")] or indicadores.ipca())
     for ind in catalogo.FOCUS["indicadores"]:
         teste(f"Focus {ind}", lambda i=ind: indicadores.focus(i))
     for s in SETORES:
         teste(f"PMC {s}", lambda x=s: indicadores.pmc(x))
-        teste(f"PIM {s}", lambda x=s: indicadores.pim(x))
+        if s in catalogo.PIM["atividades_por_nome"]:  # pet não tem atividade na PIM
+            teste(f"PIM {s}", lambda x=s: indicadores.pim(x))
         teste(f"Comex {s}", lambda x=s: indicadores.comex(x))
     for f in noticias.FEEDS:
         teste(f"RSS {f['veiculo']}", lambda f=f: noticias.rss(f))

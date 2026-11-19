@@ -20,12 +20,15 @@ def _abrir(req, tempo, tentativas):
             erro = e
             if isinstance(e, urllib.error.HTTPError) and e.code < 500 and e.code != 429:
                 break
+            if "CERTIFICATE" in str(e):  # certificado ausente não se resolve tentando de novo
+                break
             time.sleep(1.5 * (n + 1))
     raise RuntimeError(f"Falha ao consultar {req.full_url}: {erro}")
 
 
 def url(base: str, params: dict | None = None) -> str:
-    return base + ("?" + urllib.parse.urlencode(params, safe="[]|,:'$ ") if params else "")
+    # Espaço vira %20 (não "+"): a API OData do BCB recusa "+" no $filter (erro 400 em 19/11/2026).
+    return base + ("?" + urllib.parse.urlencode(params, safe="[]|,:'$", quote_via=urllib.parse.quote) if params else "")
 
 
 def obter_texto(endereco: str, tempo: int = 30, tentativas: int = 3, cabecalhos: dict | None = None) -> str:

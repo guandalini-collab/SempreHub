@@ -117,3 +117,21 @@ def test_paginas_e_relatorio(tmp_path):
     assert md.index("Dados estatísticos oficiais") < md.index("Análises e notícias jornalísticas")
     relatorio.gravar(tmp_path, "t", "Teste", regs)
     assert (tmp_path / "t.csv").exists()
+
+
+def test_url_usa_percent20_e_gdelt_sem_parenteses_isolados():
+    from fontes.rede import url
+    assert "Indicador%20eq%20'IPCA'" in url("https://x/odata", {"$filter": "Indicador eq 'IPCA'"})
+    vistos = []
+    noticias.gdelt('"varejo"', obter=lambda u: vistos.append(u) or {"articles": []})
+    assert "%28" not in vistos[0] and "(" not in vistos[0]
+
+
+def test_comex_niveis_heading_e_codigo():
+    enviados = []
+    def enviar(u, corpo):
+        enviados.append(corpo)
+        return {"data": {"list": [{"year": "2025", "monthNumber": "11", "headingCode": "9403", "heading": "Outros móveis",
+                                   "metricFOB": "10", "metricKG": "2"}]}}
+    r = indicadores.comex("moveis", enviar=enviar)
+    assert enviados[0]["filters"][0]["filter"] == "heading" and r[0]["codigo"] == "9403"

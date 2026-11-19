@@ -48,11 +48,17 @@ def _item(veiculo, titulo, link, data_pub, autor="", resumo="", origem=""):
 
 
 def gdelt(termos: str, dias: int = 30, idioma: str = "portuguese", limite: int = 50, obter=obter_json) -> list[dict]:
-    consulta = f"({termos}) sourcelang:{idioma}" if idioma else termos
+    # O GDELT só aceita parênteses em torno de termos ligados por OR.
+    grupo = f"({termos})" if " OR " in termos else termos
+    consulta = f"{grupo} sourcelang:{idioma}" if idioma else grupo
     endereco = url(GDELT, {"query": consulta, "mode": "artlist", "format": "json",
                            "maxrecords": str(limite), "timespan": f"{dias}d", "sort": "datedesc"})
+    try:
+        resposta = obter(endereco)
+    except ValueError as e:  # o GDELT responde em texto quando recusa a consulta
+        raise RuntimeError(f"GDELT recusou a consulta {consulta!r}: resposta não é JSON") from e
     saida = []
-    for a in obter(endereco).get("articles", []):
+    for a in resposta.get("articles", []):
         bruto = a.get("seendate", "")  # formato AAAAMMDDTHHMMSSZ
         try:
             data_pub = datetime.strptime(bruto, "%Y%m%dT%H%M%SZ").date().isoformat()
