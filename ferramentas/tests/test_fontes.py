@@ -135,3 +135,11 @@ def test_comex_niveis_heading_e_codigo():
                                    "metricFOB": "10", "metricKG": "2"}]}}
     r = indicadores.comex("moveis", enviar=enviar)
     assert enviados[0]["filters"][0]["filter"] == "heading" and r[0]["codigo"] == "9403"
+
+
+def test_sidra_buscar_e_comex_livre():
+    r = indicadores.sidra_buscar(8888, "moveis", obter=lambda u: {**META, "nome": "PIM-PF"})
+    assert r["nome"] == "PIM-PF" and r["categorias"][0]["id"] == 129331
+    enviados = []
+    indicadores.comex_codigos("heading", [9506], enviar=lambda u, c: enviados.append(c) or {"data": {"list": []}})
+    assert enviados[0]["filters"] == [{"filter": "heading", "values": [9506]}]

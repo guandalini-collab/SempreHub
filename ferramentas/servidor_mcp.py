@@ -69,5 +69,26 @@ def noticias_setor(setor: str, dias: int = 30) -> list[dict]:
     return noticias.setor(setor, dias)
 
 
+@app.tool()
+def sidra_buscar(tabela: int, termo: str = "") -> dict:
+    """Metadados de uma tabela do IBGE (SIDRA): nome, pesquisa, periodicidade, variáveis e categorias
+    cujo nome contém o termo. Serve para conferir códigos antes de usar."""
+    return indicadores.sidra_buscar(tabela, termo)
+
+
+@app.tool()
+def sidra_consultar(tabela: int, variavel: int, classificacao: str = "", periodos: str = "-1") -> list[dict]:
+    """Consulta livre ao SIDRA (Brasil). classificacao no formato '85[90673]' ou '11046[56734]|85[90673]';
+    periodos '-1' = último, '-13' = últimos 13, ou '202601-202609'."""
+    return indicadores.sidra(tabela, variavel, classificacao, periodos, situacao="consulta_livre")
+
+
+@app.tool()
+def comex_consultar(nivel: str, codigos: list[int], fluxo: str = "import", de: str = "", ate: str = "") -> list[dict]:
+    """Consulta livre ao Comex Stat. nivel: chapter, heading, subHeading ou ncm; fluxo: import ou export;
+    de/ate no formato AAAA-MM (vazio = últimos 12 meses)."""
+    return indicadores.comex_codigos(nivel, codigos, fluxo, de or None, ate or None)
+
+
 if __name__ == "__main__":
     app.run()

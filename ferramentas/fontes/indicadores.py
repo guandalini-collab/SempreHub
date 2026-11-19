@@ -83,6 +83,20 @@ def sidra_resolver(tabela: int, termos: list[str], obter=obter_json) -> list[dic
     return achados
 
 
+def sidra_buscar(tabela: int, termo: str = "", obter=obter_json) -> dict:
+    """Nome da tabela, periodicidade, variáveis e categorias cujo nome contém o termo (vazio = só cabeçalho)."""
+    meta = sidra_metadados(tabela, obter)
+    t = _sem_acento(termo)
+    return {"tabela": tabela, "nome": meta.get("nome"), "pesquisa": meta.get("pesquisa"),
+            "periodicidade": meta.get("periodicidade"),
+            "variaveis": [{"id": v["id"], "nome": v["nome"]} for v in meta.get("variaveis", [])
+                          if not t or t in _sem_acento(v["nome"])],
+            "categorias": [{"classificacao": cl["id"], "classificacao_nome": cl["nome"], "id": c["id"], "nome": c["nome"]}
+                           for cl in meta.get("classificacoes", []) for c in cl.get("categorias", [])
+                           if t and t in _sem_acento(c["nome"])][:60],
+            "link": f"{SIDRA_BASE}/{tabela}/metadados"}
+
+
 def sidra_variavel(tabela: int, termo: str, obter=obter_json) -> dict | None:
     for v in sidra_metadados(tabela, obter).get("variaveis", []):
         if _sem_acento(termo) in _sem_acento(v["nome"]):
@@ -156,13 +170,22 @@ def _campo(linha: dict, *nomes):
     return None
 
 
-def comex(setor: str, fluxo: str = "import", de: str | None = None, ate: str | None = None,
-          enviar=enviar_json) -> list[dict]:
+def comex_codigos(nivel: str, codigos: list[int], fluxo: str = "import", de: str | None = None,
+                  ate: str | None = None, enviar=enviar_json) -> list[dict]:
+    """Consulta livre: nivel = chapter (2 dígitos), heading (4), subHeading (6) ou ncm (8)."""
+    if nivel not in ("chapter", "heading", "subHeading", "ncm"):
+        raise ValueError("nivel deve ser chapter, heading, subHeading ou ncm")
+    return comex(None, fluxo, de, ate, enviar, cfg={nivel: [int(c) for c in codigos],
+                                                    "situacao": "consulta_livre", "nota": f"{nivel} {codigos}"})
+
+
+def comex(setor: str | None, fluxo: str = "import", de: str | None = None, ate: str | None = None,
+          enviar=enviar_json, cfg: dict | None = None) -> list[dict]:
     """Valor FOB (US$) e peso (kg) por mês, para os códigos do setor."""
     hoje = date.today()
     de = de or f"{hoje.year - 1}-{hoje.month:02d}"
     ate = ate or f"{hoje.year}-{hoje.month:02d}"
-    cfg = catalogo.COMEX[setor]
+    cfg = cfg or catalogo.COMEX[setor]
     saida = []
     for nivel in ("chapter", "heading", "subHeading", "ncm"):
         if not cfg.get(nivel):
