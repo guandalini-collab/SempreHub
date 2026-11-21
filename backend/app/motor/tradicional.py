@@ -680,6 +680,12 @@ def apurar(preparo: dict, demanda: float,
     catalogo_fixo = any(i.get("preco_mercado") for i in itens)
     comercial_ativo = publicado and (c.get("marketing", 0) > 0 or catalogo_fixo)
     demanda_comercial = min(demanda, capacidade_entrega) if comercial_ativo else 0
+    if catalogo_fixo and p.get("mercado_em_reais") and comercial_ativo:
+        # Pedidos pendentes do mês anterior têm prioridade na capacidade de entrega
+        # sobre os clientes novos (aprovado em 18/11/2026).
+        ids_plano = {i["produto_id"] for i in itens}
+        pend_total = sum(int(v) for k, v in (s.get("pedidos_pendentes") or {}).items() if k in ids_plano)
+        demanda_comercial = min(demanda, max(0, capacidade_entrega - min(pend_total, capacidade_entrega)))
     if demanda and not publicado:
         c["alertas"].append("Demanda anulada: nenhum produto foi publicado no mix comercial.")
     elif demanda and c.get("marketing", 0) <= 0 and not catalogo_fixo:

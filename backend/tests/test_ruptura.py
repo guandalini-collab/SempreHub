@@ -107,3 +107,12 @@ def test_clientes_trocam_para_lojas_que_vendem_o_produto(monkeypatch):
     assert preparos[1]['parametros']['demanda_transferida'] == {'pet-petisco': 20}
     assert 'demanda_transferida' not in preparos[2]['parametros']
     assert bots[0]['receita'] == 200.0 and bots[0]['clientes_recebidos_ruptura'] == 10
+
+
+def test_extras_sem_capacidade_contam_como_perdidos():
+    itens = [_item('pet-caminha')]
+    estado = _estado(**{'pet-caminha': 100})
+    _, r = vender_com_ruptura(estado, itens, 10, [1], pendentes={'pet-caminha': 8},
+                              transferidas={'pet-caminha': 5}, limite_extra=6)
+    assert r['pendentes_atendidos'] == 6 and r['pendentes_perdidos'] == 2
+    assert r['transferidas_atendidas'] == 0 and r['transferidas_perdidas'] == 5

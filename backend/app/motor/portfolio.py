@@ -493,21 +493,23 @@ def vender_com_ruptura(estado, itens, demanda, pesos, diagnosticos_publico=None,
     ids = {p['produto_id'] for p in itens}
     pendentes = {k: v for k, v in pendentes.items() if k in ids}
     transferidas = {k: v for k, v in transferidas.items() if k in ids}
+    resposta = {"substituidas": 0, "outra_loja": {}, "pendentes": {}, "perdidas": 0,
+                "pendentes_atendidos": 0, "pendentes_perdidos": 0,
+                "transferidas_atendidas": 0, "transferidas_perdidas": 0}
     if limite_extra is not None:
-        # Os pedidos extras também precisam de capacidade de entrega.
+        # Os pedidos extras também precisam de capacidade de entrega; o que não
+        # cabe é contado como perdido (pendentes antes dos transferidos).
         livre = max(0, int(limite_extra))
-        for fonte in (pendentes, transferidas):
+        for fonte, chave in ((pendentes, "pendentes_perdidos"), (transferidas, "transferidas_perdidas")):
             total = sum(fonte.values())
             if total > livre:
                 chaves = list(fonte)
                 partes = dividir(livre, [fonte[k] for k in chaves])
                 fonte.clear(); fonte.update({k: q for k, q in zip(chaves, partes) if q})
+                resposta[chave] += total - livre
             livre -= sum(fonte.values())
     demandas = dividir(demanda, pesos)
     linhas = []
-    resposta = {"substituidas": 0, "outra_loja": {}, "pendentes": {}, "perdidas": 0,
-                "pendentes_atendidos": 0, "pendentes_perdidos": 0,
-                "transferidas_atendidas": 0, "transferidas_perdidas": 0}
     estoques = estado.setdefault('estoques_produtos', {})
     for p, d in zip(itens, demandas):
         pid = p['produto_id']
