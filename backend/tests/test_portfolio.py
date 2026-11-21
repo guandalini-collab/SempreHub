@@ -72,9 +72,12 @@ def test_portfolio_apura_sem_duplicar_caixa_ou_capacidade(cliente,professor,monk
         assert sum(s['estoque_pa']['quantidade'] for s in stocks.values())==estado['estoque_pa']['quantidade']
         assert sum(s['estoque_pa']['valor'] for s in stocks.values())==pytest.approx(estado['estoque_pa']['valor'])
         op=resultado['detalhes_simulacao']['operacao']
-        assert sum(l['vendas']+l['estoque_final']['quantidade'] for l in linhas)+op['refugo']==op['producao_real']
-        assert op['producao_real']==100
-        assert op['refugo']==2
+        # Revenda do catálogo (21/11/2026): o que foi comprado é vendido ou fica
+        # em estoque; não há produção nem refugo.
+        comprado=sum(c['comprado'] for c in estado['portfolio_compras'])
+        assert comprado==100
+        assert sum(l['vendas']+l['estoque_final']['quantidade'] for l in linhas)==comprado
+        assert op['producao_real']==0 and op['refugo']==0
     if modo!='LEGADO':
         b=resultado['detalhes_simulacao']['balanco'];dfc=resultado['detalhes_simulacao']['dfc']
         assert b['caixa']+b['receber']+b['estoques']+b['imobilizado']==pytest.approx(b['pagar']+b['divida']+b['patrimonio'],abs=.01)
@@ -217,3 +220,36 @@ def test_catalogo_propaganda_persiste_e_caixa_rende_selic(cliente,professor,monk
     # estado e o fechamento registra o destino dos clientes sem produto.
     assert isinstance(painel['empresa']['estado_simulacao']['pedidos_pendentes'], dict)
     assert 'resposta_ruptura' in res2['detalhes_simulacao']['operacao']
+
+
+def test_revenda_compra_mercadoria_sem_maquina(cliente,professor,monkeypatch):
+    """Revenda aprovada em 21/11/2026: loja de catálogo começa sem máquina e a
+    mercadoria comprada entra direto no estoque, ao custo do catálogo."""
+    from .decisoes import completar_decisao
+    from app.routers import mercado
+    cat=edicao();monkeypatch.setattr(mercado,'gerar_json',lambda *a:(cat,{'https://www.ibge.gov.br/produto'}))
+    turma=_criar_turma(cliente,professor,modo_jogo='TRADICIONAL',total_rodadas=3,demanda_base_por_empresa=20,
+                       configuracao_simulacao={'fabrica_inicial':False})
+    aluno=cadastrar(cliente,'Bia','revenda@aluno.iffar.edu.br');empresa=_entrar(cliente,aluno,turma['codigo'],'Revenda')
+    url=f"/api/professor/turmas/{turma['id']}"
+    eid=cliente.post(url+'/mercado/pesquisar',headers=professor,json={'setor':'Pet Shop','noticias':1,'analises':1,'produtos':2}).json()['id']
+    assert cliente.post(url+f'/mercado/{eid}/publicar',headers=professor,json={}).status_code==200
+    base=f'/api/aluno/empresas/{empresa}'
+    assert cliente.get(base,headers=aluno).json()['empresa']['estado_simulacao']['maquinas']==[]
+    mix={'estrategia_preco':'COMPETITIVO','posicionamento':'PRECO','canais':['DIRETO'],'cobertura':'LOCAL','intensidade':'BAIXA','midias':[{'id':'email','quantidade':100}]}
+    plano={'edicao_id':eid,'produto_id':'pet-brinquedo',**mix,'produtos':[{'produto_id':pid,**mix,'preco':preco,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]} for pid,preco in (('pet-brinquedo',59),('pet-guia',43))]}
+    d={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano,
+       'simulacao':{'comprar_insumos_por_produto':{'pet-brinquedo':30,'pet-guia':10},'pro_labore':2000,'orcamento_logistico':10000}}
+    r=cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d));assert r.status_code==200,r.text
+    custos={p['produto_id']:p['custo_unitario'] for p in r.json()['plano_comercial']['produtos']}
+    assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
+    painel=cliente.get(base,headers=aluno).json();res=painel['resultados'][0];estado=painel['empresa']['estado_simulacao']
+    compras={c['produto_id']:c for c in estado['portfolio_compras']}
+    assert compras['pet-brinquedo']['comprado']==30 and compras['pet-guia']['comprado']==10
+    # Sem desconto por volume: custo do catálogo.
+    assert compras['pet-brinquedo']['custo_unitario']==custos['pet-brinquedo']
+    op=res['detalhes_simulacao']['operacao']
+    assert op['producao_real']==0 and op['refugo']==0
+    for l in res['produtos_resultado']:
+        assert l['vendas']+l['estoque_final']['quantidade']==compras[l['produto_id']]['comprado']
+    assert res['dre'].get('depreciacao',0)==0

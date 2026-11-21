@@ -429,7 +429,13 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         custo_base = sum(i["custo_unitario"] * i.get("peso", 1) for i in itens_operacionais) / max(1, sum(i.get("peso", 1) for i in itens_operacionais))
     else:
         custo_base = p.get("custo_unitario", 40)
-    custo_unitario_atual, fator_barganha = custo_unitario_com_barganha(custo_base, compra_planejada)
+    # Revenda do catálogo (aprovada em 21/11/2026): sem desconto automático por
+    # volume, que não tem fonte; a loja paga o custo de compra do catálogo.
+    revenda = any(i.get("preco_mercado") for i in itens)
+    if revenda:
+        custo_unitario_atual, fator_barganha = custo_base, 0.0
+    else:
+        custo_unitario_atual, fator_barganha = custo_unitario_com_barganha(custo_base, compra_planejada)
     if itens_operacionais:
         for item in itens_operacionais:
             ganho_pd = pd_por_linha.get(item["produto_id"], {}).get("reducao_custo", 0)
@@ -461,7 +467,19 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     elif compra_planejada > limite_compra:
         op = {**op, "comprar_mp": limite_compra}
         alertas.append("Compra de insumos limitada pelo caixa disponível para pagamento à vista.")
-    if itens:
+    if itens and revenda:
+        # Revenda: mercadoria pronta direto no estoque; sem produção nem refugo.
+        from .portfolio import revender
+        compras = revender(s, itens_operacionais or itens, op, multiplicador_custo)
+        mp, pa = s["estoque_mp"], s["estoque_pa"]
+        producao_pedida = producao_real = refugo = boas = 0
+        custo_refugo = 0.0
+        utilizacao = 0.0
+        compra_a_prazo = _produto(compras, _limitar(op.get("compras_prazo", 0), 0, 1))
+        compra_a_vista = _soma([compras, -compra_a_prazo])
+        if compra_a_prazo:
+            s["pagar"].append({"origem": rodada, "vencimento": rodada + op.get("prazo_pagamento", 1), "valor": compra_a_prazo})
+    elif itens:
         if not itens_operacionais:
             compras = producao_real = refugo = custo_refugo = compra_a_prazo = compra_a_vista = 0.0
             producao_pedida = max(0, int(op.get("producao", 0)))

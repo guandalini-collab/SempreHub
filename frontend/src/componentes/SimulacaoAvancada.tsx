@@ -10,7 +10,7 @@ import { inteiro, percentual, reais, umDecimal } from "../formatos";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, PreviaSimulacao } from "../tiposSimulacao";
 import { Campo, Cartao, EntradaNumero, Modal, estiloEntrada } from "./ui";
 
-export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, produtosMix = [], area = "decisoes", rodada, etapaFinanceira, etapaRH = "equipe" }: {
+export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, produtosMix = [], area = "decisoes", rodada, etapaFinanceira, etapaRH = "equipe", revenda = false, estoquesProdutos, historicoProdutos = [] }: {
   modo: ModoJogo;
   valores: DecisaoSimulacao;
   aoMudar: (valores: DecisaoSimulacao) => void;
@@ -25,6 +25,9 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
   fatorPeriodo?: number;
   semanal?: boolean;
   rodada: number;
+  revenda?: boolean;
+  estoquesProdutos?: EstadoSimulacao["estoques_produtos"];
+  historicoProdutos?: { rodada: number; produtos: { produto_id: string; demanda?: number; vendas: number }[] }[];
 }) {
   const [mostrarImpacto,setMostrarImpacto]=React.useState(false);
   const [etapaProducao, setEtapaProducao] = React.useState("volume");
@@ -41,7 +44,7 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
     aoMudar({ ...valores, comprar_insumos_por_produto: compras, comprar_mp: Object.values(compras).reduce((soma, valor) => soma + valor, 0) });
   };
   return <div className="space-y-6">
-    {area === "producao" && modo === "TRADICIONAL" && <nav aria-label="Etapas de Produção" className="etapas-curtas">{[["volume","Volume e insumos"],["maquinas","Máquinas e manutenção"],["localizacao","Localização"]].map(([id,t])=><button type="button" key={id} aria-pressed={etapaProducao===id} onClick={()=>setEtapaProducao(id)}>{t}</button>)}</nav>}
+    {area === "producao" && modo === "TRADICIONAL" && <nav aria-label="Etapas de Produção" className="etapas-curtas">{(revenda ? [["volume","Compra de mercadoria"],["localizacao","Localização"]] : [["volume","Volume e insumos"],["maquinas","Máquinas e manutenção"],["localizacao","Localização"]]).map(([id,t])=><button type="button" key={id} aria-pressed={etapaProducao===id} onClick={()=>setEtapaProducao(id)}>{t}</button>)}</nav>}
     {mostrarImpacto && <Modal titulo="Impacto estimado da compra de máquinas" aoFechar={()=>setMostrarImpacto(false)}>        <p className="mb-2 text-sm text-slate-600">Vida útil: {config.vida_util_maquina} meses · compra opcional · ativação na rodada seguinte.</p><dl className="mt-2 grid gap-2 rounded-lg bg-slate-50 p-2 text-sm sm:grid-cols-2"><div><dt>Investimento total</dt><dd className="font-bold"><ValorMonetario valor={valores.comprar_maquinas * config.preco_maquina}/></dd></div><div><dt>Capacidade adicional nominal</dt><dd className="font-bold">{inteiro(valores.comprar_maquinas * config.capacidade_maquina)} un./mês</dd></div><div><dt>Disponível no mês</dt><dd className="font-bold">{rodada + 1}</dd></div><div><dt>Depreciação mensal estimada</dt><dd className="font-bold"><ValorMonetario valor={valores.comprar_maquinas * config.preco_maquina / config.vida_util_maquina}/></dd></div></dl><p className="mt-2 text-xs text-slate-600">A compra reduz o caixa; a depreciação afeta o lucro nos meses de operação.</p></Modal>}
     {modo === "TRADICIONAL" && <>
       <Secao titulo="Horas extras opcionais da equipe" oculto={area !== "rh" || etapaRH !== "desenvolvimento"}>
@@ -49,11 +52,17 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
           <ControleVisual rotulo="Horas extras por funcionário" moeda={false} valor={valores.horas_extras ?? 0} limite={40} aoMudar={(v) => mudar("horas_extras", v)} />
         </Campo>
       </Secao>
-      <Secao titulo="Produção e investimento" oculto={area !== "producao" || etapaProducao !== "volume"}>
+      <Secao titulo="Compra de mercadoria" oculto={!revenda || area !== "producao" || etapaProducao !== "volume"}>
+        <p className="text-sm text-slate-700">A loja revende: a mercadoria comprada de cada produto entra direto no estoque, ao custo de compra do catálogo, e chega para as vendas deste mês. Não há produção, máquina nem insumo. O que não for vendido continua no estoque e prende dinheiro (custo de oportunidade).</p>
+        <div className="grid gap-3 md:grid-cols-2">{produtosMix.map(produto => <Campo key={produto.produto_id} rotulo={`Comprar ${produto.produto_nome ?? produto.produto_id}`} ajuda={`Custo de compra: ${reais(produto.custo_unitario ?? 0)} por unidade. Estoque atual: ${inteiro(estoquesProdutos?.[produto.produto_id]?.estoque_pa?.quantidade ?? 0)} un.`}><ControleVisual rotulo={`Comprar ${produto.produto_nome ?? produto.produto_id}`} moeda={false} inteiro valor={valores.comprar_insumos_por_produto?.[produto.produto_id] ?? 0} aoMudar={(v) => mudarCompraProduto(produto.produto_id, v)} limite={100000} /></Campo>)}</div>
+        <p className="text-sm font-semibold text-corporativo">Total comprado: {inteiro(valores.comprar_mp)} un. · {reais(produtosMix.reduce((t, p) => t + (valores.comprar_insumos_por_produto?.[p.produto_id] ?? 0) * (p.custo_unitario ?? 0), 0))}</p>
+        <ApoioCompras produtos={produtosMix} estoques={estoquesProdutos} historico={historicoProdutos} />
+      </Secao>
+      <Secao titulo="Produção e investimento" oculto={revenda || area !== "producao" || etapaProducao !== "volume"}>
         <Campo rotulo="Produção planejada" ajuda="Unidades a produzir nesta rodada. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><ControleVisual rotulo="producao" moeda={false} inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} limite={10000} /></Campo>
         {produtosMix.length ? <div className="rounded-xl border border-cyan-200 bg-cyan-50/50 p-4"><h3 className="font-bold text-corporativo">Insumos por linha de produto</h3><p className="mt-1 text-sm text-slate-600">Cada insumo pertence somente ao produto indicado. Comprar material para uma linha não abastece outra.</p><div className="mt-3 grid gap-3 md:grid-cols-2">{produtosMix.map(produto => <Campo key={produto.produto_id} rotulo={`${produto.produto_nome ?? produto.produto_id} · ${produto.insumo_chave ?? "insumo específico"}`} ajuda="Quantidade do insumo exclusivo desta linha."><ControleVisual rotulo={`Comprar insumo para ${produto.produto_nome ?? produto.produto_id}`} moeda={false} inteiro valor={valores.comprar_insumos_por_produto?.[produto.produto_id] ?? 0} aoMudar={(v) => mudarCompraProduto(produto.produto_id, v)} limite={10000} /></Campo>)}</div><p className="mt-2 text-sm font-semibold text-corporativo">Total de insumos: {inteiro(valores.comprar_mp)} un.</p></div> : <Campo rotulo="Comprar matéria-prima" ajuda="Unidades a comprar nesta rodada. O que não for consumido continua no estoque para as próximas rodadas."><ControleVisual rotulo="comprar mp" moeda={false} inteiro valor={valores.comprar_mp} aoMudar={(v) => mudar("comprar_mp", v)} limite={10000} /></Campo>}
       </Secao>
-      <Secao titulo="Máquinas e manutenção" oculto={area !== "producao" || etapaProducao !== "maquinas"}>
+      <Secao titulo="Máquinas e manutenção" oculto={revenda || area !== "producao" || etapaProducao !== "maquinas"}>
 
         {rodada >= 3 ? <><Campo rotulo="Comprar máquinas" ajuda={`Cada máquina custa ${reais(config.preco_maquina)} e entra em operação na rodada seguinte. É investimento; a depreciação aparece no lucro.`}><ControleVisual rotulo="comprar maquinas" moeda={false} inteiro valor={valores.comprar_maquinas} aoMudar={(v) => mudar("comprar_maquinas", v)} limite={100} /></Campo><button type="button" className="consulta-previa" onClick={()=>setMostrarImpacto(true)}>Consultar impacto da compra</button></> : <p className="rounded-lg bg-blue-50 p-4 text-sm text-blue-900"><strong>Expansão do maquinário a partir da rodada 3.</strong> Nas duas primeiras rodadas, planeje a produção com as máquinas iniciais e cuide da manutenção.</p>}
         <Campo rotulo="Manutenção da rodada" ajuda="Cuida das condições das máquinas e da capacidade das próximas rodadas."><ControleVisual rotulo="manutencao"  valor={valores.manutencao} aoMudar={(v) => mudar("manutencao", v)} limite={100000} /></Campo>
@@ -108,6 +117,31 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
       <Campo rotulo="Prazo de recebimento" ajuda="Contado a partir desta rodada."><select className={estiloEntrada} value={valores.prazo_recebimento} onChange={(e) => mudar("prazo_recebimento", Number(e.target.value))}>{[1, 2, 3].map((prazo) => <option key={prazo} value={prazo}>{prazo} {semanal?"semana(s)":"mês(es)"}</option>)}</select></Campo>
     </Secao>
   </div>;
+}
+
+// Apoio à decisão de compra pela revisão periódica (Ballou, 2007, p. 292-294):
+// M = d(T + LT) + z·s, pedido = M − estoque disponível. Referência, não resposta.
+const NIVEIS_SERVICO: [number, number][] = [[0.90, 1.28], [0.95, 1.65], [0.99, 2.33]];
+function ApoioCompras({ produtos, estoques, historico }: { produtos: MixProduto[]; estoques?: EstadoSimulacao["estoques_produtos"]; historico: { rodada: number; produtos: { produto_id: string; demanda?: number; vendas: number }[] }[] }) {
+  const [nivel, setNivel] = React.useState(1);
+  const [z, servico] = [NIVEIS_SERVICO[nivel][1], NIVEIS_SERVICO[nivel][0]];
+  const linhas = produtos.map(p => {
+    const serie = historico.map(h => h.produtos.find(x => x.produto_id === p.produto_id)).filter(Boolean).map(x => Number(x!.demanda ?? x!.vendas));
+    const n = serie.length;
+    const d = n ? serie.reduce((a, b) => a + b, 0) / n : null;
+    const s = n >= 2 && d != null ? Math.sqrt(serie.reduce((a, b) => a + (b - d) ** 2, 0) / (n - 1)) : null;
+    const q = estoques?.[p.produto_id]?.estoque_pa?.quantidade ?? 0;
+    const M = d != null ? d + z * (s ?? 0) : null;
+    return { p, n, d, s, q, M, pedido: M != null ? Math.max(0, Math.ceil(M - q)) : null };
+  });
+  return <details className="rounded-xl border border-cyan-200 bg-cyan-50/50 p-4">
+    <summary className="cursor-pointer font-bold text-corporativo">Apoio à decisão: quanto repor? (revisão periódica)</summary>
+    <p className="mt-2 text-sm text-slate-700">Ballou (2007) descreve a revisão periódica: a cada intervalo fixo (aqui, um mês), confere-se o estoque e pede-se a diferença até um nível máximo M = d·(T + LT) + z·s, em que d é a demanda média por mês, T o intervalo de revisão (1 mês), LT o prazo de entrega (0, a compra chega no mesmo mês), s o desvio-padrão da demanda e z o fator do nível de serviço desejado. Os números abaixo usam a demanda que a sua loja registrou nos meses anteriores. São uma referência: a previsão é decisão da equipe (Corsten e Gruen, 2003, mostram que a maior parte das faltas nasce de pedido e previsão da própria loja).</p>
+    <label className="mt-2 block text-sm">Nível de serviço desejado <select className="ml-2 rounded border px-2 py-1" value={nivel} onChange={e => setNivel(Number(e.target.value))}>{NIVEIS_SERVICO.map(([ns, zz], i) => <option key={ns} value={i}>{Math.round(ns * 100)}% (z = {zz.toLocaleString("pt-BR")})</option>)}</select></label>
+    <div className="mt-3 overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left">{["Produto", "Meses com dado", "Demanda média (d)", "Desvio (s)", "Nível máximo (M)", "Estoque atual (q)", `Pedido M − q (${Math.round(servico * 100)}%)`].map(t => <th key={t} className="p-2">{t}</th>)}</tr></thead>
+      <tbody>{linhas.map(l => <tr key={l.p.produto_id} className="border-t"><td className="p-2 font-semibold">{l.p.produto_nome ?? l.p.produto_id}</td><td className="p-2">{l.n}</td><td className="p-2">{l.d == null ? "sem histórico" : inteiro(Math.round(l.d))}</td><td className="p-2">{l.s == null ? (l.n === 1 ? "precisa de 2 meses" : "—") : inteiro(Math.round(l.s))}</td><td className="p-2">{l.M == null ? "—" : inteiro(Math.ceil(l.M))}</td><td className="p-2">{inteiro(l.q)}</td><td className="p-2 font-bold">{l.pedido == null ? "—" : inteiro(l.pedido)}</td></tr>)}</tbody></table></div>
+    <p className="mt-2 text-xs text-slate-600">Sem histórico (primeiro mês), use a pesquisa de mercado e a sua estimativa de vendas. Com um só mês de dados, o desvio ainda não pode ser calculado e o estoque de segurança fica zero. Demanda registrada inclui pedidos pendentes e clientes vindos de outras lojas.</p>
+  </details>;
 }
 
 export function PainelOperacional({ estado, modo }: { estado: EstadoSimulacao; modo: ModoJogo }) {

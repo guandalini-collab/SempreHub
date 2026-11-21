@@ -384,6 +384,34 @@ def unidades_da_receita(receita, itens, pesos):
     return receita * sum(pesos_em_valor(itens, pesos)) / soma if soma else 0.0
 
 
+def revender(estado, itens, op, multiplicador):
+    """Revenda (aprovada em 21/11/2026): a mercadoria pronta comprada de cada item
+    entra direto no estoque de produtos, ao custo de compra do catálogo, sem
+    insumo, máquina, refugo ou setup. Revisão periódica (Ballou, 2007, p. 292-294):
+    a cada mês a equipe confere o estoque e decide quanto repor; a compra decidida
+    no início do mês chega para as vendas do mesmo mês (escolha de modelagem)."""
+    estoque = estado.setdefault('estoques_produtos', {})
+    compras_especificas = op.get('comprar_insumos_por_produto') or {}
+    # Sem quantidade por item, a compra total é dividida pelos pesos do mix.
+    unidades = ([max(0, int(compras_especificas.get(p['produto_id'], 0))) for p in itens] if compras_especificas
+                else dividir(max(0, int(op.get('comprar_mp', 0))), [p.get('peso', 1) for p in itens]))
+    compras = 0
+    registro = []
+    for p, un in zip(itens, unidades):
+        st = estoque.setdefault(p['produto_id'], {'estoque_mp': {'quantidade': 0, 'valor': 0},
+                                                  'estoque_pa': {'quantidade': 0, 'valor': 0}})
+        valor = dinheiro(un * p['custo_unitario'] * multiplicador)
+        compras += valor
+        st['estoque_pa']['quantidade'] += un
+        st['estoque_pa']['valor'] = dinheiro(st['estoque_pa']['valor'] + valor)
+        registro.append({'produto_id': p['produto_id'], 'comprado': un, 'custo_unitario': p['custo_unitario'],
+                         'valor': valor, 'estoque_apos_compra': st['estoque_pa']['quantidade']})
+    estado['portfolio_compras'] = registro
+    estado.pop('portfolio_producao', None)
+    sincronizar(estado)
+    return dinheiro(compras)
+
+
 def produzir(estado, itens, op, capacidade, maquinas, multiplicador,
              taxas_defeito_linha=None, qualificacao_linha=None):
     estoque=deepcopy(estado.get('estoques_produtos') or {})

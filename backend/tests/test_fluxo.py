@@ -69,6 +69,9 @@ def _criar_turma(cliente, professor, **parametros):
     # Cenários de regressão mensais mantêm explicitamente o contrato histórico.
     cfg = dict(parametros.get("configuracao_simulacao", {}))
     cfg.setdefault("calendario_automatico", False)
+    # Cenários de regressão do motor de fábrica mantêm a máquina inicial; os de
+    # revenda do catálogo pedem fabrica_inicial=False explicitamente.
+    cfg.setdefault("fabrica_inicial", True)
     parametros["configuracao_simulacao"] = cfg
     r = cliente.post("/api/professor/turmas", headers=professor, json={"nome": "Empreendedorismo 2026", **parametros})
     assert r.status_code == 201, r.text

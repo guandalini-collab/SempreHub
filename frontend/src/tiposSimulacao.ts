@@ -103,6 +103,7 @@ export interface EstadoSimulacao {
   rh: { moral: number; qualificacao: number; rotatividade_acumulada: number };
   satisfacao: number;
   nivel_servico?: { otif: number | null; taxa_ruptura: number; taxa_atraso: number };
+  estoques_produtos?: Record<string, { estoque_pa: EstoqueSimulacao; estoque_mp?: EstoqueSimulacao }>;
   clientes: number;
   participacao_fundadores: number;
   capital_aportado: number;

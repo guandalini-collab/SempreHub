@@ -50,6 +50,9 @@ class ConfiguracaoSimulacao(BaseModel):
     cenario_mei_plp186: bool = False
     atividade_rural: bool = False
     calendario_automatico: bool = True
+    # Turmas com catálogo começam como loja de revenda, sem máquina (21/11/2026).
+    # True só para cenários de fábrica (testes do motor e marca própria futura).
+    fabrica_inicial: bool = False
     rodada_inicio_calendario: int = Field(1, ge=1, le=60)
     perfil_sazonal: Literal["NEUTRO", "VAREJO", "ALIMENTACAO", "SERVICOS"] = "NEUTRO"
     # Definido pela edição de mercado publicada; é usado somente nas próximas

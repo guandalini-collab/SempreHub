@@ -128,6 +128,14 @@ def radar_coerencia(*, modo: str, decisao: dict, plano_comercial: dict | None,
     pd = max(0.0, float(decisao.get("pd", 0)))
     producao = max(0, int(op.get("producao", 0)))
     publicado = bool((plano_comercial or {}).get("produtos"))
+    # Revenda do catálogo (21/11/2026): não há produção; a mercadoria é comprada pronta.
+    revenda = any(i.get("preco_mercado") for i in (plano_comercial or {}).get("produtos") or [])
+    if revenda:
+        producao = 0
+        compras = (sum(max(0, int(v)) for v in (op.get("comprar_insumos_por_produto") or {}).values())
+                   or max(0, int(op.get("comprar_mp", 0))))
+        if publicado and compras <= 0 and estoque_disponivel <= 0:
+            avisos.append("Revenda sem compra de mercadoria e sem estoque: não haverá produto para vender neste mês.")
     pro_labore = max(0.0, float(op.get("pro_labore", 0)))
 
     if modo == "TRADICIONAL" and producao > 0:
@@ -161,6 +169,7 @@ def radar_coerencia(*, modo: str, decisao: dict, plano_comercial: dict | None,
         avisos.append("Produção planejada supera a capacidade efetiva; a quantidade será limitada pelo gargalo.")
     if modo == "TRADICIONAL" and marketing > 0 and publicado and custo_frete_unitario > 0:
         capacidade_entrega = float(op.get("orcamento_logistico", 0)) / custo_frete_unitario
-        if capacidade_entrega < max(1, producao + estoque_disponivel):
+        disponivel = (compras if revenda else producao) + estoque_disponivel
+        if capacidade_entrega < max(1, disponivel):
             avisos.append("O orçamento logístico pode limitar o escoamento, mesmo com estoque disponível.")
     return {"bloqueios": bloqueios, "avisos": avisos, "liberado": not bloqueios}

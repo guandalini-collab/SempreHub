@@ -27,6 +27,10 @@ def estado_inicial(turma):
     crise = turma.cenario == "CRISE"
     tradicional = turma.modo_jogo == "TRADICIONAL"
     custo = turma.custo_unitario
+    # Turmas com catálogo: a loja revende (aprovado em 21/11/2026) e não começa
+    # com máquina; a fábrica fica para a marca própria a partir da rodada 5.
+    from ..routers.mercado import usa_catalogo_fixo
+    revenda = tradicional and usa_catalogo_fixo(turma) and not cfg.get("fabrica_inicial")
     return {
         "versao": 1,
         "estoque_mp": {"quantidade": 100 if crise and tradicional else 0, "valor": 100 * custo if crise and tradicional else 0},
@@ -34,7 +38,7 @@ def estado_inicial(turma):
         "estoque_obsoleto": {"quantidade": 50 if crise and tradicional else 0, "valor": 0},
         "maquinas": [{"custo": cfg["preco_maquina"], "valor_liquido": cfg["preco_maquina"] * (.5 if crise else 1),
                        "capacidade": cfg["capacidade_maquina"], "condicao": .55 if crise else 1,
-                       "ativacao": 1, "vida_util": cfg["vida_util_maquina"]}] if tradicional else [],
+                       "ativacao": 1, "vida_util": cfg["vida_util_maquina"]}] if tradicional and not revenda else [],
         "receber": [{"origem": 0, "vencimento": 1, "valor": 5000}] if crise else [],
         "pagar": [{"origem": 0, "vencimento": 1, "valor": 8000}] if crise else [],
         "rh": {"moral": 40 if crise else 80, "qualificacao": 0, "rotatividade_acumulada": 0},
