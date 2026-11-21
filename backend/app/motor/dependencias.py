@@ -132,6 +132,7 @@ def radar_coerencia(*, modo: str, decisao: dict, plano_comercial: dict | None,
     revenda = any(i.get("preco_mercado") for i in (plano_comercial or {}).get("produtos") or [])
     if revenda:
         producao = 0
+        pd = 0.0  # a revenda não desenvolve produto; o motor desconsidera o P&D
         compras = (sum(max(0, int(v)) for v in (op.get("comprar_insumos_por_produto") or {}).values())
                    or max(0, int(op.get("comprar_mp", 0))))
         if publicado and compras <= 0 and estoque_disponivel <= 0:

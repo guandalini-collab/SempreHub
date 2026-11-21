@@ -112,6 +112,9 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
   const atual = resultados[resultados.length - 1];
   const anterior = resultados.length > 1 ? resultados[resultados.length - 2] : undefined;
   const modo = (atual?.detalhes_simulacao?.modo ?? turma.modo_jogo) as ModoJogo;
+  // Revenda do catálogo (21/11/2026): loja sem fábrica; a área se chama Compras.
+  const maquinas = (empresa.estado_simulacao as { maquinas?: unknown[] } | null | undefined)?.maquinas;
+  const revenda = turma.modo_jogo === "TRADICIONAL" && Array.isArray(maquinas) && maquinas.length === 0;
   useEffect(() => { let ativo = true; api.get<Boletim>(`/api/aluno/empresas/${empresaId}/atualizacoes-oficiais`).then((dados) => { if (ativo) setBoletim(dados); }).catch(() => { if (ativo) setBoletim(null); }); return () => { ativo = false; }; }, [empresaId]);
 
   const dados = useMemo(() => {
@@ -165,7 +168,7 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
         modo === "STARTUP" ? metrica("Burn rate", "Queima operacional de caixa por período. Aumentos reduzem a autonomia financeira.", numero(atual, "burn"), numero(anterior, "burn"), "moeda") : metrica("EBITDA operacional", "Resultado antes de juros, impostos, depreciação e amortização, quando o motor possui todos os dados.", numero(atual, "ebitda"), numero(anterior, "ebitda"), "moeda"),
         modo === "STARTUP" ? metrica("Runway", "Semanas de caixa disponíveis mantendo a queima operacional atual.", numero(atual, "runway"), numero(anterior, "runway"), "semanas") : metrica("Giro do imobilizado", "Receita do período em relação ao valor líquido das máquinas. Mede o uso econômico dos ativos físicos.", dividir(atual.dre.receita, atual.detalhes_simulacao?.balanco?.imobilizado ?? null), dividir(anterior?.dre.receita, anterior?.detalhes_simulacao?.balanco?.imobilizado ?? null), "numero"),
       ]},
-      { titulo: "Produção e operação", estado: grauOperacao(atual, modo), metricas: [
+      { titulo: revenda ? "Compras e estoque" : "Produção e operação", estado: grauOperacao(atual, modo), metricas: [
         metrica("Custo unitário", "CMV por unidade vendida. Uma alta sem reajuste de preço pressiona a margem.", custoUnitario, custoUnitarioAnterior, "moeda"),
         modo === "STARTUP" ? metrica("Uso da nuvem", "Clientes atendidos em relação à capacidade contratada. Próximo do limite aumenta o risco de indisponibilidade.", usoNuvem, usoNuvemAnterior, "percentual") : metrica("Ocupação da fábrica", "Produção realizada em relação à capacidade disponível das máquinas.", numero(atual, "utilizacao_maquinas"), numero(anterior, "utilizacao_maquinas"), "percentual"),
         modo === "STARTUP" ? metrica("Clientes não atendidos", "Clientes que não puderam ser atendidos por capacidade insuficiente no período.", numero(atual, "clientes_nao_atendidos"), numero(anterior, "clientes_nao_atendidos"), "numero") : metrica("Refugo", "Percentual da produção que não ficou aproveitável. Aumento gera desperdício e risco de falta de estoque.", refugo, refugoAnterior, "percentual"),

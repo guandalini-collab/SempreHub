@@ -240,7 +240,8 @@ def test_revenda_compra_mercadoria_sem_maquina(cliente,professor,monkeypatch):
     plano={'edicao_id':eid,'produto_id':'pet-brinquedo',**mix,'produtos':[{'produto_id':pid,**mix,'preco':preco,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]} for pid,preco in (('pet-brinquedo',59),('pet-guia',43))]}
     d={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano,
        'simulacao':{'comprar_insumos_por_produto':{'pet-brinquedo':30,'pet-guia':10},'pro_labore':2000,'orcamento_logistico':10000}}
-    r=cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d));assert r.status_code==200,r.text
+    dec=completar_decisao(d);dec['pd']=5000  # revenda: P&D desconsiderado
+    r=cliente.put(base+'/decisao',headers=aluno,json=dec);assert r.status_code==200,r.text
     custos={p['produto_id']:p['custo_unitario'] for p in r.json()['plano_comercial']['produtos']}
     assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
     painel=cliente.get(base,headers=aluno).json();res=painel['resultados'][0];estado=painel['empresa']['estado_simulacao']
@@ -253,3 +254,5 @@ def test_revenda_compra_mercadoria_sem_maquina(cliente,professor,monkeypatch):
     for l in res['produtos_resultado']:
         assert l['vendas']+l['estoque_final']['quantidade']==compras[l['produto_id']]['comprado']
     assert res['dre'].get('depreciacao',0)==0
+    assert res['dre'].get('pd',0)==0
+    assert any('P&D foi desconsiderado' in a for a in res.get('alertas',[]))

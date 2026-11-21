@@ -47,6 +47,15 @@ import type { DecisaoSimulacao } from "../../tiposSimulacao";
 const FERRAMENTAS = ["SWOT", "PORTER", "BCG", "PESTEL", "CONCORRENCIA", "SEGMENTACAO"];
 const ANALISES_APRENDIZAGEM = ["5 Forças de Porter", "PESTEL", "Análise de mercado", "SWOT (FOFA)", "Análise financeira", "Segmentação de mercado"];
 const DEPARTAMENTOS = [{id:"decisoes",titulo:"Produtos e marketing"},{id:"pd",titulo:"P&D"},{id:"rh",titulo:"RH"},{id:"financas",titulo:"Finanças"},{id:"producao",titulo:"Produção"},{id:"logistica",titulo:"Logística"}];
+// Revenda do catálogo (21/11/2026): a loja começa sem máquina e compra a
+// mercadoria pronta. Não há P&D de produto, e "Produção" passa a ser "Compras".
+function ehRevenda(painel: PainelAluno) {
+  const maquinas = painel.empresa.estado_simulacao?.maquinas;
+  return painel.turma.modo_jogo === "TRADICIONAL" && Array.isArray(maquinas) && maquinas.length === 0;
+}
+function departamentos(revenda: boolean) {
+  return revenda ? DEPARTAMENTOS.filter(d => d.id !== "pd").map(d => d.id === "producao" ? {...d, titulo: "Compras"} : d) : DEPARTAMENTOS;
+}
 
 function CalendarioSazonal({calendario}:{calendario:CalendarioSimulado}) {
   const sazonal = calendario.sazonalidade;
@@ -256,6 +265,8 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   if (!painel) return <Carregando />;
 
   const { empresa, turma, resultados } = painel;
+  const revenda = ehRevenda(painel);
+  const deps = departamentos(revenda);
   const ultimo = resultados[resultados.length - 1];
   const encerrada = turma.status === "ENCERRADA";
 
@@ -265,7 +276,7 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
   }
 
   return (
-    <LayoutPainel itens={ITENS_PAINEL.filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe","atualizacoes"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") || i.id === "cockpit" ? "3. Estratégia e público" : DEPARTAMENTOS.some(d=>d.id===i.id) ? "2. Decisões" : i.id.startsWith("resultado-") ? "5. Resultados" : ["evolucao","historico","relatorios","conquistas"].includes(i.id) ? "7. Histórico e evolução" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
+    <LayoutPainel itens={ITENS_PAINEL.filter(i => !(revenda && i.id === "pd")).map(i => revenda && i.id === "producao" ? {...i, titulo: "Compras", descricao: "Compra de mercadoria e estoque."} : i).filter(i => !["departamentos", "analises", "estrategia", ...ANALISES_APRENDIZAGEM.map((_,n)=>`analise-${n}`)].includes(i.id) && !(i.id === "logistica" && turma.modo_jogo !== "TRADICIONAL")).map(i => ({...i, grupo: ["rodada","visao","mercado","equipe","atualizacoes"].includes(i.id) ? "1. Começar a rodada" : i.id === "estrategia" || i.id.startsWith("ferramenta-") || i.id === "cockpit" ? "3. Estratégia e público" : deps.some(d=>d.id===i.id) ? "2. Decisões" : i.id.startsWith("resultado-") ? "5. Resultados" : ["evolucao","historico","relatorios","conquistas"].includes(i.id) ? "7. Histórico e evolução" : i.grupo === "Resultados e evolução" ? "5. Resultados" : "Ajuda", pai: undefined, estado: undefined})).concat([{id:"conferencia",titulo:"Conferir e enviar",descricao:"Confira o planejamento completo antes do envio definitivo.",simbolo:"",grupo:"4. Conferência e envio",pai:undefined,estado:undefined}])} ativa={secao} aoSelecionar={setSecao} rodada={turma.rodada_atual} total={turma.total_rodadas} concluidas={resultados.length} perfil="Aluno" contexto={{ periodoSimulado:tituloPeriodo(turma.calendario), turma: turma.nome, empresa: empresa.nome, caixa: empresa.caixa, alertas: painel.pendencias_envio?.length ?? 0, status: encerrada ? "Simulação encerrada" : painel.decisao_atual?.enviada_em ? "Decisão enviada · modo leitura" : painel.decisao_atual ? "Rascunho salvo · envio ainda pendente" : "Planejamento ainda não salvo", prazo: turma.prazo_rodada }}>
       <SecaoPainel id="rodada" ativa={secao}>
       {turma.calendario&&<CalendarioSazonal calendario={turma.calendario}/>}
       {painel.eventos_operacionais.length > 0 && <section className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm" aria-label="Ocorrências operacionais desta semana">
@@ -313,10 +324,10 @@ export default function PainelEmpresa({ empresaId }: { empresaId: number }) {
       <RelatorioPrimeiraRodada empresaId={empresa.id} disponivel={resultados.some(r => r.rodada === 1)} />
 
       </SecaoPainel>
-      <SecaoPainel id="departamentos" ativa={secao}><Cartao titulo="Departamentos"><p>Escolha uma área para planejar, conferir e salvar as decisões da rodada.</p><nav aria-label="Departamentos" className="mt-4 flex flex-wrap gap-2">{DEPARTAMENTOS.map(d=><Botao key={d.id} onClick={()=>setSecao(d.id==="estrategia"?"ferramenta-SWOT":d.id)}>{d.titulo}</Botao>)}</nav></Cartao></SecaoPainel>
+      <SecaoPainel id="departamentos" ativa={secao}><Cartao titulo="Departamentos"><p>Escolha uma área para planejar, conferir e salvar as decisões da rodada.</p><nav aria-label="Departamentos" className="mt-4 flex flex-wrap gap-2">{deps.map(d=><Botao key={d.id} onClick={()=>setSecao(d.id==="estrategia"?"ferramenta-SWOT":d.id)}>{d.titulo}</Botao>)}</nav></Cartao></SecaoPainel>
       <SecaoPainel id={(AREAS_DECISAO.includes(secao) || ["pd", "rh"].includes(secao) || secao === "estrategia" || secao === "conferencia" || secao.startsWith("ferramenta-")) ? secao : "decisoes"} ativa={secao}>
         <div>
-          <nav className="subabas-estacao mb-4 flex flex-wrap gap-2" aria-label="Subabas dos departamentos">{DEPARTAMENTOS.map(d=><Botao key={d.id} variante={secao===d.id || (d.id==="estrategia" && secao.startsWith("ferramenta-")) ? "primario" : "secundario"} onClick={()=>setSecao(d.id==="estrategia"?"ferramenta-SWOT":d.id)}>{d.titulo}</Botao>)}</nav>
+          <nav className="subabas-estacao mb-4 flex flex-wrap gap-2" aria-label="Subabas dos departamentos">{deps.map(d=><Botao key={d.id} variante={secao===d.id || (d.id==="estrategia" && secao.startsWith("ferramenta-")) ? "primario" : "secundario"} onClick={()=>setSecao(d.id==="estrategia"?"ferramenta-SWOT":d.id)}>{d.titulo}</Botao>)}</nav>
           {(secao==="estrategia" || secao.startsWith("ferramenta-")) && <nav className="subabas-estrategia mb-4 flex flex-wrap gap-2" aria-label="Ferramentas de estratégia">{FERRAMENTAS.map(f=><Botao key={f} variante={secao===`ferramenta-${f}` ? "primario" : "secundario"} onClick={()=>setSecao(`ferramenta-${f}`)}>{f==="CONCORRENCIA" ? "Concorrentes" : f==="SEGMENTACAO" ? "Segmentação" : f}</Botao>)}</nav>}
           {encerrada ? (
             <Cartao titulo="Simulação encerrada">
@@ -483,7 +494,9 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar, aoPr
   const p = turma.parametros!;
   const [confirmandoEnvio, setConfirmandoEnvio] = useState(false);
   const somenteLeitura = !!painel.decisao_atual?.enviada_em || (turma.modo_equipe && !painel.equipe?.pode_decidir);
-  const sequencia = ["decisoes", "pd", "rh", "financas", "producao", ...(turma.modo_jogo === "TRADICIONAL" ? ["logistica"] : [])];
+  const revenda = ehRevenda(painel);
+  const deps = departamentos(revenda);
+  const sequencia = ["decisoes", ...(revenda ? [] : ["pd"]), "rh", "financas", "producao", ...(turma.modo_jogo === "TRADICIONAL" ? ["logistica"] : [])];
   const proxima = sequencia.includes(area) ? sequencia[sequencia.indexOf(area) + 1] ?? "conferencia" : undefined;
   const versaoServidor = painel.equipe?.versao_decisao ?? painel.decisao_atual?.versao ?? 0;
   const [d, setD] = useState<DecisaoEntrada>(() => decisaoInicial(painel));
@@ -597,7 +610,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar, aoPr
 
   return (
     <Cartao className="cartao-decisao"
-      titulo={`${area === "estrategia" ? "Ferramentas estratégicas e segmentação" : area === "pd" ? "P&D - tecnologia e inovação" : area === "rh" ? "Recursos humanos" : area === "financas" ? "Planejamento financeiro" : area === "producao" ? "Produção e operação" : area === "logistica" ? "Logística" : "Decisões comerciais"} · rodada ${turma.rodada_atual}`}
+      titulo={`${area === "estrategia" ? "Ferramentas estratégicas e segmentação" : area === "pd" ? "P&D - tecnologia e inovação" : area === "rh" ? "Recursos humanos" : area === "financas" ? "Planejamento financeiro" : area === "producao" ? (revenda ? "Compras de mercadoria" : "Produção e operação") : area === "logistica" ? "Logística" : "Decisões comerciais"} · rodada ${turma.rodada_atual}`}
       acao={
         painel.decisao_atual ? (
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${painel.decisao_atual?.enviada_em ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{painel.decisao_atual.enviada_em ? "Decisão final enviada" : `Rascunho · versão ${versaoServidor}`}</span>
@@ -610,10 +623,10 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar, aoPr
         {painel.decisao_atual?.enviada_em && <div role="status" className="sticky top-0 z-20 rounded-xl border border-emerald-300 bg-emerald-50 p-4 font-semibold text-emerald-900">🔒 Decisões salvas! Modo de leitura ativado. Aguardando o encerramento do prazo pelo professor. Rodada {turma.rodada_atual} · envio em {new Date(painel.decisao_atual.enviada_em).toLocaleString("pt-BR",{timeZone:"America/Sao_Paulo"})} (Brasília).</div>}
         {somenteLeitura && !painel.decisao_atual?.enviada_em && <Aviso tipo="info">Você está em modo de visualização. Discuta as decisões com o líder, que registra e envia pela equipe.</Aviso>}
         <p className="text-sm text-slate-600">Decisões da equipe · salve ao concluir esta etapa. Envie a rodada após revisar todos os departamentos.</p>
-        {painelAuxiliar === "revisao" && <Modal titulo="Revisão dos departamentos" aoFechar={()=>setPainelAuxiliar(null)}><p className="mt-1 text-sm text-slate-600">Confira cada área e marque a revisão. Alterar escolhas pede nova revisão das áreas afetadas. Valores zero são escolhas válidas para ações opcionais. Todas as áreas aplicáveis precisam estar revisadas para o envio final.</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{AREAS_DECISAO.map(id => {
+        {painelAuxiliar === "revisao" && <Modal titulo="Revisão dos departamentos" aoFechar={()=>setPainelAuxiliar(null)}><p className="mt-1 text-sm text-slate-600">Confira cada área e marque a revisão. Alterar escolhas pede nova revisão das áreas afetadas. Valores zero são escolhas válidas para ações opcionais. Todas as áreas aplicáveis precisam estar revisadas para o envio final.</p><div className="mt-3 grid gap-2 sm:grid-cols-2">{AREAS_DECISAO.filter(id => deps.some(dep => dep.id === id)).map(id => {
           const aplicavel = id !== "logistica" || turma.modo_jogo === "TRADICIONAL";
           const revisada = !!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>];
-          return <button type="button" key={id} onClick={() => aoNavegar(id)} className={`rounded-lg border p-3 text-left text-sm ${aplicavel && revisada ? "border-emerald-300 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>{id === "decisoes" ? "Produtos e marketing" : id === "financas" ? "Finanças" : id === "producao" ? "Produção" : "Logística"} · {aplicavel ? revisada ? "Revisado ✓" : "Revisar →" : "Sem decisão neste modelo"}</button>;
+          return <button type="button" key={id} onClick={() => aoNavegar(id)} className={`rounded-lg border p-3 text-left text-sm ${aplicavel && revisada ? "border-emerald-300 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}>{deps.find(dep => dep.id === id)?.titulo ?? id} · {aplicavel ? revisada ? "Revisado ✓" : "Revisar →" : "Sem decisão neste modelo"}</button>;
         })}</div></Modal>}
         {turma.modo_equipe && <p className="text-sm text-slate-600">Somente o líder altera e envia. Todos podem consultar o planejamento e contribuir na discussão. O envio final será bloqueado se houver etapas obrigatórias pendentes.</p>}
         {conflito && <div className="space-y-2"><Aviso tipo="info">Outra atualização chegou enquanto você editava. Seus campos foram mantidos. Carregue a decisão salva da empresa antes de continuar; essa ação substitui os valores do formulário.</Aviso><Botao type="button" variante="secundario" disabled={carregando} onClick={carregarDecisaoSalva}>Carregar decisão salva</Botao></div>}
@@ -621,7 +634,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar, aoPr
           <p className="text-sm text-slate-600">Esta conferência inclui todos os departamentos. Investimentos opcionais podem permanecer em zero.</p>
           <div className="resumo-conferencia"><span>Preço <strong>{reais(d.preco)}</strong></span><span>Campanhas <strong>{reais(d.marketing)}</strong></span><span>P&D <strong>{reais(d.pd)}</strong></span><span>Contratações <strong>{d.contratar}</strong></span><span>Demissões <strong>{d.demitir}</strong></span><span>Empréstimo <strong>{reais(d.emprestimo)}</strong></span></div>
           <p className="text-sm">Confira os conjuntos exigidos pelo jogo. Alterações posteriores removem automaticamente as confirmações afetadas.</p>
-          <div className="lista-conferencia">{AREAS_DECISAO.filter(id=>id!=="logistica" || turma.modo_jogo==="TRADICIONAL").map(id=><label key={id}><input type="checkbox" disabled={somenteLeitura || carregando} checked={!!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e=>setD(atual=>({...atual,revisao_areas:{...atual.revisao_areas,[id]:e.target.checked}}))}/><span>{DEPARTAMENTOS.find(dep=>dep.id===id)?.titulo ?? id}</span><button type="button" onClick={()=>aoNavegar(id)}>Conferir valores →</button></label>)}</div>
+          <div className="lista-conferencia">{AREAS_DECISAO.filter(id=>(id!=="logistica" || turma.modo_jogo==="TRADICIONAL") && deps.some(dep=>dep.id===id)).map(id=><label key={id}><input type="checkbox" disabled={somenteLeitura || carregando} checked={!!d.revisao_areas?.[id as keyof NonNullable<DecisaoEntrada["revisao_areas"]>]} onChange={e=>setD(atual=>({...atual,revisao_areas:{...atual.revisao_areas,[id]:e.target.checked}}))}/><span>{deps.find(dep=>dep.id===id)?.titulo ?? id}</span><button type="button" onClick={()=>aoNavegar(id)}>Conferir valores →</button></label>)}</div>
           {!previsao && !erroPrevisao && <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600" role="status">Validando a integração entre pessoas, caixa, produção, marketing e entrega…</p>}
           {erroPrevisao && <Aviso tipo="erro">Não foi possível validar a coerência da rodada. Revise a prévia antes de enviar.</Aviso>}
           {previsao?.radar && <div className={`rounded-lg border p-4 text-sm ${previsao.radar.liberado ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-red-300 bg-red-50 text-red-900"}`}>
@@ -769,7 +782,7 @@ function FormularioDecisao({ painel, aoEnviar, area, ferramenta, aoNavegar, aoPr
 
         {!somenteLeitura && <><p className="text-xs text-slate-600">O rascunho pode ficar incompleto. No envio final, o programa informa as pendências e impede o envio até que sejam resolvidas.</p>
 
-        {destinoAcoes && createPortal(<div className="barra-decisao" aria-label="Ações da decisão"><div className="situacao-rascunho" role={mensagem?.tipo === "erro" ? "alert" : "status"}>{mensagem ? mensagem.texto : alterada ? "Alterações ainda não salvas" : painel.decisao_atual ? `Rascunho completo salvo · versão ${base.versao}` : "Valores iniciais · ainda não salvos"}</div><button type="button" className="consulta-previa" onClick={()=>setPainelAuxiliar("previa")}>Prévia estimada</button><Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho completo</Botao>{area === "conferencia" ? <Botao variante="final" type="submit" form={`form-decisao-${empresa.id}`} carregando={carregando} disabled={conflito || !previsao || !!erroPrevisao || previsao.radar?.liberado === false}>Enviar decisão final</Botao> : proxima && <Botao type="button" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para {proxima === "conferencia" ? "conferência" : DEPARTAMENTOS.find(x=>x.id===proxima)?.titulo ?? proxima} →</Botao>}</div>, destinoAcoes)}</>}
+        {destinoAcoes && createPortal(<div className="barra-decisao" aria-label="Ações da decisão"><div className="situacao-rascunho" role={mensagem?.tipo === "erro" ? "alert" : "status"}>{mensagem ? mensagem.texto : alterada ? "Alterações ainda não salvas" : painel.decisao_atual ? `Rascunho completo salvo · versão ${base.versao}` : "Valores iniciais · ainda não salvos"}</div><button type="button" className="consulta-previa" onClick={()=>setPainelAuxiliar("previa")}>Prévia estimada</button><Botao type="button" variante="secundario" disabled={carregando||conflito} onClick={()=>salvar(true)}>Salvar rascunho completo</Botao>{area === "conferencia" ? <Botao variante="final" type="submit" form={`form-decisao-${empresa.id}`} carregando={carregando} disabled={conflito || !previsao || !!erroPrevisao || previsao.radar?.liberado === false}>Enviar decisão final</Botao> : proxima && <Botao type="button" disabled={carregando||conflito} onClick={()=>salvar(true,true)}>Salvar e ir para {proxima === "conferencia" ? "conferência" : deps.find(x=>x.id===proxima)?.titulo ?? proxima} →</Botao>}</div>, destinoAcoes)}</>}
       </form>
       {confirmandoEnvio && <Modal titulo="Confirmar decisão final" aoFechar={()=>setConfirmandoEnvio(false)}><p className="text-sm">Confirma o envio de todos os departamentos para a rodada {turma.rodada_atual}? Após enviar, todas as escolhas ficam visíveis em modo de leitura até a próxima rodada. Use o rascunho se ainda precisar alterar algo.</p><div className="mt-6 flex justify-end gap-3"><Botao variante="secundario" onClick={()=>setConfirmandoEnvio(false)}>Voltar e revisar</Botao><Botao variante="final" carregando={carregando} onClick={()=>{setConfirmandoEnvio(false);salvar(false);}}>Confirmar envio final</Botao></div></Modal>}
     </Cartao>

@@ -350,6 +350,14 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     mp_inicial, pa_inicial = deepcopy(mp), deepcopy(pa)
     plano_comercial = d.get("plano_comercial") or {}
     itens=deepcopy(plano_comercial.get("produtos", []))
+    # Revenda do catálogo (aprovada em 21/11/2026): a loja compra a mercadoria
+    # pronta e não desenvolve o produto. O P&D não tem efeito sobre o custo de
+    # compra nem gera despesa; volta a existir com fábrica ou marca própria.
+    if any(i.get("preco_mercado") for i in itens) and float(d.get("pd") or 0) > 0:
+        d["pd"] = 0
+        alertas_pd_revenda = True
+    else:
+        alertas_pd_revenda = False
     from .portfolio import diagnosticos_segmentacao
     diagnosticos_publico = diagnosticos_segmentacao(itens, (plano_comercial.get("analises") or {}).get("segmentacao"))
     for item in itens:
@@ -432,6 +440,8 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     # Revenda do catálogo (aprovada em 21/11/2026): sem desconto automático por
     # volume, que não tem fonte; a loja paga o custo de compra do catálogo.
     revenda = any(i.get("preco_mercado") for i in itens)
+    if alertas_pd_revenda:
+        alertas.append("Revenda: a loja compra a mercadoria pronta; o valor informado em P&D foi desconsiderado.")
     if revenda:
         custo_unitario_atual, fator_barganha = custo_base, 0.0
     else:

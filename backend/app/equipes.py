@@ -234,7 +234,9 @@ def pendencias_envio(empresa, dados):
     motivos = [m for m in motivos if not m.startswith("Salve uma decisão")]
     if not empresa.turma.modo_equipe:
         motivos = []
-    areas = {"decisoes": "Produtos e marketing", "financas": "Finanças", "producao": "Produção e operação"}
+    revenda = any(p.preco_mercado for p in ((dados.plano_comercial.produtos if dados.plano_comercial else None) or []))
+    areas = {"decisoes": "Produtos e marketing", "financas": "Finanças",
+             "producao": "Compras de mercadoria" if revenda else "Produção e operação"}
     if empresa.turma.modo_jogo == "TRADICIONAL":
         areas["logistica"] = "Logística"
     for chave, titulo in areas.items():
