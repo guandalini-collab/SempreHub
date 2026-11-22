@@ -282,7 +282,7 @@ def test_revenda_estoque_medio_com_sobra(cliente,professor,monkeypatch):
     res=cliente.get(base,headers=aluno).json()['resultados'][0]
     final=sum(l['estoque_final']['valor'] for l in res['produtos_resultado'])
     assert final>0
-    assert res['detalhes_simulacao']['operacao']['estoque_medio']==round(final/2,2)
+    assert abs(res['detalhes_simulacao']['operacao']['estoque_medio']-final/2)<=0.011  # arredondamento por linha
 
 
 def test_curva_abc_planilha(cliente,professor,monkeypatch):
@@ -336,3 +336,98 @@ def test_aviso_de_produtos_some_no_catalogo_fixo():
     from app.routers.mercado import _aviso_sobre_produtos
     assert _aviso_sobre_produtos("Sem evidência verificável de produtos físicos; campo produtos omitido conforme instrução de não pesquisar catálogo nesta turma.")
     assert not _aviso_sobre_produtos("Itens retirados porque a página citada não pôde ser conferida.")
+
+
+def _revenda_pet(cliente, professor, monkeypatch, email, nome, regime="MEI"):
+    from app.routers import mercado
+    cat=edicao();monkeypatch.setattr(mercado,'gerar_json',lambda *a:(cat,{'https://www.ibge.gov.br/produto'}))
+    turma=_criar_turma(cliente,professor,modo_jogo='TRADICIONAL',total_rodadas=3,demanda_base_por_empresa=20,
+                       configuracao_simulacao={'fabrica_inicial':False})
+    aluno=cadastrar(cliente,nome,email);empresa=_entrar(cliente,aluno,turma['codigo'],nome,regime=regime)
+    url=f"/api/professor/turmas/{turma['id']}"
+    eid=cliente.post(url+'/mercado/pesquisar',headers=professor,json={'setor':'Pet Shop','noticias':1,'analises':1,'produtos':2}).json()['id']
+    assert cliente.post(url+f'/mercado/{eid}/publicar',headers=professor,json={}).status_code==200
+    mix={'estrategia_preco':'COMPETITIVO','posicionamento':'PRECO','canais':['DIRETO'],'cobertura':'LOCAL','intensidade':'BAIXA','midias':[{'id':'email','quantidade':100}]}
+    plano={'edicao_id':eid,'produto_id':'pet-brinquedo',**mix,'produtos':[{'produto_id':pid,**mix,'preco':preco,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]} for pid,preco in (('pet-brinquedo',59),('pet-guia',43))]}
+    return aluno, empresa, url, plano
+
+
+def test_vendas_limitadas_pela_equipe(cliente,professor,monkeypatch):
+    """Item 1 (22/11/2026): a loja vende no máximo pessoas × receita por pessoa
+    ocupada (PAC 2024, loja pequena); o dono conta como uma pessoa."""
+    aluno, empresa, url, plano = _revenda_pet(cliente, professor, monkeypatch, 'equipe@aluno.iffar.edu.br', 'Equipe')
+    d={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano,
+       'simulacao':{'comprar_insumos_por_produto':{'pet-brinquedo':3000,'pet-guia':3000},'compras_prazo':1,'pro_labore':2000,'orcamento_logistico':100000}}
+    base=f'/api/aluno/empresas/{empresa}'
+    assert cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d)).status_code==200
+    assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
+    res=cliente.get(base,headers=aluno).json()['resultados'][0]
+    op=res['detalhes_simulacao']['operacao']
+    at=op['atendimento_equipe']
+    assert at['pessoas']==1.0 and at['receita_por_pessoa']>0
+    assert at['limite_reais']==round(at['receita_por_pessoa'],2)
+    receita=sum(l['receita'] for l in op['produtos'])
+    assert receita<=at['limite_reais']+at['receita_por_pessoa']*0.01
+    assert at['limitou'] and at['demanda_reais']>at['limite_reais']
+    assert any('Vendas limitadas pela equipe' in a for a in res['alertas'])
+
+
+def test_loja_sem_ninguem_nao_vende(cliente,professor,monkeypatch):
+    aluno, empresa, url, plano = _revenda_pet(cliente, professor, monkeypatch, 'vazia@aluno.iffar.edu.br', 'Vazia')
+    d={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano,
+       'simulacao':{'comprar_insumos_por_produto':{'pet-brinquedo':300,'pet-guia':300},'compras_prazo':1,'pro_labore':0,'orcamento_logistico':100000}}
+    base=f'/api/aluno/empresas/{empresa}'
+    assert cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d)).status_code==200
+    assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
+    res=cliente.get(base,headers=aluno).json()['resultados'][0]
+    op=res['detalhes_simulacao']['operacao']
+    assert op['atendimento_equipe']['pessoas']==0 and op['vendas']==0
+    assert any('Sem ninguém para atender' in a for a in res['alertas'])
+
+
+def test_salario_abaixo_do_minimo_e_recusado():
+    """Item 2 (22/11/2026): CF, art. 7º, IV; Decreto nº 12.797/2025 (R$ 1.621,00)."""
+    from pydantic import ValidationError
+    from app.schemas import DecisaoSimulacao, ParametrosTurma
+    from app.mercado_pac import salario_minimo_vigente, SALARIO_REFERENCIA_PAC
+    assert salario_minimo_vigente(2026)==1621.00
+    assert SALARIO_REFERENCIA_PAC>salario_minimo_vigente()
+    with pytest.raises(ValidationError, match='salário mínimo'):
+        DecisaoSimulacao(salario=1500)
+    assert DecisaoSimulacao(salario=1621).salario==1621
+    with pytest.raises(ValidationError, match='salário mínimo'):
+        ParametrosTurma(salario_base=1000)
+
+
+def test_mei_paga_exatamente_o_salario_minimo(cliente,professor,monkeypatch):
+    """LC 123/2006, art. 18-C: o empregado do MEI recebe exclusivamente o salário mínimo."""
+    from app.motor.tributos import fator_clt
+    aluno, empresa, url, plano = _revenda_pet(cliente, professor, monkeypatch, 'meiemp@aluno.iffar.edu.br', 'Mei Emp')
+    d={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano,'contratar':1,
+       'simulacao':{'comprar_insumos_por_produto':{'pet-brinquedo':300,'pet-guia':300},'compras_prazo':1,'pro_labore':2000,
+                    'orcamento_logistico':100000,'salario':3000}}
+    base=f'/api/aluno/empresas/{empresa}'
+    r=cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d));assert r.status_code==200,r.text
+    assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
+    res=cliente.get(base,headers=aluno).json()['resultados'][0]
+    dre=res['detalhes_simulacao']['dre']
+    assert dre['folha']==round(1621*fator_clt('MEI'),2)
+    assert any('MEI: o empregado recebe exatamente o salário mínimo' in a for a in res['alertas'])
+
+
+def test_decisao_gravada_abaixo_do_minimo_nao_quebra_fechamento(cliente,professor,monkeypatch):
+    """Decisões gravadas antes da trava sobem ao mínimo legal no fechamento."""
+    from app.database import SessionLocal
+    from app.models import Decisao
+    aluno, empresa, url, plano = _revenda_pet(cliente, professor, monkeypatch, 'antiga@aluno.iffar.edu.br', 'Antiga', regime='SIMPLES_NACIONAL')
+    d={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano,'contratar':1,
+       'simulacao':{'comprar_insumos_por_produto':{'pet-brinquedo':300,'pet-guia':300},'compras_prazo':1,'pro_labore':2000,
+                    'orcamento_logistico':100000,'salario':1700}}
+    base=f'/api/aluno/empresas/{empresa}'
+    assert cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d)).status_code==200
+    with SessionLocal() as db:
+        dec=db.query(Decisao).filter_by(empresa_id=empresa,rodada=1).one()
+        dec.simulacao={**dec.simulacao,'salario':1000};db.commit()
+    assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
+    res=cliente.get(base,headers=aluno).json()['resultados'][0]
+    assert any('ajustado ao mínimo legal' in a for a in res['alertas'])

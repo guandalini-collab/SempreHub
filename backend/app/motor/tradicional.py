@@ -258,6 +258,14 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         alertas.append(f"Clima da rodada anterior: {turnover} empregado(s) saíram voluntariamente.")
     salario_base = p.get("salario_base", 2000)
     salario = salario_base if op.get("salario") is None else op["salario"]
+    regime_folha = str(getattr(e.get("regime_tributario"), "value", e.get("regime_tributario") or ""))
+    if p.get("salario_minimo") and regime_folha == "MEI":
+        # LC 123/2006, art. 18-C: o empregado do MEI recebe exclusivamente o
+        # salário mínimo ou o piso da categoria (item 2, 22/11/2026).
+        if op.get("salario") is not None and abs(float(op["salario"]) - p["salario_minimo"]) > 0.005:
+            alertas.append("MEI: o empregado recebe exatamente o salário mínimo (LC 123/2006, art. 18-C); "
+                           "o salário informado foi substituído.")
+        salario = salario_base = p["salario_minimo"]  # referência do MEI: o clima não cai por cumprir a lei
     beneficio = max(0, op.get("beneficio", 0))
     treinamento = _dinheiro(max(0, op.get("treinamento", 0)))
     salario_relativo = salario / salario_base if salario_base > 0 else 1.0
@@ -707,6 +715,29 @@ def apurar(preparo: dict, demanda: float,
                            if custo_frete > 0 and orcamento_logistico > 0 else 0)
     catalogo_fixo = any(i.get("preco_mercado") for i in itens)
     comercial_ativo = publicado and (c.get("marketing", 0) > 0 or catalogo_fixo)
+    atendimento = None
+    if catalogo_fixo and demanda_reais and p.get("receita_por_pessoa_mensal"):
+        # Item 1 (22/11/2026): a loja vende no máximo pessoas × receita por
+        # pessoa ocupada (PAC 2024, escala da loja pequena); o dono conta como
+        # uma pessoa, proporcional à dedicação (Levy; Grewal, 2026, p. 455 e 466).
+        # A capacidade em reais é convertida em unidades na mesma proporção da
+        # demanda (opção B: a disputa é em reais).
+        fracao_mes = float(p.get("_calendario", {}).get("fator_mensal", 1) or 1)
+        pessoas = float(c.get("funcionarios", 0)) + float(c.get("dedicacao_fundador", 0) or 0)
+        limite_reais = _produto(pessoas, float(p["receita_por_pessoa_mensal"]), fracao_mes)
+        limite_unidades = math.floor(demanda * min(1.0, limite_reais / demanda_reais)) if demanda_reais > 0 else 0
+        atendimento = {"pessoas": round(pessoas, 2), "receita_por_pessoa": float(p["receita_por_pessoa_mensal"]),
+                       "limite_reais": limite_reais, "demanda_reais": _dinheiro(demanda_reais),
+                       "limitou": limite_reais < demanda_reais}
+        capacidade_entrega = min(capacidade_entrega, limite_unidades)
+        if pessoas <= 0:
+            c["alertas"].append("Sem ninguém para atender: o dono não dedicou tempo (pró-labore zero) e não há empregados; "
+                                "a loja não vende.")
+        elif atendimento["limitou"]:
+            br = lambda v, casas=2: f"{v:,.{casas}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+            c["alertas"].append(
+                f"Vendas limitadas pela equipe: {br(pessoas, 1)} pessoa(s) atendem até R$ {br(limite_reais)} no mês, "
+                f"mas a loja atraiu R$ {br(demanda_reais)} em demanda.")
     demanda_comercial = min(demanda, capacidade_entrega) if comercial_ativo else 0
     if catalogo_fixo and p.get("mercado_em_reais") and comercial_ativo:
         # Pedidos pendentes do mês anterior têm prioridade na capacidade de entrega
@@ -885,6 +916,8 @@ def apurar(preparo: dict, demanda: float,
         operacao["resposta_ruptura"] = deepcopy(resposta_ruptura)
     if demanda_reais is not None:
         operacao.update(demanda_reais=round(demanda_reais, 2))
+    if atendimento is not None:
+        operacao["atendimento_equipe"] = atendimento
     operacao.update(demanda=demanda, demanda_comercial=demanda_comercial, vendas=vendas, ruptura=ruptura,
                     estoque_mp_final=deepcopy(s["estoque_mp"]), estoque_pa_final=deepcopy(pa),
                     satisfacao=s["satisfacao"], moral=s["rh"]["moral"], qualificacao=s["rh"]["qualificacao"],

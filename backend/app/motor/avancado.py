@@ -86,6 +86,12 @@ def parametros(turma):
         dados["configuracao_simulacao"]["custo_armazenagem_m3"] = 0.0
         dados["rendimento_caixa_mensal"] = custos["taxa_capital_estoque"]
         dados["custos_loja"] = custos
+        # Equipe da loja (itens 1 e 2, 22/11/2026): limite de atendimento por
+        # pessoa (PAC 2024) e salário de referência da PAC, nunca abaixo do
+        # salário mínimo (CF, art. 7º, IV).
+        dados["receita_por_pessoa_mensal"] = custos["receita_por_pessoa"]["valor"]
+        dados["salario_minimo"] = custos["salario_minimo"]
+        dados["salario_base"] = max(custos["salario_referencia"], custos["salario_minimo"])
     return dados
 
 
@@ -102,7 +108,15 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0, efeitos_op
         original=anteriores[-1].plano_comercial["produto_id"] if anteriores else (decisao.plano_comercial or {}).get("produto_id")
         if original: dados["estado_simulacao"].setdefault("produto_estoque_original",original)
     entrada = colunas(decisao)
-    entrada["simulacao"] = DecisaoSimulacao.model_validate(entrada["simulacao"] or {}).model_dump()
+    simulacao_salva = dict(entrada["simulacao"] or {})
+    salario_ajustado = False
+    from ..mercado_pac import salario_minimo_vigente
+    if simulacao_salva.get("salario") is not None and float(simulacao_salva["salario"]) < salario_minimo_vigente():
+        # Decisão gravada antes da trava do salário mínimo (22/11/2026): o
+        # fechamento não falha; o salário sobe ao mínimo legal e o aluno é avisado.
+        simulacao_salva["salario"] = salario_minimo_vigente()
+        salario_ajustado = True
+    entrada["simulacao"] = DecisaoSimulacao.model_validate(simulacao_salva).model_dump()
     p = parametros(turma)
     p["custo_referencia_portfolio"]=turma.custo_unitario
     if decisao.plano_comercial:
@@ -115,6 +129,9 @@ def preparar(empresa, decisao, turma, multiplicador_custo=1, multa=0, efeitos_op
     p["multas"] = multa
     p["eventos_operacionais"] = deepcopy(efeitos_operacionais or {})
     preparo = motor(turma).preparar(dados, entrada, p, turma.rodada_atual, multiplicador_custo)
+    if salario_ajustado:
+        preparo.setdefault("alertas", []).append(
+            "Salário abaixo do salário mínimo na decisão gravada: ajustado ao mínimo legal (Constituição, art. 7º, IV).")
     # A mesma parametrização usada pelo motor acompanha a prévia até o
     # fechamento, inclusive os efeitos de ocorrências operacionais.
     preparo["parametros"] = deepcopy(p)

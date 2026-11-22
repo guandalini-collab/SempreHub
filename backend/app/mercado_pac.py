@@ -234,8 +234,70 @@ def atualizar_selic(db, abrir=urllib.request.urlopen, hoje=None) -> bool:
     return True
 
 
+# ---------------------------------------------------------------------------
+# Equipe da loja (itens 1 e 2, aprovados em 22/11/2026).
+# Item 1: limite de vendas = pessoas × receita por pessoa ocupada, na escala da
+# loja pequena; o dono conta como uma pessoa (proporcional à dedicação).
+# Produtividade = vendas líquidas ÷ empregados (Levy; Grewal, Retailing
+# Management, 2026, p. 455); dono como a organização inteira na loja única
+# (p. 466); direção do efeito do pessoal sobre as vendas, côncava, em Perdikaki,
+# Kesavan e Swaminathan (2012, M&SOM 14(1):145-162) e Mani, Kesavan e
+# Swaminathan (2015, POM 24(2):201-218). A fórmula de Mani et al. ficou como
+# pendência do professor (14).
+# Dados: PAC 2024, tabela 10645 (receita líquida de revenda e pessoal ocupado
+# em 31/12 por atividade) e tabela 10647 (varejo por faixa de pessoal),
+# consultadas na API do IBGE em 22/11/2026.
+# ---------------------------------------------------------------------------
+FONTE_PESSOAL = ("IBGE, PAC 2024, tabela 10645 (receita líquida de revenda ÷ pessoal ocupado em 31/12) "
+                 "e tabela 10647 (varejo, faixa até 19 pessoas)")
+# setor → (receita líquida de revenda no ano, R$ mil; pessoal ocupado em 31/12)
+PESSOAL_PAC = {
+    "moveis": (99_045_884, 362_219),
+    "bicicletas": (62_158_025, 207_344),
+    "vestuario": (126_040_112, 653_824),
+    "mochilas": (40_913_827, 190_949),
+    "pet": (125_829_641, 454_807),
+}
+PESSOAL_PAC["colchoes"] = PESSOAL_PAC["moveis"]
+# Varejo (tabela 10647): receita operacional líquida (R$ mil) e pessoal ocupado.
+VAREJO_TOTAL = (3_196_219_374, 7_647_251)
+VAREJO_ATE_19 = (1_255_619_180, 3_991_871)
+RAZAO_PRODUTIVIDADE_PEQUENA = round((VAREJO_ATE_19[0] / VAREJO_ATE_19[1])
+                                    / (VAREJO_TOTAL[0] / VAREJO_TOTAL[1]), 4)  # 0,7526
+AVISO_PESSOAL = ("Estimativa: a razão de produtividade loja pequena/média (0,7526) só é publicada para o varejo total; "
+                 "o pessoal ocupado inclui os donos e é contado em 31/12.")
+
+# Item 2: salário de referência = remuneração média por pessoa ocupada nas
+# lojas até 19 pessoas (tabela 10647, gastos com salários, retiradas e outras
+# remunerações ÷ pessoal ocupado), dividida por 13,333 porque o total anual já
+# inclui 13º e 1/3 de férias, que o motor provisiona (tributos.fator_folha).
+GASTOS_SALARIOS_ATE_19 = 97_793_101  # R$ mil no ano
+SALARIO_REFERENCIA_PAC = round(GASTOS_SALARIOS_ATE_19 * 1000 / VAREJO_ATE_19[1] / (12 + 1 + 1 / 3), 2)
+# Piso legal (CF, art. 7º, IV). Decreto nº 12.797, de 23/12/2025, art. 1º.
+SALARIO_MINIMO = {2026: 1621.00}
+FONTE_SALARIO_MINIMO = "Decreto nº 12.797, de 23/12/2025 (salário mínimo a partir de 1º/1/2026)"
+
+
+def salario_minimo_vigente(ano: int | None = None) -> float:
+    """Salário mínimo nacional do ano (último publicado quando o ano não consta)."""
+    if ano in SALARIO_MINIMO:
+        return SALARIO_MINIMO[ano]
+    return SALARIO_MINIMO[max(SALARIO_MINIMO)]
+
+
+def receita_por_pessoa(setor: str, series: dict | None = None) -> dict:
+    """Receita mensal por pessoa ocupada, na escala da loja pequena, atualizada pela PMC."""
+    receita_ano, pessoal = PESSOAL_PAC[setor]
+    media = receita_ano * 1000 / pessoal / 12
+    series = (series or BASE)["series"]
+    fator, periodo = fator_atualizacao(series[str(ATIVIDADE_PMC[setor])])
+    return {"valor": round(media * RAZAO_PRODUTIVIDADE_PEQUENA * fator, 2), "media_atividade": round(media, 2),
+            "razao_loja_pequena": RAZAO_PRODUTIVIDADE_PEQUENA, "fator_pmc": round(fator, 4), "periodo_pmc": periodo,
+            "fonte": FONTE_PESSOAL, "aviso": AVISO_PESSOAL}
+
+
 def custos_da_turma(turma) -> dict | None:
-    """Custos fixos e taxa de capital do estoque para turmas com catálogo fixo."""
+    """Custos fixos, taxa de capital do estoque e parâmetros de pessoal para turmas com catálogo fixo."""
     if getattr(turma, "modo_jogo", None) == "STARTUP":
         return None
     from .routers.mercado import chave_setor
@@ -245,5 +307,9 @@ def custos_da_turma(turma) -> dict | None:
     from .database import SessionLocal
     with SessionLocal() as db:
         taxa, mes = selic_mensal(db)
+        series = series_vigentes(db)
     return {"custos_fixos": custos_fixos_loja(setor), "taxa_capital_estoque": taxa,
-            "selic_referencia": mes, "fonte_selic": "BCB, SGS 4390 (Selic acumulada no mês)"}
+            "selic_referencia": mes, "fonte_selic": "BCB, SGS 4390 (Selic acumulada no mês)",
+            "receita_por_pessoa": receita_por_pessoa(setor, series),
+            "salario_referencia": SALARIO_REFERENCIA_PAC, "salario_minimo": salario_minimo_vigente(),
+            "fonte_salario_minimo": FONTE_SALARIO_MINIMO}

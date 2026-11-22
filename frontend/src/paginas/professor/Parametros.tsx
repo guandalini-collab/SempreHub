@@ -48,7 +48,7 @@ const GRUPOS: { titulo: string; cor: string; campos: Definicao[] }[] = [
     { campo: "custo_unitario", rotulo: "Custo da mercadoria (por unidade)", ajuda: "CMV por unidade vendida.", tipo: "moeda" },
     { campo: "produtividade_por_pessoa", rotulo: "Produtividade (un./pessoa/mês)", ajuda: "O dono também produz.", tipo: "decimal" },
     { campo: "custos_fixos_mensais", rotulo: "Custos fixos (por mês)", ajuda: "Aluguel, energia, contador etc.", tipo: "moeda" },
-    { campo: "salario_base", rotulo: "Salário-base", ajuda: "Sem encargos.", tipo: "moeda" },
+    { campo: "salario_base", rotulo: "Salário-base", ajuda: "Sem encargos. Mínimo de R$ 1.621,00 (salário mínimo de 2026, Decreto nº 12.797/2025). Nas turmas com catálogo fixo, o jogo usa a remuneração média da loja pequena (PAC 2024), nunca abaixo do mínimo.", tipo: "moeda" },
   ] },
   { titulo: "Crédito e Tributação", cor: "bg-hub", campos: [
     { campo: "taxa_juros_mensal", rotulo: "Juros do empréstimo (ao mês)", ajuda: "Muda com eventos de Selic.", tipo: "percentual" },

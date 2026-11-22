@@ -155,6 +155,18 @@ class DecisaoSimulacao(BaseModel):
     aporte: float = Field(0.0, ge=0, le=10_000_000)
     valuation: float = Field(100000.0, gt=0, le=1_000_000_000)
 
+    @field_validator("salario")
+    @classmethod
+    def validar_salario_minimo(cls, valor):
+        # Piso legal (CF, art. 7º, IV; item 2 aprovado em 22/11/2026).
+        from .mercado_pac import salario_minimo_vigente
+        minimo = salario_minimo_vigente()
+        if valor is not None and valor < minimo:
+            valor_br = f"{minimo:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+            raise ValueError(f"O salário não pode ficar abaixo do salário mínimo nacional (R$ {valor_br}; "
+                             "Constituição Federal, art. 7º, IV).")
+        return valor
+
     @field_validator("comprar_insumos_por_produto")
     @classmethod
     def validar_compras_por_produto(cls, valores):
@@ -187,6 +199,17 @@ class ParametrosTurma(BaseModel):
     das_mei_mensal: float = Field(82.05, ge=0, le=100_000)
     aliquota_icms: float = Field(0.17, ge=0, le=0.4)
 
+
+    @field_validator("salario_base")
+    @classmethod
+    def validar_salario_base_minimo(cls, valor):
+        from .mercado_pac import salario_minimo_vigente
+        minimo = salario_minimo_vigente()
+        if valor < minimo:
+            valor_br = f"{minimo:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+            raise ValueError(f"O salário de referência não pode ficar abaixo do salário mínimo nacional (R$ {valor_br}; "
+                             "Constituição Federal, art. 7º, IV).")
+        return valor
 
     @model_validator(mode="after")
     def validar_calendario_do_modelo(self):

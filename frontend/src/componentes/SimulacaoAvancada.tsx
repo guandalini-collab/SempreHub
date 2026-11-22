@@ -11,6 +11,9 @@ import { inteiro, percentual, reais, umDecimal } from "../formatos";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, PreviaSimulacao } from "../tiposSimulacao";
 import { Campo, Cartao, EntradaNumero, Modal, estiloEntrada } from "./ui";
 
+// Salário mínimo nacional de 2026 (Decreto nº 12.797, de 23/12/2025); piso legal (CF, art. 7º, IV).
+const SALARIO_MINIMO = 1621;
+
 export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, produtosMix = [], area = "decisoes", rodada, etapaFinanceira, etapaRH = "equipe", revenda = false, estoquesProdutos, historicoProdutos = [], empresaId }: {
   modo: ModoJogo;
   valores: DecisaoSimulacao;
@@ -98,13 +101,13 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
       {area === "logistica" && <div className="rounded-xl bg-blue-50 p-5 text-sm"><h3 className="font-bold">Operação digital</h3><p className="mt-2">A entrega deste serviço acontece pela nuvem. Planeje a capacidade de atendimento em Produção e operação.</p></div>}
     </>}
     <Secao titulo="Pessoas e desenvolvimento" oculto={area !== "rh" || etapaRH !== "remuneracao"}>
-      <Campo rotulo="Pró-labore semanal do proprietário" ajuda="Remuneração do proprietário que trabalha na operação. Sem pró-labore, ele não conta como capacidade produtiva ou de atendimento. O fundador contribui no máximo como uma pessoa júnior em jornada regular.">
+      <Campo rotulo="Pró-labore semanal do proprietário" ajuda="Remuneração do proprietário que trabalha na operação. Sem pró-labore, ele não conta como capacidade produtiva ou de atendimento. O fundador conta no máximo como uma pessoa. Na loja, cada pessoa (dono e empregados) atende um volume limitado de vendas por mês, pela receita por pessoa ocupada da PAC/IBGE: para vender mais, é preciso contratar.">
         <ControleVisual rotulo="Pró-labore" valor={valores.pro_labore} aoMudar={(v) => mudar("pro_labore", v)} limite={100_000} />
       </Campo>
-      <Campo rotulo="Salário da equipe de funcionários" ajuda={`O padrão da turma é ${reais(salarioBase)} por funcionário. Salários, benefícios e treinamento influenciam moral, qualificação e rotatividade.`}>
+      <Campo rotulo="Salário da equipe de funcionários" ajuda={`O padrão da turma é ${reais(salarioBase)} por funcionário. Nenhum salário pode ficar abaixo do salário mínimo (${reais(SALARIO_MINIMO)}; Constituição, art. 7º, IV; Decreto nº 12.797/2025). No MEI, o empregado recebe exatamente o salário mínimo (LC 123/2006, art. 18-C). Salários, benefícios e treinamento influenciam moral, qualificação e rotatividade.`}>
         <select className={estiloEntrada} value={valores.salario === null ? "PADRAO" : "PROPRIO"} onChange={(e) => mudar("salario", e.target.value === "PADRAO" ? null : salarioBase)}><option value="PADRAO">Usar salário-base da turma</option><option value="PROPRIO">Definir salário da empresa</option></select>
       </Campo>
-      {valores.salario !== null && <Campo rotulo="Salário mensal de referência por funcionário"><ControleVisual rotulo="salario"  valor={valores.salario} aoMudar={(v) => mudar("salario", v)} limite={100000} /></Campo>}
+      {valores.salario !== null && <Campo rotulo="Salário mensal de referência por funcionário"><ControleVisual rotulo="salario" minimo={SALARIO_MINIMO} valor={valores.salario} aoMudar={(v) => mudar("salario", v)} limite={100000} /></Campo>}
       <Campo rotulo="Benefício mensal de referência por funcionário" ajuda="Valor mensal por empregado; aparece como despesa de benefícios."><ControleVisual rotulo="beneficio"  valor={valores.beneficio} aoMudar={(v) => mudar("beneficio", v)} limite={100000} /></Campo>
     </Secao>
     <Secao titulo="Treinamento" oculto={area !== "rh" || etapaRH !== "desenvolvimento"}>
