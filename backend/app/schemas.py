@@ -134,7 +134,7 @@ class DecisaoSimulacao(BaseModel):
     # Nas decisões com mix, cada item representa a quantidade do insumo
     # exclusivo daquele produto. A chave é o produto_id publicado no catálogo.
     # O campo agregado comprar_mp permanece para turmas/rodadas sem portfólio.
-    comprar_insumos_por_produto: dict[str, int] = Field(default_factory=dict, max_length=10)
+    comprar_insumos_por_produto: dict[str, int] = Field(default_factory=dict, max_length=60)  # igual ao limite de produtos do plano comercial
     horas_extras: float = Field(0.0, ge=0, le=40, description="Horas opcionais por empregado no mês; premissa didática.")
     comprar_maquinas: int = Field(0, ge=0, le=100)
     manutencao: float = Field(0.0, ge=0, le=10_000_000)

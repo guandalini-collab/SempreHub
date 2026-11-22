@@ -400,6 +400,9 @@ def _processar_principal(bruto, fontes, turma, dados):
         bruto["avisos"] = list(bruto.get("avisos") or [])
         if usa_catalogo_fixo(turma):
             bruto["produtos"] = produtos_do_catalogo(dados.setor)
+            # Os produtos vêm do catálogo fixo; comentários da pesquisa sobre
+            # produtos não se aplicam e confundiam o professor (22/11/2026).
+            bruto["avisos"] = [a for a in bruto["avisos"] if not _aviso_sobre_produtos(a)]
         else:
             _completar_produtos_estimados(bruto, turma, dados)
     try: edicao=Edicao.model_validate(bruto)
@@ -439,6 +442,11 @@ def _retirar_repetidas(bruto, ja_publicados, avisos):
         bruto[campo] = mantidos
     if retiradas:
         avisos.append("Itens retirados por repetirem notícia ou análise publicada nas últimas 4 rodadas: " + "; ".join(f"“{t}”" for t in retiradas) + ".")
+
+
+def _aviso_sobre_produtos(aviso) -> bool:
+    texto = str(aviso).lower()
+    return "produto" in texto and ("catálogo" in texto or "catalogo" in texto or "omitid" in texto)
 
 
 def executar_pesquisa(db, turma, dados, rodada, exigir_rodada_atual=True):

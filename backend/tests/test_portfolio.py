@@ -316,3 +316,23 @@ def test_curva_abc_planilha(cliente,professor,monkeypatch):
     assert ws['E8'].value>=ws['E9'].value  # ordem decrescente de vendas
     assert ws['L8'].value.startswith('=IF(OR(A8=1,J8<=$C$4)')
     assert 'Como usar' in wb.sheetnames
+
+
+def test_compra_aceita_ate_60_produtos():
+    """A compra por produto acompanha o limite do plano comercial (60), não 10."""
+    from pydantic import ValidationError
+    from app.schemas import DecisaoSimulacao
+    def erros_do_campo(n):
+        try:
+            DecisaoSimulacao.model_validate({'comprar_insumos_por_produto': {f'p{i}': 1 for i in range(n)}})
+            return []
+        except ValidationError as e:
+            return [x for x in e.errors() if x['loc'] and x['loc'][0] == 'comprar_insumos_por_produto']
+    assert erros_do_campo(60) == []
+    assert erros_do_campo(61)
+
+
+def test_aviso_de_produtos_some_no_catalogo_fixo():
+    from app.routers.mercado import _aviso_sobre_produtos
+    assert _aviso_sobre_produtos("Sem evidência verificável de produtos físicos; campo produtos omitido conforme instrução de não pesquisar catálogo nesta turma.")
+    assert not _aviso_sobre_produtos("Itens retirados porque a página citada não pôde ser conferida.")
