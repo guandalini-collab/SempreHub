@@ -81,7 +81,7 @@ _REFERENCIAS = (
         "obra": "Retailing Management, 2026 release (McGraw Hill)",
         "ano": 2026,
         "localizacao": "Capítulo 12 — Managing the Merchandise Planning Process (p. 318-352)",
-        "contribuicao": "Variedade (número de subcategorias) e sortimento (número de itens em cada uma), p. 335; desempenho do comprador por margem bruta, giro do estoque e GMROI, p. 323-325; disponibilidade do produto e estoque de segurança, p. 338-341.",
+        "contribuicao": "Variedade (número de subcategorias) e sortimento (número de itens em cada uma), p. 335; desempenho do comprador por margem bruta, giro do estoque e GMROI, p. 323-325; disponibilidade do produto e estoque de segurança, p. 338-341; análise ABC dos itens, p. 347-348.",
         "nota_edicao": "Edições anteriores (Levy e Weitz) trazem o mesmo conteúdo em outro capítulo; procure \"Managing the Merchandise Planning Process\".",
     },
     {

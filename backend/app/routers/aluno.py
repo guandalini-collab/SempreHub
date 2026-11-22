@@ -452,6 +452,27 @@ def registrar_acesso(empresa_id: int, dados: AcessoEntrada, db: Session = Depend
 from ..dashboard_semanal import BasesSemanais
 
 
+@router.get('/empresas/{empresa_id}/curva-abc.xlsx')
+def curva_abc(empresa_id:int,rodada:int|None=None,db:Session=Depends(get_db),aluno:Usuario=Depends(exigir_aluno)):
+    """Planilha da curva ABC por produto do mês fechado (Levy; Grewal, 2026, p. 347-348)."""
+    from fastapi.responses import Response
+    from ..curva_abc import gerar_planilha, produtos_do_resultado
+    empresa=_empresa_do_aluno(db,empresa_id,aluno)
+    consulta=db.query(Resultado).filter(Resultado.empresa_id==empresa.id)
+    if rodada is not None:
+        consulta=consulta.filter(Resultado.rodada==rodada)
+    resultado=consulta.order_by(Resultado.rodada.desc()).first()
+    if resultado is None:
+        raise HTTPException(404,"Ainda não há mês fechado para montar a curva ABC.")
+    produtos=produtos_do_resultado(resultado.detalhes_simulacao)
+    if not produtos:
+        raise HTTPException(404,"Este resultado não tem vendas por produto.")
+    conteudo=gerar_planilha(empresa.nome,resultado.rodada,produtos)
+    nome=f"curva_abc_mes_{resultado.rodada}.xlsx"
+    return Response(conteudo,media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    headers={"Content-Disposition":f'attachment; filename="{nome}"'})
+
+
 @router.get('/empresas/{empresa_id}/dashboard/{rodada}')
 def dashboard(empresa_id:int,rodada:int,db:Session=Depends(get_db),aluno:Usuario=Depends(exigir_aluno)):
     from ..dashboard_semanal import consultar

@@ -4,13 +4,14 @@ import ResultadoProdutos, {type LinhaProduto} from "./ResultadoProdutos";
 import CentroGravidade from "./CentroGravidade";
 import { ControleVisual } from "./Experiencia";
 import React from "react";
+import { baixarArquivo } from "../api";
 import type { MixProduto } from "./MercadoReal";
 
 import { inteiro, percentual, reais, umDecimal } from "../formatos";
 import type { ConfiguracaoMotor, DecisaoSimulacao, DetalhesSimulacao, EstadoSimulacao, ModoJogo, PreviaSimulacao } from "../tiposSimulacao";
 import { Campo, Cartao, EntradaNumero, Modal, estiloEntrada } from "./ui";
 
-export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, produtosMix = [], area = "decisoes", rodada, etapaFinanceira, etapaRH = "equipe", revenda = false, estoquesProdutos, historicoProdutos = [] }: {
+export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, valores, aoMudar, config, salarioBase, marketing, mixSelecionado = false, produtosMix = [], area = "decisoes", rodada, etapaFinanceira, etapaRH = "equipe", revenda = false, estoquesProdutos, historicoProdutos = [], empresaId }: {
   modo: ModoJogo;
   valores: DecisaoSimulacao;
   aoMudar: (valores: DecisaoSimulacao) => void;
@@ -27,7 +28,8 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
   rodada: number;
   revenda?: boolean;
   estoquesProdutos?: EstadoSimulacao["estoques_produtos"];
-  historicoProdutos?: { rodada: number; produtos: { produto_id: string; demanda?: number; vendas: number }[] }[];
+  historicoProdutos?: { rodada: number; produtos: ProdutoHistorico[] }[];
+  empresaId?: number;
 }) {
   const [mostrarImpacto,setMostrarImpacto]=React.useState(false);
   const [etapaProducao, setEtapaProducao] = React.useState("volume");
@@ -57,6 +59,7 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
         <div className="grid gap-3 md:grid-cols-2">{produtosMix.map(produto => <Campo key={produto.produto_id} rotulo={`Comprar ${produto.produto_nome ?? produto.produto_id}`} ajuda={`Custo de compra: ${reais(produto.custo_unitario ?? 0)} por unidade. Estoque atual: ${inteiro(estoquesProdutos?.[produto.produto_id]?.estoque_pa?.quantidade ?? 0)} un.`}><ControleVisual rotulo={`Comprar ${produto.produto_nome ?? produto.produto_id}`} moeda={false} inteiro valor={valores.comprar_insumos_por_produto?.[produto.produto_id] ?? 0} aoMudar={(v) => mudarCompraProduto(produto.produto_id, v)} limite={100000} /></Campo>)}</div>
         <p className="text-sm font-semibold text-corporativo">Total comprado: {inteiro(valores.comprar_mp)} un. · {reais(produtosMix.reduce((t, p) => t + (valores.comprar_insumos_por_produto?.[p.produto_id] ?? 0) * (p.custo_unitario ?? 0), 0))}</p>
         <ApoioCompras produtos={produtosMix} estoques={estoquesProdutos} historico={historicoProdutos} />
+        <CurvaABC historico={historicoProdutos} empresaId={empresaId} />
       </Secao>
       <Secao titulo="Produção e investimento" oculto={revenda || area !== "producao" || etapaProducao !== "volume"}>
         <Campo rotulo="Produção planejada" ajuda="Unidades a produzir nesta rodada. Matéria-prima, pessoas e máquinas limitam a produção; sobrecarga pode gerar refugo."><ControleVisual rotulo="producao" moeda={false} inteiro valor={valores.producao} aoMudar={(v) => mudar("producao", v)} limite={10000} /></Campo>
@@ -122,7 +125,35 @@ export function ControlesSimulacao({fatorPeriodo = 1, semanal = false, modo, val
 // Apoio à decisão de compra pela revisão periódica (Ballou, 2007, p. 292-294):
 // M = d(T + LT) + z·s, pedido = M − estoque disponível. Referência, não resposta.
 const NIVEIS_SERVICO: [number, number][] = [[0.90, 1.28], [0.95, 1.65], [0.99, 2.33]];
-function ApoioCompras({ produtos, estoques, historico }: { produtos: MixProduto[]; estoques?: EstadoSimulacao["estoques_produtos"]; historico: { rodada: number; produtos: { produto_id: string; demanda?: number; vendas: number }[] }[] }) {
+type ProdutoHistorico = { produto_id: string; nome?: string; demanda?: number; vendas: number; receita?: number; cmv?: number; falta_clientes_mes?: number };
+
+// Análise ABC (aprovada em 22/11/2026): ordena os produtos pelas vendas do último mês
+// fechado (Levy; Grewal, 2026, p. 347-348). Sem classes automáticas na tela: o livro
+// não fixa cortes; a planilha para download deixa os cortes editáveis.
+function CurvaABC({ historico, empresaId }: { historico: { rodada: number; produtos: ProdutoHistorico[] }[]; empresaId?: number }) {
+  const [erro, setErro] = React.useState("");
+  const ultimo = historico.length ? historico.reduce((a, b) => (b.rodada > a.rodada ? b : a)) : null;
+  const itens = (ultimo?.produtos ?? []).map(p => ({ ...p, receita: Number(p.receita ?? 0), cmv: Number(p.cmv ?? 0) })).sort((a, b) => b.receita - a.receita);
+  const total = itens.reduce((s, p) => s + p.receita, 0);
+  let acumulado = 0;
+  const linhas = itens.map(p => { const part = total ? p.receita / total : 0; acumulado += part; return { p, part, acumulado, margem: p.receita ? (p.receita - p.cmv) / p.receita : null }; });
+  return <details className="rounded-xl border border-violet-200 bg-violet-50/50 p-4">
+    <summary className="cursor-pointer font-bold text-corporativo">Apoio à decisão: curva ABC dos produtos</summary>
+    <p className="mt-2 text-sm text-slate-700">Levy e Grewal (2026, p. 347-348) recomendam ordenar os itens por vendas, margem, giro ou GMROI e classificá-los: os itens A, que concentram a maior parte das vendas, não devem faltar; os C toleram disponibilidade menor (p. 338-339). O livro não fixa os cortes entre as classes; no exemplo dele, os itens A somam cerca de 70% das vendas. Leia a participação acumulada e decida quais produtos tratar como A, por exemplo com nível de serviço mais alto no apoio acima.</p>
+    {!ultimo || !itens.length ? <p className="mt-3 text-sm text-slate-600">A curva aparece depois do primeiro mês fechado.</p> : <>
+      <p className="mt-2 text-xs text-slate-600">Vendas do mês de operação {ultimo.rodada}, em ordem decrescente.</p>
+      <div className="mt-2 overflow-x-auto"><table className="w-full text-sm"><thead><tr className="text-left">{["Posição", "Produto", "Vendas (R$)", "Participação", "Acumulada", "Margem bruta", "Clientes sem produto"].map(c => <th key={c} className="p-2">{c}</th>)}</tr></thead>
+        <tbody>{linhas.map((l, i) => <tr key={l.p.produto_id} className="border-t"><td className="p-2">{i + 1}</td><td className="p-2 font-semibold">{l.p.nome ?? l.p.produto_id}</td><td className="p-2">{reais(l.p.receita)}</td><td className="p-2">{umDecimal(l.part * 100)}%</td><td className="p-2">{umDecimal(l.acumulado * 100)}%</td><td className="p-2">{l.margem == null ? "—" : `${umDecimal(l.margem * 100)}%`}</td><td className="p-2">{inteiro(l.p.falta_clientes_mes ?? 0)}</td></tr>)}</tbody></table></div>
+    </>}
+    {empresaId != null && ultimo && itens.length > 0 && <div className="mt-3 flex flex-wrap items-center gap-3">
+      <button type="button" className="rounded-lg bg-corporativo px-3 py-2 text-sm font-semibold text-white" onClick={() => { setErro(""); baixarArquivo(`/api/aluno/empresas/${empresaId}/curva-abc.xlsx`, `curva_abc_mes_${ultimo.rodada}.xlsx`).catch(e => setErro(e instanceof Error ? e.message : "Não foi possível gerar a planilha.")); }}>Baixar planilha da curva ABC (Excel)</button>
+      <span className="text-xs text-slate-600">A planilha classifica os produtos em A, B e C pelos cortes que você definir nas células amarelas (valor inicial: exemplo do livro, 70% e 90%).</span>
+      {erro && <span role="alert" className="text-xs text-red-700">{erro}</span>}
+    </div>}
+  </details>;
+}
+
+function ApoioCompras({ produtos, estoques, historico }: { produtos: MixProduto[]; estoques?: EstadoSimulacao["estoques_produtos"]; historico: { rodada: number; produtos: ProdutoHistorico[] }[] }) {
   const [nivel, setNivel] = React.useState(1);
   const [z, servico] = [NIVEIS_SERVICO[nivel][1], NIVEIS_SERVICO[nivel][0]];
   const linhas = produtos.map(p => {

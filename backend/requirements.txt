@@ -11,3 +11,6 @@ tzdata>=2024.1
 
 # Leitura de boletins em PDF citados pela pesquisa de mercado.
 pypdf>=4.0,<8.0
+
+# Planilha da curva ABC para download (aluno).
+openpyxl>=3.1,<4

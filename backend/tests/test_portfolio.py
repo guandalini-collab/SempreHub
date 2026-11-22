@@ -283,3 +283,36 @@ def test_revenda_estoque_medio_com_sobra(cliente,professor,monkeypatch):
     final=sum(l['estoque_final']['valor'] for l in res['produtos_resultado'])
     assert final>0
     assert res['detalhes_simulacao']['operacao']['estoque_medio']==round(final/2,2)
+
+
+def test_curva_abc_planilha(cliente,professor,monkeypatch):
+    """Planilha da curva ABC: produtos em ordem de vendas, cortes editáveis e fórmulas
+    (Levy; Grewal, 2026, p. 347-348)."""
+    from io import BytesIO
+    from openpyxl import load_workbook
+    from .decisoes import completar_decisao
+    from app.routers import mercado
+    cat=edicao();monkeypatch.setattr(mercado,'gerar_json',lambda *a:(cat,{'https://www.ibge.gov.br/produto'}))
+    turma=_criar_turma(cliente,professor,modo_jogo='TRADICIONAL',total_rodadas=3,demanda_base_por_empresa=20,
+                       configuracao_simulacao={'fabrica_inicial':False})
+    aluno=cadastrar(cliente,'Bia','abc@aluno.iffar.edu.br');empresa=_entrar(cliente,aluno,turma['codigo'],'Loja ABC')
+    url=f"/api/professor/turmas/{turma['id']}"
+    eid=cliente.post(url+'/mercado/pesquisar',headers=professor,json={'setor':'Pet Shop','noticias':1,'analises':1,'produtos':2}).json()['id']
+    assert cliente.post(url+f'/mercado/{eid}/publicar',headers=professor,json={}).status_code==200
+    base=f'/api/aluno/empresas/{empresa}'
+    assert cliente.get(base+'/curva-abc.xlsx',headers=aluno).status_code==404
+    mix={'estrategia_preco':'COMPETITIVO','posicionamento':'PRECO','canais':['DIRETO'],'cobertura':'LOCAL','intensidade':'BAIXA','midias':[{'id':'email','quantidade':100}]}
+    plano={'edicao_id':eid,'produto_id':'pet-brinquedo',**mix,'produtos':[{'produto_id':pid,**mix,'preco':preco,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]} for pid,preco in (('pet-brinquedo',59),('pet-guia',43))]}
+    d={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano,
+       'simulacao':{'comprar_insumos_por_produto':{'pet-brinquedo':40,'pet-guia':10},'compras_prazo':1,'pro_labore':2000,'orcamento_logistico':10000}}
+    assert cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d)).status_code==200
+    assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
+    r=cliente.get(base+'/curva-abc.xlsx',headers=aluno)
+    assert r.status_code==200 and 'spreadsheetml' in r.headers['content-type']
+    wb=load_workbook(BytesIO(r.content))
+    ws=wb['Curva ABC']
+    assert ws['C4'].value==0.70 and ws['C5'].value==0.90
+    assert ws['A8'].value==1 and ws['A9'].value==2
+    assert ws['E8'].value>=ws['E9'].value  # ordem decrescente de vendas
+    assert ws['L8'].value.startswith('=IF(OR(A8=1,J8<=$C$4)')
+    assert 'Como usar' in wb.sheetnames
