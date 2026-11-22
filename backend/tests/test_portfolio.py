@@ -255,4 +255,31 @@ def test_revenda_compra_mercadoria_sem_maquina(cliente,professor,monkeypatch):
         assert l['vendas']+l['estoque_final']['quantidade']==compras[l['produto_id']]['comprado']
     assert res['dre'].get('depreciacao',0)==0
     assert res['dre'].get('pd',0)==0
+    # Estoque médio a custo sempre registrado (giro e GMROI do comprador; Levy; Grewal, 2026)
+    assert op['estoque_medio']==round((0+sum(l['estoque_final']['valor'] for l in res['produtos_resultado']))/2,2)
     assert any('P&D foi desconsiderado' in a for a in res.get('alertas',[]))
+
+
+def test_revenda_estoque_medio_com_sobra(cliente,professor,monkeypatch):
+    """Giro e GMROI do comprador usam o estoque médio a custo [(inicial + final) ÷ 2]
+    (Levy; Grewal, 2026, p. 324-325); com sobra de mercadoria ele é positivo."""
+    from .decisoes import completar_decisao
+    from app.routers import mercado
+    cat=edicao();monkeypatch.setattr(mercado,'gerar_json',lambda *a:(cat,{'https://www.ibge.gov.br/produto'}))
+    turma=_criar_turma(cliente,professor,modo_jogo='TRADICIONAL',total_rodadas=3,demanda_base_por_empresa=20,
+                       configuracao_simulacao={'fabrica_inicial':False})
+    aluno=cadastrar(cliente,'Caio','sobra@aluno.iffar.edu.br');empresa=_entrar(cliente,aluno,turma['codigo'],'Sobra')
+    url=f"/api/professor/turmas/{turma['id']}"
+    eid=cliente.post(url+'/mercado/pesquisar',headers=professor,json={'setor':'Pet Shop','noticias':1,'analises':1,'produtos':2}).json()['id']
+    assert cliente.post(url+f'/mercado/{eid}/publicar',headers=professor,json={}).status_code==200
+    base=f'/api/aluno/empresas/{empresa}'
+    mix={'estrategia_preco':'COMPETITIVO','posicionamento':'PRECO','canais':['DIRETO'],'cobertura':'LOCAL','intensidade':'BAIXA','midias':[{'id':'email','quantidade':100}]}
+    plano={'edicao_id':eid,'produto_id':'pet-brinquedo',**mix,'produtos':[{'produto_id':pid,**mix,'preco':preco,'peso':1,'revisado':True,'servicos':[{'id':'servico-email','quantidade':1}]} for pid,preco in (('pet-brinquedo',59),('pet-guia',43))]}
+    d={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano,
+       'simulacao':{'comprar_insumos_por_produto':{'pet-brinquedo':3000,'pet-guia':3000},'compras_prazo':1,'pro_labore':2000,'orcamento_logistico':10000}}
+    r=cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d));assert r.status_code==200,r.text
+    assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
+    res=cliente.get(base,headers=aluno).json()['resultados'][0]
+    final=sum(l['estoque_final']['valor'] for l in res['produtos_resultado'])
+    assert final>0
+    assert res['detalhes_simulacao']['operacao']['estoque_medio']==round(final/2,2)

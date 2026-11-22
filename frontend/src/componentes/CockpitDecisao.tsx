@@ -141,6 +141,12 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
     const giroEstoqueAnterior = dividir(anterior?.dre.cmv, anterior?.detalhes_simulacao?.estado_final?.estoque_pa?.valor ?? null);
     const roi = atual.dre.marketing > 0 ? dividir(atual.dre.receita - atual.dre.marketing, atual.dre.marketing) : null;
     const roiAnterior = anterior?.dre.marketing && anterior.dre.marketing > 0 ? dividir(anterior.dre.receita - anterior.dre.marketing, anterior.dre.marketing) : null;
+    // Revenda: desempenho do comprador pela margem bruta, giro e GMROI, em base
+    // anual (Levy; Grewal, Retailing Management, 2026 release, p. 324-325).
+    const periodosAno = 12 / Math.max(0.01, turma.calendario?.fator_mensal ?? 1);
+    const margemBruta = (r?: Resultado) => r ? dividir(r.dre.receita - r.dre.cmv, r.dre.receita) : null;
+    const giroAnual = (r?: Resultado) => r ? dividir(r.dre.cmv, numero(r, "estoque_medio"), periodosAno) : null;
+    const gmroiAnual = (r?: Resultado) => r ? dividir(r.dre.receita - r.dre.cmv, numero(r, "estoque_medio"), periodosAno) : null;
     const investimentoPd = dividir(atual.dre.pd, atual.dre.receita);
     const investimentoPdAnterior = dividir(anterior?.dre.pd, anterior?.dre.receita);
     const cartoes = [
@@ -168,7 +174,12 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
         modo === "STARTUP" ? metrica("Burn rate", "Queima operacional de caixa por período. Aumentos reduzem a autonomia financeira.", numero(atual, "burn"), numero(anterior, "burn"), "moeda") : metrica("EBITDA operacional", "Resultado antes de juros, impostos, depreciação e amortização, quando o motor possui todos os dados.", numero(atual, "ebitda"), numero(anterior, "ebitda"), "moeda"),
         modo === "STARTUP" ? metrica("Runway", "Semanas de caixa disponíveis mantendo a queima operacional atual.", numero(atual, "runway"), numero(anterior, "runway"), "semanas") : metrica("Giro do imobilizado", "Receita do período em relação ao valor líquido das máquinas. Mede o uso econômico dos ativos físicos.", dividir(atual.dre.receita, atual.detalhes_simulacao?.balanco?.imobilizado ?? null), dividir(anterior?.dre.receita, anterior?.detalhes_simulacao?.balanco?.imobilizado ?? null), "numero"),
       ]},
-      { titulo: revenda ? "Compras e estoque" : "Produção e operação", estado: grauOperacao(atual, modo), metricas: [
+      revenda ? { titulo: "Compras e estoque", estado: "neutro" as Semaforo, metricas: [
+        metrica("Custo unitário", "CMV por unidade vendida. Uma alta sem reajuste de preço pressiona a margem.", custoUnitario, custoUnitarioAnterior, "moeda"),
+        metrica("Margem bruta", "(Vendas − CMV) ÷ vendas. Depende do preço praticado e do custo de compra da mercadoria.", margemBruta(atual), margemBruta(anterior), "percentual"),
+        metrica("Giro do estoque (ao ano)", "CMV ÷ estoque médio a custo, convertido para o ano. Giro maior significa menos dinheiro parado em mercadoria; giro alto demais aumenta o risco de faltar produto.", giroAnual(atual), giroAnual(anterior), "numero"),
+        metrica("GMROI (ao ano)", "Margem bruta em reais ÷ estoque médio a custo, convertido para o ano: quanto cada real investido em estoque devolve em margem. Leia junto com as vendas e a margem; sozinho, não mostra o tamanho do resultado.", gmroiAnual(atual), gmroiAnual(anterior), "percentual"),
+      ]} : { titulo: "Produção e operação", estado: grauOperacao(atual, modo), metricas: [
         metrica("Custo unitário", "CMV por unidade vendida. Uma alta sem reajuste de preço pressiona a margem.", custoUnitario, custoUnitarioAnterior, "moeda"),
         modo === "STARTUP" ? metrica("Uso da nuvem", "Clientes atendidos em relação à capacidade contratada. Próximo do limite aumenta o risco de indisponibilidade.", usoNuvem, usoNuvemAnterior, "percentual") : metrica("Ocupação da fábrica", "Produção realizada em relação à capacidade disponível das máquinas.", numero(atual, "utilizacao_maquinas"), numero(anterior, "utilizacao_maquinas"), "percentual"),
         modo === "STARTUP" ? metrica("Clientes não atendidos", "Clientes que não puderam ser atendidos por capacidade insuficiente no período.", numero(atual, "clientes_nao_atendidos"), numero(anterior, "clientes_nao_atendidos"), "numero") : metrica("Refugo", "Percentual da produção que não ficou aproveitável. Aumento gera desperdício e risco de falta de estoque.", refugo, refugoAnterior, "percentual"),
@@ -177,12 +188,14 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
       { titulo: "Logística e entregas", estado: grauOperacao(atual, modo), metricas: [
         metrica("Nível de serviço (OTIF)", "Pedidos entregues no prazo e completos. Quedas afetam satisfação e recompra.", numero(atual, "otif"), numero(anterior, "otif"), "percentual"),
         metrica("Custo logístico / receita", "Frete e armazenagem registrados como parcela da receita do período.", custoLogistico, custoLogisticoAnterior, "percentual"),
-        modo === "STARTUP" ? metrica("Churn", "Percentual de clientes perdidos na base; alta recorrente reduz receita futura.", numero(atual, "churn"), numero(anterior, "churn"), "percentual") : metrica("Giro de estoque", "CMV do período em relação ao estoque final de produtos acabados. Interprete junto com risco de ruptura.", giroEstoque, giroEstoqueAnterior, "numero"),
+        modo === "STARTUP" ? metrica("Churn", "Percentual de clientes perdidos na base; alta recorrente reduz receita futura.", numero(atual, "churn"), numero(anterior, "churn"), "percentual") : (revenda ? null : metrica("Giro de estoque", "CMV do período em relação ao estoque final de produtos acabados. Interprete junto com risco de ruptura.", giroEstoque, giroEstoqueAnterior, "numero")),
         modo === "STARTUP" ? metrica("Ativação digital", "O tempo de ativação por cliente ainda não é registrado separadamente pelo motor.", null, null, "semanas") : metrica("Frete e armazenagem", "Custo logístico registrado na DRE. Altas pressionam preço e margem.", (atual.dre.frete ?? 0) + (atual.dre.armazenagem ?? 0), (anterior?.dre.frete ?? 0) + (anterior?.dre.armazenagem ?? 0), "moeda"),
       ]},
     ];
-    return cartoes;
-  }, [atual, anterior, empresa, modo]);
+    // Na revenda não há P&D de produto (aprovado em 21/11/2026).
+    return cartoes.filter(c => !(revenda && c.titulo === "P&D e inovação"))
+      .map(c => ({ ...c, metricas: c.metricas.filter((m): m is Metrica => m != null) }));
+  }, [atual, anterior, empresa, modo, revenda, turma.calendario?.fator_mensal]);
 
   const radarMotor = useMemo(() => {
     if (!previsao) return null;

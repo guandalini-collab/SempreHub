@@ -899,6 +899,9 @@ def apurar(preparo: dict, demanda: float,
                     ocupacao_armazenagem_m3=_dinheiro(ocupacao_armazenagem_m3),
                     armazenagem_sobre_valor=armazenagem_sobre_valor,
                     armazenagem_por_volume=armazenagem_por_volume)
+    # Estoque médio a custo [(inicial + final) ÷ 2], base do giro e do GMROI
+    # do comprador (Levy; Grewal, 2026, p. 324-325).
+    operacao["estoque_medio"] = estoque_medio
     if taxa_aplicacao:
         operacao.update(taxa_aplicacao=taxa_aplicacao, rendimento_aplicacao=rendimento_aplicacao,
                         estoque_medio=estoque_medio, custo_oportunidade_estoque=custo_oportunidade_estoque)
