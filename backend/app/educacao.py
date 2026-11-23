@@ -76,6 +76,22 @@ _REFERENCIAS = (
         "nota_edicao": "O relatório é atualizado periodicamente; use a edição indicada pelo professor.",
     },
     {
+        "id": "krajewski-ritzman-malhotra-2009",
+        "autor": "Lee J. Krajewski, Larry P. Ritzman e Manoj K. Malhotra",
+        "obra": "Administração de produção e operações, 8. ed. (Pearson Prentice Hall)",
+        "ano": 2009,
+        "localizacao": "Capítulo 7 — Administração das restrições (p. 210-241) e Suplemento C — Filas de espera (p. 242-255)",
+        "contribuicao": "Capacidade medida pela entrada (número de pessoas) quando há variedade de serviços, p. 212; utilização e reserva de capacidade, p. 212-213 e 224; necessidade de capacidade M = D·p ÷ {N·[1 − C/100]}, p. 226-227; demanda acima da capacidade perdida no caso básico, p. 228; por que as filas se formam e modelos de fila, p. 242-252. Base da capacidade do banho e tosa.",
+    },
+    {
+        "id": "rios-cestari-2021",
+        "autor": "Estefânia Falquetti Rios e Isabel Cristina Rodrigues Cestari",
+        "obra": "Qualidade de serviços em setor de banho e tosa: uma avaliação dos pontos críticos (Ciência & Tecnologia, FATEC-JB, v. 13, n. 1)",
+        "ano": 2021,
+        "localizacao": "p. 167-177; DOI 10.52138/citec.v13i1.171",
+        "contribuicao": "Ciclo de serviço do banho e tosa e momentos da verdade; recomenda listar o tempo estimado de cada serviço para saber quantos atendimentos cabem no dia, p. 174.",
+    },
+    {
         "id": "levy-grewal-2026-cap3-4",
         "autor": "Michael Levy e Dhruv Grewal",
         "obra": "Retailing Management, 2026 release (McGraw Hill)",

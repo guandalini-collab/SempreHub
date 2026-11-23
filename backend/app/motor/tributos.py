@@ -28,6 +28,25 @@ FAIXAS_SIMPLES_ANEXO_I: List[Tuple[float, float, float]] = [
 
 ALIQUOTA_FEDERAL_LUCRO_PRESUMIDO = 0.15 * 0.08 + 0.09 * 0.12 + 0.0065 + 0.03  # 5,93%
 
+# Serviços (banho e tosa, CNAE 9609-2/08; 23/11/2026). Simples Nacional:
+# Anexo III (LC 123/2006, art. 18, § 5º-F; tabela vigente desde 01/01/2018,
+# consultada no Planalto em 23/11/2026); a atividade não está nos §§ 5º-C e
+# 5º-I, e a contribuição patronal segue no DAS (só o Anexo IV a exclui).
+FAIXAS_SIMPLES_ANEXO_III: List[Tuple[float, float, float]] = [
+    (180_000.00, 0.060, 0.00),
+    (360_000.00, 0.112, 9_360.00),
+    (720_000.00, 0.135, 17_640.00),
+    (1_800_000.00, 0.160, 35_640.00),
+    (3_600_000.00, 0.210, 125_640.00),
+    (4_800_000.00, 0.330, 648_000.00),
+]
+# Lucro Presumido, serviços em geral: presunção de 32% para IRPJ (Lei 9.249/1995,
+# art. 15, § 1º, III, a) e CSLL (art. 20, I), mais PIS 0,65% e COFINS 3%
+# (total 11,33%), e ISS pela alíquota máxima de 5% (LC 116/2003, art. 8º, II),
+# porque a alíquota do município não é modelada.
+ALIQUOTA_FEDERAL_LUCRO_PRESUMIDO_SERVICOS = 0.15 * 0.32 + 0.09 * 0.32 + 0.0065 + 0.03  # 11,33%
+ALIQUOTA_ISS_MAXIMA = 0.05
+
 # Multiplicador sobre o salário mensal que representa o custo do empregado CLT.
 #
 # Método (Martins, Contabilidade de custos, 12. ed., 2025, cap. 11, 11.3.3):
@@ -94,15 +113,24 @@ MAX_FUNCIONARIOS_MEI = 1
 TOLERANCIA_TETO_MEI = 0.20
 
 
-def aliquota_efetiva_simples(rbt12: float) -> float:
+def aliquota_efetiva_simples(rbt12: float, faixas: List[Tuple[float, float, float]] = None) -> float:
+    faixas = faixas or FAIXAS_SIMPLES_ANEXO_I
     if rbt12 <= 0:
-        return FAIXAS_SIMPLES_ANEXO_I[0][1]
-    for limite, nominal, deduzir in FAIXAS_SIMPLES_ANEXO_I:
+        return faixas[0][1]
+    for limite, nominal, deduzir in faixas:
         if rbt12 <= limite:
             return max(0.0, (rbt12 * nominal - deduzir) / rbt12)
     # Acima do teto do Simples: aplica a última faixa (o jogo sinaliza o excesso em alerta)
-    _, nominal, deduzir = FAIXAS_SIMPLES_ANEXO_I[-1]
+    _, nominal, deduzir = faixas[-1]
     return (rbt12 * nominal - deduzir) / rbt12
+
+
+def imposto_simples(receita: float, base_rbt12: float, servicos: float = 0.0) -> float:
+    """Receitas segregadas (LC 123/2006, art. 18, § 4º): revenda no Anexo I e
+    serviço no Anexo III, ambas pela faixa da receita bruta total em 12 meses."""
+    servicos = min(max(0.0, servicos), max(0.0, receita))
+    return ((receita - servicos) * aliquota_efetiva_simples(base_rbt12)
+            + servicos * aliquota_efetiva_simples(base_rbt12, FAIXAS_SIMPLES_ANEXO_III))
 
 
 def rbt12(receitas_anteriores: List[float]) -> float:
@@ -122,6 +150,7 @@ def calcular_imposto(
     receitas_anteriores: List[float],
     das_mei: float,
     aliquota_icms: float,
+    servicos: float = 0.0,
 ) -> Tuple[float, float]:
     """Retorna (imposto da rodada, alíquota efetiva sobre a receita)."""
     if regime == RegimeTributario.MEI:
@@ -130,10 +159,12 @@ def calcular_imposto(
     if regime == RegimeTributario.SIMPLES_NACIONAL:
         # Na primeira receita, a própria receita do mês é a base de cálculo da média
         base = rbt12(receitas_anteriores) if receitas_anteriores else receita * 12
-        aliquota = aliquota_efetiva_simples(base)
-        return receita * aliquota, aliquota
+        total = imposto_simples(receita, base, servicos)
+        return total, (total / receita if receita > 0 else aliquota_efetiva_simples(base))
 
-    federal = receita * ALIQUOTA_FEDERAL_LUCRO_PRESUMIDO
-    icms = max(0.0, receita - cmv) * aliquota_icms
-    total = federal + icms
+    servicos = min(max(0.0, servicos), max(0.0, receita))
+    mercadorias = receita - servicos
+    federal = mercadorias * ALIQUOTA_FEDERAL_LUCRO_PRESUMIDO
+    icms = max(0.0, mercadorias - cmv) * aliquota_icms
+    total = federal + icms + servicos * (ALIQUOTA_FEDERAL_LUCRO_PRESUMIDO_SERVICOS + ALIQUOTA_ISS_MAXIMA)
     return total, (total / receita if receita > 0 else 0.0)

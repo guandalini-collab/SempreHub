@@ -149,14 +149,16 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
     // Revenda: desempenho do comprador pela margem bruta, giro e GMROI, em base
     // anual (Levy; Grewal, Retailing Management, 2026 release, p. 324-325).
     const periodosAno = 12 / Math.max(0.01, turma.calendario?.fator_mensal ?? 1);
-    const margemBruta = (r?: Resultado) => r ? dividir(r.dre.receita - r.dre.cmv, r.dre.receita) : null;
+    // Mercadorias sem o banho e tosa: margem, GMROI e vendas por pessoa são do comprador e da loja.
+    const receitaMercadorias = (r: Resultado) => r.dre.receita - (campo(r, "banho_tosa", "receita") ?? 0);
+    const margemBruta = (r?: Resultado) => r ? dividir(receitaMercadorias(r) - r.dre.cmv, receitaMercadorias(r)) : null;
     const giroAnual = (r?: Resultado) => r ? dividir(r.dre.cmv, numero(r, "estoque_medio"), periodosAno) : null;
-    const gmroiAnual = (r?: Resultado) => r ? dividir(r.dre.receita - r.dre.cmv, numero(r, "estoque_medio"), periodosAno) : null;
+    const gmroiAnual = (r?: Resultado) => r ? dividir(receitaMercadorias(r) - r.dre.cmv, numero(r, "estoque_medio"), periodosAno) : null;
     // Revenda (aprovado em 23/11/2026): disponibilidade do produto = parte da
     // demanda atendida (Levy; Grewal, 2026, p. 338-339); vendas por pessoa com o
     // dono contado pelo tempo dedicado (p. 455); venda pela internet.
     const disponibilidade = (r?: Resultado) => { const d = numero(r, "demanda"), f = numero(r, "ruptura"); return d != null && d > 0 && f != null ? 1 - f / d : null; };
-    const vendasPorPessoa = (r?: Resultado) => r ? dividir(r.dre.receita, campo(r, "atendimento_equipe", "pessoas")) : null;
+    const vendasPorPessoa = (r?: Resultado) => r ? dividir(receitaMercadorias(r), campo(r, "atendimento_equipe", "pessoas")) : null;
     const parteInternet = (r?: Resultado) => r ? dividir(campo(r, "canais_venda", "receita_internet"), r.dre.receita) : null;
     const tarifaMarketplace = (r?: Resultado) => campo(r, "canais_venda", "tarifa_marketplace");
     const investimentoPd = dividir(atual.dre.pd, atual.dre.receita);
@@ -190,6 +192,16 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
         metrica("Frete e armazenagem", "Custo logístico registrado na DRE. Altas pressionam preço e margem.", (atual.dre.frete ?? 0) + (atual.dre.armazenagem ?? 0), (anterior?.dre.frete ?? 0) + (anterior?.dre.armazenagem ?? 0), "moeda"),
       ]},
     ];
+    // Banho e tosa (setor pet, 23/11/2026): utilização = atendimentos ÷
+    // capacidade (Krajewski; Ritzman; Malhotra, 2009, p. 212-213), sem faixa.
+    if (atual.detalhes_simulacao?.operacao?.banho_tosa) {
+      cartoesRevenda.push({ titulo: "Banho e tosa", estado: "neutro" as Semaforo, metricas: [
+        metrica("Atendimentos", "Banhos e tosas feitos no mês.", campo(atual, "banho_tosa", "atendimentos"), campo(anterior, "banho_tosa", "atendimentos"), "numero"),
+        metrica("Atendimentos perdidos", "Clientes do serviço que não couberam no tempo dos tosadores.", campo(atual, "banho_tosa", "atendimentos_perdidos"), campo(anterior, "banho_tosa", "atendimentos_perdidos"), "numero"),
+        metrica("Utilização dos tosadores", "Minutos usados ÷ minutos disponíveis dos tosadores (Krajewski; Ritzman; Malhotra, 2009, p. 212). A reserva de capacidade é 100% menos a utilização; o livro não dá faixa para pet shop.", campo(atual, "banho_tosa", "utilizacao"), campo(anterior, "banho_tosa", "utilizacao"), "percentual"),
+        metrica("Receita do serviço", "Receita do banho e tosa no mês (tributada no Anexo III do Simples).", campo(atual, "banho_tosa", "receita"), campo(anterior, "banho_tosa", "receita"), "moeda"),
+      ]});
+    }
     // Revenda: semáforos sem faixa com fonte ficam sem cor (regra do Cockpit).
     if (revenda) return cartoesRevenda;
     const cartoes = [

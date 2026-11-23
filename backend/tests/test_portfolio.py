@@ -490,3 +490,77 @@ def test_decisao_gravada_abaixo_do_minimo_nao_quebra_fechamento(cliente,professo
     assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
     res=cliente.get(base,headers=aluno).json()['resultados'][0]
     assert any('ajustado ao mínimo legal' in a for a in res['alertas'])
+
+
+def test_banho_tosa_capacidade_em_minutos():
+    """Krajewski, Ritzman e Malhotra (2009, p. 226-228): minutos dos tosadores
+    ÷ (tempo + folga); a demanda acima da capacidade é perdida."""
+    from app.banho_tosa import apurar, minutos_mes, SERVICOS, FOLGA_MIN
+    assert minutos_mes(1) == pytest.approx(43 * 52 / 12 * 60)
+    farta = apurar({'banho_tosa': {'oferece': True}}, 1000.0, 2)
+    assert farta['atendimentos_perdidos'] < 4 and farta['utilizacao'] < 1
+    linha = farta['linhas'][0]
+    assert linha['preco'] == SERVICOS[linha['id']][4]  # sem preço informado vale o de mercado
+    curta = apurar({'banho_tosa': {'oferece': True}}, 100000.0, 1)
+    assert curta['minutos_usados'] <= curta['minutos_capacidade']
+    assert curta['atendimentos_perdidos'] > 0 and curta['utilizacao'] > .95
+    assert curta['minutos_usados'] == pytest.approx(sum(l['atendimentos'] * (SERVICOS[l['id']][3] + FOLGA_MIN)
+                                                        for l in curta['linhas']))
+    assert curta['insumos'] == pytest.approx(sum(l['atendimentos'] * SERVICOS[l['id']][5] for l in curta['linhas']), abs=.05)
+
+
+def test_simples_segrega_servico_no_anexo_iii():
+    """LC 123/2006, art. 18, § 4º e § 5º-F: revenda no Anexo I, serviço no Anexo III."""
+    from app.motor.tributos import imposto_simples, aliquota_efetiva_simples, FAIXAS_SIMPLES_ANEXO_III
+    assert imposto_simples(10000, 120000, 0) == pytest.approx(400)
+    assert imposto_simples(10000, 120000, 2000) == pytest.approx(8000 * .04 + 2000 * .06)
+    assert aliquota_efetiva_simples(300000, FAIXAS_SIMPLES_ANEXO_III) == pytest.approx((300000 * .112 - 9360) / 300000)
+
+
+def _fechar_banho_tosa(cliente, professor, monkeypatch, email, nome, banho_tosa):
+    aluno, empresa, url, plano = _revenda_pet(cliente, professor, monkeypatch, email, nome, regime='SIMPLES_NACIONAL')
+    plano['banho_tosa'] = banho_tosa
+    d={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano,'contratar':3,
+       'simulacao':{'comprar_insumos_por_produto':{'pet-brinquedo':3000,'pet-guia':3000},'compras_prazo':1,'pro_labore':2000,'orcamento_logistico':100000}}
+    base=f'/api/aluno/empresas/{empresa}'
+    r=cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d));assert r.status_code==200,r.text
+    assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
+    return cliente.get(base,headers=aluno).json()['resultados'][0]
+
+
+def test_loja_pet_com_banho_e_tosa(cliente,professor,monkeypatch):
+    from app.motor.tributos import fator_clt
+    res = _fechar_banho_tosa(cliente, professor, monkeypatch, 'banho@aluno.iffar.edu.br', 'Banho',
+                             {'oferece': True, 'tosadores': 1, 'salario': 2100,
+                              'precos': {'bt_maquina_pequeno': 95}})
+    det = res['detalhes_simulacao']
+    bt = det['operacao']['banho_tosa']
+    dre = det['dre']
+    assert bt['mercado']['demanda_reais'] > 0 and bt['atendimentos'] > 0
+    assert bt['linhas'][0]['preco'] == 95
+    assert dre['folha_servicos'] == round(2100 * fator_clt('SIMPLES_NACIONAL'), 2)
+    assert dre['insumos_servicos'] == bt['insumos'] > 0
+    vendas_mercadorias = round(sum(l['receita'] for l in det['operacao']['produtos']), 2)
+    assert dre['receita'] == pytest.approx(vendas_mercadorias + bt['receita'], abs=.02)
+    # Participação de mercado só nas mercadorias.
+    bots = det['concorrentes_virtuais']
+    total = vendas_mercadorias + sum(b.get('receita', 0) for b in bots)
+    assert res['participacao_mercado'] == pytest.approx(vendas_mercadorias / total, rel=1e-6)
+    assert all(b.get('receita_servicos', 0) > 0 for b in bots)
+
+
+def test_banho_e_tosa_sem_tosador_nao_atende(cliente,professor,monkeypatch):
+    res = _fechar_banho_tosa(cliente, professor, monkeypatch, 'semtosa@aluno.iffar.edu.br', 'Sem tosa',
+                             {'oferece': True, 'tosadores': 0})
+    bt = res['detalhes_simulacao']['operacao']['banho_tosa']
+    assert bt['atendimentos'] == 0 and bt['receita'] == 0 and bt['atendimentos_perdidos'] > 0
+    assert any('sem tosador' in a for a in res['alertas'])
+
+
+def test_salario_do_tosador_abaixo_do_minimo_e_recusado():
+    from pydantic import ValidationError
+    from app.schemas import BanhoTosaPlano
+    with pytest.raises(ValidationError, match='salário mínimo'):
+        BanhoTosaPlano(oferece=True, tosadores=1, salario=1000)
+    with pytest.raises(ValidationError, match='desconhecido'):
+        BanhoTosaPlano(precos={'tosa_gigante': 200})

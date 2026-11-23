@@ -294,6 +294,25 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     equivalentes_folha = (composicao["operarios"] + composicao["tecnicos"] * 1.5
                           + composicao["especialistas"] * 2.2)
     folha = _produto(equivalentes_folha, salario * fracao, fator_encargos)
+    # Banho e tosa (setor pet, 23/11/2026): tosadores são equipe à parte, com
+    # salário próprio (nunca abaixo do mínimo) e os mesmos encargos da folha.
+    plano_bt = ((d.get("plano_comercial") or {}).get("banho_tosa") or {})
+    banho_tosa_prep = None
+    folha_servicos = 0.0
+    if plano_bt.get("oferece") and p.get("setor_servico_banho_tosa"):
+        from ..banho_tosa import SALARIO_REFERENCIA
+        tosadores = max(0, int(plano_bt.get("tosadores") or 0))
+        salario_tosador = float(plano_bt.get("salario") or SALARIO_REFERENCIA)
+        minimo = float(p.get("salario_minimo") or 0)
+        if regime_folha == "MEI" and minimo:
+            salario_tosador = minimo
+        elif minimo and salario_tosador < minimo:
+            salario_tosador = minimo
+            alertas.append("Salário do tosador abaixo do mínimo: ajustado ao mínimo legal (Constituição, art. 7º, IV).")
+        folha_servicos = _produto(tosadores, salario_tosador * fracao, fator_encargos)
+        banho_tosa_prep = {"tosadores": tosadores, "salario": salario_tosador, "folha": folha_servicos}
+        if tosadores == 0:
+            alertas.append("Banho e tosa oferecido sem tosador: os clientes do serviço não serão atendidos.")
     # O proprietário pode executar no máximo uma jornada júnior, e a atividade
     # exige pró-labore explícito. A jornada é proporcional à retirada comparada
     # ao salário de referência da turma (dedicação parcial do sócio).
@@ -591,7 +610,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
     networking = _dinheiro(d.get("networking", 0))
     multas = _dinheiro(p.get("multas", 0))
     custos_eventos = _dinheiro(efeitos_eventos.get("custo", 0))
-    despesas_pagas = _soma([folha, custo_horas_extras, beneficios, treinamento, rescisoes, pro_labore, encargos_pro_labore, manutencao,
+    despesas_pagas = _soma([folha, folha_servicos, custo_horas_extras, beneficios, treinamento, rescisoes, pro_labore, encargos_pro_labore, manutencao,
                             custos_fixos, marketing, pd, networking, juros, multas])
 
     from ..custos_campanhas import investimento_efetivo
@@ -670,7 +689,7 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         "custos_eventos": custos_eventos,
         "marketing": marketing,
         "horas_extras": horas_extras, "custo_horas_extras": custo_horas_extras,
-        "folha": folha, "pro_labore": pro_labore, "encargos_pro_labore": encargos_pro_labore, "fundador_ativo": fundador_ativo, "dedicacao_fundador": dedicacao,
+        "folha": folha, "folha_servicos": folha_servicos, "banho_tosa": banho_tosa_prep, "pro_labore": pro_labore, "encargos_pro_labore": encargos_pro_labore, "fundador_ativo": fundador_ativo, "dedicacao_fundador": dedicacao,
         "juros": juros, "juros_cheque": juros_cheque,
         "gastos_previstos": _soma([despesas_pagas, custos_eventos, depreciacao, custo_refugo]),
         "beneficios": beneficios, "treinamento": treinamento, "rescisoes": rescisoes,
@@ -799,10 +818,30 @@ def apurar(preparo: dict, demanda: float,
         pa["valor"] = _soma([pa["valor"], -cmv])
     venda_prazo = _produto(receita, _limitar(op.get("vendas_prazo", 0), 0, 1))
     venda_vista = _soma([receita, -venda_prazo])
+    # Banho e tosa (setor pet, 23/11/2026): serviço recebido à vista; a receita
+    # entra no total da DRE e é tributada à parte (Simples, Anexo III).
+    banho_tosa = None
+    receita_servicos = insumos_servicos = 0.0
+    if c.get("banho_tosa") and p.get("banho_tosa_mercado"):
+        from ..banho_tosa import apurar as apurar_banho_tosa
+        banho_tosa = apurar_banho_tosa(plano_comercial, p["banho_tosa_mercado"]["demanda_reais"],
+                                       c["banho_tosa"]["tosadores"],
+                                       float(p.get("_calendario", {}).get("fator_mensal", 1) or 1))
+        banho_tosa.update(folha=c["banho_tosa"]["folha"], salario=c["banho_tosa"]["salario"],
+                          mercado=deepcopy(p["banho_tosa_mercado"]))
+        receita_servicos, insumos_servicos = banho_tosa["receita"], banho_tosa["insumos"]
+        venda_vista = _soma([venda_vista, receita_servicos])
+        if banho_tosa["atendimentos_perdidos"] >= 1:
+            br = lambda v, casas=0: f"{v:,.{casas}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+            c["alertas"].append(f"Banho e tosa: {br(banho_tosa['atendimentos'])} atendimento(s) feitos e "
+                                f"{br(banho_tosa['atendimentos_perdidos'])} perdido(s) por falta de tosador "
+                                "(capacidade em minutos esgotada).")
+    receita = _soma([receita, receita_servicos])
     if venda_prazo:
         s["receber"].append({"origem": c["rodada"], "vencimento": c["rodada"] + op.get("prazo_recebimento", 1),
                              "valor": venda_prazo})
-    impostos, aliquota = tributar(receita, cmv)
+    impostos, aliquota = (tributar(receita, cmv, receita_servicos) if receita_servicos
+                          else tributar(receita, cmv))
     impostos = _dinheiro(impostos)
     modal = op.get("modal", "PADRAO")
     frete = _produto(vendas, custo_frete)
@@ -835,6 +874,7 @@ def apurar(preparo: dict, demanda: float,
     custos_eventos = _soma([c.get("custos_eventos", 0), perda_recebiveis])
     dre = {
         "receita": receita, "impostos": impostos, "cmv": cmv, "folha": c["folha"], "pro_labore": c["pro_labore"],
+        "folha_servicos": c.get("folha_servicos", 0.0), "insumos_servicos": insumos_servicos,
         "encargos_pro_labore": c.get("encargos_pro_labore", 0),
         "horas_extras": c["custo_horas_extras"],
         "custos_fixos": _dinheiro(p.get("custos_fixos_mensais", 1500)),
@@ -865,7 +905,7 @@ def apurar(preparo: dict, demanda: float,
             "valor": impostos,
             "origem_contabil": "impostos_provisionados",
         })
-    pagamentos = _soma([c["pagamentos_vencidos"], c["compras_a_vista"], c["despesas_pagas"], c.get("custos_eventos", 0),
+    pagamentos = _soma([c["pagamentos_vencidos"], c["compras_a_vista"], c["despesas_pagas"], c.get("custos_eventos", 0), insumos_servicos,
                         imposto_pagar, frete, armazenagem, royalties, comissao_canal])
     operacional = _soma([recebimentos, -pagamentos])
     investimento, financiamento = -c["investimento"], _soma([c["emprestimo"], -c["amortizacao"]])
@@ -935,6 +975,8 @@ def apurar(preparo: dict, demanda: float,
         operacao.update(demanda_reais=round(demanda_reais, 2))
     if atendimento is not None:
         operacao["atendimento_equipe"] = atendimento
+    if banho_tosa is not None:
+        operacao["banho_tosa"] = banho_tosa
     if p.get("canais_venda"):
         operacao["canais_venda"] = {**deepcopy(p["canais_venda"]),
                                     "receita_internet": _soma(l.get("receita_internet", 0) for l in linhas),

@@ -92,6 +92,9 @@ def parametros(turma):
         dados["receita_por_pessoa_mensal"] = custos["receita_por_pessoa"]["valor"]
         dados["salario_minimo"] = custos["salario_minimo"]
         dados["salario_base"] = max(custos["salario_referencia"], custos["salario_minimo"])
+        from ..banho_tosa import setor_tem_servico
+        # Banho e tosa só existe no setor pet (23/11/2026).
+        dados["setor_servico_banho_tosa"] = setor_tem_servico(custos.get("setor"))
     return dados
 
 
@@ -218,7 +221,7 @@ def prever(empresa, decisao, turma):
     }
 
 
-def _tributar(empresa, turma, receita, cmv, alertas):
+def _tributar(empresa, turma, receita, cmv, alertas, servicos=0.0):
     regime = empresa.regime_tributario
     temporal = adaptar(parametros(turma), turma.rodada_atual)
     historico = [r.receita for r in empresa.resultados]
@@ -227,11 +230,12 @@ def _tributar(empresa, turma, receita, cmv, alertas):
         ultimos = empresa.resultados[-52:]
         equivalentes = sum((r.detalhes_simulacao or {}).get('calendario', {}).get('fator_mensal', 1) for r in ultimos)
         base = sum(r.receita for r in ultimos)/equivalentes*12 if equivalentes else receita/temporal['_calendario']['fator_mensal']*12
-        aliquota = aliquota_efetiva_simples(base)
-        impostos = receita*aliquota
+        from .tributos import imposto_simples
+        impostos = imposto_simples(receita, base, servicos)
+        aliquota = impostos / receita if receita > 0 else aliquota_efetiva_simples(base)
     else:
         impostos, aliquota = calcular_imposto(regime, receita, cmv, historico,
-                                             temporal["das_mei_mensal"], turma.aliquota_icms)
+                                             temporal["das_mei_mensal"], turma.aliquota_icms, servicos)
     acumulado = empresa.faturamento_ano + receita
     if regime == RegimeTributario.MEI:
         empresa.das_mei_pago_ano += impostos
@@ -318,6 +322,8 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
                 "parte_internet_mercado": partes["internet_pac"], "fonte": partes["fonte"], "aviso": partes["aviso"]}
     else:
         demandas = [total * atr / soma if atr > 0 else 0.0 for atr in atrativos]
+    if pac and pac.get("setor"):
+        _mercado_banho_tosa(preparos, decisoes, bots, pac, temporal, total / max(1e-9, temporal["demanda_base_por_empresa"] * (len(preparos) + len(bots))))
     for bot, demanda in zip(bots, demandas[len(preparos):]):
         if pac:
             bot["receita"] = round(min(bot["capacidade"], demanda), 2)
@@ -329,6 +335,39 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     return [demanda * p["avaliacao_estrategica"]["fator"] for demanda, p in zip(demandas, preparos)], bots
 
 
+def _mercado_banho_tosa(preparos, decisoes, bots, pac, temporal, ajuste):
+    """Banho e tosa (setor pet, 23/11/2026). Mercado do serviço = mercado de
+    mercadorias da loja × razão serviços gerais ÷ mercadorias de pet shop
+    (Abempet, 2025), pelo mesmo número de lojas, sazonalidade e eventos
+    (``ajuste``). Disputam as equipes que oferecem o serviço e os concorrentes
+    simulados, pela atratividade de preço do serviço (mesma forma da loja)."""
+    from ..banho_tosa import RAZAO_SERVICO, atratividade, setor_tem_servico, fontes
+    if not setor_tem_servico(pac.get("setor")):
+        return
+    from .portfolio import fator_propaganda
+    total = temporal["demanda_base_por_empresa"] * (len(preparos) + len(bots)) * ajuste * RAZAO_SERVICO
+    atr = []
+    for p, d in zip(preparos, decisoes):
+        plano = d.plano_comercial or {}
+        if not (plano.get("banho_tosa") or {}).get("oferece"):
+            atr.append(0.0)
+            continue
+        prop = (p.get("parametros") or {}).get("propaganda") or {}
+        estoques = list((prop.get("estoques") or {}).values())
+        fator = fator_propaganda(sum(estoques) / len(estoques), prop) if estoques else 1.0
+        atr.append(max(.001, atratividade(plano, fator)))
+    atr_bots = [b["atratividade"] for b in bots]
+    soma = sum(atr) + sum(atr_bots)
+    for p, a in zip(preparos, atr):
+        if a > 0:
+            p["parametros"]["banho_tosa_mercado"] = {
+                "demanda_reais": round(total * a / soma, 2) if soma else 0.0,
+                "mercado_total": round(total, 2), "lojas_com_servico": sum(1 for x in atr if x > 0) + len(bots),
+                "razao_servico": RAZAO_SERVICO, "fonte": fontes()["mercado"], "aviso": fontes()["aviso"]}
+    for b, a in zip(bots, atr_bots):
+        b["receita_servicos"] = round(total * a / soma, 2) if soma else 0.0
+
+
 def _transferir_ruptura(turma, preparos, demandas, bots):
     """Clientes que vão a outra loja quando falta o produto (Corsten e Gruen,
     2003: 31% nos itens de consumo do pet). Uma apuração prévia, sem tributos,
@@ -337,7 +376,7 @@ def _transferir_ruptura(turma, preparos, demandas, bots):
     concorrentes simulados). Quem não encontra de novo desiste (sem cascata)."""
     from .portfolio import dividir
     apurar = motor(turma).apurar
-    previas = [apurar(p, demanda, lambda receita, cmv: (0.0, 0.0)) for p, demanda in zip(preparos, demandas)]
+    previas = [apurar(p, demanda, lambda receita, cmv, servicos=0.0: (0.0, 0.0)) for p, demanda in zip(preparos, demandas)]
     extras = [dict() for _ in preparos]
     for i, previa in enumerate(previas):
         itens_origem = {item["produto_id"]: item for item in
@@ -392,7 +431,10 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
             _aplicar_mudanca_regime(empresa, d, turma, c)
             from .regras_mei import regras_mei
             limite_empregados = regras_mei(turma, rodada)["limite_empregados"]
-            if empresa.regime_tributario == RegimeTributario.MEI and empresa.funcionarios + d.contratar - d.demitir > limite_empregados:
+            # Tosadores do banho e tosa também são empregados (23/11/2026).
+            tosadores = int((((d.plano_comercial or {}).get("banho_tosa") or {}).get("tosadores") or 0)
+                            if ((d.plano_comercial or {}).get("banho_tosa") or {}).get("oferece") else 0)
+            if empresa.regime_tributario == RegimeTributario.MEI and empresa.funcionarios + d.contratar - d.demitir + tosadores > limite_empregados:
                 empresa.regime_tributario = RegimeTributario.SIMPLES_NACIONAL
                 c.alertas.append(f"Mais de {limite_empregados} empregado(s): migração do MEI para o Simples Nacional.")
         empresa.networking = _limitar(empresa.networking - 1 + 2 * math.sqrt(max(0, d.networking) / 500))
@@ -417,11 +459,13 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
     apuracoes = []
     for empresa, p, demanda in zip(empresas, preparos, demandas):
         apuracoes.append(motor(turma).apurar(p, demanda,
-                        lambda receita, cmv, e=empresa, alertas=p["alertas"]: _tributar(e, turma, receita, cmv, alertas)))
+                        lambda receita, cmv, servicos=0.0, e=empresa, alertas=p["alertas"]: _tributar(e, turma, receita, cmv, alertas, servicos)))
     em_reais = any(p.get("parametros", {}).get("mercado_em_reais") for p in preparos)
     if em_reais:
         # Participação em valor (Cooper e Nakanishi, eq. 2.1: "dollar volume").
-        medida = [a["dre"]["receita"] for a in apuracoes]
+        # Banho e tosa fica fora da participação de mercado (mercadorias).
+        medida = [a["dre"]["receita"] - float(((a["detalhes"].get("operacao") or {}).get("banho_tosa") or {}).get("receita", 0))
+                  for a in apuracoes]
         total_vendas = sum(medida) + sum(b.get("receita", 0) for b in bots)
         for bot in bots:
             bot["participacao_mercado"] = bot.get("receita", 0) / total_vendas if total_vendas else 0
@@ -473,7 +517,7 @@ def processar_empresas(db, turma, empresas, rodada, evento, multiplicador_demand
         detalhes["decisao"].pop("enviada_em", None)
         db.add(Resultado(empresa_id=empresa.id, rodada=rodada, preco=d.preco,
                         demanda=demanda, capacidade=a["capacidade"], unidades_vendidas=a["vendas"],
-                        participacao_mercado=(a["dre"]["receita"] if em_reais else a["vendas"]) / total_vendas if total_vendas else 0,
+                        participacao_mercado=(medida[empresas.index(empresa)] if em_reais else a["vendas"]) / total_vendas if total_vendas else 0,
                         receita=dre["receita"], impostos=dre["impostos"], cmv=dre["cmv"], folha=dre["folha"],
                         custos_fixos=dre["custos_fixos"], marketing=dre["marketing"], pd=dre["pd"],
                         networking_invest=dre["networking"], rescisoes=dre["rescisoes"], royalties=dre["royalties"],

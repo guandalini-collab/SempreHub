@@ -379,8 +379,40 @@ class MixProduto(BaseModel):
     preco_mercado: Optional[float] = Field(None, gt=0, le=1000000)
 
 
+class BanhoTosaPlano(BaseModel):
+    """Serviço de banho e tosa (setor pet, turmas com catálogo; 23/11/2026)."""
+    model_config = ConfigDict(allow_inf_nan=False)
+    oferece: bool = False
+    tosadores: int = Field(0, ge=0, le=20)
+    salario: Optional[float] = Field(None, ge=0, le=100_000)
+    precos: dict[str, float] = Field(default_factory=dict)
+
+    @field_validator("salario")
+    @classmethod
+    def validar_salario_tosador(cls, valor):
+        # Piso legal (CF, art. 7º, IV), como no salário dos atendentes.
+        from .mercado_pac import salario_minimo_vigente
+        minimo = salario_minimo_vigente()
+        if valor is not None and valor < minimo:
+            valor_br = f"{minimo:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+            raise ValueError(f"O salário do tosador não pode ficar abaixo do salário mínimo nacional (R$ {valor_br}; "
+                             "Constituição Federal, art. 7º, IV).")
+        return valor
+
+    @model_validator(mode="after")
+    def validar_precos(self):
+        from .banho_tosa import SERVICOS
+        for chave, valor in self.precos.items():
+            if chave not in SERVICOS:
+                raise ValueError(f"Serviço de banho e tosa desconhecido: {chave}.")
+            if not (0 < float(valor) <= 10_000):
+                raise ValueError("Preço do banho e tosa deve ser maior que zero.")
+        return self
+
+
 class PlanoComercial(BaseModel):
     model_config = ConfigDict(allow_inf_nan=False)
+    banho_tosa: Optional[BanhoTosaPlano] = None
     versao_custos: Literal[2] = 2
     custos_campanha: Optional[dict] = None
     edicao_id: int = Field(gt=0)

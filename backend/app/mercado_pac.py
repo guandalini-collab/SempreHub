@@ -364,4 +364,4 @@ def custos_da_turma(turma) -> dict | None:
             "selic_referencia": mes, "fonte_selic": "BCB, SGS 4390 (Selic acumulada no mês)",
             "receita_por_pessoa": receita_por_pessoa(setor, series),
             "salario_referencia": SALARIO_REFERENCIA_PAC, "salario_minimo": salario_minimo_vigente(),
-            "fonte_salario_minimo": FONTE_SALARIO_MINIMO}
+            "fonte_salario_minimo": FONTE_SALARIO_MINIMO, "setor": setor}

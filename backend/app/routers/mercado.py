@@ -693,6 +693,13 @@ def campanhas():
     return {"midias":catalogo(),"observacao":"Tarifas originais de mídia do jogo, acrescidas dos serviços obrigatórios. Referências públicas têm fonte e escopo; serviços sob consulta exigem orçamento informado pela equipe. CPM compra mil impressões, não mil clientes."}
 
 
+@router.get("/api/educacao/banho-tosa")
+def banho_tosa_catalogo():
+    """Serviços de banho e tosa do setor pet (23/11/2026), com fontes."""
+    from ..banho_tosa import catalogo, fontes
+    return {"servicos": catalogo(), "fontes": fontes()}
+
+
 def validar_plano(db,empresa,dados,rascunho=False):
     from math import isclose
     from ..catalogo_campanhas import catalogo
