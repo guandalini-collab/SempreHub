@@ -783,7 +783,13 @@ def validar_plano(db,empresa,dados,rascunho=False):
     plano.midias=[]
     if dados.simulacao:
         dados.simulacao.marketing_digital=round(digital,2)
-        dados.simulacao.canal="DISTRIBUIDOR" if "ATACADO" in plano.canais else "DIGITAL" if any(c in plano.canais for c in ("ECOMMERCE","MARKETPLACE")) else "DIRETO"
+        online=any(c in plano.canais for c in ("ECOMMERCE","MARKETPLACE"))
+        if any(i.preco_mercado for i in itens):
+            # Catálogo fixo (canal de venda, 23/11/2026): loja física, com ou sem
+            # venda pela internet no marketplace; não há canal distribuidor.
+            dados.simulacao.canal="DIGITAL" if online else "DIRETO"
+        else:
+            dados.simulacao.canal="DISTRIBUIDOR" if "ATACADO" in plano.canais else "DIGITAL" if online else "DIRETO"
         dados.simulacao.posicionamento="CUSTO" if plano.posicionamento=="PRECO" else "DIFERENCIACAO"
     from ..models import DiagnosticoEstrategico
     diagnostico=db.query(DiagnosticoEstrategico).filter_by(empresa_id=empresa.id,edicao_id=e.id,rodada=empresa.turma.rodada_atual).first()

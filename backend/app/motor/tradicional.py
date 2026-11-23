@@ -612,6 +612,16 @@ def preparar(empresa: dict, decisao: dict, parametros: dict, rodada: int,
         "DIGITAL": 1.05 + (0.10 * digital / verba_midia if verba_midia else 0),
     }.get(canal, 1.0)
     taxa_comissao_canal = {"DIRETO": 0.0, "DISTRIBUIDOR": 0.05, "DIGITAL": 0.03}.get(canal, 0.0)
+    if catalogo_fixo:
+        # Canal de venda (opção A, 23/11/2026): loja física, com ou sem venda
+        # pela internet. O canal não muda a atratividade (Levy; Grewal, 2026,
+        # cap. 3 e 4, sem número); ele define se a loja disputa a parte da
+        # internet, e a tarifa do marketplace incide sobre essas vendas.
+        if canal == "DISTRIBUIDOR":
+            alertas.append("Distribuidor não é canal de uma loja que revende ao consumidor final; "
+                           "a loja vende só na loja física.")
+            canal = "DIRETO"
+        fator_canal, taxa_comissao_canal = 1.0, 0.0
     # Marketing digital é parte do orçamento já lançado e melhora a marca;
     # não é uma despesa adicional nem um segundo custo.
     if digital and not catalogo_fixo:
@@ -766,8 +776,15 @@ def apurar(preparo: dict, demanda: float,
             linhas, resposta_ruptura = vender_com_ruptura(
                 s, itens, demanda_comercial, pesos, c.get("diagnosticos_segmentacao"),
                 pendentes=s.pop("pedidos_pendentes", None), transferidas=p.get("demanda_transferida"),
-                limite_extra=(capacidade_entrega - demanda_comercial) if comercial_ativo else 0)
+                limite_extra=(capacidade_entrega - demanda_comercial) if comercial_ativo else 0,
+                fracao_internet=float((p.get("canais_venda") or {}).get("fracao_internet", 0.0)))
             s["pedidos_pendentes"] = resposta_ruptura["pendentes"]
+            canais = p.get("canais_venda")
+            if canais and canais.get("vende_internet"):
+                br = lambda v: f"{v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+                c["alertas"].append(
+                    f"Venda pela internet: {br(canais['fracao_internet'] * 100)}% da demanda da loja veio do marketplace; "
+                    f"tarifa do Mercado Livre de R$ {br(_soma(l['comissao_canal'] for l in linhas))} no mês.")
             demanda += sum(l["pendentes_recebidos"] + l["transferidas_recebidas"] for l in linhas)
         else:
             linhas=vender(s,itens,demanda_comercial,pesos,c.get("diagnosticos_segmentacao"))
@@ -918,6 +935,10 @@ def apurar(preparo: dict, demanda: float,
         operacao.update(demanda_reais=round(demanda_reais, 2))
     if atendimento is not None:
         operacao["atendimento_equipe"] = atendimento
+    if p.get("canais_venda"):
+        operacao["canais_venda"] = {**deepcopy(p["canais_venda"]),
+                                    "receita_internet": _soma(l.get("receita_internet", 0) for l in linhas),
+                                    "tarifa_marketplace": _soma(l["comissao_canal"] for l in linhas)}
     operacao.update(demanda=demanda, demanda_comercial=demanda_comercial, vendas=vendas, ruptura=ruptura,
                     estoque_mp_final=deepcopy(s["estoque_mp"]), estoque_pa_final=deepcopy(pa),
                     satisfacao=s["satisfacao"], moral=s["rh"]["moral"], qualificacao=s["rh"]["qualificacao"],

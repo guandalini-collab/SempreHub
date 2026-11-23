@@ -297,7 +297,27 @@ def _mercado(preparos, decisoes, turma, rodada, multiplicador):
     # demanda. A fatia que ela deixaria de atender migra para concorrentes.
     atrativos = [max(.001, p["atratividade"]) if p.get("comercial_ativo") else 0.0 for p in preparos] + [b["atratividade"] for b in bots]
     soma = sum(atrativos)
-    demandas = [total * atr / soma if atr > 0 else 0.0 for atr in atrativos]
+    if pac and pac.get("setor"):
+        # Canal de venda (opção A, 23/11/2026): toda loja disputa a parte vendida
+        # em lojas; só quem vende pela internet (e os concorrentes simulados)
+        # disputa a parte da internet (PAC 2023, tabela 9349). Sem fator de
+        # canal na atratividade (Levy; Grewal, 2026, cap. 3 e 4, não dão número).
+        from ..mercado_pac import participacao_canais
+        partes = participacao_canais(pac["setor"])
+        online = [1.0 if p.get("canal") == "DIGITAL" else 0.0 for p in preparos] + [1.0 for _ in bots]
+        soma_online = sum(a * o for a, o in zip(atrativos, online))
+        lojas = [total * partes["loja"] * atr / soma if atr > 0 else 0.0 for atr in atrativos]
+        internet = [total * partes["internet"] * atr * o / soma_online if atr > 0 and o and soma_online else 0.0
+                    for atr, o in zip(atrativos, online)]
+        demandas = [a + b for a, b in zip(lojas, internet)]
+        for p, d_loja, d_net in zip(preparos, lojas, internet):
+            p["parametros"]["canais_venda"] = {
+                "vende_internet": p.get("canal") == "DIGITAL", "demanda_loja": round(d_loja, 2),
+                "demanda_internet": round(d_net, 2),
+                "fracao_internet": d_net / (d_loja + d_net) if d_loja + d_net else 0.0,
+                "parte_internet_mercado": partes["internet_pac"], "fonte": partes["fonte"], "aviso": partes["aviso"]}
+    else:
+        demandas = [total * atr / soma if atr > 0 else 0.0 for atr in atrativos]
     for bot, demanda in zip(bots, demandas[len(preparos):]):
         if pac:
             bot["receita"] = round(min(bot["capacidade"], demanda), 2)

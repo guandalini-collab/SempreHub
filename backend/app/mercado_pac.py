@@ -153,7 +153,7 @@ def demanda_por_loja(turma, planos=None, fator_periodo: float = 1.0) -> dict | N
     from .database import SessionLocal
     with SessionLocal() as db:
         series = series_vigentes(db)
-    return {**receita_mensal_loja(setor, series), "fator_periodo": fator_periodo}
+    return {**receita_mensal_loja(setor, series), "fator_periodo": fator_periodo, "setor": setor}
 
 
 # ---------------------------------------------------------------------------
@@ -294,6 +294,58 @@ def receita_por_pessoa(setor: str, series: dict | None = None) -> dict:
     return {"valor": round(media * RAZAO_PRODUTIVIDADE_PEQUENA * fator, 2), "media_atividade": round(media, 2),
             "razao_loja_pequena": RAZAO_PRODUTIVIDADE_PEQUENA, "fator_pmc": round(fator, 4), "periodo_pmc": periodo,
             "fonte": FONTE_PESSOAL, "aviso": AVISO_PESSOAL}
+
+
+# ---------------------------------------------------------------------------
+# Canal de venda (opção A, aprovada em 23/11/2026). Canal é o meio de vender e
+# entregar (Levy; Grewal, 2026, p. 103); os capítulos 3 e 4 não dão número que
+# ligue canal a demanda, por isso não há fator de canal na atratividade. O
+# mercado da loja é dividido entre a parte vendida em lojas e a parte vendida
+# pela internet segundo a PAC 2023 (tabela 9349, empresas com 20 ou mais
+# pessoas ocupadas; demais formas — televendas, porta a porta etc. — ficam
+# fora da disputa e as duas partes são renormalizadas). Quem vende pela
+# internet usa o marketplace e paga a tarifa do anúncio Clássico do Mercado
+# Livre da categoria (o varejista paga parte da receita à plataforma; Levy;
+# Grewal, 2026, p. 84).
+# ---------------------------------------------------------------------------
+FONTE_CANAIS = ("IBGE, PAC 2023, tabela 9349 (receita bruta de revenda por forma de comercialização, "
+                "empresas varejistas com 20 ou mais pessoas ocupadas), consultada em 23/11/2026")
+# R$ mil em 2023: (lojas, internet)
+CANAIS_PAC = {
+    "moveis": (27_596_373, 7_228_616),      # 1.5.3 Móveis, iluminação e artigos de uso doméstico
+    "vestuario": (74_888_395, 10_618_506),  # 1.3.2 Artigos do vestuário e complementos
+    "bicicletas": (22_986_389, 3_788_987),  # 1.5.6 Artigos culturais, recreativos e esportivos
+    "pet": (37_159_347, 8_942_249),         # 1.5.8 Outros produtos novos
+    "mochilas": (17_627_213, 4_392_832),    # 1.3.3 Calçados, artigos de couro e viagem
+}
+CANAIS_PAC["colchoes"] = CANAIS_PAC["moveis"]
+AVISO_CANAIS = ("A PAC mede as formas de venda só nas empresas com 20 ou mais pessoas; colchões estão em "
+                "móveis e pet em outros produtos novos.")
+# Mercado Livre, "Tarifas de venda" (busca de categoria), anúncio Clássico,
+# consultada em 23/11/2026: https://www.mercadolivre.com.br/landing/custos-de-venda/tarifas-de-venda
+FONTE_TARIFA_MARKETPLACE = ("Mercado Livre, Tarifas de venda, anúncio Clássico por categoria, consultada em "
+                            "23/11/2026 (https://www.mercadolivre.com.br/landing/custos-de-venda/tarifas-de-venda)")
+TARIFA_MARKETPLACE = {"colchoes": .115, "moveis": .115, "vestuario": .14, "bicicletas": .115,
+                      "pet": .125, "mochilas": .14}
+# Pet: ração e petiscos 14%; coleiras e areia higiênica 12,5% (demais linhas).
+TARIFA_MARKETPLACE_LINHA = {("pet", "Alimentação"): .14}
+
+
+def participacao_canais(setor: str) -> dict:
+    """Partes da loja e da internet no mercado do jogo (renormalizadas)."""
+    lojas, internet = CANAIS_PAC[setor]
+    total = lojas + internet
+    return {"loja": lojas / total, "internet": internet / total,
+            "internet_pac": round(internet / total, 4), "fonte": FONTE_CANAIS, "aviso": AVISO_CANAIS}
+
+
+def tarifa_marketplace(produto_id: str) -> float:
+    """Tarifa de venda do marketplace (Clássico) para um item do catálogo fixo."""
+    from .catalogo_fixo import item as item_catalogo
+    ficha = item_catalogo(produto_id)
+    if not ficha:
+        return 0.0
+    return TARIFA_MARKETPLACE_LINHA.get((ficha["setor"], ficha["linha"]), TARIFA_MARKETPLACE.get(ficha["setor"], 0.0))
 
 
 def custos_da_turma(turma) -> dict | None:

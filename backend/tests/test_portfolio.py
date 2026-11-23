@@ -385,6 +385,65 @@ def test_loja_sem_ninguem_nao_vende(cliente,professor,monkeypatch):
     assert any('Sem ninguém para atender' in a for a in res['alertas'])
 
 
+def test_canais_pac_e_tarifa_do_marketplace():
+    """Canal de venda (23/11/2026): PAC 2023, tabela 9349; Mercado Livre, Clássico."""
+    from app.mercado_pac import participacao_canais, tarifa_marketplace
+    pet = participacao_canais('pet')
+    assert abs(pet['loja'] + pet['internet'] - 1) < 1e-9
+    assert round(37_159_347 / (37_159_347 + 8_942_249), 6) == round(pet['loja'], 6)
+    assert participacao_canais('colchoes') == participacao_canais('moveis')
+    assert tarifa_marketplace('pet-guia') == .125
+    assert tarifa_marketplace('pet-brinquedo') == .125
+    assert tarifa_marketplace('pet-peticos') == 0.0  # inexistente
+    from app.catalogo_fixo import catalogo
+    racao = next(i['id'] for i in catalogo('pet') if i['linha'] == 'Alimentação')
+    assert tarifa_marketplace(racao) == .14
+
+
+def test_catalogo_sem_fator_de_canal_na_atratividade():
+    from app.motor.portfolio import atrativos
+    base = {'produto_id': 'pet-guia', 'produto_nome': 'Guia', 'preco': 43, 'peso': 1, 'custo_unitario': 20,
+            'posicionamento': 'PRECO', 'preco_mercado': 43, 'midias': [], 'servicos': []}
+    loja = atrativos([{**base, 'canais': ['VAREJO']}], 100, 40)
+    internet = atrativos([{**base, 'canais': ['VAREJO', 'MARKETPLACE']}], 100, 40)
+    atacado = atrativos([{**base, 'canais': ['ATACADO']}], 100, 40)
+    assert loja == internet == atacado
+
+
+def _fechar_canal(cliente, professor, monkeypatch, email, nome, canais):
+    aluno, empresa, url, plano = _revenda_pet(cliente, professor, monkeypatch, email, nome, regime='SIMPLES_NACIONAL')
+    plano['canais'] = canais
+    for item in plano['produtos']:
+        item['canais'] = canais
+    d={'rodada':1,'preco':1,'marketing':1114,'plano_comercial':plano,'contratar':3,
+       'simulacao':{'comprar_insumos_por_produto':{'pet-brinquedo':3000,'pet-guia':3000},'compras_prazo':1,'pro_labore':2000,'orcamento_logistico':100000}}
+    base=f'/api/aluno/empresas/{empresa}'
+    assert cliente.put(base+'/decisao',headers=aluno,json=completar_decisao(d)).status_code==200
+    assert cliente.post(url+'/fechar-rodada',headers=professor,json={'rodada':1,'evento':'NENHUM'}).status_code==200
+    return cliente.get(base,headers=aluno).json()['resultados'][0]
+
+
+def test_loja_sem_internet_nao_disputa_a_parte_da_internet(cliente,professor,monkeypatch):
+    res = _fechar_canal(cliente, professor, monkeypatch, 'soloja@aluno.iffar.edu.br', 'Só loja', ['VAREJO'])
+    canais = res['detalhes_simulacao']['operacao']['canais_venda']
+    assert canais['vende_internet'] is False and canais['demanda_internet'] == 0
+    assert canais['fracao_internet'] == 0 and canais['tarifa_marketplace'] == 0
+    assert res['detalhes_simulacao']['dre']['comissao_canal'] == 0
+
+
+def test_loja_com_internet_paga_tarifa_do_marketplace(cliente,professor,monkeypatch):
+    res = _fechar_canal(cliente, professor, monkeypatch, 'online@aluno.iffar.edu.br', 'Online', ['VAREJO', 'MARKETPLACE'])
+    op = res['detalhes_simulacao']['operacao']
+    canais = op['canais_venda']
+    assert canais['vende_internet'] is True and canais['demanda_internet'] > 0
+    assert 0 < canais['fracao_internet'] < 1
+    for linha in op['produtos']:
+        assert linha['tarifa_marketplace'] == .125
+        assert abs(linha['comissao_canal'] - round(linha['receita'] * canais['fracao_internet'] * .125, 2)) <= .02
+    assert res['detalhes_simulacao']['dre']['comissao_canal'] == round(sum(l['comissao_canal'] for l in op['produtos']), 2)
+    assert any('Venda pela internet' in a for a in res['alertas'])
+
+
 def test_salario_abaixo_do_minimo_e_recusado():
     """Item 2 (22/11/2026): CF, art. 7º, IV; Decreto nº 12.797/2025 (R$ 1.621,00)."""
     from pydantic import ValidationError

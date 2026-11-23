@@ -349,8 +349,10 @@ def atrativos(itens, referencia, custo_referencia, marca=0, qualidade=0, segment
                               "beta": beta_propaganda(2, persistencia_propaganda())}
             estoque = (propaganda.get("estoques") or {}).get(p.get("produto_id"), 0.0)
             from .simulacao import ELASTICIDADE_PRECO_ESCOLHA
+            # Canal de venda (23/11/2026): sem fator de canal no catálogo; a
+            # internet entra pela divisão do mercado (avancado._mercado).
             valores.append(p['peso']*(float(p['preco_mercado'])/preco)**ELASTICIDADE_PRECO_ESCOLHA
-                           *canal*pos*fator_propaganda(estoque, propaganda)*segmento["fator"])
+                           *pos*fator_propaganda(estoque, propaganda)*segmento["fator"])
             continue
         # Nas linhas novas não há demanda orgânica. Se a equipe escolheu mídia
         # incompatível (ou não escolheu nenhum canal), a verba aparece como
@@ -511,7 +513,7 @@ def linha_catalogo(produto_id):
 
 
 def vender_com_ruptura(estado, itens, demanda, pesos, diagnosticos_publico=None,
-                       pendentes=None, transferidas=None, limite_extra=None):
+                       pendentes=None, transferidas=None, limite_extra=None, fracao_internet=0.0):
     """Venda do catálogo com pedidos pendentes, demanda vinda de outras lojas e
     resposta à falta. Prioridade no estoque: pendentes, clientes do mês e, por
     último, clientes vindos de outras lojas. Pendente não atendido de novo e
@@ -597,9 +599,15 @@ def vender_com_ruptura(estado, itens, demanda, pesos, diagnosticos_publico=None,
                     outra['receita'] = dinheiro(outra['receita'] + receita); outra['cmv'] = dinheiro(outra['cmv'] + cmv)
                     resposta["substituidas"] += qtd; sub -= qtd
             resposta["perdidas"] += sub
+    from ..mercado_pac import tarifa_marketplace
     for p, linha in zip(itens, linhas):
-        linha['comissao_canal'] = dinheiro(linha['receita'] * (.05 if 'ATACADO' in p['canais'] else .03 if any(
-            c in p['canais'] for c in ('ECOMMERCE', 'MARKETPLACE')) else 0))
+        # Canal de venda (23/11/2026): a tarifa do marketplace (Mercado Livre,
+        # Clássico, por categoria) incide sobre a parte da receita vinda da
+        # internet; a loja física não paga comissão.
+        tarifa = tarifa_marketplace(linha['produto_id'])
+        linha['tarifa_marketplace'] = tarifa
+        linha['receita_internet'] = dinheiro(linha['receita'] * fracao_internet)
+        linha['comissao_canal'] = dinheiro(linha['receita_internet'] * tarifa)
         linha['estoque_final'] = deepcopy(estoques[linha['produto_id']]['estoque_pa'])
     sincronizar(estado)
     return linhas, resposta

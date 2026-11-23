@@ -76,6 +76,14 @@ _REFERENCIAS = (
         "nota_edicao": "O relatório é atualizado periodicamente; use a edição indicada pelo professor.",
     },
     {
+        "id": "levy-grewal-2026-cap3-4",
+        "autor": "Michael Levy e Dhruv Grewal",
+        "obra": "Retailing Management, 2026 release (McGraw Hill)",
+        "ano": 2026,
+        "localizacao": "Capítulo 3 — Digital Retailing (p. 64-99) e capítulo 4 — Multichannel and Omnichannel Retailing (p. 102-121)",
+        "contribuicao": "Canal é o meio de vender e entregar; mídia é o meio de comunicar, p. 103; vantagens da loja física e da internet, p. 104-113; quem vende em plataforma de terceiros paga parte da receita à plataforma, p. 84. O livro não dá um número para o efeito do canal nas vendas.",
+    },
+    {
         "id": "levy-grewal-2026",
         "autor": "Michael Levy e Dhruv Grewal",
         "obra": "Retailing Management, 2026 release (McGraw Hill)",
