@@ -7,7 +7,7 @@ import type { ModoJogo } from "../tiposSimulacao";
 type BoletimItem = { titulo: string; resumo: string; competencia?: string | null; referencia: string; setores_afetados?: string[] };
 type Boletim = { itens: BoletimItem[]; consultado_em: string | null; setor_sem_item_especifico?: boolean };
 type Semaforo = "verde" | "amarelo" | "vermelho" | "neutro";
-type Metrica = { nome: string; ajuda: string; valor: number | null; anterior: number | null; formato: "moeda" | "percentual" | "numero" | "pontos" | "escala" | "semanas" };
+type Metrica = { nome: string; ajuda: string; valor: number | null; anterior: number | null; formato: "moeda" | "percentual" | "numero" | "pontos" | "escala" | "semanas" | "meses" };
 
 const cor: Record<Semaforo, string> = {
   verde: "border-emerald-200 bg-emerald-50",
@@ -22,6 +22,10 @@ function numero(resultado: Resultado | undefined, chave: string): number | null 
   const valor = resultado?.detalhes_simulacao?.operacao?.[chave];
   return typeof valor === "number" && Number.isFinite(valor) ? valor : null;
 }
+function campo(resultado: Resultado | undefined, objeto: string, chave: string): number | null {
+  const valor = (resultado?.detalhes_simulacao?.operacao?.[objeto] as Record<string, unknown> | undefined)?.[chave];
+  return typeof valor === "number" && Number.isFinite(valor) ? valor : null;
+}
 function dividir(a: number | null | undefined, b: number | null | undefined, fator = 1): number | null {
   return a != null && b != null && b > 0 ? (a / b) * fator : null;
 }
@@ -31,6 +35,7 @@ function unidade(valor: number | null, formato: Metrica["formato"]) {
   if (formato === "percentual") return percentual(valor, 1);
   if (formato === "pontos") return `${valor.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} pontos`;
   if (formato === "escala") return `${valor.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
+  if (formato === "meses") return `${valor.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} meses`;
   if (formato === "semanas") return `${valor.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} sem.`;
   return valor.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
 }
@@ -147,8 +152,46 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
     const margemBruta = (r?: Resultado) => r ? dividir(r.dre.receita - r.dre.cmv, r.dre.receita) : null;
     const giroAnual = (r?: Resultado) => r ? dividir(r.dre.cmv, numero(r, "estoque_medio"), periodosAno) : null;
     const gmroiAnual = (r?: Resultado) => r ? dividir(r.dre.receita - r.dre.cmv, numero(r, "estoque_medio"), periodosAno) : null;
+    // Revenda (aprovado em 23/11/2026): disponibilidade do produto = parte da
+    // demanda atendida (Levy; Grewal, 2026, p. 338-339); vendas por pessoa com o
+    // dono contado pelo tempo dedicado (p. 455); venda pela internet.
+    const disponibilidade = (r?: Resultado) => { const d = numero(r, "demanda"), f = numero(r, "ruptura"); return d != null && d > 0 && f != null ? 1 - f / d : null; };
+    const vendasPorPessoa = (r?: Resultado) => r ? dividir(r.dre.receita, campo(r, "atendimento_equipe", "pessoas")) : null;
+    const parteInternet = (r?: Resultado) => r ? dividir(campo(r, "canais_venda", "receita_internet"), r.dre.receita) : null;
+    const tarifaMarketplace = (r?: Resultado) => campo(r, "canais_venda", "tarifa_marketplace");
     const investimentoPd = dividir(atual.dre.pd, atual.dre.receita);
     const investimentoPdAnterior = dividir(anterior?.dre.pd, anterior?.dre.receita);
+    const cartoesRevenda = [
+      { titulo: "Produtos e marketing", estado: "neutro" as Semaforo, metricas: [
+        metrica("Participação de mercado", "Parte das vendas em reais do mercado simulado que ficou com a loja.", atual.participacao_mercado, anterior?.participacao_mercado ?? null, "percentual"),
+        metrica("Receita pela internet", "Parte da receita do mês vinda das vendas no marketplace. Só existe se a loja vende também pela internet.", parteInternet(atual), parteInternet(anterior), "percentual"),
+        metrica("Tarifa do marketplace", "Valor pago ao Mercado Livre no mês sobre as vendas pela internet (anúncio Clássico da categoria).", tarifaMarketplace(atual), tarifaMarketplace(anterior), "moeda"),
+      ]},
+      { titulo: "Recursos humanos", estado: "neutro" as Semaforo, metricas: [
+        metrica("Vendas por pessoa", `Vendas do mês ÷ pessoas que atendem (empregados + o dono pelo tempo dedicado), como em Levy e Grewal (2026, p. 455). Referência da PAC para a loja pequena do setor: ${unidade(campo(atual, "atendimento_equipe", "receita_por_pessoa"), "moeda")} por pessoa no mês (sem faixa de bom ou ruim).`, vendasPorPessoa(atual), vendasPorPessoa(anterior), "moeda"),
+        metrica("Moral da equipe", "Índice de clima calculado pelas decisões de remuneração, benefícios, treinamento e sobrecarga. Escala de 0 a 100.", moral, moralAnterior, "escala"),
+        metrica("Horas extras", "Horas extras planejadas por colaborador. Excesso aumenta sobrecarga e custos.", numero(atual, "horas_extras"), numero(anterior, "horas_extras"), "numero"),
+        metrica("Custo de treinamento", "Gasto do mês em capacitação. Deve ser interpretado junto com qualificação e produtividade.", atual.dre.treinamento ?? null, anterior?.dre.treinamento ?? null, "moeda"),
+      ]},
+      { titulo: "Finanças", estado: "neutro" as Semaforo, metricas: [
+        metrica("Margem líquida", "Lucro ou prejuízo final como proporção da receita do mês.", margem, margemAnterior, "percentual"),
+        metrica("Liquidez corrente", "Ativos de curto prazo divididos por obrigações de curto prazo. Quedas reduzem a folga de pagamento.", liquidez, liquidezAnterior, "numero"),
+        metrica("EBITDA operacional", "Resultado antes de juros, impostos, depreciação e amortização, quando o motor possui todos os dados.", numero(atual, "ebitda"), numero(anterior, "ebitda"), "moeda"),
+      ]},
+      { titulo: "Compras e estoque", estado: "neutro" as Semaforo, metricas: [
+        metrica("Disponibilidade do produto", "Parte da demanda do mês atendida com estoque (Levy; Grewal, 2026, p. 338-339). Aumentar a disponibilidade perto de 100% exige estoque de segurança cada vez maior.", disponibilidade(atual), disponibilidade(anterior), "percentual"),
+        metrica("Margem bruta", "(Vendas − CMV) ÷ vendas. Depende do preço praticado e do custo de compra da mercadoria.", margemBruta(atual), margemBruta(anterior), "percentual"),
+        metrica("Giro do estoque (ao ano)", "CMV ÷ estoque médio a custo, convertido para o ano. Giro maior significa menos dinheiro parado em mercadoria; giro alto demais aumenta o risco de faltar produto.", giroAnual(atual), giroAnual(anterior), "numero"),
+        metrica("GMROI (ao ano)", "Margem bruta em reais ÷ estoque médio a custo, convertido para o ano: quanto cada real investido em estoque devolve em margem. Leia junto com as vendas e a margem; sozinho, não mostra o tamanho do resultado.", gmroiAnual(atual), gmroiAnual(anterior), "percentual"),
+      ]},
+      { titulo: "Logística e entregas", estado: "neutro" as Semaforo, metricas: [
+        metrica("Nível de serviço (OTIF)", "Pedidos entregues no prazo e completos.", numero(atual, "otif"), numero(anterior, "otif"), "percentual"),
+        metrica("Custo logístico / receita", "Frete e armazenagem registrados como parcela da receita do mês.", custoLogistico, custoLogisticoAnterior, "percentual"),
+        metrica("Frete e armazenagem", "Custo logístico registrado na DRE. Altas pressionam preço e margem.", (atual.dre.frete ?? 0) + (atual.dre.armazenagem ?? 0), (anterior?.dre.frete ?? 0) + (anterior?.dre.armazenagem ?? 0), "moeda"),
+      ]},
+    ];
+    // Revenda: semáforos sem faixa com fonte ficam sem cor (regra do Cockpit).
+    if (revenda) return cartoesRevenda;
     const cartoes = [
       { titulo: "Produtos e marketing", estado: atual.participacao_mercado > 0 ? "verde" as Semaforo : "amarelo" as Semaforo, metricas: [
         metrica("Participação de mercado", "Parcela das vendas da empresa no mercado simulado. Uma queda reduz poder competitivo.", atual.participacao_mercado, anterior?.participacao_mercado ?? null, "percentual"),
@@ -216,7 +259,7 @@ export default function CockpitDecisao({ empresaId, empresa, turma, resultados, 
     {turma.calendario?.proximo_mes && <SazonalidadeProximoMes calendario={turma.calendario} />}
     {!atual ? <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-sm">O cockpit será preenchido após o fechamento da primeira rodada. Enquanto isso, consulte o mercado e prepare as decisões.</div> : <>
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Termômetro macro e caixa">
-        <div className="rounded-xl border border-blue-200 bg-blue-50 p-3"><p className="text-xs text-slate-600">Caixa disponível</p><p className="mt-1 text-xl font-bold text-corporativo">{reais(empresa.caixa)}</p><p className="text-xs text-slate-500">{unidade(Math.max(0, empresa.caixa) / Math.max(1, atual.dre.custos_fixos + atual.dre.folha), "semanas")} de custos fixos e folha</p></div>
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-3"><p className="text-xs text-slate-600">Caixa disponível</p><p className="mt-1 text-xl font-bold text-corporativo">{reais(empresa.caixa)}</p><p className="text-xs text-slate-500">{unidade(Math.max(0, empresa.caixa) / Math.max(1, atual.dre.custos_fixos + atual.dre.folha), revenda ? "meses" : "semanas")} de custos fixos e folha</p></div>
         <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-xs text-slate-600">Resultado líquido · último período</p><p className={`mt-1 text-xl font-bold ${atual.dre.lucro_liquido < 0 ? "valor-negativo" : "text-emerald-700"}`}>{reais(atual.dre.lucro_liquido)}</p><p className="text-xs text-slate-500">{delta(atual.dre.lucro_liquido, anterior?.dre.lucro_liquido ?? null, "moeda")}</p></div>
         <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-xs text-slate-600">Selic · fonte oficial</p><p className="mt-1 text-xl font-bold text-slate-800">{macroValor(selic)}</p><p className="truncate text-xs text-slate-500" title={selic?.referencia}>{selic?.competencia ?? selic?.referencia ?? "N/D"}</p></div>
         <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-xs text-slate-600">IPCA / setor · fonte oficial</p><p className="mt-1 text-xl font-bold text-slate-800">{macroValor(ipca ?? setorItem)}</p><p className="truncate text-xs text-slate-500" title={(ipca ?? setorItem)?.titulo}>{(ipca ?? setorItem)?.competencia ?? (ipca ?? setorItem)?.titulo ?? "N/D"}</p></div>
